@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.daemonize.daemondevapp.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+
+
+    <!--<TextView
+        android:id="@+id/response"
+        android:layout_width="189dp"
+        android:layout_height="192dp"
+        android:layout_marginTop="12dp"
+        android:text="WASTED COUNTER: "
+        tools:layout_editor_absoluteX="0dp" />-->
+
+<!--    <ScrollView
+        android:id="@+id/SCROLLER_ID"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@+id/response"
+        android:scrollbars="vertical">
+
+        <TextView
+            android:id="@+id/mainquest"
+            android:layout_width="376dp"
+            android:layout_height="wrap_content"
+            android:text="search..."
+            tools:layout_editor_absoluteX="4dp" />
+
+
+    </ScrollView>
+-->
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round" />
+
+    <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round" />
+
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <ImageView
+        android:id="@+id/imageView12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <ImageView
+        android:id="@+id/imageView13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <ImageView
+        android:id="@+id/imageView14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <ImageView
+        android:id="@+id/imageView15"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <ImageView
+        android:id="@+id/imageView16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <ImageView
+        android:id="@+id/imageView17"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <ImageView
+        android:id="@+id/imageView18"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <ImageView
+        android:id="@+id/imageView19"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <ImageView
+        android:id="@+id/imageView20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView21"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView22"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView23"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView25"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView26"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView27"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView28"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView29"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView31"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView32"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView33"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView34"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView35"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView36"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView37"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView38"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView39"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageView40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+
+    <ImageView
+        android:id="@+id/imageViewMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@mipmap/ic_launcher_round"
+        app:layout_constraintBottom_toTopOf="@+id/SCROLLER_ID"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/response"
+        app:layout_constraintTop_toBottomOf="@+id/url" />
+    <!--android:layout_below="@id/response"-->
+</android.support.constraint.ConstraintLayout>
