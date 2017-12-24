@@ -71,13 +71,13 @@ Daemonprocessor will generate the Daemon class in the same package:
 
       private MainQuestDaemonEngine daemonEngine = new MainQuestDaemonEngine().setName(this.getClass().getSimpleName());
 
-      //**************************************** CONSTRUCT **************************************************************/
+      //**************************************** CONSTRUCT ******************************************************/
 
       public ExampleDaemon(Example prototype) {
         this.prototype = prototype;
       }
 
-      //**************************************** PROTOTYPE METHODS MAPPED ***********************************************/
+      //**************************************** PROTOTYPE METHODS MAPPED ***************************************/
 
       public void add(Integer i, Integer k, Closure<Integer> closure) {
         daemonEngine.pursueQuest(new AddMainQuest(i, k, closure));
