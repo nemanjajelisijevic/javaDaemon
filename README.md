@@ -25,7 +25,6 @@ Lets clarify this with an example:
 
   @Daemonize
   public class Example {
-
       public Integer add (Integer i, Integer k) {
           return i + k;
       }
@@ -66,7 +65,6 @@ Lets clarify this with an example:
 Daemonprocessor will generate the Daemon class in the same package:
 
   public final class ExampleDaemon implements Daemon {
-    
     private Example prototype;
 
     private MainQuestDaemonEngine daemonEngine = new MainQuestDaemonEngine().setName(this.getClass().getSimpleName());
