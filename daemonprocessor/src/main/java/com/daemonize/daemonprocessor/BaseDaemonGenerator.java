@@ -60,6 +60,8 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
             "DaemonState"
     );
 
+    //protected
+
     private Set<String> overloadedPrototypeMethods = new TreeSet<>();
 
     public String getPackageName() {

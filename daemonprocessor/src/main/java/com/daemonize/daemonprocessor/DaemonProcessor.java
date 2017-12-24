@@ -46,6 +46,7 @@ public class DaemonProcessor extends AbstractProcessor {
         //TODO annotation-config: update on runtime errors
         //TODO toString, equals?, hashcode?, copy construct/clone
         //TODO omit accessors
+        //TODO daemon methods return daemon instance for chaining
         //TODO get prototype method                                                         CHECK!!!!
         //TODO annotation-config: Generate exceptions!
         //TODO annotation-config: configure for singleton

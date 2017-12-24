@@ -38,7 +38,6 @@ public class Example {
         return Pair.create(5, "12");
     }
 
-    @SideQuest(SLEEP = 300)
     public void voidIt(){}
 
     public void voidIt(int a) {}
