@@ -148,6 +148,27 @@ Daemonprocessor will generate the Daemon class in the same package:
 
     }
 
+So it can be used from the gui like this:
+
+        private WeakReference<TextView> view;
+
+        ...
+
+        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example());
+
+        exampleDaemon.add(48, 54, new Closure<Integer>() {
+            @Override
+            public void doTheGuiStuff() {
+                try {
+                    view.get().setText(getResult().toString());
+                } catch (DaemonException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+
 
 There are three implementations of a Daemon (daemonengine package):
 1. MainQuestDaemonEngine
