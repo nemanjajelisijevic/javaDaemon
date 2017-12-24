@@ -148,7 +148,7 @@ Daemonprocessor will generate the Daemon class in the same package:
 
     }
 
-So it can be used from the gui like this:
+So it can be used like this:
 
     private WeakReference<TextView> view;
 
@@ -166,9 +166,6 @@ So it can be used from the gui like this:
             }
         }
     });
-
-
-
 
 There are three implementations of a Daemon (daemonengine package):
 1. MainQuestDaemonEngine
