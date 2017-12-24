@@ -148,7 +148,7 @@ Daemonprocessor will generate the Daemon class in the same package:
 
     }
 
-So it can be used like this:
+So it can be used:
 
     private WeakReference<TextView> view;
 
