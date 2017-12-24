@@ -1,11 +1,7 @@
 package com.daemonize.daemonprocessor;
 
-import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeVariableName;
-import com.squareup.javapoet.WildcardTypeName;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -46,9 +42,9 @@ public class DaemonProcessor extends AbstractProcessor {
         //TODO annotation-config: update on runtime errors
         //TODO toString, equals?, hashcode?, copy construct/clone
         //TODO omit accessors
-        //TODO daemon methods return daemon instance for chaining
+        //TODO annotation-config:daemon methods return daemon instance for chaining         CHECK!!!!
         //TODO get prototype method                                                         CHECK!!!!
-        //TODO annotation-config: Generate exceptions!
+        //TODO Generate exceptions!
         //TODO annotation-config: configure for singleton
         //TODO type parameters                                                              CHECK!!!!
 

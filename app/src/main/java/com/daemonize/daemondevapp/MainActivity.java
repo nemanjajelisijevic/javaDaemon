@@ -3,19 +3,15 @@ package com.daemonize.daemondevapp;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -161,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -197,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (mode) {
                     case GRAVITY: {
+
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
@@ -209,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                             ImageMoverDaemon starMover = new ImageMoverDaemon(
                                     new ImageTranslationMover(
                                             sprite,
-                                            i / 15,
+                                            i / 14,
                                             Pair.create((float) borderX/2, (float) borderY/2)
                                     )
                             ).setBorders(borderX, borderY);
@@ -235,12 +231,14 @@ public class MainActivity extends AppCompatActivity {
                         break;
 
                     case CHASE: {
+
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
                         mainMover.stop();
                         starMovers.clear();
                         initViews(views);
+
                         int i = 5;
                         for(ImageView vie : views) {
                             ImageMoverDaemon starMover = new ImageMoverDaemon(
@@ -272,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
 
                     case COLLIDE:{
+
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
@@ -281,8 +280,13 @@ public class MainActivity extends AppCompatActivity {
 
                         int i = 5;
                         for(ImageView vieww : views) {
-                            ImageMoverDaemon starMover = new ImageMoverDaemon(new GravityImageMover(sprite, /*i/5*/30, Pair.create((float)borderX % i, (float) borderY % i)))
-                            .setBorders(borderX, borderY);
+                            ImageMoverDaemon starMover = new ImageMoverDaemon(
+                                    new GravityImageMover(
+                                            sprite,
+                                            /*i/5*/30,
+                                            Pair.create((float)borderX % i, (float) borderY % i)
+                                    )
+                            ).setBorders(borderX, borderY);
                             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vieww)));
                             starMover.start();
                             starMovers.add(starMover);
