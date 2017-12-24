@@ -23,128 +23,130 @@ the daemonengine lib, by parsing your prototype class.
 
 Lets clarify this with an example:
 
-  @Daemonize
-  public class Example {
-      public Integer add (Integer i, Integer k) {
-          return i + k;
-      }
+    @Daemonize
+    public class Example {
 
-      public void dummy(String dummyString, List<Float> floats) {
+        public Integer add (Integer i, Integer k) {
+            return i + k;
+        }
 
-      }
+        public void dummy(String dummyString, List<Float> floats) {
 
-      public static int subtract(int i, int k) {
-          return i - k;
-      }
+        }
 
-      private void shouldNotBeHere(){}
+        public static int subtract(int i, int k) {
+            return i - k;
+        }
 
-      protected Integer shouldNorBeHere() {
-          return  1;
-      }
+        private void shouldNotBeHere(){}
 
-      public List<String> complicated(String text) throws InterruptedException {
-          return new ArrayList<>();
-      }
+        protected Integer shouldNorBeHere() {
+            return  1;
+        }
 
-      public Pair<Integer, String> pairThem() {
-          return Pair.create(5, "12");
-      }
-      
-      public void voidIt(){}
-      
-      public void voidIt(int a) {}
-      
-      public void voidIt(boolean a) {}
-      
-      public boolean voidIt(boolean a, boolean b) {
-          return a & b;
-      }
-  }
+        public List<String> complicated(String text) throws InterruptedException {
+            return new ArrayList<>();
+        }
+
+        public Pair<Integer, String> pairThem() {
+            return Pair.create(5, "12");
+        }
+
+        public void voidIt(){}
+
+        public void voidIt(int a) {}
+
+        public void voidIt(boolean a) {}
+
+        public boolean voidIt(boolean a, boolean b) {
+            return a & b;
+        }
+    }
 
 Daemonprocessor will generate the Daemon class in the same package:
 
-  public final class ExampleDaemon implements Daemon {
-    private Example prototype;
+    public final class ExampleDaemon implements Daemon {
 
-    private MainQuestDaemonEngine daemonEngine = new MainQuestDaemonEngine().setName(this.getClass().getSimpleName());
+      private Example prototype;
 
-    //**************************************** CONSTRUCT **************************************************************/
+      private MainQuestDaemonEngine daemonEngine = new MainQuestDaemonEngine().setName(this.getClass().getSimpleName());
 
-    public ExampleDaemon(Example prototype) {
-      this.prototype = prototype;
+      //**************************************** CONSTRUCT **************************************************************/
+
+      public ExampleDaemon(Example prototype) {
+        this.prototype = prototype;
+      }
+
+      //**************************************** PROTOTYPE METHODS MAPPED ***********************************************/
+
+      public void add(Integer i, Integer k, Closure<Integer> closure) {
+        daemonEngine.pursueQuest(new AddMainQuest(i, k, closure));
+      }
+
+      public void dummy(String dummystring, List<Float> floats) {
+        daemonEngine.pursueQuest(new DummyMainQuest(dummystring, floats));
+      }
+
+      public void subtract(int i, int k, Closure<Integer> closure) {
+        daemonEngine.pursueQuest(new SubtractMainQuest(i, k, closure));
+      }
+
+      public void complicated(String text, Closure<List<String>> closure) {
+        daemonEngine.pursueQuest(new ComplicatedMainQuest(text, closure));
+      }
+
+      public void pairThem(Closure<Pair<Integer, String>> closure) {
+        daemonEngine.pursueQuest(new PairThemMainQuest(closure));
+      }
+
+      public void voidIt() {
+        daemonEngine.pursueQuest(new VoidItMainQuest());
+      }
+
+      public void voidIt(int a) {
+        daemonEngine.pursueQuest(new VoidItIMainQuest(a));
+      }
+
+      public void voidIt(boolean a) {
+        daemonEngine.pursueQuest(new VoidItIIMainQuest(a));
+      }
+
+      public void voidIt(boolean a, boolean b, Closure<Boolean> closure) {
+        daemonEngine.pursueQuest(new VoidItIIIMainQuest(a, b, closure));
+      }
+
+      //*********************************** DAEMON INTERFACE METHODS ********************************************/
+
+      public Example getPrototype() {
+        return prototype;
+      }
+
+      @Override
+      public void start() {
+        daemonEngine.start();
+      }
+
+      @Override
+      public void stop() {
+        daemonEngine.stop();
+      }
+
+      @Override
+      public DaemonState getState() {
+        return daemonEngine.getState();
+      }
+
+      @Override
+      public ExampleDaemon setName(String name) {
+        daemonEngine.setName(name);
+        return this;
+      }
+
+      //********************************************************************************************************/
+
+      //...some inner classes needed for method mapping...
+
     }
-
-    //**************************************** PROTOTYPE METHODS MAPPED ***********************************************/
-    
-    public void add(Integer i, Integer k, Closure<Integer> closure) {
-      daemonEngine.pursueQuest(new AddMainQuest(i, k, closure));
-    }
-
-    public void dummy(String dummystring, List<Float> floats) {
-      daemonEngine.pursueQuest(new DummyMainQuest(dummystring, floats));
-    }
-
-    public void subtract(int i, int k, Closure<Integer> closure) {
-      daemonEngine.pursueQuest(new SubtractMainQuest(i, k, closure));
-    }
-
-    public void complicated(String text, Closure<List<String>> closure) {
-      daemonEngine.pursueQuest(new ComplicatedMainQuest(text, closure));
-    }
-
-    public void pairThem(Closure<Pair<Integer, String>> closure) {
-      daemonEngine.pursueQuest(new PairThemMainQuest(closure));
-    }
-
-    public void voidIt() {
-      daemonEngine.pursueQuest(new VoidItMainQuest());
-    }
-
-    public void voidIt(int a) {
-      daemonEngine.pursueQuest(new VoidItIMainQuest(a));
-    }
-
-    public void voidIt(boolean a) {
-      daemonEngine.pursueQuest(new VoidItIIMainQuest(a));
-    }
-
-    public void voidIt(boolean a, boolean b, Closure<Boolean> closure) {
-      daemonEngine.pursueQuest(new VoidItIIIMainQuest(a, b, closure));
-    }
-
-    //*********************************** DAEMON INTERFACE METHODS ********************************************/
-
-    public Example getPrototype() {
-      return prototype;
-    }
-
-    @Override
-    public void start() {
-      daemonEngine.start();
-    }
-
-    @Override
-    public void stop() {
-      daemonEngine.stop();
-    }
-
-    @Override
-    public DaemonState getState() {
-      return daemonEngine.getState();
-    }
-
-    @Override
-    public ExampleDaemon setName(String name) {
-      daemonEngine.setName(name);
-      return this;
-    }
-
-    //********************************************************************************************************/
-
-    //...some inner classes needed for method mapping...
-    
-  }
 
 
 There are three implementations of a Daemon (daemonengine package):
