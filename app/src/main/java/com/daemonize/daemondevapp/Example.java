@@ -9,7 +9,7 @@ import com.daemonize.daemonprocessor.SideQuest;
 import java.util.ArrayList;
 import java.util.List;
 
-@Daemonize(eager = true)
+@Daemonize(eager = true, returnDaemonInstance = true)
 public class Example {
 
     public Integer add (Integer i, Integer k) {

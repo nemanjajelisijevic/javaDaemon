@@ -26,10 +26,9 @@ import javax.lang.model.type.TypeVariable;
 
 public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
 
-
     private Set<String> overloadedPrototypeMethods = new TreeSet<>();
-
     private String currentMainQuestName = "";
+    private boolean returnInstance;
 
     {
         QUEST_TYPE_NAME = "MainQuest";
@@ -37,16 +36,20 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         daemonEngineSimpleName = "MainQuestDaemonEngine";
     }
 
-
     public MainQuestDaemonGenerator(TypeElement classElement) {
-        this(classElement, classElement.getAnnotation(Daemonize.class).eager());
+        this(
+                classElement,
+                classElement.getAnnotation(Daemonize.class).eager(),
+                classElement.getAnnotation(Daemonize.class).returnDaemonInstance()
+        );
     }
 
-    public MainQuestDaemonGenerator(TypeElement classElement, boolean eager) {
+    public MainQuestDaemonGenerator(TypeElement classElement, boolean eager, boolean returnInstance) {
         super(classElement);
         if(eager) {
             daemonEngineSimpleName = "IdleMainQuestDaemonEngine";
         }
+        this.returnInstance = returnInstance;
     }
 
     public TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods) {
@@ -187,8 +190,9 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
 
+
+
         MethodSpec.Builder apiMethodBuilder = MethodSpec.methodBuilder(prototypeMethodData.getMethodName())
-                .returns(void.class)
                 .addModifiers(Modifier.PUBLIC);
 
         apiMethodBuilder = addTypeParameters(prototypeMethod, apiMethodBuilder);
@@ -214,6 +218,12 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             );
         }
 
+        if (returnInstance) {
+            apiMethodBuilder.addStatement("return this");
+            apiMethodBuilder.returns(ClassName.get(packageName, daemonSimpleName));
+        } else {
+            apiMethodBuilder.returns(void.class);
+        }
 
         return apiMethodBuilder.build();
     }

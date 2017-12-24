@@ -6,11 +6,10 @@ import android.util.Pair;
 import com.daemonize.daemonprocessor.Daemonize;
 import com.daemonize.daemonprocessor.SideQuest;
 
-@Daemonize
+@Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
 
     class PositionedBitmap {
-        public boolean wasted = false;
         public Bitmap image;
         public float positionX;
         public float positionY;
@@ -22,15 +21,6 @@ public interface ImageMover {
         public float coeficientY;
 
         public Direction(float coeficientX, float coeficientY) {
-
-//            if ((coeficientX > 100 || coeficientX < -100) || (coeficientY > 100 || coeficientX < -100)) {
-//                throw new IllegalArgumentException("coeficient invalid: X - " + String.valueOf(coeficientX) +  ", Y - " + String.valueOf(coeficientY));
-//            }
-//
-//            if((Math.abs(coeficientX + coeficientY)) > 100) {
-//                throw new IllegalArgumentException("Math.abs(coeficientX) + Math.abs(coeficientY) should be <= 100. X:" + String.valueOf(coeficientX) +  ", Y:" + String.valueOf(coeficientY));
-//            }
-
             this.coeficientX = coeficientX;
             this.coeficientY = coeficientY;
         }

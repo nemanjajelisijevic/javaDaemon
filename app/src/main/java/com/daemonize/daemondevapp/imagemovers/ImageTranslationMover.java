@@ -102,11 +102,6 @@ public class ImageTranslationMover implements ImageMover {
     public PositionedBitmap move() {
 
         PositionedBitmap ret = new PositionedBitmap();
-
-        if (wasted) {
-            ret.wasted = true;
-        }
-
         ret.image = iterateSprite();
 
         //check borders and recalculate

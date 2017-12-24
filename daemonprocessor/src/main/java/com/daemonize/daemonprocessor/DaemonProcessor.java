@@ -71,11 +71,8 @@ public class DaemonProcessor extends AbstractProcessor {
                                 + classElement.getSimpleName()
                                 + " - @Daemonize can only be applied to a class or interface."
                 );
-
                 return true;
-
             } else {
-
                 messager.printMessage(
                         Diagnostic.Kind.NOTE,
                         "Annotated type found: " + classElement.asType().toString()
