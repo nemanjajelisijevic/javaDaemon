@@ -7,7 +7,7 @@ It encapsulates the prototype instance and a thread that executes all the protot
 allowing the main thread to loop and be responsive.
 
 It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with same signature,
-except the return type is mapped to an output argument (Closure<ReturnType>) which is instanced upon the Daemon methods call,
+except the return type is mapped to an output argument (Closure <ReturnType>) which is instantiated upon the Daemon methods call,
 and handed to the main looper for execution once the method returns.
 
 That being said, a Daemon can be called anywhere, but it only returns a Closure to MAIN thread.
