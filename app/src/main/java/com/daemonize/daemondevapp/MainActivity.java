@@ -193,11 +193,14 @@ public class MainActivity extends AppCompatActivity {
                 switch (mode) {
                     case GRAVITY: {
 
+                        mainMover.stop();
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
-                        mainMover.stop();
+
                         starMovers.clear();
+                        starMovers = new ArrayList<>(40);
+                        views = new ArrayList<>(40);
                         initViews(views);
 
                         int i = 5;
@@ -232,11 +235,14 @@ public class MainActivity extends AppCompatActivity {
 
                     case CHASE: {
 
+                        mainMover.stop();
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
-                        mainMover.stop();
+
                         starMovers.clear();
+                        starMovers = new ArrayList<>(40);
+                        views = new ArrayList<>(40);
                         initViews(views);
 
                         int i = 5;
@@ -271,11 +277,14 @@ public class MainActivity extends AppCompatActivity {
 
                     case COLLIDE:{
 
+                        mainMover.stop();
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
                         starMovers.clear();
-                        mainMover.stop();
+                        starMovers = new ArrayList<>(40);
+                        views = new ArrayList<>(40);
+
                         initViews(views);
 
                         int i = 5;
@@ -315,8 +324,8 @@ public class MainActivity extends AppCompatActivity {
 
         mode = Mode.GRAVITY;
         mainView = findViewById(R.id.imageViewMain);
-        views = new ArrayList<>();
-        starMovers = new ArrayList<>();
+        views = new ArrayList<>(40);
+        starMovers = new ArrayList<>(40);
         initViews(views);
 
         try {
@@ -368,12 +377,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
         mainMover.stop();
         for(ImageMoverDaemon mover : starMovers) {
             mover.stop();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
