@@ -3,6 +3,9 @@ package com.daemonize.daemondevapp.imagemovers;;
 import android.graphics.Bitmap;
 import android.util.Pair;
 
+import com.daemonize.daemondevapp.imagemovers.borders.Border;
+
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -90,6 +93,13 @@ public class ImageTranslationMover implements ImageMover {
         this.borderY = y;
     }
 
+//    List<Border> borders = new ArrayList<>();
+//
+//    @Override
+//    public void addBorders(Border border) {
+//        borders.add(border);
+//    }
+
     @Override
     public void setVelocity(float velocity) {
         this.velocity = velocity;
@@ -103,6 +113,32 @@ public class ImageTranslationMover implements ImageMover {
 
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
+
+//        for (Border border : borders) {
+//            Pair<Pair<Boolean, Boolean>, Pair<Boolean, Boolean>> borderHits = border.checkBorder(lastX, lastY);
+//
+//            if (borderHits.first.first) {
+//                currentDirX = - currentDirX;
+//                lastX = border.getMinX();
+//                break;
+//            } else if (borderHits.first.second) {
+//                currentDirX = - currentDirX;
+//                lastX = border.getMaxX();
+//                break;
+//            }
+//
+//            if (borderHits.second.first) {
+//                currentDirY = - currentDirY;
+//                lastY = border.getMinY();
+//                break;
+//            } else if (borderHits.second.second) {
+//                currentDirY = - currentDirY;
+//                lastY = border.getMaxY();
+//                break;
+//            }
+//
+//        }
+
 
         //check borders and recalculate
         if (lastX <= 0) {

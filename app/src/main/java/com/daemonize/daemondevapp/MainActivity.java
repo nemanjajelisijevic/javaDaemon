@@ -21,6 +21,9 @@ import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
+import com.daemonize.daemondevapp.imagemovers.borders.Border;
+import com.daemonize.daemondevapp.imagemovers.borders.MapBorder;
+import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.exceptions.DaemonException;
 
@@ -166,6 +169,15 @@ public class MainActivity extends AppCompatActivity {
         borderX = getResources().getDisplayMetrics().widthPixels - 100;
         borderY = getResources().getDisplayMetrics().heightPixels - 200;
 
+        final Border mapBorder = new MapBorder(0, borderX, 0, borderY);
+        final Border centerBorderSquare = new OuterRectangleBorder(
+                borderX/2 -20,
+                borderX/2 + 20,
+                borderY/2 - 20,
+                borderY/2 +20
+        );
+
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -194,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
                     case GRAVITY: {
 
                         mainMover.stop();
+                        mainMover = null;
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
@@ -212,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
                                             Pair.create((float) borderX/2, (float) borderY/2)
                                     )
                             ).setBorders(borderX, borderY);
+                            //.addBorders(mapBorder).addBorders(centerBorderSquare);//
                             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, v)));
                             starMover.start();
                             starMovers.add(starMover);
@@ -225,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                                 starMovers,
                                 MainImageTranslationMover.Mode.CHASE)
                         ).setBorders(borderX, borderY);
+                                //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
                         mainMover.start();
 
@@ -236,6 +251,7 @@ public class MainActivity extends AppCompatActivity {
                     case CHASE: {
 
                         mainMover.stop();
+                        mainMover = null;
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
@@ -254,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
                                             Pair.create((float)borderX % i, (float) borderY % i)
                                     )
                             ).setBorders(borderX, borderY);
+                            //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vie)));
                             starMover.start();
                             starMovers.add(starMover);
@@ -267,6 +284,7 @@ public class MainActivity extends AppCompatActivity {
                                 starMovers,
                                 MainImageTranslationMover.Mode.COLLIDE)
                         ).setBorders(borderX, borderY);
+                        //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
                         mainMover.start();
 
@@ -278,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
                     case COLLIDE:{
 
                         mainMover.stop();
+                        mainMover = null;
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
@@ -296,6 +315,7 @@ public class MainActivity extends AppCompatActivity {
                                             Pair.create((float)borderX % i, (float) borderY % i)
                                     )
                             ).setBorders(borderX, borderY);
+                            //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vieww)));
                             starMover.start();
                             starMovers.add(starMover);
@@ -309,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
                                 starMovers,
                                 MainImageTranslationMover.Mode.NONE)
                         ).setBorders(borderX, borderY);
+                        //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
                         mainMover.start();
                     }
@@ -357,6 +378,7 @@ public class MainActivity extends AppCompatActivity {
                             Pair.create((float)borderX % i, (float) borderY % i)
                     )
             ).setBorders(borderX, borderY);
+            //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, view)));
             starMover.start();
             starMovers.add(starMover);
@@ -370,6 +392,7 @@ public class MainActivity extends AppCompatActivity {
                 starMovers,
                 MainImageTranslationMover.Mode.NONE)
         ).setBorders(borderX, borderY);
+        //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
         mainMover.start();
 
@@ -411,7 +434,4 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
-
-
 }

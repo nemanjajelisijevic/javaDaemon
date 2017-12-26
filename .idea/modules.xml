@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/androidDaemon.iml" filepath="$PROJECT_DIR$/.idea/androidDaemon.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemondev.iml" filepath="$PROJECT_DIR$/daemondev.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonengine/daemonengine.iml" filepath="$PROJECT_DIR$/daemonengine/daemonengine.iml" />

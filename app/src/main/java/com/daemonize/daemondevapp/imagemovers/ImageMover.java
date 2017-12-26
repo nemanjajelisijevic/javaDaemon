@@ -3,6 +3,7 @@ package com.daemonize.daemondevapp.imagemovers;
 import android.graphics.Bitmap;
 import android.util.Pair;
 
+import com.daemonize.daemondevapp.imagemovers.borders.Border;
 import com.daemonize.daemonprocessor.Daemonize;
 import com.daemonize.daemonprocessor.SideQuest;
 
@@ -35,6 +36,7 @@ public interface ImageMover {
     void setVelocity(float velocity);
 
     void setBorders(float x, float y);
+    //void addBorders(Border border);
 
     void pause();
 

@@ -1,5 +1,5 @@
 package com.daemonize.daemonprocessor;
 
 public @interface SideQuest {
-    int SLEEP() default 0;
+    int SLEEP() default 10;
 }

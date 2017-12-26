@@ -39,7 +39,7 @@ public abstract class SideQuest<T> extends Quest<T> {
       }
       Thread.sleep(sleepInterval);
     } catch (InterruptedException ex) {
-      Log.w(Thread.currentThread().getName(),description + " interrupted.");
+      //Log.w(Thread.currentThread().getName(),description + " interrupted.");
     } catch (Exception ex) {
       if (!getIsVoid()) {
         setErrorAndUpdate(ex);
