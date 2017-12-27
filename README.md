@@ -173,7 +173,8 @@ So it can be used:
         }
     });
     
-    //main thread continues looping and executes the closure after 10 sec
+    //the add call is enqueued to Daemons call queue and returns immediatelty. Closure holding the result is
+    //handed over to the main loopers queue once the prototype add method returns (in this case after 10 sec)
 
 There are three implementations of a Daemon (daemonengine package):
 1. MainQuestDaemonEngine
