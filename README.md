@@ -11,7 +11,8 @@ differing in one thing, the return value is mapped to an output type argument
    
     Closure<ReturnType> 
     
-which is instantiated upon the Daemon methods call, and handed to the main looper for execution once the method returns.
+which is instantiated upon the Daemon methods call, and handed to the main looper for execution once the prototype
+method returns.
     
 Closure exposes an abstract method doTheGuiStuff() for implementation, and getResult() for extracting the return value.
 
