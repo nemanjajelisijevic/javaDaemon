@@ -3,8 +3,8 @@ async library for android
 
 
 Generates a wrapper (Daemon) class which is an async representation of annotated prototype class. Or interface.
-It encapsulates the prototype instance and a thread that executes all the prototype method bodies,
-allowing the main thread to loop and be responsive, executing the methods in the background.
+It encapsulates the prototype instance and a thread that executes all the prototype method bodies in the background,
+allowing the main thread to loop and be responsive.
 
 It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with similar signature,
 differing in one thing, the return value is mapped to an output type argument
