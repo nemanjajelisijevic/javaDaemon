@@ -8,12 +8,9 @@ import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseDaemonEngine implements Daemon {
-
-  public static String tag() {
-    return Thread.currentThread().getName() + ", Thread ID: " + Thread.currentThread().getId();
-  }
 
   protected String name = this.getClass().getSimpleName();
 
@@ -47,7 +44,7 @@ public abstract class BaseDaemonEngine implements Daemon {
 
   private void loop(){
 
-    Log.i(tag(),"Daemon started!");
+    Log.i(DaemonUtils.tag(),"Daemon started!");
     Quest currentQuest;
 
     while (!state.equals(DaemonState.STOPPED)) {
@@ -55,13 +52,13 @@ public abstract class BaseDaemonEngine implements Daemon {
       currentQuest = getQuest();
 
       if (currentQuest == null) {
-        Log.w(tag(), "No quest set. Terminating daemon...");
+        Log.w(DaemonUtils.tag(), "No quest set. Terminating daemon...");
         break;
       }
 
       if (!currentQuest.getIsVoid() && currentQuest.getClosure() == null) {
         Log.e(
-                tag(),
+                DaemonUtils.tag(),
             " No closure set for current quest: "
                 + currentQuest.getDescription() + " (" + currentQuest.getState()
                 + ") . Terminating daemon..."
@@ -70,7 +67,7 @@ public abstract class BaseDaemonEngine implements Daemon {
       }
 
 //      Log.d(//TODO debug only
-//              tag(),
+//              DaemonUtils.tag(),
 //          "Pursuing quest: " + currentQuest.getDescription()
 //              + " (" + currentQuest.getState() + ")"
 //      );
@@ -82,14 +79,14 @@ public abstract class BaseDaemonEngine implements Daemon {
     }
 
     setState(DaemonState.STOPPED);
-    Log.i(tag(), "Daemon stopped!");
+    Log.i(DaemonUtils.tag(), "Daemon stopped!");
   }
 
   @Override
   public void start() {
     DaemonState initState = getState();
     if (!(initState.equals(DaemonState.STOPPED))) {
-      Log.w(tag(), name + "already running. State: " + getState());
+      Log.w(DaemonUtils.tag(), name + "already running. State: " + getState());
     } else {
       daemonThread = new Thread(new Runnable() {
         @Override
