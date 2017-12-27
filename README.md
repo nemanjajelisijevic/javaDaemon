@@ -7,8 +7,9 @@ It encapsulates the prototype instance and a thread that executes all the protot
 allowing the main thread to loop and be responsive, executing the methods in the background.
 
 It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with similar signature,
-differing in one thing, the return value is mapped to an output type argument (Closure<ReturnType>) which is instantiated 
-upon the Daemon methods call, and handed to the main looper for execution once the method returns.
+differing in one thing, the return value is mapped to an output type argument
+    Closure<ReturnType> 
+which is instantiated upon the Daemon methods call, and handed to the main looper for execution once the method returns.
     
 Closure exposes an abstract method doTheGuiStuff() for implementation, and getResult() for extracting the return value.
 
