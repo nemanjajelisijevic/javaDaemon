@@ -3,30 +3,40 @@ async library for android
 
 
 Generates a wrapper (Daemon) class which is an async representation of annotated prototype class. Or interface.
-It encapsulates the prototype instance and a thread that executes all the prototype method bodies,
+It encapsulates the prototype instance and a thread that executes all the prototype method bodies in the background,
 allowing the main thread to loop and be responsive.
 
-It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with same signature,
-except the return type is mapped to an output argument (Closure <ReturnType>) which is instantiated upon the Daemon methods call,
-and handed to the main looper for execution once the method returns.
+It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with similar signature,
+differing in one thing. The return value is mapped to an output type argument
+   
+    Closure<ReturnType> 
+    
+which is instantiated upon the Daemon methods call, and handed to the main looper for execution once the prototype
+method returns.
+    
+Closure exposes an abstract method doTheGuiStuff() for implementation, and getResult() for extracting the return value.
 
-That being said, a Daemon can be called anywhere, but it only returns a Closure to MAIN thread.
+That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the MAIN thread.
 For now :)
 
-Underneath, Daemon is a thread that constantly checks a queue for a called method (consumer), or if configured in service mode 
-(prototype method is annotated with @SideQuest) constantly executing the sidequest method.
+Underneath, Daemon is a thread that constantly checks a queue for a called method (consumer), or if configured in service 
+mode (prototype method is annotated with @SideQuest) constantly executing the sidequest method.
 
 To use the Daemon you need two jars: daemonengine.jar and daemonprocessor.jar.
-Daemonengine is an android os dependent library that holds the classes needed to run the daemon.
-Daemonprocessor is an annotation processor that generates (using Javapoet) the Daemon class (.java source file) with depndencies to
-the daemonengine lib, by parsing your prototype class.
 
-Lets clarify this with an example:
+Daemonengine is an android os dependent library that holds the classes needed to run the daemon.
+
+Daemonprocessor is an annotation processor that generates the Daemon class (.java source file using Javapoet and Java apt 
+api) with dependencies to the daemonengine lib, by parsing your prototype class.
+
+Some clarification with an example:
 
     @Daemonize
     public class Example {
 
-        public Integer add (Integer i, Integer k) {
+        public Integer add (Integer i, Integer k) throws InterruptedException {
+            //Do the slowest addition the world has ever seen
+            Thread.sleep(10000);
             return i + k;
         }
 
@@ -154,7 +164,7 @@ So it can be used:
 
     ...
 
-    ExampleDaemon exampleDaemon = new ExampleDaemon(new Example());
+    ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("exampleDaemon");
 
     exampleDaemon.add(48, 54, new Closure<Integer>() {
         @Override
@@ -166,6 +176,9 @@ So it can be used:
             }
         }
     });
+    
+    //the add call is enqueued to Daemons call queue and returns immediatelty. Closure holding the result is
+    //handed over to the main loopers queue once the prototype add method returns
 
 There are three implementations of a Daemon (daemonengine package):
 1. MainQuestDaemonEngine
