@@ -7,7 +7,7 @@ It encapsulates the prototype instance and a thread that executes all the protot
 allowing the main thread to loop and be responsive.
 
 It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with similar signature,
-differing in one thing, the return value is mapped to an output type argument
+differing in one thing. The return value is mapped to an output type argument
    
     Closure<ReturnType> 
     
