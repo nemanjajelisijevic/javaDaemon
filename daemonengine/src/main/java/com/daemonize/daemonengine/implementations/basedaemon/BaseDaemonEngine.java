@@ -12,6 +12,8 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseDaemonEngine implements Daemon {
 
+  //TODO Create a DaemonEngine interface
+
   protected String name = this.getClass().getSimpleName();
 
   @SuppressWarnings("unchecked")
