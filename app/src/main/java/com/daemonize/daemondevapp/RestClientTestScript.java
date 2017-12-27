@@ -10,7 +10,7 @@ import com.daemonize.daemonengine.daemonscript.DaemonLink;
 import com.daemonize.daemonengine.daemonscript.DaemonScript;
 import com.daemonize.daemonengine.daemonscript.LinkedClosure;
 import com.daemonize.daemonengine.exceptions.DaemonException;
-import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class RestClientTestScript implements DaemonScript {
 
@@ -31,7 +31,7 @@ public class RestClientTestScript implements DaemonScript {
                                     @Override
                                     public void doTheGuiStuff() {
                                         try {
-                                            Log.d(BaseDaemonEngine.tag(), "LINK 11111111111111111111111111111111111111111111111111111111111");
+                                            Log.d(DaemonUtils.tag(), "LINK 11111111111111111111111111111111111111111111111111111111111");
                                             textView.append(getResult().toString());
                                         } catch (DaemonException e) {
                                             e.printStackTrace();
@@ -50,7 +50,7 @@ public class RestClientTestScript implements DaemonScript {
                                     public void doTheGuiStuff() {
                                         try {
                                             //b.dismiss();
-                                            Log.d(BaseDaemonEngine.tag(), "LINK 222222222222222222222222222222222222222222222222222222222222");
+                                            Log.d(DaemonUtils.tag(), "LINK 222222222222222222222222222222222222222222222222222222222222");
                                             textView.append(getResult().toString());
                                         } catch (DaemonException e) {
                                             e.printStackTrace();
@@ -69,7 +69,7 @@ public class RestClientTestScript implements DaemonScript {
                                     public void doTheGuiStuff() {
                                         try {
                                             //b.dismiss();
-                                            Log.d(BaseDaemonEngine.tag(), "LINK 3333333333333333333333333333333333333333333333333333333333333");
+                                            Log.d(DaemonUtils.tag(), "LINK 3333333333333333333333333333333333333333333333333333333333333");
                                             textView.append(getResult().toString());
                                         } catch (DaemonException e) {
                                             breakScript();
@@ -89,7 +89,7 @@ public class RestClientTestScript implements DaemonScript {
                                     public void doTheGuiStuff() {
                                         try {
                                             //b.dismiss();
-                                            Log.d(BaseDaemonEngine.tag(), "LINK 444444444444444444444444444444444444444444444444444444444444");
+                                            Log.d(DaemonUtils.tag(), "LINK 444444444444444444444444444444444444444444444444444444444444");
                                             textView.append(getResult().toString());
                                         } catch (DaemonException e) {
                                             e.printStackTrace();
