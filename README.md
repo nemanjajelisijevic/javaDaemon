@@ -163,7 +163,7 @@ So it can be used:
 
     ...
 
-    ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemonInstance0");
+    ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("exampleDaemon");
 
     exampleDaemon.add(48, 54, new Closure<Integer>() {
         @Override
