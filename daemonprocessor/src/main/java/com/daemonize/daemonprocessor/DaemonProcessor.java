@@ -40,6 +40,7 @@ public class DaemonProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
 
         //TODO annotation-config: update on runtime errors
+        //TODO add the STOP_PENDING daemon state
         //TODO toString, equals?, hashcode?, copy construct/clone
         //TODO omit accessors
         //TODO annotation-config:daemon methods return daemon instance for chaining         CHECK!!!!
