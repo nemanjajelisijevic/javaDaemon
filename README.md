@@ -16,7 +16,7 @@ method returns.
     
 Closure exposes an abstract method doTheGuiStuff() for implementation, and getResult() for extracting the return value.
 
-That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to MAIN thread.
+That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the MAIN thread.
 For now :)
 
 Underneath, Daemon is a thread that constantly checks a queue for a called method (consumer), or if configured in service 
