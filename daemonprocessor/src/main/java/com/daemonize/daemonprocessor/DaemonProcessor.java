@@ -39,19 +39,6 @@ public class DaemonProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
 
-        //TODO annotation-config: update on runtime errors
-        //TODO add the STOP_PENDING daemon state
-        //TODO toString, equals?, hashcode?, copy construct/clone
-        //TODO omit accessors
-        //TODO annotation-config:daemon methods return daemon instance for chaining         CHECK!!!!
-        //TODO get prototype method                                                         CHECK!!!!
-        //TODO Generate exceptions!
-        //TODO annotation-config: configure for singleton
-        //TODO type parameters                                                              CHECK!!!!
-        //TODO daemon parameter names all lowercase ???
-        //TODO Daemonize superclass ???
-
-
         messager.printMessage(Diagnostic.Kind.NOTE, "Starting DaemonProcessor...");
 
         Collection<? extends Element> annotatedElements =
