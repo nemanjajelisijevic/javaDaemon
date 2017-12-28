@@ -48,6 +48,7 @@ public class DaemonProcessor extends AbstractProcessor {
         //TODO Generate exceptions!
         //TODO annotation-config: configure for singleton
         //TODO type parameters                                                              CHECK!!!!
+        //TODO daemon parameter names all lowercase ???
 
         messager.printMessage(Diagnostic.Kind.NOTE, "Starting DaemonProcessor...");
 
