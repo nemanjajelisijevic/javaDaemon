@@ -40,7 +40,7 @@ public abstract class Quest<T> implements Runnable {
 
   protected abstract T pursue() throws Exception;
 
-  //************** METHODS TO UPDATE MAIN_QUEST THREAD **************************************************/
+  //************** METHODS TO UPDATE MAIN THREAD **************************************************/
 
   public final void setResultAndUpdate(T result) {
     handler.post(closure.setResult(result));
