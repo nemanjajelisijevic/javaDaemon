@@ -56,7 +56,7 @@ public class DaemonProcessor extends AbstractProcessor {
                         Diagnostic.Kind.ERROR,
                         "Error processing element: "
                                 + classElement.getSimpleName()
-                                + " - @Daemonize can only be applied to a class or interface."
+                                + " - @Daemonize can only be applied to a class or an interface."
                 );
                 return true;
             } else {
