@@ -1,4 +1,4 @@
-package com.daemonize.daemondevapp.imagemovers;;
+package com.daemonize.daemondevapp.imagemovers;
 
 import android.graphics.Bitmap;
 import android.util.Pair;
@@ -18,6 +18,20 @@ public class ImageTranslationMover implements ImageMover {
 
     protected float lastX;
     protected float lastY;
+
+    @Override
+    public PositionedBitmap setLastCoordinates(float lastX, float lastY) {
+        this.lastX = lastX;
+        this.lastY = lastY;
+
+        PositionedBitmap ret = new PositionedBitmap();
+        ret.image = iterateSprite();
+
+        ret.positionX = lastX;
+        ret.positionY = lastY;
+        
+        return ret;
+    }
 
     private boolean paused = false;
 

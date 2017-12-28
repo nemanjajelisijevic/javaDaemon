@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 
 import com.daemonize.daemondevapp.imagemovers.BouncingImageTranslationMover;
+import com.daemonize.daemondevapp.imagemovers.FullColliderImageMover;
 import com.daemonize.daemondevapp.imagemovers.GravityImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
@@ -56,11 +58,26 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean paused = false;
 
-    private MotionEvent event;
 
-    private Runnable onTouch = new Runnable() {
+    final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
+        public void onLongPress(MotionEvent e) {
+            mainMover.setVelocity(0);
+            mainMover.setLastCoordinates(
+                    e.getX(),
+                    e.getY(),
+                    new ImageMoveClosure(MainActivity.this, mainView)
+            );
+        }
+    });
+
+
+    private interface EventHandler {
+        void handleEvent(MotionEvent event);
+    }
+
+    private EventHandler onTouch = new EventHandler() {
         @Override
-        public void run() {
+        public void handleEvent(MotionEvent event) {
             switch (mode) {
                 case GRAVITY:
                     if(event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -71,7 +88,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case CHASE:
                 case COLLIDE:
-                    mainMover.setTouchDirection(event.getX(), event.getY());
+                    if (!gestureDetector.onTouchEvent(event) && event.getAction() == MotionEvent.ACTION_DOWN) {
+                        mainMover.setTouchDirection(event.getX(), event.getY());
+                    }
                     break;
             }
         }
@@ -79,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        this.event = event;
-        onTouch.run();
+        onTouch.handleEvent(event);
         return true;
     }
 
@@ -171,10 +189,10 @@ public class MainActivity extends AppCompatActivity {
 
         final Border mapBorder = new MapBorder(0, borderX, 0, borderY);
         final Border centerBorderSquare = new OuterRectangleBorder(
-                borderX/2 -20,
+                borderX/2 - 20,
                 borderX/2 + 20,
                 borderY/2 - 20,
-                borderY/2 +20
+                borderY/2 + 20
         );
 
 
@@ -262,16 +280,17 @@ public class MainActivity extends AppCompatActivity {
                         initViews(views);
 
                         int i = 5;
-                        for(ImageView vie : views) {
+
+                        for(ImageView vv : views) {
                             ImageMoverDaemon starMover = new ImageMoverDaemon(
-                                    new BouncingImageTranslationMover(
-                                            sprite,
-                                            i/20,
-                                            Pair.create((float)borderX % i, (float) borderY % i)
-                                    )
+                                        new BouncingImageTranslationMover(
+                                                sprite,
+                                                i / 20,
+                                                Pair.create((float) borderX % i, (float) borderY % i)
+                                        )
                             ).setBorders(borderX, borderY);
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
-                            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vie)));
+                            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vv)));
                             starMover.start();
                             starMovers.add(starMover);
                             i += 5;
@@ -300,6 +319,8 @@ public class MainActivity extends AppCompatActivity {
                         for(ImageMoverDaemon imageMoverDaemon : starMovers) {
                             imageMoverDaemon.stop();
                         }
+
+                        //fullStarMovers.clear();
                         starMovers.clear();
                         starMovers = new ArrayList<>(40);
                         views = new ArrayList<>(40);

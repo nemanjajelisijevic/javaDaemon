@@ -7,6 +7,8 @@ import com.daemonize.daemondevapp.imagemovers.borders.Border;
 import com.daemonize.daemonprocessor.Daemonize;
 import com.daemonize.daemonprocessor.SideQuest;
 
+import java.util.List;
+
 @Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
 
@@ -26,6 +28,8 @@ public interface ImageMover {
             this.coeficientY = coeficientY;
         }
     }
+
+    PositionedBitmap setLastCoordinates(float lastX, float lastY);
 
     void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, float velocity, Direction direction);
 
