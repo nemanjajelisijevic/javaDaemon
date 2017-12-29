@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         }
     });
 
-
     private interface EventHandler {
         void handleEvent(MotionEvent event);
     }
@@ -146,35 +145,35 @@ public class MainActivity extends AppCompatActivity {
         views.add((ImageView) findViewById(R.id.imageView14));
         views.add((ImageView) findViewById(R.id.imageView15));
 
-        views.add((ImageView) findViewById(R.id.imageView16));
-        views.add((ImageView) findViewById(R.id.imageView17));
-        views.add((ImageView) findViewById(R.id.imageView18));
-        views.add((ImageView) findViewById(R.id.imageView19));
-        views.add((ImageView) findViewById(R.id.imageView20));
-
-        views.add((ImageView) findViewById(R.id.imageView21));
-        views.add((ImageView) findViewById(R.id.imageView22));
-        views.add((ImageView) findViewById(R.id.imageView23));
-        views.add((ImageView) findViewById(R.id.imageView24));
-        views.add((ImageView) findViewById(R.id.imageView25));
-
-        views.add((ImageView) findViewById(R.id.imageView26));
-        views.add((ImageView) findViewById(R.id.imageView27));
-        views.add((ImageView) findViewById(R.id.imageView28));
-        views.add((ImageView) findViewById(R.id.imageView29));
-        views.add((ImageView) findViewById(R.id.imageView30));
-
-        views.add((ImageView) findViewById(R.id.imageView31));
-        views.add((ImageView) findViewById(R.id.imageView32));
-        views.add((ImageView) findViewById(R.id.imageView33));
-        views.add((ImageView) findViewById(R.id.imageView34));
-        views.add((ImageView) findViewById(R.id.imageView35));
-
-        views.add((ImageView) findViewById(R.id.imageView36));
-        views.add((ImageView) findViewById(R.id.imageView37));
-        views.add((ImageView) findViewById(R.id.imageView38));
-        views.add((ImageView) findViewById(R.id.imageView39));
-        views.add((ImageView) findViewById(R.id.imageView40));
+//        views.add((ImageView) findViewById(R.id.imageView16));
+//        views.add((ImageView) findViewById(R.id.imageView17));
+//        views.add((ImageView) findViewById(R.id.imageView18));
+//        views.add((ImageView) findViewById(R.id.imageView19));
+//        views.add((ImageView) findViewById(R.id.imageView20));
+//
+//        views.add((ImageView) findViewById(R.id.imageView21));
+//        views.add((ImageView) findViewById(R.id.imageView22));
+//        views.add((ImageView) findViewById(R.id.imageView23));
+//        views.add((ImageView) findViewById(R.id.imageView24));
+//        views.add((ImageView) findViewById(R.id.imageView25));
+//
+//        views.add((ImageView) findViewById(R.id.imageView26));
+//        views.add((ImageView) findViewById(R.id.imageView27));
+//        views.add((ImageView) findViewById(R.id.imageView28));
+//        views.add((ImageView) findViewById(R.id.imageView29));
+//        views.add((ImageView) findViewById(R.id.imageView30));
+//
+//        views.add((ImageView) findViewById(R.id.imageView31));
+//        views.add((ImageView) findViewById(R.id.imageView32));
+//        views.add((ImageView) findViewById(R.id.imageView33));
+//        views.add((ImageView) findViewById(R.id.imageView34));
+//        views.add((ImageView) findViewById(R.id.imageView35));
+//
+//        views.add((ImageView) findViewById(R.id.imageView36));
+//        views.add((ImageView) findViewById(R.id.imageView37));
+//        views.add((ImageView) findViewById(R.id.imageView38));
+//        views.add((ImageView) findViewById(R.id.imageView39));
+//        views.add((ImageView) findViewById(R.id.imageView40));
 
     }
 
@@ -283,10 +282,11 @@ public class MainActivity extends AppCompatActivity {
 
                         for(ImageView vv : views) {
                             ImageMoverDaemon starMover = new ImageMoverDaemon(
-                                        new BouncingImageTranslationMover(
+                                        new FullColliderImageMover(
                                                 sprite,
                                                 i / 20,
-                                                Pair.create((float) borderX % i, (float) borderY % i)
+                                                Pair.create((float) borderX % i, (float) borderY % i),
+                                                MainImageTranslationMover.Mode.COLLIDE
                                         )
                             ).setBorders(borderX, borderY);
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
@@ -294,6 +294,14 @@ public class MainActivity extends AppCompatActivity {
                             starMover.start();
                             starMovers.add(starMover);
                             i += 5;
+                        }
+
+                        for (ImageMoverDaemon subscriber : starMovers) {
+                            for (ImageMoverDaemon observer : starMovers) {
+                                if(!subscriber.getPrototype().equals(observer.getPrototype())) {
+                                    subscriber.setObserver(observer);
+                                }
+                            }
                         }
 
                         mainMover = new ImageMoverDaemon(new MainImageTranslationMover(

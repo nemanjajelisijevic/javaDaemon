@@ -6,4 +6,5 @@ public enum DaemonState {
     IDLE,
     SIDE_QUEST,
     MAIN_QUEST
+    //, STOP_PENDING
 }

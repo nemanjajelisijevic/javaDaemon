@@ -37,7 +37,12 @@ public class MainImageTranslationMover extends ImageTranslationMover {
                 if(mode.equals(Mode.CHASE)) {
                     observer.setTouchDirection(lastX, lastY); //TODO CHASER
                 } else if (mode.equals(Mode.COLLIDE)) {
-                    observer.checkCollisionAndBounce(Pair.create(lastX, lastY), velocity, new Direction(currentDirX, currentDirY)); //TODO Collisions
+                    observer.checkCollisionAndBounce(
+                            Pair.create(lastX, lastY),
+                            velocity,
+                            new Direction(currentDirX, currentDirY),
+                            observer.getSideQuest().getClosure()
+                    ); //TODO Collisions
                 }
             }
 

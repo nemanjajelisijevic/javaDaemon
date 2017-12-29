@@ -11,7 +11,7 @@ public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQue
 
   private SideQuest sideQuest;
 
-  public void setSideQuest(SideQuest quest) {
+  public <T> void setSideQuest(SideQuest<T> quest) {
     this.sideQuest = quest;
   }
 
@@ -26,7 +26,8 @@ public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQue
   }
 
   @Override
-  public SideQuest getSideQuest() {
+  @SuppressWarnings("unchecked")
+  public<T> SideQuest<T> getSideQuest() {
     return sideQuest;
   }
 

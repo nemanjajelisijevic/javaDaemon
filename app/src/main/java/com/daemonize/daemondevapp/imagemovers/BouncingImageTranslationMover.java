@@ -15,7 +15,7 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
         super(sprite, velocity, startingPos);
     }
 
-    public void checkCollisionAndBounce(
+    public PositionedBitmap checkCollisionAndBounce(
             Pair<Float, Float> colliderCoordinates,
             float velocity,
             Direction direction
@@ -27,7 +27,11 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
                     (direction.coeficientX + currentDirX) / 2 ,
                     (direction.coeficientY + currentDirY) / 2
             ));
+
+            return move();
         }
+
+        return null;
     }
 
     @Override

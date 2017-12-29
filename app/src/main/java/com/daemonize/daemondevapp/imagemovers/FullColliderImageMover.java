@@ -4,6 +4,9 @@ package com.daemonize.daemondevapp.imagemovers;
 import android.graphics.Bitmap;
 import android.util.Pair;
 
+import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.quests.SideQuest;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,17 +35,16 @@ public class FullColliderImageMover extends BouncingImageTranslationMover {
     public PositionedBitmap move() {
 
         if (velocity > 0 && mode.equals(MainImageTranslationMover.Mode.COLLIDE)) {
-
             for (ImageMoverDaemon imageMoverDaemon : obs) {
-                if (!imageMoverDaemon.getPrototype().equals(this)) {
+                //if (!imageMoverDaemon.getPrototype().equals(this)) {
                         imageMoverDaemon.checkCollisionAndBounce(
                                 Pair.create(lastX, lastY),
                                 velocity,
-                                new Direction(currentDirX, currentDirY)
+                                new Direction(currentDirX, currentDirY),
+                                imageMoverDaemon.moveSideQuest.getClosure()
                         ); //TODO Collisions
-                }
+                //}
             }
-
             return super.move();
         }
 

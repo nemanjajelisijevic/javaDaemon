@@ -173,12 +173,21 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         List<MethodSpec> ret = super.generateDaemonApiMethods();
 
+
+        TypeVariableName typeVariableName = TypeVariableName.get("T");
+
         ret.add(
                 MethodSpec.methodBuilder("setSideQuest")
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
+                        .addTypeVariable(typeVariableName)
                         .returns(void.class)
-                        .addParameter(ClassName.get(QUEST_PACKAGE, "SideQuest"), "sideQuest")
+                        //.addParameter(ClassName.get(QUEST_PACKAGE, "SideQuest"), "sideQuest")
+                        .addParameter(ParameterizedTypeName.get(
+                                ClassName.get(
+                                        QUEST_PACKAGE,
+                                        "SideQuest"
+                                ), typeVariableName), "sideQuest")
                         .addStatement(DAEMON_ENGINE_STRING + ".setSideQuest($N)", "sideQuest")
                         .build()
         );
@@ -187,7 +196,14 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 MethodSpec.methodBuilder("getSideQuest")
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
-                        .returns(ClassName.get(QUEST_PACKAGE, "SideQuest"))
+                        .addTypeVariable(typeVariableName)
+                        //.returns(ClassName.get(QUEST_PACKAGE, "SideQuest"))
+                        .returns(ParameterizedTypeName.get(
+                                ClassName.get(
+                                        QUEST_PACKAGE,
+                                        "SideQuest"
+                                ), typeVariableName)
+                        )
                         .addStatement("return " + DAEMON_ENGINE_STRING + ".getSideQuest()")
                         .build()
         );

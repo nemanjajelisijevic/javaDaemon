@@ -114,13 +114,23 @@ public class ImageTranslationMover implements ImageMover {
 //        borders.add(border);
 //    }
 
+
+    @Override
+    public void setObserver(ImageMoverDaemon observers) {}
+
     @Override
     public void setVelocity(float velocity) {
         this.velocity = velocity;
     }
 
     @Override
-    public void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, float velocity, Direction direction) {}
+    public PositionedBitmap checkCollisionAndBounce(
+            Pair<Float, Float> colliderCoordinates,
+            float velocity,
+            Direction direction
+    ) {
+        return null;
+    }
 
     @Override
     public PositionedBitmap move() {

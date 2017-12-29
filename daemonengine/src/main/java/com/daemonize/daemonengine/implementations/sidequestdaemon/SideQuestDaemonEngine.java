@@ -9,12 +9,13 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine implements SideQuest
 
   private SideQuest sideQuest;
 
-  public void setSideQuest(SideQuest quest) {
+  public <T> void setSideQuest(SideQuest<T> quest) {
     this.sideQuest = quest;
   }
 
   @Override
-  public SideQuest getSideQuest() {
+  @SuppressWarnings("unchecked")
+  public <T> SideQuest<T> getSideQuest() {
     return sideQuest;
   }
 

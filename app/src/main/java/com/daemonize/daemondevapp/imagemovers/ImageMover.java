@@ -29,9 +29,11 @@ public interface ImageMover {
         }
     }
 
+    void setObserver(ImageMoverDaemon observers);
+
     PositionedBitmap setLastCoordinates(float lastX, float lastY);
 
-    void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, float velocity, Direction direction);
+    PositionedBitmap checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, float velocity, Direction direction);
 
     void setDirection(Direction direction);
 
