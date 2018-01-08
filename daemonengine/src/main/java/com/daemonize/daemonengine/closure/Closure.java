@@ -4,9 +4,7 @@ package com.daemonize.daemonengine.closure;
 import android.app.Activity;
 import android.util.Log;
 
-import com.daemonize.daemonengine.daemonscript.DaemonScript;
 import com.daemonize.daemonengine.exceptions.DaemonException;
-import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 
 import java.lang.ref.WeakReference;
 
@@ -57,9 +55,9 @@ public abstract class Closure<T> implements Runnable {
       );
       return;
     }
-    doTheGuiStuff();
+    onReturn();
   }
 
-  public abstract void doTheGuiStuff();
+  public abstract void onReturn();
 
 }

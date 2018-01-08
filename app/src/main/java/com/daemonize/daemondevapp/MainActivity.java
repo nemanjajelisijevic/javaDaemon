@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void doTheGuiStuff() {
+        public void onReturn() {
             try {
                 view.get().setX(getResult().positionX);
                 view.get().setY(getResult().positionY);

@@ -29,7 +29,7 @@ public class RestClientTestScript implements DaemonScript {
                                 DelayedGetResponse.class,
                                 new LinkedClosure<DelayedGetResponse>(activity, chain) {
                                     @Override
-                                    public void doTheGuiStuff() {
+                                    public void onReturn() {
                                         try {
                                             Log.d(DaemonUtils.tag(), "LINK 11111111111111111111111111111111111111111111111111111111111");
                                             textView.append(getResult().toString());
@@ -47,7 +47,7 @@ public class RestClientTestScript implements DaemonScript {
                                 DelayedGetResponse.class,
                                 new LinkedClosure<DelayedGetResponse>(activity, chain) {
                                     @Override
-                                    public void doTheGuiStuff() {
+                                    public void onReturn() {
                                         try {
                                             //b.dismiss();
                                             Log.d(DaemonUtils.tag(), "LINK 222222222222222222222222222222222222222222222222222222222222");
@@ -66,7 +66,7 @@ public class RestClientTestScript implements DaemonScript {
                                 DelayedGetResponse.class,
                                 new LinkedClosure<DelayedGetResponse>(activity, chain) {
                                     @Override
-                                    public void doTheGuiStuff() {
+                                    public void onReturn() {
                                         try {
                                             //b.dismiss();
                                             Log.d(DaemonUtils.tag(), "LINK 3333333333333333333333333333333333333333333333333333333333333");
@@ -86,7 +86,7 @@ public class RestClientTestScript implements DaemonScript {
                                 DelayedGetResponse.class,
                                 new LinkedClosure<DelayedGetResponse>(activity, chain) {
                                     @Override
-                                    public void doTheGuiStuff() {
+                                    public void onReturn() {
                                         try {
                                             //b.dismiss();
                                             Log.d(DaemonUtils.tag(), "LINK 444444444444444444444444444444444444444444444444444444444444");
