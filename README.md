@@ -168,7 +168,7 @@ So it can be used:
 
     exampleDaemon.add(48, 54, new Closure<Integer>() {
         @Override
-        public void doTheGuiStuff() {
+        public void onReturn() {
             try {
                 view.get().setText(getResult().toString());
             } catch (DaemonException e) {
