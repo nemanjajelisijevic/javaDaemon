@@ -14,7 +14,7 @@ differing in one thing. The return value is mapped to an output type argument
 which is instantiated upon the Daemon methods call, and handed to the main looper for execution once the prototype
 method returns.
     
-Closure exposes an abstract method doTheGuiStuff() for implementation, and getResult() for extracting the return value.
+Closure exposes an abstract method onReturn() for implementation, and getResult() for extracting the return value.
 
 That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the MAIN thread.
 For now :)
