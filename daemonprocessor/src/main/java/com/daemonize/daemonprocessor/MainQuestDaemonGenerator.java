@@ -2,13 +2,11 @@ package com.daemonize.daemonprocessor;
 
 
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeVariableName;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,9 +17,7 @@ import java.util.TreeSet;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeVariable;
+import javax.lang.model.type.TypeMirror;
 
 
 public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
@@ -65,6 +61,12 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         Map<TypeSpec, MethodSpec> mainQuestsAndApiMethods = new LinkedHashMap<>();
 
         for (ExecutableElement method : publicPrototypeMethods) {
+
+            if (method.getAnnotation(CallingThread.class) != null) {
+                daemonClassBuilder.addMethod(copyMethod(method));
+                continue;
+            }
+
             mainQuestsAndApiMethods.put(createMainQuest(method), createApiMethod(method));
         }
 
@@ -189,9 +191,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     public MethodSpec createApiMethod(ExecutableElement prototypeMethod) {
 
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
-
-
-
         MethodSpec.Builder apiMethodBuilder = MethodSpec.methodBuilder(prototypeMethodData.getMethodName())
                 .addModifiers(Modifier.PUBLIC);
 
@@ -226,6 +225,31 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         }
 
         return apiMethodBuilder.build();
+    }
+
+    private MethodSpec copyMethod(ExecutableElement prototypeMethod){
+
+        PrototypeMethodData methodData = new PrototypeMethodData(prototypeMethod);
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(
+                prototypeMethod.getSimpleName().toString()
+        ).addModifiers(Modifier.PUBLIC).returns(TypeName.get(prototypeMethod.getReturnType()));
+
+        methodBuilder = BaseDaemonGenerator.addTypeParameters(prototypeMethod, methodBuilder);
+
+        for(Pair<TypeName, String> param : methodData.getParameters()) {
+            methodBuilder.addParameter(param.getFirst(), param.getSecond());
+        }
+
+        for ( TypeMirror exception : prototypeMethod.getThrownTypes()) {
+            methodBuilder.addException(TypeName.get(exception));
+        }
+
+        return methodBuilder.addStatement(
+                        "return prototype."
+                                + prototypeMethod.getSimpleName().toString()
+                                + "(" + methodData.getArguments()
+                                + ")"
+        ).build();
     }
 
 }

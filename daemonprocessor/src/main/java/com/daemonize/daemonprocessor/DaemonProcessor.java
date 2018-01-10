@@ -22,7 +22,13 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
-@SupportedAnnotationTypes({"com.daemonize.daemonprocessor.Daemonize", "com.daemonize.daemonprocessor.SideQuest"})
+@SupportedAnnotationTypes(
+        {
+                "com.daemonize.daemonprocessor.Daemonize",
+                "com.daemonize.daemonprocessor.SideQuest",
+                "com.daemonize.daemonprocessor.CallingThread"
+        }
+)
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class DaemonProcessor extends AbstractProcessor {
 
