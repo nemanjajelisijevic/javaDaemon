@@ -2,6 +2,7 @@ package com.daemonize.daemondevapp;
 
 import android.util.Pair;
 
+import com.daemonize.daemonprocessor.CallingThread;
 import com.daemonize.daemonprocessor.Daemonize;
 import com.daemonize.daemonprocessor.SideQuest;
 
@@ -12,6 +13,8 @@ import java.util.List;
 @Daemonize(eager = true, returnDaemonInstance = true)
 public class Example {
 
+
+    @CallingThread
     public Integer add (Integer i, Integer k) {
         return i + k;
     }
@@ -34,6 +37,7 @@ public class Example {
         return new ArrayList<>();
     }
 
+    @CallingThread
     public Pair<Integer, String> pairThem() {
         return Pair.create(5, "12");
     }

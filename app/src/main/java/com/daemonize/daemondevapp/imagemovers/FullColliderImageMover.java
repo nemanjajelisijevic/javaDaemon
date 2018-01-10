@@ -30,9 +30,7 @@ public class FullColliderImageMover extends BouncingImageTranslationMover {
 
     @Override
     public PositionedBitmap move() {
-
         if (velocity > 0 && mode.equals(MainImageTranslationMover.Mode.COLLIDE)) {
-
             for (ImageMoverDaemon imageMoverDaemon : obs) {
                 if (!imageMoverDaemon.getPrototype().equals(this)) {
                         imageMoverDaemon.checkCollisionAndBounce(
@@ -42,10 +40,8 @@ public class FullColliderImageMover extends BouncingImageTranslationMover {
                         ); //TODO Collisions
                 }
             }
-
             return super.move();
         }
-
         return null;
     }
 }

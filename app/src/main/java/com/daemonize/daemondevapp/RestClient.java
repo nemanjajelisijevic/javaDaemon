@@ -2,6 +2,7 @@ package com.daemonize.daemondevapp;
 
 import android.util.Log;
 
+import com.daemonize.daemonprocessor.CallingThread;
 import com.daemonize.daemonprocessor.Daemonize;
 import com.google.gson.Gson;
 
@@ -46,6 +47,7 @@ public class RestClient {
         return null;//TODO fuck this
     }
 
+    @CallingThread
     public <T, K> T post(String url, K entity, Class<T> tClass) throws IllegalAccessException, InstantiationException {
 
         Log.d(Thread.currentThread().getName(),"URL: "  + baseUrl + url);
