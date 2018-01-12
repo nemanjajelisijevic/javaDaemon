@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.borders.Border;
+import com.daemonize.daemondevapp.imagemovers.collider.PositionUpdate;
+import com.daemonize.daemonprocessor.CallingThread;
 import com.daemonize.daemonprocessor.Daemonize;
 import com.daemonize.daemonprocessor.SideQuest;
 
@@ -28,6 +30,9 @@ public interface ImageMover {
             this.coeficientY = coeficientY;
         }
     }
+
+    @CallingThread
+    void updatePosition(int id, PositionUpdate update);
 
     PositionedBitmap setLastCoordinates(float lastX, float lastY);
 

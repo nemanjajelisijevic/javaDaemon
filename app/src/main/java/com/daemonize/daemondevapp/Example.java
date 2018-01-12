@@ -23,6 +23,7 @@ public class Example {
 
     }
 
+    @CallingThread
     public static int subtract(int i, int k) {
         return i - k;
     }

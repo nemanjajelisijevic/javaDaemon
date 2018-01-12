@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.borders.Border;
+import com.daemonize.daemondevapp.imagemovers.collider.PositionUpdate;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,6 +33,9 @@ public class ImageTranslationMover implements ImageMover {
         
         return ret;
     }
+
+    @Override
+    public void updatePosition(int id, PositionUpdate update) {}
 
     private boolean paused = false;
 
