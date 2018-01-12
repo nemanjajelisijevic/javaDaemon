@@ -22,6 +22,13 @@ public class ColliderImageMover extends ImageTranslationMover {
     private PositionUpdate[] othersPosition;
     private int id;
 
+    private int proximity = 10;
+
+    public ColliderImageMover setProximity(int proximity) {
+        this.proximity = proximity;
+        return this;
+    }
+
     public ColliderImageMover(
             List<Bitmap> sprite,
             float velocity,
@@ -59,8 +66,8 @@ public class ColliderImageMover extends ImageTranslationMover {
         for (PositionUpdate update : othersPosition) {
             //check for collision
             if (update.isAlive()
-                    && Math.abs(this.lastX - update.getX()) < 10
-                    && Math.abs(this.lastY - update.getY()) < 10) {
+                    && Math.abs(this.lastX - update.getX()) < proximity
+                    && Math.abs(this.lastY - update.getY()) < proximity) {
                 setDirection(update.getDirection());
                 setVelocity(update.getVelocity() / 2);
                 break;
