@@ -61,12 +61,11 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         Map<TypeSpec, MethodSpec> mainQuestsAndApiMethods = new LinkedHashMap<>();
 
         for (ExecutableElement method : publicPrototypeMethods) {
-
             if (method.getAnnotation(CallingThread.class) != null) {
+                //System.out.println("@CallingThread - PROTOTYPE: " + method.getEnclosingElement().asType().toString() + ", METHOD: " + method.toString());
                 daemonClassBuilder.addMethod(copyMethod(method));
                 continue;
             }
-
             mainQuestsAndApiMethods.put(createMainQuest(method), createApiMethod(method));
         }
 
@@ -227,7 +226,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return apiMethodBuilder.build();
     }
 
-    private MethodSpec copyMethod(ExecutableElement prototypeMethod){
+    public MethodSpec copyMethod(ExecutableElement prototypeMethod){
 
         PrototypeMethodData methodData = new PrototypeMethodData(prototypeMethod);
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(
@@ -245,7 +244,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         }
 
         return methodBuilder.addStatement(
-                        "return prototype."
+                (methodData.isVoid() ? "" : "return ")
+                                + "prototype."
                                 + prototypeMethod.getSimpleName().toString()
                                 + "(" + methodData.getArguments()
                                 + ")"

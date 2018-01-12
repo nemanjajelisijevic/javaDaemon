@@ -95,6 +95,13 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         Map<TypeSpec, MethodSpec> mainQuestsAndApiMethods = new LinkedHashMap<>();
 
         for (ExecutableElement method : publicPrototypeMethods) {
+
+            if (method.getAnnotation(CallingThread.class) != null) {
+                System.out.println("@CallingThread - PROTOTYPE: " + method.getEnclosingElement().asType().toString() + ", METHOD: " + method.toString());
+                daemonClassBuilder.addMethod(mainGenerator.copyMethod(method));
+                continue;
+            }
+
             mainQuestsAndApiMethods.put(
                     mainGenerator.createMainQuest(method),
                     mainGenerator.createApiMethod(method)
