@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp.imagemovers.collider;
 
-
 import android.graphics.Bitmap;
 import android.util.Pair;
 
@@ -32,8 +31,8 @@ public class ColliderImageMover extends ImageTranslationMover {
     ) {
         super(sprite, velocity, startingPos);
         this.id = id;
-        others = new ArrayList<>(othersSize);
-        othersPosition = new PositionUpdate[othersSize];
+        this.others = new ArrayList<>(othersSize);
+        this.othersPosition = new PositionUpdate[othersSize];
     }
 
     @Override
@@ -47,18 +46,21 @@ public class ColliderImageMover extends ImageTranslationMover {
         //update others
         for (ImageMoverDaemon other : others) {
             other.updatePosition(id, new PositionUpdate(
-                    true,
-                    lastX,
-                    lastY,
-                    velocity,
-                    new Direction(this.currentDirX, this.currentDirY))
+                        true,
+                        lastX,
+                        lastY,
+                        velocity,
+                        new Direction(this.currentDirX, this.currentDirY)
+                    )
             );
         }
 
         //check collisions
         for (PositionUpdate update : othersPosition) {
             //check for collision
-            if (update.isAlive() && Math.abs(this.lastX - update.getX()) < 10 && Math.abs(this.lastY - update.getY()) < 10) {
+            if (update.isAlive()
+                    && Math.abs(this.lastX - update.getX()) < 10
+                    && Math.abs(this.lastY - update.getY()) < 10) {
                 setDirection(update.getDirection());
                 setVelocity(update.getVelocity() / 2);
                 break;
