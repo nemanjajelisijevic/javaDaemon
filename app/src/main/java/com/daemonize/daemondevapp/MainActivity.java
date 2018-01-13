@@ -15,9 +15,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-
 import com.daemonize.daemondevapp.imagemovers.BouncingImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.FullColliderImageMover;
 import com.daemonize.daemondevapp.imagemovers.GravityImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
@@ -26,6 +24,8 @@ import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.borders.Border;
 import com.daemonize.daemondevapp.imagemovers.borders.MapBorder;
 import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
+import com.daemonize.daemondevapp.imagemovers.collider.ColliderImageMover;
+import com.daemonize.daemondevapp.imagemovers.collider.PositionUpdate;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.exceptions.DaemonException;
 
@@ -163,18 +163,18 @@ public class MainActivity extends AppCompatActivity {
         views.add((ImageView) findViewById(R.id.imageView28));
         views.add((ImageView) findViewById(R.id.imageView29));
         views.add((ImageView) findViewById(R.id.imageView30));
-
-        views.add((ImageView) findViewById(R.id.imageView31));
-        views.add((ImageView) findViewById(R.id.imageView32));
-        views.add((ImageView) findViewById(R.id.imageView33));
-        views.add((ImageView) findViewById(R.id.imageView34));
-        views.add((ImageView) findViewById(R.id.imageView35));
-
-        views.add((ImageView) findViewById(R.id.imageView36));
-        views.add((ImageView) findViewById(R.id.imageView37));
-        views.add((ImageView) findViewById(R.id.imageView38));
-        views.add((ImageView) findViewById(R.id.imageView39));
-        views.add((ImageView) findViewById(R.id.imageView40));
+//
+//        views.add((ImageView) findViewById(R.id.imageView31));
+//        views.add((ImageView) findViewById(R.id.imageView32));
+//        views.add((ImageView) findViewById(R.id.imageView33));
+//        views.add((ImageView) findViewById(R.id.imageView34));
+//        views.add((ImageView) findViewById(R.id.imageView35));
+//
+//        views.add((ImageView) findViewById(R.id.imageView36));
+//        views.add((ImageView) findViewById(R.id.imageView37));
+//        views.add((ImageView) findViewById(R.id.imageView38));
+//        views.add((ImageView) findViewById(R.id.imageView39));
+//        views.add((ImageView) findViewById(R.id.imageView40));
 
     }
 
@@ -241,8 +241,8 @@ public class MainActivity extends AppCompatActivity {
                                             sprite,
                                             i / 14,
                                             Pair.create((float) borderX/2, (float) borderY/2)
-                                    )
-                            ).setBorders(borderX, borderY);
+                                    ).setBorders(borderX, borderY)
+                            );
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);//
                             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, v)));
                             starMover.start();
@@ -255,8 +255,8 @@ public class MainActivity extends AppCompatActivity {
                                 40f,
                                 Pair.create(borderX / 2f, borderY / 2f),
                                 starMovers,
-                                MainImageTranslationMover.Mode.CHASE)
-                        ).setBorders(borderX, borderY);
+                                MainImageTranslationMover.Mode.CHASE).setBorders(borderX, borderY)
+                        );
                                 //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
                         mainMover.start();
@@ -278,31 +278,60 @@ public class MainActivity extends AppCompatActivity {
                         starMovers = new ArrayList<>(40);
                         views = new ArrayList<>(40);
                         initViews(views);
+//
+//                        for (int i = 0; i < views.size(); ++i) {
+//                            ImageMoverDaemon starMover = new ImageMoverDaemon(
+//                                    new ColliderImageMover(
+//                                            sprite,
+//                                            30,
+//                                            Pair.create(300f, 500f),
+//                                            i,
+//                                            views.size()
+//                                    ).setBorders(borderX, borderY)
+//                            );
+//                            starMover.setSideQuest(
+//                                    starMover.moveSideQuest.setClosure(
+//                                            new ImageMoveClosure(
+//                                                    MainActivity.this,
+//                                                    views.get(i)
+//                                            )
+//                                    )
+//                            );
+//                            starMover.start();
+//                            starMovers.add(starMover);
+//                        }
+//
+//                        for(ImageMoverDaemon starMover : starMovers) {
+//                            for(ImageMoverDaemon other : starMovers) {
+//                                ((ColliderImageMover) starMover.getPrototype()).addOther(other);
+//                            }
+//                        }
 
                         int i = 5;
-
                         for(ImageView vv : views) {
                             ImageMoverDaemon starMover = new ImageMoverDaemon(
                                         new BouncingImageTranslationMover(
                                                 sprite,
                                                 i / 20,
                                                 Pair.create((float) borderX % i, (float) borderY % i)
-                                        )
-                            ).setBorders(borderX, borderY);
-                            //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
+                                        ).setBorders(borderX, borderY)
+                            );
+                            //.addBorders(mapBorder).addBorders(centerBorderSquare);
                             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vv)));
                             starMover.start();
                             starMovers.add(starMover);
                             i += 5;
                         }
 
-                        mainMover = new ImageMoverDaemon(new MainImageTranslationMover(
-                                spriteMain,
-                                50f,
-                                Pair.create(borderX/2f, borderY/2f),
-                                starMovers,
-                                MainImageTranslationMover.Mode.COLLIDE)
-                        ).setBorders(borderX, borderY);
+                        mainMover = new ImageMoverDaemon(
+                                new MainImageTranslationMover(
+                                        spriteMain,
+                                        50f,
+                                        Pair.create(borderX/2f, borderY/2f),
+                                        starMovers,
+                                        MainImageTranslationMover.Mode.COLLIDE
+                                ).setBorders(borderX, borderY)
+                        );
                         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
                         mainMover.start();
@@ -334,8 +363,8 @@ public class MainActivity extends AppCompatActivity {
                                             sprite,
                                             /*i/5*/30,
                                             Pair.create((float)borderX % i, (float) borderY % i)
-                                    )
-                            ).setBorders(borderX, borderY);
+                                    ).setBorders(borderX, borderY)
+                            );
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vieww)));
                             starMover.start();
@@ -343,13 +372,15 @@ public class MainActivity extends AppCompatActivity {
                             i += 5;
                         }
 
-                        mainMover = new ImageMoverDaemon(new MainImageTranslationMover(
-                                spriteMain,
-                                50f,
-                                Pair.create(borderX/2f, borderY/2f),
-                                starMovers,
-                                MainImageTranslationMover.Mode.NONE)
-                        ).setBorders(borderX, borderY);
+                        mainMover = new ImageMoverDaemon(
+                                new MainImageTranslationMover(
+                                        spriteMain,
+                                        50f,
+                                        Pair.create(borderX/2f, borderY/2f),
+                                        starMovers,
+                                        MainImageTranslationMover.Mode.NONE
+                                ).setBorders(borderX, borderY)
+                        );
                         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
                         mainMover.start();
@@ -397,8 +428,8 @@ public class MainActivity extends AppCompatActivity {
                             sprite,
                             /*i/5*/30,
                             Pair.create((float)borderX % i, (float) borderY % i)
-                    )
-            ).setBorders(borderX, borderY);
+                    ).setBorders(borderX, borderY)
+            );
             //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, view)));
             starMover.start();
@@ -406,13 +437,15 @@ public class MainActivity extends AppCompatActivity {
             i += 5;
         }
 
-        mainMover = new ImageMoverDaemon(new MainImageTranslationMover(
-                spriteMain,
-                50f,
-                Pair.create(borderX/2f, borderY/2f),
-                starMovers,
-                MainImageTranslationMover.Mode.NONE)
-        ).setBorders(borderX, borderY);
+        mainMover = new ImageMoverDaemon(
+                new MainImageTranslationMover(
+                        spriteMain,
+                        50f,
+                        Pair.create(borderX/2f, borderY/2f),
+                        starMovers,
+                        MainImageTranslationMover.Mode.NONE
+                ).setBorders(borderX, borderY)
+        );
         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
         mainMover.start();

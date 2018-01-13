@@ -106,9 +106,11 @@ public class ImageTranslationMover implements ImageMover {
     }
 
     @Override
-    public void setBorders(float x, float y) {
+    @SuppressWarnings("unchecked")
+    public ImageTranslationMover setBorders(float x, float y) {
         this.borderX = x;
         this.borderY = y;
+        return this;
     }
 
 //    List<Border> borders = new ArrayList<>();

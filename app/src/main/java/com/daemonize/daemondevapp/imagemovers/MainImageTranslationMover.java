@@ -28,6 +28,13 @@ public class MainImageTranslationMover extends ImageTranslationMover {
         this.mode = mode;
     }
 
+
+    @Override
+    public MainImageTranslationMover setBorders(float x, float y) {
+        super.setBorders(x, y);
+        return this;
+    }
+
     @Override
     public PositionedBitmap move() {
 

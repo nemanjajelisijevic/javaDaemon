@@ -15,6 +15,12 @@ public class GravityImageMover extends ImageTranslationMover {
     }
 
     @Override
+    public GravityImageMover setBorders(float x, float y) {
+        super.setBorders(x, y);
+        return this;
+    }
+
+    @Override
     public void setTouchDirection(float x, float y) {
         velocity = initVelocity;
         touched = true;

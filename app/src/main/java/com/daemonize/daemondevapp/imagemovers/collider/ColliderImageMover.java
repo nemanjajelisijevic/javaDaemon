@@ -19,10 +19,20 @@ public class ColliderImageMover extends ImageTranslationMover {
         }
     }
 
+    @Override
+    public ColliderImageMover setBorders(float x, float y) {
+        super.setBorders(x, y);
+        return this;
+    }
+
     private PositionUpdate[] othersPosition;
     private int id;
 
-    private int proximity = 10;
+    public int getId() {
+        return id;
+    }
+
+    private int proximity = 20;
 
     public ColliderImageMover setProximity(int proximity) {
         this.proximity = proximity;
@@ -64,11 +74,21 @@ public class ColliderImageMover extends ImageTranslationMover {
 
         //check collisions
         for (PositionUpdate update : othersPosition) {
+
+            if(update == null) {
+                continue;
+            }
+
             //check for collision
             if (update.isAlive()
                     && Math.abs(this.lastX - update.getX()) < proximity
                     && Math.abs(this.lastY - update.getY()) < proximity) {
-                setDirection(update.getDirection());
+                setDirection(
+                        new Direction(
+                                (update.getDirection().coeficientX + this.currentDirX) / 2,
+                                (update.getDirection().coeficientY + this.currentDirY) / 2
+                        )
+                );
                 setVelocity(update.getVelocity() / 2);
                 break;
             }

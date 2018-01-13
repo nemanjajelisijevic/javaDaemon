@@ -44,7 +44,8 @@ public interface ImageMover {
 
     void setVelocity(float velocity);
 
-    void setBorders(float x, float y);
+    @CallingThread
+    <K extends ImageMover> K setBorders(float x, float y);
     //void addBorders(Border border);
 
     void pause();

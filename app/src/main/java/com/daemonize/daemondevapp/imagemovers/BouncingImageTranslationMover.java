@@ -31,6 +31,12 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
     }
 
     @Override
+    public BouncingImageTranslationMover setBorders(float x, float y) {
+        super.setBorders(x, y);
+        return this;
+    }
+
+    @Override
     public PositionedBitmap move() {
         if(velocity > 0) {
             velocity -= 0.3;
