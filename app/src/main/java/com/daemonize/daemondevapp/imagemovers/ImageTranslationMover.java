@@ -124,7 +124,11 @@ public class ImageTranslationMover implements ImageMover {
     }
 
     @Override
-    public void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, float velocity, Direction direction) {}
+    public void checkCollisionAndBounce(
+            Pair<Float, Float> colliderCoordinates,
+            float velocity,
+            Direction direction
+    ) {}
 
     @Override
     public PositionedBitmap move() {
@@ -157,7 +161,6 @@ public class ImageTranslationMover implements ImageMover {
 //
 //        }
 
-
         //check borders and recalculate
         if (lastX <= 0) {
             currentDirX = - currentDirX;
@@ -182,7 +185,6 @@ public class ImageTranslationMover implements ImageMover {
 
         ret.positionX = lastX;
         ret.positionY = lastY;
-
 
         return ret;
     }
