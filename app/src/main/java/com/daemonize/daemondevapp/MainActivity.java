@@ -3,6 +3,12 @@ package com.daemonize.daemondevapp;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +21,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+
 import com.daemonize.daemondevapp.imagemovers.BouncingImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.GravityImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
@@ -25,7 +32,6 @@ import com.daemonize.daemondevapp.imagemovers.borders.Border;
 import com.daemonize.daemondevapp.imagemovers.borders.MapBorder;
 import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
 import com.daemonize.daemondevapp.imagemovers.collider.ColliderImageMover;
-import com.daemonize.daemondevapp.imagemovers.collider.PositionUpdate;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.exceptions.DaemonException;
 
@@ -33,6 +39,9 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.graphics.Color.BLACK;
+import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -163,18 +172,18 @@ public class MainActivity extends AppCompatActivity {
         views.add((ImageView) findViewById(R.id.imageView28));
         views.add((ImageView) findViewById(R.id.imageView29));
         views.add((ImageView) findViewById(R.id.imageView30));
-//
-//        views.add((ImageView) findViewById(R.id.imageView31));
-//        views.add((ImageView) findViewById(R.id.imageView32));
-//        views.add((ImageView) findViewById(R.id.imageView33));
-//        views.add((ImageView) findViewById(R.id.imageView34));
-//        views.add((ImageView) findViewById(R.id.imageView35));
-//
-//        views.add((ImageView) findViewById(R.id.imageView36));
-//        views.add((ImageView) findViewById(R.id.imageView37));
-//        views.add((ImageView) findViewById(R.id.imageView38));
-//        views.add((ImageView) findViewById(R.id.imageView39));
-//        views.add((ImageView) findViewById(R.id.imageView40));
+
+        views.add((ImageView) findViewById(R.id.imageView31));
+        views.add((ImageView) findViewById(R.id.imageView32));
+        views.add((ImageView) findViewById(R.id.imageView33));
+        views.add((ImageView) findViewById(R.id.imageView34));
+        views.add((ImageView) findViewById(R.id.imageView35));
+
+        views.add((ImageView) findViewById(R.id.imageView36));
+        views.add((ImageView) findViewById(R.id.imageView37));
+        views.add((ImageView) findViewById(R.id.imageView38));
+        views.add((ImageView) findViewById(R.id.imageView39));
+        views.add((ImageView) findViewById(R.id.imageView40));
 
     }
 
@@ -280,11 +289,17 @@ public class MainActivity extends AppCompatActivity {
                         initViews(views);
 //
 //                        for (int i = 0; i < views.size(); ++i) {
+//
+//                            List<Bitmap> numberedSprite = new ArrayList<>(4);
+//                            for(Bitmap bitmap : sprite) {
+//                                numberedSprite.add(drawTextOnBitmap(bitmap, Integer.toString(i)));
+//                            }
+//
 //                            ImageMoverDaemon starMover = new ImageMoverDaemon(
 //                                    new ColliderImageMover(
-//                                            sprite,
-//                                            30,
-//                                            Pair.create(300f, 500f),
+//                                            numberedSprite,
+//                                            20,
+//                                            Pair.create(300f + i*10, 500f + i*10),
 //                                            i,
 //                                            views.size()
 //                                    ).setBorders(borderX, borderY)
@@ -313,11 +328,21 @@ public class MainActivity extends AppCompatActivity {
                                         new BouncingImageTranslationMover(
                                                 sprite,
                                                 i / 20,
-                                                Pair.create((float) borderX % i, (float) borderY % i)
+                                                Pair.create(
+                                                        (float) borderX % i,
+                                                        (float) borderY % i
+                                                )
                                         ).setBorders(borderX, borderY)
                             );
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);
-                            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vv)));
+                            starMover.setSideQuest(
+                                    starMover.moveSideQuest.setClosure(
+                                            new ImageMoveClosure(
+                                                    MainActivity.this,
+                                                    vv
+                                            )
+                                    )
+                            );
                             starMover.start();
                             starMovers.add(starMover);
                             i += 5;
@@ -488,4 +513,20 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private static Bitmap drawTextOnBitmap(Bitmap bitmap, String text) {
+
+        Bitmap ret = Bitmap.createBitmap(bitmap);
+        Canvas canvas = new Canvas(ret);
+
+        Paint paint = new Paint();
+        paint.setColor(BLACK);
+        paint.setStrokeWidth(300);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
+        canvas.drawBitmap(ret, 0, 0, paint);
+        canvas.drawText(text, 60, 60, paint);
+
+        return ret;
+    }
+
 }
