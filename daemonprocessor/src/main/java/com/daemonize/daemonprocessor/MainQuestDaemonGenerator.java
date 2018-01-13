@@ -62,7 +62,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         for (ExecutableElement method : publicPrototypeMethods) {
             if (method.getAnnotation(CallingThread.class) != null) {
-                //System.out.println("@CallingThread - PROTOTYPE: " + method.getEnclosingElement().asType().toString() + ", METHOD: " + method.toString());
                 daemonClassBuilder.addMethod(copyMethod(method));
                 continue;
             }
