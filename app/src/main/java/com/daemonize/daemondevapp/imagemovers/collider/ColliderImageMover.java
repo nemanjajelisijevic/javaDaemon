@@ -32,7 +32,7 @@ public class ColliderImageMover extends ImageTranslationMover {
         return id;
     }
 
-    private int proximity = 20;
+    private int proximity = 50;
 
     public ColliderImageMover setProximity(int proximity) {
         this.proximity = proximity;
@@ -52,6 +52,21 @@ public class ColliderImageMover extends ImageTranslationMover {
         this.othersPosition = new PositionUpdate[othersSize];
     }
 
+    public void checkCollisionAndBounce(
+            Pair<Float, Float> colliderCoordinates,
+            float velocity,
+            Direction direction
+    ) {
+
+        if(Math.abs(lastX - colliderCoordinates.first) < 50 && Math.abs(lastY - colliderCoordinates.second) < 50) {
+            setVelocity(velocity);
+            setDirection(new Direction(
+                    (direction.coeficientX + currentDirX) / 2 ,
+                    (direction.coeficientY + currentDirY) / 2
+            ));
+        }
+    }
+
     @Override
     public void updatePosition(int id, PositionUpdate update) {
         othersPosition[id] = update;
@@ -63,33 +78,35 @@ public class ColliderImageMover extends ImageTranslationMover {
         //update others
         for (ImageMoverDaemon other : others) {
             other.updatePosition(id, new PositionUpdate(
-                        true,
-                        lastX,
-                        lastY,
-                        velocity,
-                        new Direction(this.currentDirX, this.currentDirY)
+                            true,
+                            lastX,
+                            lastY,
+                            velocity,
+                            new Direction(this.currentDirX, this.currentDirY)
                     )
             );
         }
 
         //check collisions
         for (PositionUpdate update : othersPosition) {
-
             if(update == null) {
                 continue;
             }
-
             //check for collision
             if (update.isAlive()
                     && Math.abs(this.lastX - update.getX()) < proximity
                     && Math.abs(this.lastY - update.getY()) < proximity) {
                 setDirection(
                         new Direction(
-                                (update.getDirection().coeficientX + this.currentDirX) / 2,
-                                (update.getDirection().coeficientY + this.currentDirY) / 2
+                                 - (update.getDirection().coeficientX),
+                                - (update.getDirection().coeficientY)
                         )
                 );
-                setVelocity(update.getVelocity() / 2);
+                setVelocity(
+                        update.getVelocity() > 0
+                                ?  (update.getVelocity() + velocity) / 2
+                                : velocity / 2
+                );
                 break;
             }
         }
