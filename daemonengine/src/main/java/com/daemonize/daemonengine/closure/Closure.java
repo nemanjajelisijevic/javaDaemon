@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.util.Log;
 
 import com.daemonize.daemonengine.exceptions.DaemonException;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -50,7 +51,7 @@ public abstract class Closure<T> implements Runnable {
 
     if(activity != null && activity.get() != null && (activity.get().isDestroyed() || activity.get().isFinishing())) {
       Log.d(
-              Thread.currentThread().getName(),
+              DaemonUtils.tag(),
               activityName + " that created this closure is now dead. Terminating closure..."
       );
       return;
