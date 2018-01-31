@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class MainQuest<T> extends Quest<T> {
 
@@ -29,13 +30,13 @@ public abstract class MainQuest<T> extends Quest<T> {
       }
     } catch (Exception ex) {
       if (ex instanceof InterruptedException) {
-        Log.w(Thread.currentThread().getName(),description + " interrupted.");
+        Log.w(DaemonUtils.tag(),description + " interrupted.");
       }
       if (!getIsVoid()) {
         setErrorAndUpdate(ex);
       } else {
-        Log.e(Thread.currentThread().getName(), "Error in void returning method: " + description + ":");
-        Log.e(Thread.currentThread().getName(), Log.getStackTraceString(ex));
+        Log.e(DaemonUtils.tag(), "Error in void returning method: " + description + ":");
+        Log.e(DaemonUtils.tag(), Log.getStackTraceString(ex));
       }
     }
   }
