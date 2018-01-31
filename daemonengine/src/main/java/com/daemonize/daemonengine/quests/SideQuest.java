@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 public abstract class SideQuest<T> extends Quest<T> {
@@ -44,8 +45,8 @@ public abstract class SideQuest<T> extends Quest<T> {
       if (!getIsVoid()) {
         setErrorAndUpdate(ex);
       } else {
-        Log.e(Thread.currentThread().getName(), "Error in void returning method: " + description + ":");
-        Log.e(Thread.currentThread().getName(), Log.getStackTraceString(ex));
+        Log.e(DaemonUtils.tag(), "Error in void returning method: " + description + ":");
+        Log.e(DaemonUtils.tag(), Log.getStackTraceString(ex));
       }
     }
   }
