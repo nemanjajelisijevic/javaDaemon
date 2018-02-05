@@ -12,6 +12,7 @@ import android.graphics.PorterDuffXfermode;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -32,7 +33,9 @@ import com.daemonize.daemondevapp.imagemovers.borders.Border;
 import com.daemonize.daemondevapp.imagemovers.borders.MapBorder;
 import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
 import com.daemonize.daemondevapp.imagemovers.collider.ColliderImageMover;
+import com.daemonize.daemonengine.closure.CheckedClosure;
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.UncheckedClosure;
 import com.daemonize.daemonengine.exceptions.DaemonException;
 
 import java.io.IOException;
@@ -111,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private class ImageMoveClosure extends Closure<ImageMover.PositionedBitmap> {
+    private class ImageMoveClosure extends UncheckedClosure<ImageMover.PositionedBitmap> {
 
         private WeakReference<ImageView> view;
 
@@ -122,14 +125,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReturn() {
-            try {
-                view.get().setX(getResult().positionX);
-                view.get().setY(getResult().positionY);
-                if (getResult().image != null)
-                    view.get().setImageBitmap(getResult().image);
-            } catch (DaemonException e) {
-                e.printStackTrace();
-            }
+            view.get().setX(getResult().positionX);
+            view.get().setY(getResult().positionY);
+            if (getResult().image != null)
+                view.get().setImageBitmap(getResult().image);
         }
     }
 

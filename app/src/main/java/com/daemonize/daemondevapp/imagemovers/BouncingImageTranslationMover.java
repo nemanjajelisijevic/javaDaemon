@@ -8,11 +8,17 @@ import java.util.List;
 
 public class BouncingImageTranslationMover extends ImageTranslationMover {
 
+    private float proximityDistance = 50;
+
     public BouncingImageTranslationMover(
             List<Bitmap> sprite,
             float velocity,
             Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
+        if (sprite != null && !sprite.isEmpty()) {
+            proximityDistance = sprite.get(0).getHeight() > sprite.get(0).getWidth()
+                    ? sprite.get(0).getHeight() / 2 : sprite.get(0).getWidth() / 2;
+        }
     }
 
     public void checkCollisionAndBounce(
@@ -21,7 +27,8 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
             Direction direction
     ) {
 
-        if(Math.abs(lastX - colliderCoordinates.first) < 50 && Math.abs(lastY - colliderCoordinates.second) < 50) {
+        if(Math.abs(lastX - colliderCoordinates.first) < proximityDistance
+                && Math.abs(lastY - colliderCoordinates.second) < proximityDistance) {
             setVelocity(velocity);
             setDirection(new Direction(
                     (direction.coeficientX + currentDirX) / 2 ,

@@ -76,19 +76,11 @@ public class ImageTranslationMover implements ImageMover {
         this.currentDirY = direction.coeficientY;
     }
 
-    private boolean wasted = false;
-
     @Override
     public void setTouchDirection(float x, float y) {
 
         float diffX = x - lastX;
         float diffY = y - lastY;
-
-        if (Math.abs(diffX) < 20 && Math.abs(diffY) < 20) {
-            wasted = true;
-        } else {
-            wasted = false;
-        }
 
         float a;
         boolean signY = diffY >= 0;
