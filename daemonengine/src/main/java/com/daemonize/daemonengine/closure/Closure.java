@@ -11,14 +11,16 @@ import java.lang.ref.WeakReference;
 
 public abstract class Closure<T> implements Runnable {
 
-  private T result;
+  protected volatile T result;
+  protected volatile Exception error;
+
   private WeakReference<Activity> activity;
   private String activityName;
 
-  public Closure() {}
+  protected Closure() {}
 
   //Use this construct to check if the activity that made this closure is alive
-  public Closure(Activity activity) {
+  protected Closure(Activity activity) {
     this.activity = new WeakReference<>(activity);
     activityName = activity.getLocalClassName();
   }
@@ -29,17 +31,6 @@ public abstract class Closure<T> implements Runnable {
     return (K) this;
   }
 
-  public T getResult() throws DaemonException {
-
-    if (error != null) {
-      throw new DaemonException(error);
-    }
-
-    return result;
-  }
-
-  private Exception error;
-
   @SuppressWarnings("unchecked")
   public <K extends Closure> K setError(Exception error) {
     this.error = error;
@@ -49,7 +40,8 @@ public abstract class Closure<T> implements Runnable {
   @Override
   public void run() {
 
-    if(activity != null && activity.get() != null && (activity.get().isDestroyed() || activity.get().isFinishing())) {
+    if(activity != null && activity.get() != null
+            && (activity.get().isDestroyed() || activity.get().isFinishing())) {
       Log.d(
               DaemonUtils.tag(),
               activityName + " that created this closure is now dead. Terminating closure..."

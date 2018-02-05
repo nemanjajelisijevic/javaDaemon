@@ -3,10 +3,11 @@ package com.daemonize.daemonengine.daemonscript;
 import android.app.Activity;
 
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.UncheckedClosure;
 
 import java.lang.ref.WeakReference;
 
-public abstract class LinkedClosure<T> extends Closure<T> {
+public abstract class LinkedClosure<T> extends UncheckedClosure<T> {
 
     private WeakReference<DaemonScript> script;
     private boolean scriptBroken = false;
