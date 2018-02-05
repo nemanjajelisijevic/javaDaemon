@@ -166,7 +166,7 @@ So it can be used:
 
     ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("exampleDaemon");
 
-    exampleDaemon.add(48, 54, new Closure<Integer>() {
+    exampleDaemon.add(48, 54, new CheckedClosure<Integer>() {
         @Override
         public void onReturn() {
             try {
@@ -174,6 +174,15 @@ So it can be used:
             } catch (DaemonException e) {
                 e.printStackTrace();
             }
+        }
+    });
+    
+    //or:
+    
+    exampleDaemon.add(48, 54, new UncheckedClosure<Integer>() {
+        @Override
+        public void onReturn() {
+            view.get().setText(getResult().toString());
         }
     });
     
