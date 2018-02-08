@@ -170,6 +170,7 @@ So it can be used:
         @Override
         public void onReturn() {
             try {
+                //view.get() != null
                 view.get().setText(getResult().toString());
             } catch (DaemonException e) {
                 e.printStackTrace();
@@ -182,6 +183,7 @@ So it can be used:
     exampleDaemon.add(48, 54, new UncheckedClosure<Integer>() {
         @Override
         public void onReturn() {
+            //view.get() != null
             view.get().setText(getResult().toString());
         }
     });
