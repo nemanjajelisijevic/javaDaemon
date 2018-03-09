@@ -22,6 +22,11 @@ public abstract class BaseDaemonEngine implements Daemon {
     return (K) this;
   }
 
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
   protected Thread daemonThread;
   private DaemonState state = DaemonState.STOPPED;
 

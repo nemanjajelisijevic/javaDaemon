@@ -164,6 +164,15 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                         .build()
         );
 
+        ret.add(
+                MethodSpec.methodBuilder("getName")
+                        .addAnnotation(Override.class)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(String.class)
+                        .addStatement("return daemonEngine.getName()")
+                        .build()
+        );
+
         return ret;
     }
 

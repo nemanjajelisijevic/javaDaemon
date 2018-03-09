@@ -10,4 +10,6 @@ public interface Daemon {
 
   <K extends Daemon> K setName(String name);
 
+  String getName();
+
 }
