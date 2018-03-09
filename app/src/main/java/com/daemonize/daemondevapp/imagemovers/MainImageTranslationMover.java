@@ -2,6 +2,7 @@ package com.daemonize.daemondevapp.imagemovers;
 
 
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.util.Pair;
 
 import java.util.List;
@@ -27,7 +28,6 @@ public class MainImageTranslationMover extends ImageTranslationMover {
         this.observers = observers;
         this.mode = mode;
     }
-
 
     @Override
     public MainImageTranslationMover setBorders(float x, float y) {

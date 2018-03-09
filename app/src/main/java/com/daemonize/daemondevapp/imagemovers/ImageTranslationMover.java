@@ -14,7 +14,7 @@ public class ImageTranslationMover implements ImageMover {
 
     protected List<Bitmap> sprite;
     protected Iterator<Bitmap> spriteIterator;
-    protected  float initVelocity = 30;
+    protected  float initVelocity = 20;
     protected float velocity = initVelocity;
 
     protected float lastX;
@@ -51,8 +51,8 @@ public class ImageTranslationMover implements ImageMover {
     protected float borderX;
     protected float borderY;
 
-    protected float currentDirX = 80;
-    protected float currentDirY = 20;
+    protected volatile float currentDirX = 80;
+    protected volatile float currentDirY = 20;
 
     public ImageTranslationMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
         this.sprite = sprite;
