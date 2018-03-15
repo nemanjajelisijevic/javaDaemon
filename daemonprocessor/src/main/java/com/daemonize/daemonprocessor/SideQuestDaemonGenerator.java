@@ -49,8 +49,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
                 .addModifiers(
-                        Modifier.PUBLIC,
-                        Modifier.FINAL
+                        Modifier.PUBLIC
                 ).addSuperinterface(daemonInterface);
 
         daemonClassBuilder = addTypeParameters(classElement, daemonClassBuilder);

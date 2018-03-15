@@ -46,8 +46,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
 
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
                 .addModifiers(
-                        Modifier.PUBLIC,
-                        Modifier.FINAL
+                        Modifier.PUBLIC
                 ).addSuperinterface(daemonInterface);
 
         daemonClassBuilder = addTypeParameters(classElement, daemonClassBuilder);
