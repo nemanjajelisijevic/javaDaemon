@@ -75,7 +75,7 @@ public class MainImageTranslationMover extends ImageTranslationMover {
             ret.positionX = lastX;
             ret.positionY = lastY;
 
-            velocity -= 0.1;
+            //velocity -= 0.1;
             return ret;
         }
 
