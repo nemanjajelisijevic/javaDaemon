@@ -86,15 +86,12 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         //TODO ignore accessors
 
         List<ExecutableElement> publicMethods = new ArrayList<>(10);
-
         for(Element innerElement :  annotatedClass.getEnclosedElements()) {
-
-            if (!(innerElement instanceof ExecutableElement) ||
-                    innerElement.getSimpleName().toString().equals("<init>") ||
-                    !innerElement.getModifiers().contains(Modifier.PUBLIC)) {
-                continue;
+            if ((innerElement instanceof ExecutableElement) &&
+                    !innerElement.getSimpleName().toString().equals("<init>") &&
+                    innerElement.getModifiers().contains(Modifier.PUBLIC)) {
+                publicMethods.add(((ExecutableElement) innerElement));
             }
-            publicMethods.add(((ExecutableElement) innerElement));
         }
 
         return publicMethods;
