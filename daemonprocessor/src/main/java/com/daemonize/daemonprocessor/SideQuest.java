@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface SideQuest {
-    int SLEEP() default 0;
+    int SLEEP() default 10;
 }
