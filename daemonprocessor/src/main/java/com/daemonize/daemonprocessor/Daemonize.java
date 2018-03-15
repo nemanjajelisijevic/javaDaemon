@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 public @interface Daemonize {
     boolean eager() default false;
     boolean returnDaemonInstance() default false;
-    String daemonName() default "";
+    String className() default "";
 }

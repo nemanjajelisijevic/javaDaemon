@@ -7,7 +7,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
-import com.squareup.javapoet.WildcardTypeName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +72,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         this.prototypeClassQualifiedName = classElement.getQualifiedName().toString();
         this.prototypeClassSimpleName = classElement.getSimpleName().toString();
         this.packageName = prototypeClassQualifiedName.substring(0, prototypeClassQualifiedName.lastIndexOf("."));
-        String name = classElement.getAnnotation(Daemonize.class).daemonName();
+        String name = classElement.getAnnotation(Daemonize.class).className();
         if (name.isEmpty()) {
             this.daemonSimpleName = prototypeClassSimpleName + "Daemon";
         } else {
