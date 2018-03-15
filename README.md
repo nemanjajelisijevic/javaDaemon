@@ -75,7 +75,7 @@ Some clarification with an example:
 
 Daemonprocessor will generate the Daemon class in the same package:
 
-    public final class ExampleDaemon implements Daemon {
+    public class ExampleDaemon implements Daemon {
 
       private Example prototype;
 
