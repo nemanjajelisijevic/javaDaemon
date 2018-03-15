@@ -222,7 +222,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                         pursueImplementation,
                         logExecutionTime.daemonName(),
                         logExecutionTime.timeUnits(),
-                        methodRetTypeName.toString() + " ret = " + instanceOrClass + "." + methodName + "(" + arguments + ")"
+                        methodRetTypeName.toString() + " ret = " + instanceOrClass + "." + methodName + "(" + arguments + ")"//TODO fix ret
                 );
             } else {
                 pursueImplementation.addStatement("return " + instanceOrClass + "."
@@ -369,7 +369,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
             builder.addCode("if (Thread.currentThread().getName().equals($S)) {\n", daemonName);
             builder.addStatement("  long end = System.nanoTime()");
             builder.addStatement(
-                    "  System.out.println($T.tag() + \" : Method execution lasted: \" + $T.convertNanoTimeUnits(end - begin, $T.$N))",
+                    "  System.out.println($T.tag() + \" : Method '\" + this.description + \"' execution lasted: \" + $T.convertNanoTimeUnits(end - begin, $T.$N))",
                     DAEMON_UTILS_CLASSNAME,
                     DAEMON_UTILS_CLASSNAME,
                     TIMEUNITS_CLASSNAME,

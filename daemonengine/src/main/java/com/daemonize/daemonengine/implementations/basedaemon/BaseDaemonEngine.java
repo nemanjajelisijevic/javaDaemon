@@ -1,7 +1,6 @@
 package com.daemonize.daemonengine.implementations.basedaemon;
 
-import android.os.Handler;
-import android.os.Looper;
+
 import android.util.Log;
 
 import com.daemonize.daemonengine.Daemon;
@@ -49,12 +48,6 @@ public abstract class BaseDaemonEngine implements Daemon {
     return state;
   }
 
-  //private Handler handler = new Handler(Looper.getMainLooper());
-
-  public void update(Closure closure, Handler handler) {
-    handler.post(closure);
-  }
-
   protected abstract Quest getQuest();
 
   private void loop(){
@@ -81,13 +74,6 @@ public abstract class BaseDaemonEngine implements Daemon {
         break;
       }
 
-//      Log.d(//TODO debug only
-//              DaemonUtils.tag(),
-//          "Pursuing quest: " + currentQuest.getDescription()
-//              + " (" + currentQuest.getState() + ")"
-//      );
-
-      //currentQuest.setHandler(new Handler(Looper.myLooper()));//TODO double check this
       currentQuest.setConsumer(consumer);
       setState(currentQuest.getState());
       currentQuest.run();
