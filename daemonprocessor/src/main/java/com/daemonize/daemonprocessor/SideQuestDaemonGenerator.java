@@ -56,7 +56,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         //private fields for DaemonEngine and prototype
         FieldSpec prototype = FieldSpec.builder(
                 ClassName.get(classElement.asType()),
-                PROTOYPE_STRING
+                PROTOTYPE_STRING
         ).addModifiers(Modifier.PRIVATE).build();
 
         ClassName daemonEngineClass = ClassName.get(
@@ -81,8 +81,8 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         //daemon construct
         MethodSpec daemonConstructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(classElement.asType()), PROTOYPE_STRING)
-                .addStatement("this.$N = $N", PROTOYPE_STRING, PROTOYPE_STRING)
+                .addParameter(ClassName.get(classElement.asType()), PROTOTYPE_STRING)
+                .addStatement("this.$N = $N", PROTOTYPE_STRING, PROTOTYPE_STRING)
                 .build();
 
         daemonClassBuilder.addMethod(daemonConstructor);
@@ -151,7 +151,8 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 prototypeMethodData.getMethodRetTypeName(),
                 prototypeMethodData.getArguments(),
                 prototypeMethodData.isVoid(),
-                prototypeSideQuestMethod.getModifiers().contains(Modifier.STATIC)
+                prototypeSideQuestMethod.getModifiers().contains(Modifier.STATIC),
+                prototypeSideQuestMethod.getAnnotation(LogExecutionTime.class)
         );
 
         sideQuestBuilder.addMethod(pursue);

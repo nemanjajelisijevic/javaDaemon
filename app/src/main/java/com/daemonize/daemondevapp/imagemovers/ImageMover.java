@@ -3,13 +3,10 @@ package com.daemonize.daemondevapp.imagemovers;
 import android.graphics.Bitmap;
 import android.util.Pair;
 
-import com.daemonize.daemondevapp.imagemovers.borders.Border;
 import com.daemonize.daemondevapp.imagemovers.collider.PositionUpdate;
 import com.daemonize.daemonprocessor.CallingThread;
 import com.daemonize.daemonprocessor.Daemonize;
 import com.daemonize.daemonprocessor.SideQuest;
-
-import java.util.List;
 
 @Daemonize(returnDaemonInstance = true)
 public interface ImageMover {

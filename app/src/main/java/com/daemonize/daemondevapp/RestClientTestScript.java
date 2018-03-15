@@ -9,7 +9,6 @@ import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.daemonscript.DaemonLink;
 import com.daemonize.daemonengine.daemonscript.DaemonScript;
 import com.daemonize.daemonengine.daemonscript.LinkedClosure;
-import com.daemonize.daemonengine.exceptions.DaemonException;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class RestClientTestScript implements DaemonScript {

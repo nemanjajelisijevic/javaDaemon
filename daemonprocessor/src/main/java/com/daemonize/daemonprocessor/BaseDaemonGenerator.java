@@ -27,9 +27,9 @@ import static javax.lang.model.type.TypeKind.VOID;
 public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
 
-    protected final String PROTOYPE_STRING = "prototype";
-    protected final String DAEMON_ENGINE_STRING = "daemonEngine";
+    protected final String PROTOTYPE_STRING = "prototype";
 
+    protected final String DAEMON_ENGINE_STRING = "daemonEngine";
     protected final String DAEMON_ENGINE_PACKAGE_ROOT = "com.daemonize.daemonengine";
     protected final String DAEMON_ENGINE_IMPL_PACKAGE = DAEMON_ENGINE_PACKAGE_ROOT + ".implementations";
 
@@ -41,11 +41,15 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
     protected final String CONSUMER_PACKAGE = "com.daemonize.daemonengine.consumer";
 
+    private final String DAEMONUTILS_PACKAGE = "com.daemonize.daemonengine.utils";
+    protected final ClassName DAEMON_UTILS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "DaemonUtils");
+    private final ClassName TIMEUNITS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "TimeUnits");
 
     protected TypeElement classElement;
 
     protected String prototypeClassQualifiedName;
     protected String prototypeClassSimpleName;
+
     protected String packageName;
     protected String daemonSimpleName;
 
@@ -196,7 +200,8 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
             TypeName methodRetTypeName,
             String arguments,
             boolean isVoid,
-            boolean isStatic
+            boolean isStatic,
+            LogExecutionTime logExecutionTime
     ) {
 
         MethodSpec.Builder pursueImplementation = MethodSpec.methodBuilder("pursue")
@@ -206,11 +211,24 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         pursueImplementation.returns(methodRetTypeName);
         pursueImplementation.addException(Exception.class);//TODO check this shit
 
-        String instanceOrClass = isStatic ? prototypeClassSimpleName : PROTOYPE_STRING;
+        String instanceOrClass = isStatic ? prototypeClassSimpleName : PROTOTYPE_STRING;
+
 
         if (!isVoid) {
-            pursueImplementation.addStatement("return " + instanceOrClass + "."
-                    + methodName + "(" + arguments + ")");
+
+
+            if (logExecutionTime != null) {
+                addTimeMeasureCode(
+                        pursueImplementation,
+                        logExecutionTime.daemonName(),
+                        logExecutionTime.timeUnits(),
+                        methodRetTypeName.toString() + " ret = " + instanceOrClass + "." + methodName + "(" + arguments + ")"
+                );
+            } else {
+                pursueImplementation.addStatement("return " + instanceOrClass + "."
+                        + methodName + "(" + arguments + ")");
+            }
+
         } else {
             pursueImplementation.addStatement(instanceOrClass + "."
                     + methodName + "(" + arguments + ")");
@@ -338,6 +356,34 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         }
 
         return builder;
+    }
+
+    private void addTimeMeasureCode(MethodSpec.Builder builder, String daemonName, TimeUnits units, String usefulCode) {
+
+        builder.addStatement("long begin = System.nanoTime()");
+
+        builder.addStatement(usefulCode);
+
+        if (!daemonName.isEmpty()) {
+
+            builder.addCode("if (Thread.currentThread().getName().equals($S)) {\n", daemonName);
+            builder.addStatement("  long end = System.nanoTime()");
+            builder.addStatement(
+                    "  System.out.println($T.tag() + \" : Method execution lasted: \" + $T.convertNanoTimeUnits(end - begin, $T.$N))",
+                    DAEMON_UTILS_CLASSNAME,
+                    DAEMON_UTILS_CLASSNAME,
+                    TIMEUNITS_CLASSNAME,
+                    units.name()
+            );
+
+            builder.addCode("}\n");
+
+        } else {
+            builder.addStatement("long end = System.nanoTime()");
+            builder.addStatement("System.out.println($T.convertNanoTimeUnits(end - begin, $T.$N))", DAEMON_UTILS_CLASSNAME, TIMEUNITS_CLASSNAME, units.name());
+        }
+
+        builder.addStatement("return ret");
     }
 
 }
