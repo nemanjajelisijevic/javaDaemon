@@ -10,11 +10,9 @@ import com.daemonize.daemonprocessor.SideQuest;
 @Daemonize(className = "SideQuestDaemonTest")
 public class SideQuestDaemonTestPrototype {
 
-    private int cnt;
-
-    @SideQuest(SLEEP = 5000)
+    @SideQuest()
     public void test() {
-        Log.d(DaemonUtils.tag(), "CNT: " + Integer.toString(cnt++));
+        Log.d(DaemonUtils.tag(), "CNT: " + Long.toString(System.currentTimeMillis()));
     }
 
 }

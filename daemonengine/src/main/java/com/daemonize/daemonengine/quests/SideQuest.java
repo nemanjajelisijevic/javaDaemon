@@ -30,7 +30,9 @@ public abstract class SideQuest<T> extends Quest<T> {
   @Override
   public final void run(){
     try {
+
       T result = pursue();
+
       if (!Thread.currentThread().isInterrupted()) {
         if (result != null) {
           setResultAndUpdate(result);
@@ -38,7 +40,11 @@ public abstract class SideQuest<T> extends Quest<T> {
           Log.d(Thread.currentThread().getName(), description + " returned null.");
         }*/
       }
-      Thread.sleep(sleepInterval);
+
+      if (sleepInterval > 0) {
+        Thread.sleep(sleepInterval);
+      }
+
     } catch (InterruptedException ex) {
       //Log.w(Thread.currentThread().getName(),description + " interrupted.");
     } catch (Exception ex) {
