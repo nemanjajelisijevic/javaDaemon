@@ -6,9 +6,7 @@ import android.util.Pair;
 import com.daemonize.daemondevapp.imagemovers.collider.PositionUpdate;
 import com.daemonize.daemonprocessor.CallingThread;
 import com.daemonize.daemonprocessor.Daemonize;
-import com.daemonize.daemonprocessor.LogExecutionTime;
 import com.daemonize.daemonprocessor.SideQuest;
-import com.daemonize.daemonprocessor.TimeUnits;
 
 @Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
@@ -45,7 +43,6 @@ public interface ImageMover {
 
     @CallingThread
     <K extends ImageMover> K setBorders(float x, float y);
-    //void addBorders(Border border);
 
     void pause();
 
