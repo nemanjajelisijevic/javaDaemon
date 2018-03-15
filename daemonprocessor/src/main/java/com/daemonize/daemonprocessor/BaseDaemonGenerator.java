@@ -72,12 +72,10 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         this.prototypeClassQualifiedName = classElement.getQualifiedName().toString();
         this.prototypeClassSimpleName = classElement.getSimpleName().toString();
         this.packageName = prototypeClassQualifiedName.substring(0, prototypeClassQualifiedName.lastIndexOf("."));
+
         String name = classElement.getAnnotation(Daemonize.class).className();
-        if (name.isEmpty()) {
-            this.daemonSimpleName = prototypeClassSimpleName + "Daemon";
-        } else {
-            this.daemonSimpleName = name;
-        }
+        this.daemonSimpleName = name.isEmpty() ? prototypeClassSimpleName + "Daemon" : name;
+
     }
 
     public static List<ExecutableElement> getAnnotatedClassMethods(Element annotatedClass) {
