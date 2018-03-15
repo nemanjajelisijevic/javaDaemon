@@ -40,7 +40,11 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         );
     }
 
-    public MainQuestDaemonGenerator(TypeElement classElement, boolean eager, boolean returnInstance) {
+    public MainQuestDaemonGenerator(
+            TypeElement classElement,
+            boolean eager,
+            boolean returnInstance
+    ) {
         super(classElement);
         if(eager) {
             daemonEngineSimpleName = "IdleMainQuestDaemonEngine";
