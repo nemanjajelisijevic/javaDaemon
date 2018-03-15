@@ -1,6 +1,7 @@
 package com.daemonize.daemonengine.implementations.hybriddaemon;
 
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.mainquestdaemon.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.sidequestdaemon.SideQuestDaemon;
 import com.daemonize.daemonengine.quests.MainQuest;
@@ -10,6 +11,10 @@ import com.daemonize.daemonengine.quests.SideQuest;
 public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQuestDaemon {
 
   private SideQuest sideQuest;
+
+  public HybridDaemonEngine(Consumer consumer) {
+    super(consumer);
+  }
 
   public void setSideQuest(SideQuest quest) {
     this.sideQuest = quest;

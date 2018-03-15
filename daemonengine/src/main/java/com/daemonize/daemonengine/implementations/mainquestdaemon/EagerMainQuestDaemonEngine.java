@@ -3,14 +3,19 @@ package com.daemonize.daemonengine.implementations.mainquestdaemon;
 import android.util.Log;
 
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.Quest;
 
 import java.util.concurrent.locks.Condition;
 
-public final class IdleMainQuestDaemonEngine extends MainQuestDaemonEngine {
+public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine {
 
   private Condition mainQuestAvailable = mainQuestLock.newCondition();
+
+  public EagerMainQuestDaemonEngine(Consumer consumer) {
+    super(consumer);
+  }
 
   @Override
   protected void addMainQuest(MainQuest quest) {

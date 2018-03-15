@@ -7,14 +7,18 @@ import android.util.Log;
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseDaemonEngine implements Daemon {
 
   //TODO Create a DaemonEngine interface
+  private DaemonState state = DaemonState.STOPPED;
+  private Consumer consumer;
+  private String name = this.getClass().getSimpleName();
 
-  protected String name = this.getClass().getSimpleName();
+  protected Thread daemonThread;
 
   @SuppressWarnings("unchecked")
   public <K extends Daemon> K setName(String name) {
@@ -27,10 +31,14 @@ public abstract class BaseDaemonEngine implements Daemon {
     return this.name;
   }
 
-  protected Thread daemonThread;
-  private DaemonState state = DaemonState.STOPPED;
+  @Override
+  public void setConsumer(Consumer consumer) {
+    this.consumer = consumer;
+  }
 
-  private Handler handler = new Handler(Looper.getMainLooper());
+  protected BaseDaemonEngine(Consumer consumer) {
+    this.consumer = consumer;
+  }
 
   protected void setState(DaemonState state) {
     this.state = state;
@@ -80,7 +88,7 @@ public abstract class BaseDaemonEngine implements Daemon {
 //      );
 
       //currentQuest.setHandler(new Handler(Looper.myLooper()));//TODO double check this
-      currentQuest.setHandler(handler);
+      currentQuest.setConsumer(consumer);
       setState(currentQuest.getState());
       currentQuest.run();
     }

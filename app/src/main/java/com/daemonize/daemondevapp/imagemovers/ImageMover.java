@@ -52,7 +52,7 @@ public interface ImageMover {
 
     void resume();
 
-    @SideQuest(SLEEP = 30)
+    @SideQuest(SLEEP = 25)
     PositionedBitmap move();
 
 }

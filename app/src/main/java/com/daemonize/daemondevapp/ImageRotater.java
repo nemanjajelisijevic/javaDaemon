@@ -9,7 +9,7 @@ import com.daemonize.daemonprocessor.SideQuest;
 import java.util.Iterator;
 import java.util.List;
 
-@Daemonize
+@Daemonize(className = "RotaterDaemonCustom")
 public class ImageRotater {
 
     public static class PositionedBitmap {

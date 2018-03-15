@@ -2,6 +2,7 @@ package com.daemonize.daemonengine.implementations.mainquestdaemon;
 
 
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.Quest;
@@ -14,8 +15,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MainQuestDaemonEngine extends BaseDaemonEngine {
 
   protected Queue<MainQuest> mainQuestQueue = new LinkedList<>();
-
   protected final Lock mainQuestLock = new ReentrantLock();
+
+  public MainQuestDaemonEngine(Consumer consumer) {
+    super(consumer);
+  }
 
   protected void addMainQuest(MainQuest quest) {
     mainQuestLock.lock();

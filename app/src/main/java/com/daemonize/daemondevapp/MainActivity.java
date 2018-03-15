@@ -334,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
                                         ).setBorders(borderX, borderY)
                             );
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);
+                            starMover.setName("Star " + Integer.toString(i));
                             starMover.setSideQuest(
                                     starMover.moveSideQuest.setClosure(
                                             new ImageMoveClosure(
@@ -355,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
                                         starMovers,
                                         MainImageTranslationMover.Mode.COLLIDE
                                 ).setBorders(borderX, borderY)
-                        );
+                        ).setName("Exceptione");
                         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
                         mainMover.start();

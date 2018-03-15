@@ -1,5 +1,7 @@
 package com.daemonize.daemonengine;
 
+import com.daemonize.daemonengine.consumer.Consumer;
+
 public interface Daemon {
 
   void start();
@@ -11,5 +13,7 @@ public interface Daemon {
   <K extends Daemon> K setName(String name);
 
   String getName();
+
+  void setConsumer(Consumer consumer);
 
 }

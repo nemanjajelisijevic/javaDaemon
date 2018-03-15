@@ -1,16 +1,15 @@
 package com.daemonize.daemonengine.quests;
 
-import android.os.Handler;
-
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.consumer.Consumer;
 
 public abstract class Quest<T> implements Runnable {
 
   protected DaemonState state;
   protected String description = "";
   protected Closure<T> closure;
-  private Handler handler;
+  private Consumer consumer;
 
   public String getDescription() {
     return description;
@@ -26,12 +25,13 @@ public abstract class Quest<T> implements Runnable {
     return closure;
   }
 
-  public void setHandler(Handler handler) {
-    this.handler = handler;
+  public Quest<T> setConsumer(Consumer consumer) {
+    this.consumer = consumer;
+    return this;
   }
 
-  public Handler getHandler() {
-    return handler;
+  public Consumer getConsumer() {
+    return consumer;
   }
 
   public DaemonState getState() {
@@ -43,11 +43,11 @@ public abstract class Quest<T> implements Runnable {
   //************** METHODS TO UPDATE MAIN THREAD **************************************************/
 
   public final void setResultAndUpdate(T result) {
-    handler.post(closure.setResult(result));
+    consumer.queueRunnable(closure.setResult(result));
   }
 
   public void setErrorAndUpdate(Exception error) {
-    handler.post(closure.setError(error));
+    consumer.queueRunnable(closure.setError(error));
   }
 
   //************************** Return type should be void *****************************************/

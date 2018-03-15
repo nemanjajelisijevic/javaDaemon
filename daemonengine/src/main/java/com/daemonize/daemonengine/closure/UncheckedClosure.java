@@ -4,7 +4,7 @@ package com.daemonize.daemonengine.closure;
 import android.app.Activity;
 import com.daemonize.daemonengine.exceptions.DaemonRuntimeError;
 
-public abstract class UncheckedClosure<T> extends Closure<T> {
+public abstract class UncheckedClosure<T> extends AndroidClosure<T> {
 
     public UncheckedClosure(){}
 

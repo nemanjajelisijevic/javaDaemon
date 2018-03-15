@@ -15,7 +15,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-@Daemonize(eager = true)
+@Daemonize(eager = true, className = "LinkGetta")
 public class LinkGetter<K> {
 
     private OkHttpClient client = new OkHttpClient();

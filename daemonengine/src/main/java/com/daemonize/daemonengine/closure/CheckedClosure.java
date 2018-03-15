@@ -5,7 +5,7 @@ import android.app.Activity;
 
 import com.daemonize.daemonengine.exceptions.DaemonException;
 
-public abstract class CheckedClosure<T> extends Closure<T> {
+public abstract class CheckedClosure<T> extends AndroidClosure<T> {
 
     public CheckedClosure(){}
 
