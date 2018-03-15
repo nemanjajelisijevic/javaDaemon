@@ -136,10 +136,15 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addModifiers(Modifier.PRIVATE, Modifier.FINAL);
 
         //SideQuest construct
-        MethodSpec sideQuestConstructor = MethodSpec.constructorBuilder()
+        MethodSpec.Builder sideQuestConstructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE)
-                .addStatement("this.description = \"$N\"", prototypeMethodData.getMethodName())
-                .build();
+                .addStatement("this.description = \"$N\"", prototypeMethodData.getMethodName());
+
+        if(prototypeMethodData.isVoid()) {
+            sideQuestConstructorBuilder.addStatement("setVoid()");
+        }
+
+        MethodSpec sideQuestConstructor = sideQuestConstructorBuilder.build();
 
         MethodSpec pursue =  createPursue(
                 prototypeMethodData.getMethodName(),
