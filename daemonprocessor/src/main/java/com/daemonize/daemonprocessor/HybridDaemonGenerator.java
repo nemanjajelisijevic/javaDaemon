@@ -5,7 +5,6 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeVariableName;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -15,7 +14,6 @@ import java.util.Map;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
 
 public class HybridDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
 
@@ -62,12 +60,15 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 daemonEngineSimpleName
         );
 
+        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, platform.getPlatformConsumer());
+
         FieldSpec daemonEngine = FieldSpec.builder(
                 daemonEngineClass,
                 DAEMON_ENGINE_STRING
         ).addModifiers(Modifier.PRIVATE).initializer(
-                "new $N().setName(this.getClass().getSimpleName())",
-                daemonEngineSimpleName
+                "new $N(new $T()).setName(this.getClass().getSimpleName())",
+                daemonEngineSimpleName,
+                consumer
         ).build();
 
         daemonClassBuilder.addField(prototype);

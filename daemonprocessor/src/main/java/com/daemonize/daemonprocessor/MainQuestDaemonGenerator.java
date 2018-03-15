@@ -47,7 +47,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     ) {
         super(classElement);
         if(eager) {
-            daemonEngineSimpleName = "IdleMainQuestDaemonEngine";
+            daemonEngineSimpleName = "EagerMainQuestDaemonEngine";
         }
         this.returnInstance = returnInstance;
     }
@@ -82,12 +82,15 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 daemonEngineSimpleName
         );
 
+        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, platform.getPlatformConsumer());
+
         FieldSpec daemonEngine = FieldSpec.builder(
                 daemonEngineClass,
                 DAEMON_ENGINE_STRING
         ).addModifiers(Modifier.PRIVATE).initializer(
-                "new $N().setName(this.getClass().getSimpleName())",
-                daemonEngineSimpleName
+                "new $N(new $T()).setName(this.getClass().getSimpleName())",
+                daemonEngineSimpleName,
+                consumer
         ).build();
 
         daemonClassBuilder.addField(prototype);

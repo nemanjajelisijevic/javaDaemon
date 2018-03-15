@@ -6,7 +6,6 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeVariableName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,12 +64,15 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 daemonEngineSimpleName
         );
 
+        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, platform.getPlatformConsumer());
+
         FieldSpec daemonEngine = FieldSpec.builder(
                 daemonEngineClass,
                 DAEMON_ENGINE_STRING
         ).addModifiers(Modifier.PRIVATE).initializer(
-                "new $N().setName(this.getClass().getSimpleName())",
-                daemonEngineSimpleName
+                "new $N(new $T()).setName(this.getClass().getSimpleName())",
+                daemonEngineSimpleName,
+                consumer
         ).build();
 
         daemonClassBuilder.addField(prototype);

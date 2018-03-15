@@ -12,4 +12,5 @@ public @interface Daemonize {
     boolean eager() default false;
     boolean returnDaemonInstance() default false;
     String className() default "";
+    Platform platform() default Platform.ANDROID;
 }

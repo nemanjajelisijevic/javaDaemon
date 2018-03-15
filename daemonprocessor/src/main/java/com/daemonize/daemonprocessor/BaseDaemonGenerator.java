@@ -39,12 +39,17 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     protected final String QUEST_PACKAGE = "com.daemonize.daemonengine.quests";
     protected String QUEST_TYPE_NAME;
 
+    protected final String CONSUMER_PACKAGE = "com.daemonize.daemonengine.consumer";
+
+
     protected TypeElement classElement;
 
     protected String prototypeClassQualifiedName;
     protected String prototypeClassSimpleName;
     protected String packageName;
     protected String daemonSimpleName;
+
+    protected Platform platform;
 
     protected String daemonPackage;
     protected String daemonEngineSimpleName;
@@ -72,7 +77,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         this.prototypeClassQualifiedName = classElement.getQualifiedName().toString();
         this.prototypeClassSimpleName = classElement.getSimpleName().toString();
         this.packageName = prototypeClassQualifiedName.substring(0, prototypeClassQualifiedName.lastIndexOf("."));
-
+        this.platform = classElement.getAnnotation(Daemonize.class).platform();
         String name = classElement.getAnnotation(Daemonize.class).className();
         this.daemonSimpleName = name.isEmpty() ? prototypeClassSimpleName + "Daemon" : name;
 
@@ -168,6 +173,18 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                         .addModifiers(Modifier.PUBLIC)
                         .returns(String.class)
                         .addStatement("return daemonEngine.getName()")
+                        .build()
+        );
+
+        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, "Consumer");
+
+        ret.add(
+                MethodSpec.methodBuilder("setConsumer")
+                        .addParameter(consumer, "consumer")
+                        .addAnnotation(Override.class)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(void.class)
+                        .addStatement("daemonEngine.setConsumer(consumer)")
                         .build()
         );
 
