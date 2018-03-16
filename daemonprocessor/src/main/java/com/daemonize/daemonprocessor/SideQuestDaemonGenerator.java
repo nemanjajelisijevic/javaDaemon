@@ -1,5 +1,7 @@
 package com.daemonize.daemonprocessor;
 
+import com.daemonize.daemonprocessor.annotations.LogExecutionTime;
+import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;

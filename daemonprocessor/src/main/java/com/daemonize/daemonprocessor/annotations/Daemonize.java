@@ -1,5 +1,7 @@
-package com.daemonize.daemonprocessor;
+package com.daemonize.daemonprocessor.annotations;
 
+
+import com.daemonize.daemonprocessor.Platform;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

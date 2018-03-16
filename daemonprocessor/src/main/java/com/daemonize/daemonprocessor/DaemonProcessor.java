@@ -1,5 +1,7 @@
 package com.daemonize.daemonprocessor;
 
+import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 
@@ -24,9 +26,9 @@ import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes(
         {
-                "com.daemonize.daemonprocessor.Daemonize",
-                "com.daemonize.daemonprocessor.SideQuest",
-                "com.daemonize.daemonprocessor.CallingThread"
+                "com.daemonize.daemonprocessor.annotations.Daemonize",
+                "com.daemonize.daemonprocessor.annotations.SideQuest",
+                "com.daemonize.daemonprocessor.annotations.CallingThread"
         }
 )
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
