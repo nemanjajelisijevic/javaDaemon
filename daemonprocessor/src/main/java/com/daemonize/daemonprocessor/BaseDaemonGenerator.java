@@ -360,13 +360,11 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
     private void addTimeMeasureCode(MethodSpec.Builder builder, String daemonName, TimeUnits units, String usefulCode) {
 
-        builder.addStatement("long begin = System.nanoTime()");
-
-        builder.addStatement(usefulCode);
-
         if (!daemonName.isEmpty()) {
 
             builder.addCode("if (Thread.currentThread().getName().equals($S)) {\n", daemonName);
+            builder.addStatement("  long begin = System.nanoTime()");
+            builder.addStatement("  " + usefulCode);
             builder.addStatement("  long end = System.nanoTime()");
             builder.addStatement(
                     "  System.out.println($T.tag() + \" : Method '\" + this.description + \"' execution lasted: \" + $T.convertNanoTimeUnits(end - begin, $T.$N))",
@@ -375,15 +373,22 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                     TIMEUNITS_CLASSNAME,
                     units.name()
             );
-
+            builder.addStatement("  return ret");
+            builder.addCode("} else {\n");
+            builder.addStatement("  " + usefulCode);
+            builder.addStatement("  return ret");
             builder.addCode("}\n");
 
         } else {
+            builder.addStatement("long begin = System.nanoTime()");
+            builder.addStatement(usefulCode);
             builder.addStatement("long end = System.nanoTime()");
             builder.addStatement("System.out.println($T.convertNanoTimeUnits(end - begin, $T.$N))", DAEMON_UTILS_CLASSNAME, TIMEUNITS_CLASSNAME, units.name());
+            builder.addStatement("return ret");
         }
 
-        builder.addStatement("return ret");
+
+
     }
 
 }
