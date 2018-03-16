@@ -4,8 +4,8 @@ package com.daemonize.daemondevapp;
 import android.util.Log;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
-import com.daemonize.daemonprocessor.Daemonize;
-import com.daemonize.daemonprocessor.SideQuest;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 @Daemonize(className = "SideQuestDaemonTest")
 public class SideQuestDaemonTestPrototype {

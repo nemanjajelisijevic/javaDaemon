@@ -3,8 +3,8 @@ package com.daemonize.daemondevapp;
 
 import android.graphics.Bitmap;
 
-import com.daemonize.daemonprocessor.Daemonize;
-import com.daemonize.daemonprocessor.SideQuest;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.Iterator;
 import java.util.List;

@@ -2,8 +2,8 @@ package com.daemonize.daemondevapp;
 
 import android.util.Log;
 
-import com.daemonize.daemonprocessor.CallingThread;
-import com.daemonize.daemonprocessor.Daemonize;
+import com.daemonize.daemonprocessor.annotations.CallingThread;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.google.gson.Gson;
 
 import java.io.IOException;
