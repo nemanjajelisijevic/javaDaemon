@@ -1,10 +1,7 @@
 package com.daemonize.daemonengine.implementations.basedaemon;
 
 
-import android.util.Log;
-
 import com.daemonize.daemonengine.Daemon;
-import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
@@ -52,7 +49,7 @@ public abstract class BaseDaemonEngine implements Daemon {
 
   private void loop(){
 
-    Log.i(DaemonUtils.tag(),"Daemon started!");
+    System.out.println(DaemonUtils.tag() + "Daemon started!");
     Quest currentQuest;
 
     while (!state.equals(DaemonState.STOPPED)) {
@@ -60,14 +57,14 @@ public abstract class BaseDaemonEngine implements Daemon {
       currentQuest = getQuest();
 
       if (currentQuest == null) {
-        Log.w(DaemonUtils.tag(), "No quest set. Terminating daemon...");
+        System.out.println(DaemonUtils.tag() + "No quest set. Terminating daemon...");
         break;
       }
 
       if (!currentQuest.getIsVoid() && currentQuest.getClosure() == null) {
-        Log.e(
-                DaemonUtils.tag(),
-            " No closure set for current quest: "
+        System.out.println(
+                DaemonUtils.tag()
+                + " No closure set for current quest: "
                 + currentQuest.getDescription() + " (" + currentQuest.getState()
                 + ") . Terminating daemon..."
         );
@@ -80,14 +77,14 @@ public abstract class BaseDaemonEngine implements Daemon {
     }
 
     setState(DaemonState.STOPPED);
-    Log.i(DaemonUtils.tag(), "Daemon stopped!");
+    System.out.println(DaemonUtils.tag() + "Daemon stopped!");
   }
 
   @Override
   public void start() {
     DaemonState initState = getState();
     if (!(initState.equals(DaemonState.STOPPED))) {
-      Log.w(DaemonUtils.tag(), name + "already running. State: " + getState());
+      System.out.println(DaemonUtils.tag() +  name + "already running. State: " + getState());
     } else {
       daemonThread = new Thread(new Runnable() {
         @Override

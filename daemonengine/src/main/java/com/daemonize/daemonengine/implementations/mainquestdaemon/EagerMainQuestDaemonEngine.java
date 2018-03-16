@@ -1,11 +1,10 @@
 package com.daemonize.daemonengine.implementations.mainquestdaemon;
 
-import android.util.Log;
-
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.concurrent.locks.Condition;
 
@@ -37,7 +36,7 @@ public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine {
       }
       ret = mainQuestQueue.poll();
     } catch (InterruptedException ex) {
-      Log.i(Thread.currentThread().getName(), "Waiting on a quest interrupted");
+      System.out.println(DaemonUtils.tag() + "Waiting on a quest interrupted");
     } finally {
       mainQuestLock.unlock();
     }

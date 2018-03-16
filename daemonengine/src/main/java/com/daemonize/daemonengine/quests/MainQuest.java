@@ -1,7 +1,5 @@
 package com.daemonize.daemonengine.quests;
 
-import android.util.Log;
-
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
@@ -21,23 +19,22 @@ public abstract class MainQuest<T> extends Quest<T> {
   public final void run() {
     try {
       T result = pursue();
-      if (!Thread.currentThread().isInterrupted()) {
-        if (result != null) {
-          setResultAndUpdate(result);
-        }/* else if (!getIsVoid()) {//TODO debug only
-          Log.d(Thread.currentThread().getName(), description + " returned null.");
-        }*/
+      if (!Thread.currentThread().isInterrupted() && result != null) {
+        setResultAndUpdate(result);
       }
     } catch (Exception ex) {
+
       if (ex instanceof InterruptedException) {
-        Log.w(DaemonUtils.tag(),description + " interrupted.");
+        System.out.println(DaemonUtils.tag() + description + " interrupted.");
       }
+
       if (!getIsVoid()) {
         setErrorAndUpdate(ex);
       } else {
-        Log.e(DaemonUtils.tag(), "Error in void returning method: " + description + ":");
-        Log.e(DaemonUtils.tag(), Log.getStackTraceString(ex));
+        System.out.println(DaemonUtils.tag() + "Error in void returning method: " + description + ":");
+        ex.printStackTrace();
       }
+
     }
   }
 }

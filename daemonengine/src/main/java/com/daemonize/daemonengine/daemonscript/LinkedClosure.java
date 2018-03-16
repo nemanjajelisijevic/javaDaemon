@@ -2,7 +2,6 @@ package com.daemonize.daemonengine.daemonscript;
 
 import android.app.Activity;
 
-import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.UncheckedClosure;
 
 import java.lang.ref.WeakReference;

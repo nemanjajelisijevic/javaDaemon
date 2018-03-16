@@ -14,7 +14,7 @@ public class AndroidLooperConsumer implements Consumer {
     }
 
     @Override
-    public void queueRunnable(Runnable runnable) {
+    public void enqueue(Runnable runnable) {
         handler.post(runnable);
     }
 }

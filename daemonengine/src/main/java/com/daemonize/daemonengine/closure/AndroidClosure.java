@@ -2,7 +2,6 @@ package com.daemonize.daemonengine.closure;
 
 
 import android.app.Activity;
-import android.util.Log;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
@@ -25,9 +24,10 @@ public abstract class AndroidClosure<T> extends Closure<T> {
     public void run() {
         if(activity != null && activity.get() != null
                 && (activity.get().isDestroyed() || activity.get().isFinishing())) {
-            Log.d(
-                    DaemonUtils.tag(),
-                    activityName + " that created this closure is now dead. Terminating closure..."
+            System.out.println(
+                    DaemonUtils.tag()
+                    + activityName
+                    + " that created this closure is now dead. Terminating closure..."
             );
             return;
         }

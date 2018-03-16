@@ -1,7 +1,5 @@
 package com.daemonize.daemonengine.quests;
 
-import android.util.Log;
-
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
@@ -32,13 +30,8 @@ public abstract class SideQuest<T> extends Quest<T> {
     try {
 
       T result = pursue();
-
-      if (!Thread.currentThread().isInterrupted()) {
-        if (result != null) {
-          setResultAndUpdate(result);
-        }/* else if (!getIsVoid()) {//TODO debug only
-          Log.d(Thread.currentThread().getName(), description + " returned null.");
-        }*/
+      if (!Thread.currentThread().isInterrupted() && result != null) {
+        setResultAndUpdate(result);
       }
 
       if (sleepInterval > 0) {
@@ -46,13 +39,13 @@ public abstract class SideQuest<T> extends Quest<T> {
       }
 
     } catch (InterruptedException ex) {
-      //Log.w(Thread.currentThread().getName(),description + " interrupted.");
+      //System.out.println(DaemonUtils.tag() + description + " interrupted.");
     } catch (Exception ex) {
       if (!getIsVoid()) {
         setErrorAndUpdate(ex);
       } else {
-        Log.e(DaemonUtils.tag(), "Error in void returning method: " + description + ":");
-        Log.e(DaemonUtils.tag(), Log.getStackTraceString(ex));
+        System.out.println(DaemonUtils.tag() + "Error in void returning method: " + description + ":");
+        ex.printStackTrace();
       }
     }
   }
