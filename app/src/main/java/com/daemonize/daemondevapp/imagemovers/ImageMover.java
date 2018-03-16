@@ -6,9 +6,7 @@ import android.util.Pair;
 import com.daemonize.daemondevapp.imagemovers.collider.PositionUpdate;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.LogExecutionTime;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
-import com.daemonize.daemonprocessor.TimeUnits;
 
 @Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
@@ -50,7 +48,6 @@ public interface ImageMover {
 
     void resume();
 
-    @LogExecutionTime(daemonName = "Exceptione", timeUnits = TimeUnits.MILLISECONDS)
     @SideQuest(SLEEP = 25)
     PositionedBitmap move();
 

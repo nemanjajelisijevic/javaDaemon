@@ -370,7 +370,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
             builder.addStatement("  " + usefulCode);
             builder.addStatement("  long end = System.nanoTime()");
             builder.addStatement(
-                    "  System.out.println($T.tag() + \" : Method '\" + this.description + \"' execution lasted: \" + $T.convertNanoTimeUnits(end - begin, $T.$N))",
+                    "  System.out.println($T.tag() + \"Method '\" + this.description + \"' execution lasted: \" + $T.convertNanoTimeUnits(end - begin, $T.$N))",
                     DAEMON_UTILS_CLASSNAME,
                     DAEMON_UTILS_CLASSNAME,
                     TIMEUNITS_CLASSNAME,

@@ -7,7 +7,6 @@ import java.util.List;
 public class DaemonChainScript implements DaemonScript {
 
     private List<DaemonLink> chain = new ArrayList<>(10);
-
     private Iterator<DaemonLink> it;
 
     @SuppressWarnings("unchecked")
