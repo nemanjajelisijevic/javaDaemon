@@ -14,16 +14,16 @@ public class DaemonUtils {
 
         switch (units) {
             case NANOSECONDS:
-                execTimeString = decimalInterval.toString() + " nanoseconds.";
+                execTimeString = decimalInterval.toString() + " nanoseconds";
                 break;
             case MICROSECONDS:
-                execTimeString  = Double.toString(decimalInterval / 1000) + " microseconds.";
+                execTimeString  = Double.toString(decimalInterval / 1000) + " microseconds";
                 break;
             case MILLISECONDS:
-                execTimeString  = Double.toString(decimalInterval / 1000000) + " milliseconds.";
+                execTimeString  = Double.toString(decimalInterval / 1000000) + " milliseconds";
                 break;
             case SECONDS:
-                execTimeString  = Double.toString(decimalInterval / 1000000000) + " seconds.";
+                execTimeString  = Double.toString(decimalInterval / 1000000000) + " seconds";
                 break;
             default:
                 execTimeString = "INVALID";

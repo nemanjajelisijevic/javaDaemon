@@ -6,6 +6,7 @@ import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonengine.utils.TimeUnits;
 
 public abstract class BaseDaemonEngine implements Daemon {
 
