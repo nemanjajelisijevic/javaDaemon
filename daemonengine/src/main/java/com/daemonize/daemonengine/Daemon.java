@@ -14,6 +14,6 @@ public interface Daemon {
 
   String getName();
 
-  void setConsumer(Consumer consumer);
+  <K extends Daemon> K setConsumer(Consumer consumer);
 
 }

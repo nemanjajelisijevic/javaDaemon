@@ -28,9 +28,11 @@ public abstract class BaseDaemonEngine implements Daemon {
     return this.name;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void setConsumer(Consumer consumer) {
+  public BaseDaemonEngine setConsumer(Consumer consumer) {
     this.consumer = consumer;
+    return this;
   }
 
   protected BaseDaemonEngine(Consumer consumer) {
@@ -72,9 +74,8 @@ public abstract class BaseDaemonEngine implements Daemon {
         break;
       }
 
-      currentQuest.setConsumer(consumer);
       setState(currentQuest.getState());
-      currentQuest.run();
+      currentQuest.setConsumer(consumer).run();
     }
 
     setState(DaemonState.STOPPED);
