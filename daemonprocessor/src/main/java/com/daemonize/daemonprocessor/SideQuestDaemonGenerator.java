@@ -186,9 +186,11 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 MethodSpec.methodBuilder("setSideQuest")
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
-                        .returns(void.class)
+                        //.returns(void.class)
+                        .returns(ClassName.get(packageName, daemonSimpleName))
                         .addParameter(ClassName.get(QUEST_PACKAGE, "SideQuest"), "sideQuest")
                         .addStatement(DAEMON_ENGINE_STRING + ".setSideQuest($N)", "sideQuest")
+                        .addStatement("return this")
                         .build()
         );
 

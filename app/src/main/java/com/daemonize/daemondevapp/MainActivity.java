@@ -259,15 +259,19 @@ public class MainActivity extends AppCompatActivity {
                             i += 5;
                         }
 
-                        mainMover = new ImageMoverDaemon(new MainImageTranslationMover(
-                                spriteMain,
-                                40f,
-                                Pair.create(borderX / 2f, borderY / 2f),
-                                starMovers,
-                                MainImageTranslationMover.Mode.CHASE).setBorders(borderX, borderY)
+                        mainMover = new ImageMoverDaemon(
+                                new MainImageTranslationMover(
+                                        spriteMain,
+                                        40f,
+                                        Pair.create(borderX / 2f, borderY / 2f),
+                                        starMovers,
+                                        MainImageTranslationMover.Mode.CHASE
+                                ).setBorders(borderX, borderY)
+                        ).setSideQuest(
+                                mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView))
                         );
                                 //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
-                        mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
+                        //mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
                         mainMover.start();
 
                         mode = Mode.CHASE;

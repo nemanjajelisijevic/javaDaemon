@@ -190,8 +190,10 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                         .addParameter(consumer, "consumer")
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
-                        .returns(void.class)
+                        //.returns(void.class)
+                        .returns(ClassName.get(packageName, daemonSimpleName))
                         .addStatement("daemonEngine.setConsumer(consumer)")
+                        .addStatement("return this")
                         .build()
         );
 

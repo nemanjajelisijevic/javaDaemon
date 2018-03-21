@@ -37,7 +37,7 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void updatePosition(int id, PositionUpdate update) {}
 
-    private boolean paused = false;
+    private volatile boolean paused = false;
 
     public void pause(){
         paused = true;
