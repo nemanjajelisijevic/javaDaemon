@@ -267,11 +267,12 @@ public class MainActivity extends AppCompatActivity {
                                         starMovers,
                                         MainImageTranslationMover.Mode.CHASE
                                 ).setBorders(borderX, borderY)
-                        ).setSideQuest(
+                        );
+
+                        mainMover.setSideQuest(
                                 mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView))
                         );
-                                //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
-                        //mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
+
                         mainMover.start();
 
                         mode = Mode.CHASE;

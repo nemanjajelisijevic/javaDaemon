@@ -16,10 +16,8 @@ public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQue
     super(consumer);
   }
 
-  @SuppressWarnings("unchecked")
-  public HybridDaemonEngine setSideQuest(SideQuest quest) {
+  public void setSideQuest(SideQuest quest) {
     this.sideQuest = quest;
-    return this;
   }
 
   @Override

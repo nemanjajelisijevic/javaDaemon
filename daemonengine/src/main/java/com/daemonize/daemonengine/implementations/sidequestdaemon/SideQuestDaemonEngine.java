@@ -14,10 +14,8 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine implements SideQuest
     super(consumer);
   }
 
-  @SuppressWarnings("unchecked")
-  public SideQuestDaemonEngine setSideQuest(SideQuest quest) {
+  public void setSideQuest(SideQuest quest) {
     this.sideQuest = quest;
-    return this;
   }
 
   @Override
