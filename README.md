@@ -160,7 +160,7 @@ Daemonprocessor will generate the Daemon class in the same package:
 
 So it can be used:
 
-    private WeakReference<TextView> view;
+    private TextView view;
 
     ...
 
@@ -170,8 +170,9 @@ So it can be used:
         @Override
         public void onReturn() {
             try {
-                //view.get() != null
-                view.get().setText(getResult().toString());
+                view.setText(getResult().toString());
+                // any exception thrown in daemon thread's context is caught and wrapped
+                // into a checked exception thrown upon CheckedClosure's getResult() call
             } catch (DaemonException e) {
                 e.printStackTrace();
             }
@@ -183,8 +184,8 @@ So it can be used:
     exampleDaemon.add(48, 54, new UncheckedClosure<Integer>() {
         @Override
         public void onReturn() {
-            //view.get() != null
-            view.get().setText(getResult().toString());
+            view.setText(getResult().toString());
+            // UncheckedClosure's getResult() throws a runtime error 
         }
     });
     
