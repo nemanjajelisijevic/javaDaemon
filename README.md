@@ -11,7 +11,7 @@ differing in one thing. The return value is mapped to an output type argument
    
     Closure<ReturnType> 
     
-which is instantiated upon the Daemon methods call, and handed to the main looper for execution once the prototype
+which is instantiated upon the Daemon method's call, and handed to the main looper for execution once the prototype
 method returns.
     
 Closure exposes an abstract method onReturn() for implementation, and getResult() for extracting the return value.
@@ -20,9 +20,9 @@ That being said, a Daemon can be called anywhere (multiple producers), but it on
 For now :)
 
 Underneath, Daemon is a thread that constantly checks a queue for a called method (consumer), or if configured in service 
-mode (prototype method is annotated with @SideQuest) constantly executing the sidequest method.
+mode (prototype method annotated with a @SideQuest annotation) constantly executing the sidequest method.
 
-To use the Daemon you need two jars: daemonengine.jar and daemonprocessor.jar.
+To use the Daemon you'll need two jars: daemonengine.jar and daemonprocessor.jar.
 
 Daemonengine is an android os dependent library that holds the classes needed to run the daemon.
 
