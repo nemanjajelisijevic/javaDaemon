@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -34,8 +35,6 @@ import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 
-import com.daemonize.daemonengine.utils.DaemonUtils;
-
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -43,6 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.graphics.Color.BLACK;
+import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -68,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean paused = false;
 
+
+    private ExampleDaemon exampleDaemon;
+    private TextView textView;
 
     final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
         public void onLongPress(MotionEvent e) {
@@ -140,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onReturn(Return<ImageMover.PositionedBitmap> aReturn) {
-            ImageMover.PositionedBitmap returnVal = aReturn.get();
+        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
+            ImageMover.PositionedBitmap returnVal = ret.get();
             view.get().setX(returnVal.positionX);
             view.get().setY(returnVal.positionY);
             if (returnVal.image != null)
@@ -208,6 +211,9 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        textView = findViewById(R.id.response);
+        textView.setTextColor(WHITE);
 
         borderX = getResources().getDisplayMetrics().widthPixels - 100;
         borderY = getResources().getDisplayMetrics().heightPixels - 200;
@@ -564,14 +570,14 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
         mainMover.start();
 
-        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
+        exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
 //        exampleDaemon.complicated("", ret -> {
 //            for (String line : ret.get()) {
 //                Log.d(DaemonUtils.tag(),exampleDaemon.getName() + " returned: " + line);
 //            }
 //        });
 
-        exampleDaemon.evenMoreComplicated("Ajmooou!", ret ->  Log.d(DaemonUtils.tag(),exampleDaemon.getName() + " returned: " + ret.get()));
+        exampleDaemon.evenMoreComplicated("Ajmooou!", update -> textView.setText(update.get()));
 
         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
 
@@ -580,6 +586,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        exampleDaemon.stop();
         mainMover.stop();
         for(ImageMoverDaemon mover : starMovers) {
             mover.stop();

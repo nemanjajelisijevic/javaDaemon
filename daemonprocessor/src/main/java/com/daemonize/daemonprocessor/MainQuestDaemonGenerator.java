@@ -166,8 +166,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                     "closure"
             );
 
-            mainQuestConstructorBuilder.addStatement("super(new $T(closure))", ClassName.get(CLOSURE_PACKAGE, returnRunnableType));//TODO check this
-
+            //mainQuestConstructorBuilder.addStatement("super(new $T(closure))", ClassName.get(CLOSURE_PACKAGE, returnRunnableType));//TODO check this
+            mainQuestConstructorBuilder.addStatement("super(new $T(closure))", ClassName.get(CLOSURE_PACKAGE, "ReturnRunnable"));
         } else {
             mainQuestConstructorBuilder.addStatement("setVoid()");
         }

@@ -26,9 +26,7 @@ public abstract class MainQuest<T> extends Quest<T> {
 
       if (ex instanceof InterruptedException) {
         System.out.println(DaemonUtils.tag() + description + " interrupted.");
-      }
-
-      if (!getIsVoid()) {
+      } else if (!getIsVoid()) {
         setErrorAndUpdate(ex);
       } else {
         System.out.println(DaemonUtils.tag() + "Error in void returning method: " + description + ":");
