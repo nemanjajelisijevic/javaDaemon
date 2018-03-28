@@ -34,6 +34,7 @@ import com.daemonize.daemondevapp.imagemovers.borders.MapBorder;
 import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             mainMover.setLastCoordinates(
                     e.getX(),
                     e.getY(),
-                    new ImageMoveClosure(MainActivity.this, mainView)
+                    new ImageMoveClosure(mainView)
             );
         }
     });
@@ -115,30 +116,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-//    private class ImageMoveClosure extends AndroidReturnRunnable<ImageMover.PositionedBitmap> {
-//
-//        private WeakReference<ImageView> view;
-//
-//        public ImageMoveClosure(Activity activity, ImageView view) {
-//            super(activity);
-//            this.view = new WeakReference<>(view);
-//        }
-//
-//        @Override
-//        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
-//            ImageMover.PositionedBitmap returnVal = ((UncheckedReturn<ImageMover.PositionedBitmap>) ret).get();
-//            view.get().setX(getResult().positionX);
-//            view.get().setY(getResult().positionY);
-//            if (getResult().image != null)
-//                view.get().setImageBitmap(getResult().image);
-//        }
-//    }
-
     private class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
 
         private WeakReference<ImageView> view;
 
-        public ImageMoveClosure(Activity activity, ImageView view) {
+        public ImageMoveClosure(ImageView view) {
             this.view = new WeakReference<>(view);
         }
 
@@ -275,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
                                     ).setBorders(borderX, borderY)
                             );
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);//
-                            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, v)));
+                            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(v)));
                             starMovers.add(starMover);
                             i += 5;
                         }
@@ -295,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
                         );
 
                         mainMover.setSideQuest(
-                                mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView))
+                                mainMover.moveSideQuest.setClosure(new ImageMoveClosure(mainView))
                         );
 
                         mainMover.start();
@@ -367,10 +349,7 @@ public class MainActivity extends AppCompatActivity {
                             starMover.setName("Star " + Integer.toString(i));
                             starMover.setSideQuest(
                                     starMover.moveSideQuest.setClosure(
-                                            new ImageMoveClosure(
-                                                    MainActivity.this,
-                                                    vv
-                                            )
+                                            new ImageMoveClosure(vv)
                                     )
                             );
                             starMovers.add(starMover);
@@ -391,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
                                 ).setBorders(borderX, borderY)
                         ).setName("Exceptione");
                         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
-                        mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
+                        mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(mainView)));
                         mainMover.start();
 
                         mode = Mode.COLLIDE;
@@ -424,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
                                     ).setBorders(borderX, borderY)
                             );
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
-                            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vieww)));
+                            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(vieww)));
                             starMovers.add(starMover);
                             i += 5;
                         }
@@ -443,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
                                 ).setBorders(borderX, borderY)
                         );
                         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
-                        mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
+                        mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(mainView)));
                         mainMover.start();
 
                     }
@@ -551,7 +530,7 @@ public class MainActivity extends AppCompatActivity {
                     ).setBorders(borderX, borderY)
             );
             //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
-            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, view)));
+            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(view)));
             starMover.start();
             starMovers.add(starMover);
             i += 5;
@@ -567,7 +546,7 @@ public class MainActivity extends AppCompatActivity {
                 ).setBorders(borderX, borderY)
         );
         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
-        mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
+        mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(mainView)));
         mainMover.start();
 
         exampleDaemon = new ExampleDaemon(new Example())
