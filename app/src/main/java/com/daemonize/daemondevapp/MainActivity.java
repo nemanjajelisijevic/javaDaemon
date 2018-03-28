@@ -570,14 +570,12 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
         mainMover.start();
 
-        exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
-//        exampleDaemon.complicated("", ret -> {
-//            for (String line : ret.get()) {
-//                Log.d(DaemonUtils.tag(),exampleDaemon.getName() + " returned: " + line);
-//            }
-//        });
-
-        exampleDaemon.evenMoreComplicated("Ajmooou!", update -> textView.setText(update.get()));
+        exampleDaemon = new ExampleDaemon(new Example())
+                .setName("ExampleDaemon")
+                .evenMoreComplicated(
+                        "Constantly updated from another thread: ",
+                        update -> textView.setText(update.get())
+                );
 
         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
 
