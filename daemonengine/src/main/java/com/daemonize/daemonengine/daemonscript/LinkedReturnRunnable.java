@@ -2,11 +2,12 @@ package com.daemonize.daemonengine.daemonscript;
 
 import android.app.Activity;
 
-import com.daemonize.daemonengine.closure.UncheckedClosure;
+import com.daemonize.daemonengine.closure.AndroidReturnRunnable;
+import com.daemonize.daemonengine.closure.Closure;
 
 import java.lang.ref.WeakReference;
 
-public abstract class LinkedClosure<T> extends UncheckedClosure<T> {
+public abstract class LinkedReturnRunnable<T> extends AndroidReturnRunnable<T> {
 
     private WeakReference<DaemonScript> script;
     private boolean scriptBroken = false;
@@ -15,8 +16,8 @@ public abstract class LinkedClosure<T> extends UncheckedClosure<T> {
         scriptBroken = true;
     }
 
-    public LinkedClosure(Activity activity, DaemonScript script) {
-        super(activity);
+    public LinkedReturnRunnable(Closure<T> closure, Activity activity, DaemonScript script) {
+        super(closure, activity);
         this.script = new WeakReference<>(script);
     }
 

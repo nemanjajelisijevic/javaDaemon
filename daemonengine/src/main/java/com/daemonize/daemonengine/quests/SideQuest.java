@@ -1,6 +1,7 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
@@ -21,7 +22,7 @@ public abstract class SideQuest<T> extends Quest<T> {
 
   @SuppressWarnings("unchecked")
   public SideQuest<T> setClosure(Closure<T> closure) {
-    this.closure = closure;
+    this.returnRunnable = new ReturnRunnable<>(closure);
     return this;
   }
 

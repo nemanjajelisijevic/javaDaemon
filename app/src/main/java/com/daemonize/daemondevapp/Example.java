@@ -1,7 +1,11 @@
 package com.daemonize.daemondevapp;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Pair;
 
+import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 
@@ -34,7 +38,22 @@ public class Example {
     }
 
     public List<String> complicated(String text) throws InterruptedException {
-        return new ArrayList<>();
+        List<String> ret = new ArrayList<>();
+        for (int i = 0; i < 203; ++i) {
+            ret.add(text + Integer.toString(i));
+            Thread.sleep(100);
+        }
+        return ret;
+    }
+
+    public void evenMoreComplicated(String text, Closure<String> update) throws InterruptedException {
+
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        for (int i = 0; i < 203; ++i) {
+            handler.post(new ReturnRunnable<>(update).setResult(text + Integer.toString(i)));
+            Thread.sleep(1000);
+        }
     }
 
     @CallingThread

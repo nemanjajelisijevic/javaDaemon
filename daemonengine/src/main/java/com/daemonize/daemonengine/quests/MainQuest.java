@@ -1,6 +1,6 @@
 package com.daemonize.daemonengine.quests;
 
-import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
@@ -10,9 +10,9 @@ public abstract class MainQuest<T> extends Quest<T> {
     this.state = DaemonState.MAIN_QUEST;
   }
 
-  public MainQuest(Closure<T> closure){
+  public MainQuest(ReturnRunnable<T> returnRunnable){
     this();
-    this.closure = closure;
+    this.returnRunnable = returnRunnable;
   }
 
   @Override

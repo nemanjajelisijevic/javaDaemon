@@ -89,24 +89,24 @@ Daemonprocessor will generate the Daemon class in the same package:
 
       //**************************************** PROTOTYPE METHODS MAPPED ***************************************/
 
-      public void add(Integer i, Integer k, Closure<Integer> closure) {
-        daemonEngine.pursueQuest(new AddMainQuest(i, k, closure));
+      public void add(Integer i, Integer k, Closure<Integer> returnRunnable) {
+        daemonEngine.pursueQuest(new AddMainQuest(i, k, returnRunnable));
       }
 
       public void dummy(String dummystring, List<Float> floats) {
         daemonEngine.pursueQuest(new DummyMainQuest(dummystring, floats));
       }
 
-      public void subtract(int i, int k, Closure<Integer> closure) {
-        daemonEngine.pursueQuest(new SubtractMainQuest(i, k, closure));
+      public void subtract(int i, int k, Closure<Integer> returnRunnable) {
+        daemonEngine.pursueQuest(new SubtractMainQuest(i, k, returnRunnable));
       }
 
-      public void complicated(String text, Closure<List<String>> closure) {
-        daemonEngine.pursueQuest(new ComplicatedMainQuest(text, closure));
+      public void complicated(String text, Closure<List<String>> returnRunnable) {
+        daemonEngine.pursueQuest(new ComplicatedMainQuest(text, returnRunnable));
       }
 
-      public void pairThem(Closure<Pair<Integer, String>> closure) {
-        daemonEngine.pursueQuest(new PairThemMainQuest(closure));
+      public void pairThem(Closure<Pair<Integer, String>> returnRunnable) {
+        daemonEngine.pursueQuest(new PairThemMainQuest(returnRunnable));
       }
 
       public void voidIt() {
@@ -121,8 +121,8 @@ Daemonprocessor will generate the Daemon class in the same package:
         daemonEngine.pursueQuest(new VoidItIIMainQuest(a));
       }
 
-      public void voidIt(boolean a, boolean b, Closure<Boolean> closure) {
-        daemonEngine.pursueQuest(new VoidItIIIMainQuest(a, b, closure));
+      public void voidIt(boolean a, boolean b, Closure<Boolean> returnRunnable) {
+        daemonEngine.pursueQuest(new VoidItIIIMainQuest(a, b, returnRunnable));
       }
 
       //*********************************** DAEMON INTERFACE METHODS ********************************************/

@@ -1,6 +1,6 @@
 package com.daemonize.daemonengine.quests;
 
-import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 
@@ -8,7 +8,7 @@ public abstract class Quest<T> implements Runnable {
 
   protected DaemonState state;
   protected String description = "";
-  protected Closure<T> closure;
+  protected ReturnRunnable<T> returnRunnable;
   private Consumer consumer;
 
   public String getDescription() {
@@ -21,8 +21,8 @@ public abstract class Quest<T> implements Runnable {
     return (K) this;
   }
 
-  public Closure<T> getClosure() {
-    return closure;
+  public ReturnRunnable<T> getReturnRunnable() {
+    return returnRunnable;
   }
 
   public Quest<T> setConsumer(Consumer consumer) {
@@ -43,11 +43,11 @@ public abstract class Quest<T> implements Runnable {
   //************** METHODS TO UPDATE MAIN THREAD **************************************************/
 
   public final void setResultAndUpdate(T result) {
-    consumer.enqueue(closure.setResult(result));
+    consumer.enqueue(returnRunnable.setResult(result));
   }
 
   public void setErrorAndUpdate(Exception error) {
-    consumer.enqueue(closure.setError(error));
+    consumer.enqueue(returnRunnable.setError(error));
   }
 
   //************************** Return type should be void *****************************************/

@@ -7,15 +7,18 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.lang.ref.WeakReference;
 
-public abstract class AndroidClosure<T> extends Closure<T> {
+public class AndroidReturnRunnable<T> extends ReturnRunnable<T> {
 
     private WeakReference<Activity> activity;
     private String activityName;
 
-    protected AndroidClosure(){}
+    public AndroidReturnRunnable(Closure<T> closure){
+        super(closure);
+    }
 
-    //Use this construct to check if the activity that made this closure is alive
-    protected AndroidClosure(Activity activity) {
+    //Use this construct to check if the activity that made this returnRunnable is alive
+    protected AndroidReturnRunnable(Closure<T> closure, Activity activity) {
+        super(closure);
         this.activity = new WeakReference<>(activity);
         activityName = activity.getLocalClassName();
     }
@@ -27,7 +30,7 @@ public abstract class AndroidClosure<T> extends Closure<T> {
             System.out.println(
                     DaemonUtils.tag()
                     + activityName
-                    + " that created this closure is now dead. Terminating closure..."
+                    + " that created this returnRunnable is now dead. Terminating returnRunnable..."
             );
             return;
         }

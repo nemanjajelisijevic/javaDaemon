@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -24,7 +23,6 @@ import android.widget.Toast;
 
 
 import com.daemonize.daemondevapp.imagemovers.BouncingImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.FullColliderImageMover;
 import com.daemonize.daemondevapp.imagemovers.GravityImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
@@ -33,11 +31,11 @@ import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.borders.Border;
 import com.daemonize.daemondevapp.imagemovers.borders.MapBorder;
 import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
-import com.daemonize.daemondevapp.imagemovers.collider.ColliderImageMover;
-import com.daemonize.daemonengine.closure.CheckedClosure;
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.UncheckedClosure;
-import com.daemonize.daemonengine.exceptions.DaemonException;
+import com.daemonize.daemonengine.closure.Return;
+
+import com.daemonize.daemonengine.utils.DaemonUtils;
+
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -45,7 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.graphics.Color.BLACK;
-import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -115,21 +112,40 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private class ImageMoveClosure extends UncheckedClosure<ImageMover.PositionedBitmap> {
+//    private class ImageMoveClosure extends AndroidReturnRunnable<ImageMover.PositionedBitmap> {
+//
+//        private WeakReference<ImageView> view;
+//
+//        public ImageMoveClosure(Activity activity, ImageView view) {
+//            super(activity);
+//            this.view = new WeakReference<>(view);
+//        }
+//
+//        @Override
+//        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
+//            ImageMover.PositionedBitmap returnVal = ((UncheckedReturn<ImageMover.PositionedBitmap>) ret).get();
+//            view.get().setX(getResult().positionX);
+//            view.get().setY(getResult().positionY);
+//            if (getResult().image != null)
+//                view.get().setImageBitmap(getResult().image);
+//        }
+//    }
+
+    private class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
 
         private WeakReference<ImageView> view;
 
         public ImageMoveClosure(Activity activity, ImageView view) {
-            super(activity);
             this.view = new WeakReference<>(view);
         }
 
         @Override
-        public void onReturn() {
-            view.get().setX(getResult().positionX);
-            view.get().setY(getResult().positionY);
-            if (getResult().image != null)
-                view.get().setImageBitmap(getResult().image);
+        public void onReturn(Return<ImageMover.PositionedBitmap> aReturn) {
+            ImageMover.PositionedBitmap returnVal = aReturn.get();
+            view.get().setX(returnVal.positionX);
+            view.get().setY(returnVal.positionY);
+            if (returnVal.image != null)
+                view.get().setImageBitmap(returnVal.image);
         }
     }
 
@@ -254,9 +270,12 @@ public class MainActivity extends AppCompatActivity {
                             );
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);//
                             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, v)));
-                            starMover.start();
                             starMovers.add(starMover);
                             i += 5;
+                        }
+
+                        for (ImageMoverDaemon starMover : starMovers) {
+                            starMover.start();
                         }
 
                         mainMover = new ImageMoverDaemon(
@@ -348,9 +367,12 @@ public class MainActivity extends AppCompatActivity {
                                             )
                                     )
                             );
-                            starMover.start();
                             starMovers.add(starMover);
                             i += 5;
+                        }
+
+                        for (ImageMoverDaemon starMover : starMovers) {
+                            starMover.start();
                         }
 
                         mainMover = new ImageMoverDaemon(
@@ -397,9 +419,12 @@ public class MainActivity extends AppCompatActivity {
                             );
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                             starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, vieww)));
-                            starMover.start();
                             starMovers.add(starMover);
                             i += 5;
+                        }
+
+                        for (ImageMoverDaemon starMover : starMovers) {
+                            starMover.start();
                         }
 
                         mainMover = new ImageMoverDaemon(
@@ -414,6 +439,7 @@ public class MainActivity extends AppCompatActivity {
                         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
                         mainMover.start();
+
                     }
                         mode = Mode.GRAVITY;
                         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
@@ -538,7 +564,17 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(MainActivity.this, mainView)));
         mainMover.start();
 
+        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
+//        exampleDaemon.complicated("", ret -> {
+//            for (String line : ret.get()) {
+//                Log.d(DaemonUtils.tag(),exampleDaemon.getName() + " returned: " + line);
+//            }
+//        });
+
+        exampleDaemon.evenMoreComplicated("Ajmooou!", ret ->  Log.d(DaemonUtils.tag(),exampleDaemon.getName() + " returned: " + ret.get()));
+
         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
+
     }
 
     @Override

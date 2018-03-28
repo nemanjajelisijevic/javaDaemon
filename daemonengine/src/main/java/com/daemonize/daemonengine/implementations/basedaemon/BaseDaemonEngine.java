@@ -6,7 +6,6 @@ import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
-import com.daemonize.daemonengine.utils.TimeUnits;
 
 public abstract class BaseDaemonEngine implements Daemon {
 
@@ -64,10 +63,10 @@ public abstract class BaseDaemonEngine implements Daemon {
         break;
       }
 
-      if (!currentQuest.getIsVoid() && currentQuest.getClosure() == null) {
+      if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null) {
         System.out.println(
                 DaemonUtils.tag()
-                + " No closure set for current quest: "
+                + " No returnRunnable set for current quest: "
                 + currentQuest.getDescription() + " (" + currentQuest.getState()
                 + ") . Terminating daemon..."
         );

@@ -165,7 +165,9 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                     prototypeMethodData.getClosureOfRet(),
                     "closure"
             );
-            mainQuestConstructorBuilder.addStatement("super(closure)");
+
+            mainQuestConstructorBuilder.addStatement("super(new $T(closure))", ClassName.get(CLOSURE_PACKAGE, returnRunnableType));//TODO check this
+
         } else {
             mainQuestConstructorBuilder.addStatement("setVoid()");
         }

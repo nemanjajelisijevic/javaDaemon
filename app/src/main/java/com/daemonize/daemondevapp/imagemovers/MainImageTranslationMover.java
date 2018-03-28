@@ -9,7 +9,7 @@ import java.util.List;
 
 public class MainImageTranslationMover extends ImageTranslationMover {
 
-    private List<ImageMoverDaemon> observers;
+    private final List<ImageMoverDaemon> observers;
 
     public enum Mode {
         NONE,

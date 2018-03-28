@@ -57,6 +57,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     protected String daemonSimpleName;
 
     protected Platform platform;
+    protected String returnRunnableType;
 
     protected String daemonPackage;
     protected String daemonEngineSimpleName;
@@ -85,6 +86,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         this.prototypeClassSimpleName = classElement.getSimpleName().toString();
         this.packageName = prototypeClassQualifiedName.substring(0, prototypeClassQualifiedName.lastIndexOf("."));
         this.platform = classElement.getAnnotation(Daemonize.class).platform();
+        this.returnRunnableType = platform.equals(Platform.ANDROID) ? "AndroidReturnRunnable" : "ReturnRunnable"; //TODO REFACTOR THIS!!!
         String name = classElement.getAnnotation(Daemonize.class).className();
         this.daemonSimpleName = name.isEmpty() ? prototypeClassSimpleName + "Daemon" : name;
 
