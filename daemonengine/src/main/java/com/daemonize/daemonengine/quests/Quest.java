@@ -42,12 +42,12 @@ public abstract class Quest<T> implements Runnable {
 
   //************** METHODS TO UPDATE MAIN THREAD **************************************************/
 
-  public final void setResultAndUpdate(T result) {
-    consumer.enqueue(returnRunnable.setResult(result));
+  public final boolean setResultAndUpdate(T result) {
+    return consumer.enqueue(returnRunnable.setResult(result));
   }
 
-  public void setErrorAndUpdate(Exception error) {
-    consumer.enqueue(returnRunnable.setError(error));
+  public boolean setErrorAndUpdate(Exception error) {
+    return consumer.enqueue(returnRunnable.setError(error));
   }
 
   //************************** Return type should be void *****************************************/

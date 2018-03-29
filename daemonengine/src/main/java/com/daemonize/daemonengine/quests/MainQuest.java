@@ -1,18 +1,22 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class MainQuest<T> extends Quest<T> {
 
+  private Closure<T> closure;
+
   public MainQuest() {
     this.state = DaemonState.MAIN_QUEST;
   }
 
-  public MainQuest(ReturnRunnable<T> returnRunnable){
+  public MainQuest(Closure<T> closure){
     this();
-    this.returnRunnable = returnRunnable;
+    this.closure = closure;
+    this.returnRunnable = new ReturnRunnable<>(closure);
   }
 
   @Override
@@ -20,19 +24,19 @@ public abstract class MainQuest<T> extends Quest<T> {
     try {
       T result = pursue();
       if (!Thread.currentThread().isInterrupted() && result != null) {
-        setResultAndUpdate(result);
+        if (!setResultAndUpdate(result)) {
+          System.out.println(DaemonUtils.tag() + description + ": Could not enqueue result to consumer's event queue.");
+        }
       }
-    } catch (Exception ex) {
-
-      if (ex instanceof InterruptedException) {
+    } catch (InterruptedException ex) {
         System.out.println(DaemonUtils.tag() + description + " interrupted.");
-      } else if (!getIsVoid()) {
-        setErrorAndUpdate(ex);
-      } else {
-        System.out.println(DaemonUtils.tag() + "Error in void returning method: " + description + ":");
-        ex.printStackTrace();
-      }
-
+    } catch (Exception ex) {
+        if (getIsVoid())
+            returnRunnable = new ReturnRunnable<>(closure);
+        if (!setErrorAndUpdate(ex))
+            System.out.println(DaemonUtils.tag() + description + ": Could not enqueue error to consumer's event queue.");
+        //System.out.println(DaemonUtils.tag() + "Error in void returning method: " + description + ":");
+        //ex.printStackTrace();
     }
   }
 }

@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class DaemonChainScript implements DaemonScript {
+public class DaemonChainScroll implements DaemonScroll {
 
     private List<DaemonLink> chain = new ArrayList<>(10);
     private Iterator<DaemonLink> it;
 
     @SuppressWarnings("unchecked")
-    public DaemonChainScript addLink(DaemonLink link) {
+    public DaemonChainScroll addLink(DaemonLink link) {
         chain.add(link);
         return this;
     }
