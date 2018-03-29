@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.app.Activity;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -9,83 +8,68 @@ import com.daemonize.daemondevapp.restcliententities.DelayedGetResponse;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.daemonscript.DaemonLink;
 import com.daemonize.daemonengine.daemonscript.DaemonScript;
-
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class RestClientTestScript implements DaemonScript {
 
     private DaemonChainScript chain = new DaemonChainScript();
 
-    private Activity activity;
     private TextView textView;
     private RestClientDaemon restClientDaemon;
 
     {
-        chain.addLink(new DaemonLink() {
-                    @Override
-                    public void execute() {
-                        restClientDaemon.get(
-                                "/api/users?delay=3",
-                                DelayedGetResponse.class,
-                                aReturn -> textView.append(aReturn.get().toString())
-                        );
-                    }}
-        ).addLink(new DaemonLink() {
-                    @Override
-                    public void execute() {
-                        restClientDaemon.get(
-                                "/api/users?delay=3",
-                                DelayedGetResponse.class,
-                                aReturn -> textView.append(aReturn.get().toString())
-//                                new LinkedReturnRunnable<DelayedGetResponse>(activity, chain) {
-//                                    @Override
-//                                    public void onReturn() {
-//                                        //b.dismiss();
-//                                        Log.d(DaemonUtils.tag(), "LINK 222222222222222222222222222222222222222222222222222222222222");
-//                                        textView.append(getResult().toString());
-//                                    }
-//                                }
-                        );
-                    }}
-        ).addLink(new DaemonLink() {
-                    @Override
-                    public void execute() {
-                        restClientDaemon.get(
-                                "/api/users?delay=3",
-                                DelayedGetResponse.class,
-                                aReturn -> textView.append(aReturn.get().toString())
-//                                new LinkedReturnRunnable<DelayedGetResponse>(activity, chain) {
-//                                    @Override
-//                                    public void onReturn() {
-//                                        //b.dismiss();
-//                                        Log.d(DaemonUtils.tag(), "LINK 3333333333333333333333333333333333333333333333333333333333333");
-//                                        textView.append(getResult().toString());
-//                                    }
-//                                }
+        chain.addLink(() ->
+                restClientDaemon.get(
+                        "/api/users?delay=3",
+                        DelayedGetResponse.class,
+                        ret -> {
+
+                            textView.setText(ret.get().toString());
+                            Log.d(DaemonUtils.tag(), "LINK 1");
+
+                            if (ret.get().total_pages > 0)
+                                next();
+                            else
+                                Log.e(
+                                        DaemonUtils.tag(),
+                                        "Total pages: " + Integer.toString(ret.get().total_pages)
                                 );
-                    }}
-        ).addLink(new DaemonLink() {
-                    @Override
-                    public void execute() {
-                        restClientDaemon.get(
-                                "/api/users?delay=3",
-                                DelayedGetResponse.class,
-                                aReturn -> textView.append(aReturn.get().toString())
-//                                new LinkedReturnRunnable<DelayedGetResponse>(activity, chain) {
-//                                    @Override
-//                                    public void onReturn() {
-//                                        //b.dismiss();
-//                                        Log.d(DaemonUtils.tag(), "LINK 444444444444444444444444444444444444444444444444444444444444");
-//                                        textView.append(getResult().toString());
-//                                    }
-//                                }
-                                );
-                    }}
+                        }
+                )
+        ).addLink(() ->
+                restClientDaemon.get(
+                        "/api/users?delay=3",
+                        DelayedGetResponse.class,
+                        aReturn -> {
+                            textView.append(aReturn.get().toString());
+                            Log.d(DaemonUtils.tag(), "LINK 2");
+                            chain.next();
+                        }
+                )
+        ).addLink(() ->
+                restClientDaemon.get(
+                        "/api/users?delay=3",
+                        DelayedGetResponse.class,
+                        aReturn -> {
+                            textView.append(aReturn.get().toString());
+                            Log.d(DaemonUtils.tag(), "LINK 3");
+                            chain.next();
+                        }
+                )
+        ).addLink(() ->
+                restClientDaemon.get(
+                        "/api/users?delay=3",
+                        DelayedGetResponse.class,
+                        aReturn -> {
+                            textView.append(aReturn.get().toString());
+                            Log.d(DaemonUtils.tag(), "LINK 4");
+                            chain.next();
+                        }
+                )
         );
     }
 
-    public RestClientTestScript(Activity activity, TextView textView, RestClientDaemon restClientDaemon) {
-        this.activity = activity;
+    public RestClientTestScript(TextView textView, RestClientDaemon restClientDaemon) {
         this.textView = textView;
         this.restClientDaemon = restClientDaemon;
     }

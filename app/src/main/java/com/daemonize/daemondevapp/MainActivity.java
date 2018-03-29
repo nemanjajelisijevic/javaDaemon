@@ -549,13 +549,19 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(mainView)));
         mainMover.start();
 
-        exampleDaemon = new ExampleDaemon(new Example())
-                .setName("ExampleDaemon")
-                .evenMoreComplicated(
-                        "Constantly updated from another thread: ",
-                        update -> textView.setText(update.get())
-                );
+//        exampleDaemon = new ExampleDaemon(new Example())
+//                .setName("ExampleDaemon")
+//                .evenMoreComplicated(
+//                        "Constantly updated from another thread: ",
+//                        update -> textView.setText(update.get())
+//                );
 
+        RestClientTestScript restClientTestScript = new RestClientTestScript(
+                textView,
+                new RestClientDaemon(new RestClient("https://reqres.in"))
+        );
+
+        restClientTestScript.run();
         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
 
     }

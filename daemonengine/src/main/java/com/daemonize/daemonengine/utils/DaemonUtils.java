@@ -7,9 +7,9 @@ public class DaemonUtils {
         return Thread.currentThread().getName() + ", Thread ID: " + Thread.currentThread().getId() + " - ";
     }
 
-    public static String convertNanoTimeUnits(long interval, TimeUnits units) {
+    public static String convertNanoTimeUnits(long nanoTime, TimeUnits units) {
 
-        Double decimalInterval = (double) interval;
+        Double decimalInterval = (double) nanoTime;
         String execTimeString;
 
         switch (units) {

@@ -9,6 +9,7 @@ import java.util.List;
 public class GravityImageMover extends ImageTranslationMover {
 
     private boolean touched = false;
+    private boolean falling = false;
 
     public GravityImageMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
@@ -30,20 +31,25 @@ public class GravityImageMover extends ImageTranslationMover {
     @Override
     public PositionedBitmap move() {
 
-            if(!(velocity > 0)) {
+            if(velocity <= 0) {
+                falling = true;
                 setTouchDirection(lastX, borderY);
                 velocity = initVelocity;
                 return super.move();
             }
 
             if (Math.abs(lastY - borderY) < 50) {
+                falling = false;
                 if (touched) {
                     touched = false;
                 } else {
                     return null;
                 }
             }
-            velocity -= 0.3;
+
+            if(!falling)
+                velocity -= 0.3;
+
             return super.move();
     }
 }
