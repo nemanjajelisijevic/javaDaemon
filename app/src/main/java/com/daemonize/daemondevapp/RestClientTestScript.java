@@ -5,14 +5,14 @@ import android.widget.TextView;
 
 import com.daemonize.daemondevapp.restcliententities.DelayedGetResponse;
 
-import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
+import com.daemonize.daemonengine.daemonscript.DaemonChainScroll;
 import com.daemonize.daemonengine.daemonscript.DaemonLink;
-import com.daemonize.daemonengine.daemonscript.DaemonScript;
+import com.daemonize.daemonengine.daemonscript.DaemonScroll;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public class RestClientTestScript implements DaemonScript {
+public class RestClientTestScript implements DaemonScroll {
 
-    private DaemonChainScript chain = new DaemonChainScript();
+    private DaemonChainScroll chain = new DaemonChainScroll();
 
     private TextView textView;
     private RestClientDaemon restClientDaemon;

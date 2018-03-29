@@ -569,7 +569,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        exampleDaemon.stop();
+        //exampleDaemon.stop();
         mainMover.stop();
         for(ImageMoverDaemon mover : starMovers) {
             mover.stop();
