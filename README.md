@@ -9,12 +9,14 @@ allowing the main thread to loop and be responsive.
 It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with similar signature,
 differing in one thing. The return value is mapped to an output type argument
    
-    Closure<ReturnType> 
+    public interface Closure<ReturnType> {
+      void onReturn(Return<ReturnType> ret);
+    }
     
-which is instantiated upon the Daemon method's call, and handed to the main looper for execution once the prototype
-method returns.
+which is implemented and instantiated upon the Daemon method's call, and handed to the main looper for execution once 
+the prototype method returns.
     
-Closure exposes an abstract method onReturn() for implementation, and getResult() for extracting the return value.
+Closure exposes an abstract method onReturn() for implementation, which takes the prototype methods return value as an argument.
 
 That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the MAIN thread.
 For now :)
@@ -166,27 +168,27 @@ So it can be used:
 
     ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("exampleDaemon");
 
-    exampleDaemon.add(48, 54, new CheckedClosure<Integer>() {
-        @Override
-        public void onReturn() {
-            try {
-                view.setText(getResult().toString());
-                // any exception thrown in daemon thread's context is caught and wrapped
-                // into a checked exception thrown upon CheckedClosure's getResult() call
-            } catch (DaemonException e) {
-                e.printStackTrace();
-            }
-        }
+    //sweet, sweet lambda as Closure 
+    //ret.get() throws a runtime error if an exception has been thrown
+    //in daemon thread's context
+    exampleDaemon.add(48, 54, ret -> view.setText(ret.get()));
+    
+    //or without the lambda syntax:
+    exampleDaemon.add(48, 54, new Closure<Integer>() {
+      @Override
+      public void onReturn(Return<Integer> ret) {
+         view.setText(ret.get());
+      }
     });
     
-    //or:
-    
-    exampleDaemon.add(48, 54, new UncheckedClosure<Integer>() {
-        @Override
-        public void onReturn() {
-            view.setText(getResult().toString());
-            // UncheckedClosure's getResult() throws a runtime error 
-        }
+    //or maybe we dont want the exception to crash the app:
+    exampleDaemon.add(48, 54, ret -> {
+      try {
+         Integer result = ret.checkAndGet(); //ret.checkAndGet() throws a checked exception
+         view.setText(result.toString());
+      } catch (DaemonException ex) {
+         ex.printStackTrace();
+      }
     });
     
     //the 'add' call is enqueued to Daemons call queue and returns immediatelty. Closure holding the result is
