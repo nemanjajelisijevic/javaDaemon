@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -11,7 +10,6 @@ import android.graphics.PorterDuffXfermode;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -34,7 +32,6 @@ import com.daemonize.daemondevapp.imagemovers.borders.MapBorder;
 import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
@@ -116,6 +113,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @FunctionalInterface
+    private interface ViewBinder {
+        ImageMoveClosure bindViewToClosure(ImageView view);
+    }
+
     private class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
 
         private WeakReference<ImageView> view;
@@ -133,6 +135,8 @@ public class MainActivity extends AppCompatActivity {
                 view.get().setImageBitmap(returnVal.image);
         }
     }
+
+    private ViewBinder binder = ImageMoveClosure::new;
 
     private void initViews(List<ImageView> views) {
 
@@ -257,13 +261,10 @@ public class MainActivity extends AppCompatActivity {
                                     ).setBorders(borderX, borderY)
                             );
                             //.addBorders(mapBorder).addBorders(centerBorderSquare);//
-                            starMover.setSideQuest(starMover.moveSideQuest.setClosure(new ImageMoveClosure(v)));
+
+                            starMover.setSideQuest(starMover.moveSideQuest.setClosure(binder.bindViewToClosure(v)));
                             starMovers.add(starMover);
                             i += 5;
-                        }
-
-                        for (ImageMoverDaemon starMover : starMovers) {
-                            starMover.start();
                         }
 
                         mainMover = new ImageMoverDaemon(
@@ -279,6 +280,10 @@ public class MainActivity extends AppCompatActivity {
                         mainMover.setSideQuest(
                                 mainMover.moveSideQuest.setClosure(new ImageMoveClosure(mainView))
                         );
+
+                        for (ImageMoverDaemon starMover : starMovers) {
+                            starMover.start();
+                        }
 
                         mainMover.start();
 
@@ -356,10 +361,6 @@ public class MainActivity extends AppCompatActivity {
                             i += 5;
                         }
 
-                        for (ImageMoverDaemon starMover : starMovers) {
-                            starMover.start();
-                        }
-
                         mainMover = new ImageMoverDaemon(
                                 new MainImageTranslationMover(
                                         spriteMain,
@@ -371,6 +372,11 @@ public class MainActivity extends AppCompatActivity {
                         ).setName("Exceptione");
                         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(mainView)));
+
+                        for (ImageMoverDaemon starMover : starMovers) {
+                            starMover.start();
+                        }
+
                         mainMover.start();
 
                         mode = Mode.COLLIDE;
@@ -408,10 +414,6 @@ public class MainActivity extends AppCompatActivity {
                             i += 5;
                         }
 
-                        for (ImageMoverDaemon starMover : starMovers) {
-                            starMover.start();
-                        }
-
                         mainMover = new ImageMoverDaemon(
                                 new MainImageTranslationMover(
                                         spriteMain,
@@ -423,6 +425,11 @@ public class MainActivity extends AppCompatActivity {
                         );
                         //.addBorders(mapBorder).addBorders(centerBorderSquare);//.setBorders(borderX, borderY);
                         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(new ImageMoveClosure(mainView)));
+
+                        for (ImageMoverDaemon starMover : starMovers) {
+                            starMover.start();
+                        }
+
                         mainMover.start();
 
                     }
