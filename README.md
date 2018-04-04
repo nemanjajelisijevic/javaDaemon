@@ -16,7 +16,8 @@ differing in one thing. The return value is mapped to an output type argument
 which is implemented and instantiated upon the Daemon method's call, and handed to the main looper for execution once 
 the prototype method returns.
     
-Closure exposes an abstract method onReturn() for implementation, which takes the prototype methods return value as an argument.
+Closure exposes an abstract method onReturn() for implementation, which takes the prototype methods return value as an
+argument.
 
 That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the MAIN thread.
 For now :)
