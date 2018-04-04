@@ -132,6 +132,11 @@ Daemonprocessor will generate the Daemon class in the same package:
       public Example getPrototype() {
         return prototype;
       }
+      
+      public ExampleDaemon setPrototype(Example prototype) {
+         this.prototype = prototype;
+         return this;
+      }
 
       @Override
       public void start() {
