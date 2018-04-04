@@ -50,7 +50,7 @@ public class Example {
 
         Handler handler = new Handler(Looper.getMainLooper());
 
-        for (int i = 0; i < 203; ++i) {
+        for (int i = 0; i < Integer.MAX_VALUE; ++i) {
             handler.post(new ReturnRunnable<>(update).setResult(text + Integer.toString(i)));
             Thread.sleep(1000);
         }
