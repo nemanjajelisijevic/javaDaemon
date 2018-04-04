@@ -136,6 +136,16 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         );
 
         ret.add(
+                MethodSpec.methodBuilder("setPrototype")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(ClassName.get(packageName, prototypeClassSimpleName), "prototype")
+                        .returns(ClassName.get(packageName, daemonSimpleName))
+                        .addStatement("this.prototype = prototype")
+                        .addStatement("return this")
+                        .build()
+        );
+
+        ret.add(
                 MethodSpec.methodBuilder("start")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
