@@ -2,7 +2,7 @@
 async library for android
 
 
-Generates a wrapper (Daemon) class which is an async representation of annotated prototype class. Or an interface.
+Generates a wrapper (Daemon) class which is an async representation of an annotated prototype class. Or an interface.
 It encapsulates the prototype instance and a thread that executes all the prototype method bodies in its own context,
 allowing the main thread to loop and be responsive.
 
@@ -132,6 +132,11 @@ Daemonprocessor will generate the Daemon class in the same package:
       public Example getPrototype() {
         return prototype;
       }
+      
+      public ExampleDaemon setPrototype(Example prototype) {
+         this.prototype = prototype;
+         return this;
+      }
 
       @Override
       public void start() {
@@ -171,13 +176,13 @@ So it can be used:
     //sweet, sweet lambda as Closure 
     //ret.get() throws a runtime error if an exception has been thrown
     //in daemon thread's context
-    exampleDaemon.add(48, 54, ret -> view.setText(ret.get()));
+    exampleDaemon.add(48, 54, ret -> view.setText(ret.get().toString()));
     
     //or without the lambda syntax:
     exampleDaemon.add(48, 54, new Closure<Integer>() {
       @Override
       public void onReturn(Return<Integer> ret) {
-         view.setText(ret.get());
+         view.setText(ret.get().toString());
       }
     });
     
