@@ -453,7 +453,15 @@ public class MainActivity extends AppCompatActivity {
                 .setName("ExampleDaemon")
                 .evenMoreComplicated(
                         "Constantly updated from another thread: ",
-                        update -> textView.setText(update.get())
+                        update -> textView.setText(update.get()),
+                        ret -> {
+                            textView.setText(ret.get());
+                            exampleDaemon.evenMoreComplicated(
+                                    "Here we go again: ",
+                                    update -> textView.setText(update.get()),
+                                    ret2 ->  textView.setText(ret2.get())
+                                    );
+                        }
                 );
 
 //        RestClientTestScript restClientTestScript = new RestClientTestScript(

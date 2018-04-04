@@ -46,14 +46,16 @@ public class Example {
         return ret;
     }
 
-    public void evenMoreComplicated(String text, Closure<String> update) throws InterruptedException {
+    public String evenMoreComplicated(String text, Closure<String> update) throws InterruptedException {
 
         Handler handler = new Handler(Looper.getMainLooper());
 
-        for (int i = 0; i < Integer.MAX_VALUE; ++i) {
+        for (int i = 0; i < 20; ++i) {
             handler.post(new ReturnRunnable<>(update).setResult(text + Integer.toString(i)));
             Thread.sleep(1000);
         }
+
+        return "DONE!";
     }
 
     @CallingThread

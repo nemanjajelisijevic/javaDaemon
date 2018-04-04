@@ -9,8 +9,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseDaemonEngine implements Daemon {
 
-  //TODO Create a DaemonEngine interface
-  private DaemonState state = DaemonState.STOPPED;
+  private volatile DaemonState state = DaemonState.STOPPED;
   private Consumer consumer;
   private String name = this.getClass().getSimpleName();
 
