@@ -176,13 +176,13 @@ So it can be used:
     //sweet, sweet lambda as Closure 
     //ret.get() throws a runtime error if an exception has been thrown
     //in daemon thread's context
-    exampleDaemon.add(48, 54, ret -> view.setText(ret.get()));
+    exampleDaemon.add(48, 54, ret -> view.setText(ret.get().toString()));
     
     //or without the lambda syntax:
     exampleDaemon.add(48, 54, new Closure<Integer>() {
       @Override
       public void onReturn(Return<Integer> ret) {
-         view.setText(ret.get());
+         view.setText(ret.get().toString());
       }
     });
     
