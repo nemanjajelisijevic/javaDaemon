@@ -1,3 +1,4 @@
+/*
 package com.daemonize.daemondevapp.imagemovers;
 
 
@@ -62,3 +63,4 @@ public class FullColliderImageMover extends BouncingImageTranslationMover {
         return null;
     }
 }
+*/

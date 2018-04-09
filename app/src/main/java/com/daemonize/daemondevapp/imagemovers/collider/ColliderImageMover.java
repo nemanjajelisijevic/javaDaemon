@@ -1,3 +1,4 @@
+/*
 package com.daemonize.daemondevapp.imagemovers.collider;
 
 import android.graphics.Bitmap;
@@ -114,3 +115,4 @@ public class ColliderImageMover extends ImageTranslationMover {
         return super.move();
     }
 }
+*/

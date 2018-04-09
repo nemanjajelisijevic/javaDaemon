@@ -3,10 +3,6 @@ package com.daemonize.daemondevapp.imagemovers;
 import android.graphics.Bitmap;
 import android.util.Pair;
 
-import com.daemonize.daemondevapp.imagemovers.borders.Border;
-import com.daemonize.daemondevapp.imagemovers.collider.PositionUpdate;
-
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,7 +11,9 @@ public class ImageTranslationMover implements ImageMover {
     protected List<Bitmap> sprite;
     protected Iterator<Bitmap> spriteIterator;
     protected  float initVelocity = 20;
-    protected float velocity = initVelocity;
+    //protected float velocity = initVelocity;
+
+    protected Momentum momentum;
 
     protected float lastX;
     protected float lastY;
@@ -34,8 +32,8 @@ public class ImageTranslationMover implements ImageMover {
         return ret;
     }
 
-    @Override
-    public void updatePosition(int id, PositionUpdate update) {}
+//    @Override
+//    public void updatePosition(int id, PositionUpdate update) {}
 
     private volatile boolean paused = false;
 
@@ -51,13 +49,18 @@ public class ImageTranslationMover implements ImageMover {
     protected float borderX;
     protected float borderY;
 
-    protected volatile float currentDirX = 80;
-    protected volatile float currentDirY = 20;
+    //protected volatile float currentDirX = 80;
+    //protected volatile float currentDirY = 20;
 
     public ImageTranslationMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
         this.sprite = sprite;
         this.initVelocity = velocity;
-        this.velocity = initVelocity;
+        //this.velocity = initVelocity;
+
+        this.momentum = new Momentum();
+        this.momentum.velocity = velocity;
+        this.momentum.direction = new Direction(80, 20);
+
         lastX = startingPos.first;
         lastY = startingPos.second;
         spriteIterator = sprite.iterator();
@@ -72,8 +75,15 @@ public class ImageTranslationMover implements ImageMover {
 
     @Override
     public void setDirection(Direction direction) {
-        this.currentDirX = direction.coeficientX;
-        this.currentDirY = direction.coeficientY;
+        this.momentum.direction = direction;
+
+        //this.currentDirX = direction.coeficientX;
+        //this.currentDirY = direction.coeficientY;
+    }
+
+    @Override
+    public void setMomentum(Momentum momentum) {
+        this.momentum = momentum;
     }
 
     @Override
@@ -87,13 +97,13 @@ public class ImageTranslationMover implements ImageMover {
         boolean signX = diffX >= 0;
 
         if (Math.abs(diffY) >= Math.abs(diffX)) {
-           a = Math.abs((100*diffX)/diffY);
-           float aY =  100 - a;
-           setDirection(new Direction(signX ? a : - a, signY ? aY : - aY));
+            a = Math.abs((100*diffX)/diffY);
+            float aY =  100 - a;
+            momentum.direction = new Direction(signX ? a : - a, signY ? aY : - aY);
         } else {
             a = Math.abs((100*diffY)/diffX);
             float aX =  100 - a;
-            setDirection(new Direction(signX ? aX : -aX, signY ? a : -a));
+            momentum.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
         }
     }
 
@@ -105,23 +115,15 @@ public class ImageTranslationMover implements ImageMover {
         return this;
     }
 
-//    List<Border> borders = new ArrayList<>();
-//
-//    @Override
-//    public void addBorders(Border border) {
-//        borders.add(border);
-//    }
-
     @Override
     public void setVelocity(float velocity) {
-        this.velocity = velocity;
+        this.momentum.velocity = velocity;
     }
 
     @Override
     public void checkCollisionAndBounce(
             Pair<Float, Float> colliderCoordinates,
-            float velocity,
-            Direction direction
+            Momentum momentum
     ) {}
 
     @Override
@@ -130,51 +132,26 @@ public class ImageTranslationMover implements ImageMover {
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
 
-//        for (Border border : borders) {
-//            Pair<Pair<Boolean, Boolean>, Pair<Boolean, Boolean>> borderHits = border.checkBorder(lastX, lastY);
-//
-//            if (borderHits.first.first) {
-//                currentDirX = - currentDirX;
-//                lastX = border.getMinX();
-//                break;
-//            } else if (borderHits.first.second) {
-//                currentDirX = - currentDirX;
-//                lastX = border.getMaxX();
-//                break;
-//            }
-//
-//            if (borderHits.second.first) {
-//                currentDirY = - currentDirY;
-//                lastY = border.getMinY();
-//                break;
-//            } else if (borderHits.second.second) {
-//                currentDirY = - currentDirY;
-//                lastY = border.getMaxY();
-//                break;
-//            }
-//
-//        }
-
         //check borders and recalculate
         if (lastX <= 0) {
-            currentDirX = - currentDirX;
+            momentum.direction.coeficientX = - momentum.direction.coeficientX;
             lastX = 0;
         } else if (lastX >= borderX) {
-            currentDirX = - currentDirX;
+            momentum.direction.coeficientX = - momentum.direction.coeficientX;
             lastX = borderX;
         }
 
         if(lastY <= 0) {
-            currentDirY = - currentDirY;
+            momentum.direction.coeficientY = - momentum.direction.coeficientY;
             lastY = 0;
         } else if( lastY >= borderY) {
-            currentDirY = - currentDirY;
+            momentum.direction.coeficientY = - momentum.direction.coeficientY;
             lastY = borderY;
         }
 
         if (!paused) {
-            lastX += velocity * (currentDirX * 0.01f);
-            lastY += velocity * (currentDirY * 0.01f);
+            lastX += momentum.velocity * (momentum.direction.coeficientX * 0.01f);
+            lastY += momentum.velocity * (momentum.direction.coeficientY * 0.01f);
         }
 
         ret.positionX = lastX;

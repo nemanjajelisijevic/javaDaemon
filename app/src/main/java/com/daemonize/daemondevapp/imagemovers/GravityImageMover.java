@@ -23,7 +23,7 @@ public class GravityImageMover extends ImageTranslationMover {
 
     @Override
     public void setTouchDirection(float x, float y) {
-        velocity = initVelocity;
+        momentum.velocity = initVelocity;
         touched = true;
         super.setTouchDirection(x, y);
     }
@@ -31,10 +31,10 @@ public class GravityImageMover extends ImageTranslationMover {
     @Override
     public PositionedBitmap move() {
 
-            if(velocity <= 0) {
+            if(momentum.velocity <= 0) {
                 falling = true;
                 setTouchDirection(lastX, borderY);
-                velocity = initVelocity;
+                momentum.velocity = initVelocity;
                 return super.move();
             }
 
@@ -48,7 +48,7 @@ public class GravityImageMover extends ImageTranslationMover {
             }
 
             if(!falling)
-                velocity -= 0.3;
+                momentum.velocity -= 0.3;
 
             return super.move();
     }

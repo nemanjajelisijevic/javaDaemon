@@ -38,45 +38,48 @@ public class MainImageTranslationMover extends ImageTranslationMover {
     @Override
     public PositionedBitmap move() {
 
-        if(velocity > 0 ) {
+        if(momentum.velocity > 0 ) {
 
             for (ImageMoverDaemon observer : observers) {
                 if(mode.equals(Mode.CHASE)) {
                     observer.setTouchDirection(lastX, lastY); //TODO CHASER
                 } else if (mode.equals(Mode.COLLIDE)) {
-                    observer.checkCollisionAndBounce(Pair.create(lastX, lastY), velocity, new Direction(currentDirX, currentDirY)); //TODO Collisions
+                    observer.checkCollisionAndBounce(Pair.create(lastX, lastY), momentum); //TODO Collisions
                 }
             }
 
-            PositionedBitmap ret = new PositionedBitmap();
+            momentum.velocity -= 0.1;
+            return super.move();
 
-            ret.image = iterateSprite();
+//            PositionedBitmap ret = new PositionedBitmap();
+//            ret.image = iterateSprite();
+//
+//            //check borders and recalculate
+//            if (lastX <= 0) {
+//                momentum.direction.coeficientX = - momentum.direction.coeficientX;
+//                lastX = 0;
+//            } else if (lastX >= borderX) {
+//                momentum.direction.coeficientX = - momentum.direction.coeficientX;
+//                lastX = borderX;
+//            }
+//
+//            if (lastY <= 0) {
+//                momentum.direction.coeficientY = - momentum.direction.coeficientY;
+//                lastY = 0;
+//            } else if (lastY >= borderY) {
+//                momentum.direction.coeficientY = - momentum.direction.coeficientY;
+//                lastY = borderY;
+//            }
+//
+//            lastX += momentum.velocity * (momentum.direction.coeficientX * 0.01f);
+//            lastY += momentum.velocity * (momentum.direction.coeficientY * 0.01f);
+//
+//            ret.positionX = lastX;
+//            ret.positionY = lastY;
+//
+//            momentum.velocity -= 0.1;
+//            return ret;
 
-            //check borders and recalculate
-            if (lastX <= 0) {
-                currentDirX = -currentDirX;
-                lastX = 0;
-            } else if (lastX >= borderX) {
-                currentDirX = -currentDirX;
-                lastX = borderX;
-            }
-
-            if (lastY <= 0) {
-                currentDirY = -currentDirY;
-                lastY = 0;
-            } else if (lastY >= borderY) {
-                currentDirY = -currentDirY;
-                lastY = borderY;
-            }
-
-            lastX = lastX + velocity * (currentDirX * 0.01f);
-            lastY = lastY + velocity * (currentDirY * 0.01f);
-
-            ret.positionX = lastX;
-            ret.positionY = lastY;
-
-            velocity -= 0.1;
-            return ret;
         }
 
         return null;

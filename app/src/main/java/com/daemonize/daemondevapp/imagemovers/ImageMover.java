@@ -3,13 +3,17 @@ package com.daemonize.daemondevapp.imagemovers;
 import android.graphics.Bitmap;
 import android.util.Pair;
 
-import com.daemonize.daemondevapp.imagemovers.collider.PositionUpdate;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 @Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
+
+    class Momentum {
+        public float velocity;
+        public Direction direction;
+    }
 
     class PositionedBitmap {
         public Bitmap image;
@@ -28,14 +32,13 @@ public interface ImageMover {
         }
     }
 
-    @CallingThread
-    void updatePosition(int id, PositionUpdate update);
-
     PositionedBitmap setLastCoordinates(float lastX, float lastY);
 
-    void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, float velocity, Direction direction);
+    void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, Momentum momentum);
 
     void setDirection(Direction direction);
+
+    void setMomentum(Momentum momentum);
 
     void setTouchDirection(float x, float y);
 
