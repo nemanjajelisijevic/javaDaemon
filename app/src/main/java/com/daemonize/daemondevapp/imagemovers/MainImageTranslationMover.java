@@ -2,7 +2,6 @@ package com.daemonize.daemondevapp.imagemovers;
 
 
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.util.Pair;
 
 import java.util.List;
@@ -50,36 +49,6 @@ public class MainImageTranslationMover extends ImageTranslationMover {
 
             momentum.velocity -= 0.1;
             return super.move();
-
-//            PositionedBitmap ret = new PositionedBitmap();
-//            ret.image = iterateSprite();
-//
-//            //check borders and recalculate
-//            if (lastX <= 0) {
-//                momentum.direction.coeficientX = - momentum.direction.coeficientX;
-//                lastX = 0;
-//            } else if (lastX >= borderX) {
-//                momentum.direction.coeficientX = - momentum.direction.coeficientX;
-//                lastX = borderX;
-//            }
-//
-//            if (lastY <= 0) {
-//                momentum.direction.coeficientY = - momentum.direction.coeficientY;
-//                lastY = 0;
-//            } else if (lastY >= borderY) {
-//                momentum.direction.coeficientY = - momentum.direction.coeficientY;
-//                lastY = borderY;
-//            }
-//
-//            lastX += momentum.velocity * (momentum.direction.coeficientX * 0.01f);
-//            lastY += momentum.velocity * (momentum.direction.coeficientY * 0.01f);
-//
-//            ret.positionX = lastX;
-//            ret.positionY = lastY;
-//
-//            momentum.velocity -= 0.1;
-//            return ret;
-
         }
 
         return null;
@@ -107,6 +76,5 @@ public class MainImageTranslationMover extends ImageTranslationMover {
 
         setVelocity(initVelocity);
     }
-
 
 }

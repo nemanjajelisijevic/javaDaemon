@@ -11,7 +11,6 @@ public class ImageTranslationMover implements ImageMover {
     protected List<Bitmap> sprite;
     protected Iterator<Bitmap> spriteIterator;
     protected  float initVelocity = 20;
-    //protected float velocity = initVelocity;
 
     protected Momentum momentum;
 
@@ -32,9 +31,6 @@ public class ImageTranslationMover implements ImageMover {
         return ret;
     }
 
-//    @Override
-//    public void updatePosition(int id, PositionUpdate update) {}
-
     private volatile boolean paused = false;
 
     public void pause(){
@@ -49,21 +45,14 @@ public class ImageTranslationMover implements ImageMover {
     protected float borderX;
     protected float borderY;
 
-    //protected volatile float currentDirX = 80;
-    //protected volatile float currentDirY = 20;
-
     public ImageTranslationMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
         this.sprite = sprite;
         this.initVelocity = velocity;
-        //this.velocity = initVelocity;
-
-        this.momentum = new Momentum();
-        this.momentum.velocity = velocity;
-        this.momentum.direction = new Direction(80, 20);
-
+        this.momentum = new Momentum(velocity, new Direction(80, 20));
         lastX = startingPos.first;
         lastY = startingPos.second;
         spriteIterator = sprite.iterator();
+
     }
 
     protected Bitmap iterateSprite() {
@@ -76,9 +65,6 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void setDirection(Direction direction) {
         this.momentum.direction = direction;
-
-        //this.currentDirX = direction.coeficientX;
-        //this.currentDirY = direction.coeficientY;
     }
 
     @Override

@@ -13,6 +13,17 @@ public interface ImageMover {
     class Momentum {
         public float velocity;
         public Direction direction;
+
+        public Momentum(float velocity, Direction direction) {
+            this.velocity = velocity;
+            this.direction = direction;
+        }
+
+        //copy construct
+        public Momentum(Momentum other) {
+            this.velocity = other.velocity;
+            this.direction = new Direction(other.direction.coeficientX, other.direction.coeficientY);
+        }
     }
 
     class PositionedBitmap {

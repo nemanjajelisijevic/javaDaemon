@@ -28,7 +28,7 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
 
         if(Math.abs(lastX - colliderCoordinates.first) < proximityDistance
                 && Math.abs(lastY - colliderCoordinates.second) < proximityDistance) {
-            setMomentum(momentum);
+            setMomentum(new Momentum(momentum));
         }
     }
 
