@@ -24,7 +24,7 @@ public class ReturnRunnable<T> implements Runnable {
             error,
             "\nDaemon: "
                     + DaemonUtils.tag()
-                    + "method: " + methodName + "\n"
+                    + "method '" + methodName + "' threw an exception:\n"
                     + error.getClass().getCanonicalName()
                     + ": "
                     + error.getMessage()
