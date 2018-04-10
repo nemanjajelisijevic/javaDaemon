@@ -1,5 +1,7 @@
 package com.daemonize.daemonengine.closure;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
+
 public class ReturnRunnable<T> implements Runnable {
 
   private Closure<T> closure;
@@ -17,8 +19,16 @@ public class ReturnRunnable<T> implements Runnable {
   }
 
   @SuppressWarnings("unchecked")
-  public <K extends ReturnRunnable> K setError(Exception error) {
-    ret.setError(error);
+  public <K extends ReturnRunnable> K setError(Exception error, String methodName) {
+    ret.setError(
+            error,
+            "\nDaemon: "
+                    + DaemonUtils.tag()
+                    + "method: " + methodName + "\n"
+                    + error.getClass().getCanonicalName()
+                    + ": "
+                    + error.getMessage()
+    );
     return (K) this;
   }
 

@@ -47,7 +47,7 @@ public abstract class Quest<T> implements Runnable {
   }
 
   public boolean setErrorAndUpdate(Exception error) {
-    return consumer.enqueue(returnRunnable.setError(error));
+    return consumer.enqueue(returnRunnable.setError(error, description));
   }
 
   //************************** Return type should be void *****************************************/

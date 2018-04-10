@@ -50,7 +50,12 @@ public class Example {
 
         Handler handler = new Handler(Looper.getMainLooper());
 
-        for (int i = 0; i < 20; ++i) {
+        for (int i = 1; i < 20; ++i) {
+
+            if(i % 7 == 0) {
+                throw new IllegalStateException("Testing exception stack trace");
+            }
+
             handler.post(new ReturnRunnable<>(update).setResult(text + Integer.toString(i)));
             Thread.sleep(1000);
         }

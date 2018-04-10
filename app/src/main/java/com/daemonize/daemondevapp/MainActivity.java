@@ -10,6 +10,7 @@ import android.graphics.PorterDuffXfermode;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -32,6 +33,7 @@ import com.daemonize.daemondevapp.imagemovers.borders.MapBorder;
 import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
+import com.daemonize.daemonengine.exceptions.DaemonException;
 
 
 import java.io.IOException;
@@ -66,8 +68,6 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean paused = false;
 
-
-    private ExampleDaemon exampleDaemon;
     private TextView textView;
 
     final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             mainMover.setLastCoordinates(
                     e.getX(),
                     e.getY(),
-                    new ImageMoveClosure(mainView)
+                    binder.bindViewToClosure(mainView)
             );
         }
     });
@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                                             i / 14,
                                             Pair.create((float) borderX/2, (float) borderY/2)
                                     ).setBorders(borderX, borderY)
-                            ).setName("Star " + Integer.toString(i));
+                            );
                             i+=5;
                         }
 
@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                                         starMovers,
                                         MainImageTranslationMover.Mode.CHASE
                                 ).setBorders(borderX, borderY)
-                        ).setName("Exceptione");
+                        );
 
                         mode = Mode.CHASE;
                         Toast.makeText(MainActivity.this, "MODE: CHASE", Toast.LENGTH_LONG).show();
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
                                                         (float) borderY % i
                                                 )
                                         ).setBorders(borderX, borderY)
-                            ).setName("Star " + Integer.toString(i));
+                            );
                             i+=5;
                         }
 
@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
                                         starMovers,
                                         MainImageTranslationMover.Mode.COLLIDE
                                 ).setBorders(borderX, borderY)
-                        ).setName("Exceptione");
+                        );
 
                         mode = Mode.COLLIDE;
                         Toast.makeText(MainActivity.this, "MODE: COLLIDE", Toast.LENGTH_LONG).show();
@@ -309,7 +309,7 @@ public class MainActivity extends AppCompatActivity {
                                             /*i/5*/30,
                                             Pair.create((float)borderX % i, (float) borderY % i)
                                     ).setBorders(borderX, borderY)
-                            ).setName("Star " + Integer.toString(i));
+                            );
                             i+=5;
                         }
 
@@ -321,7 +321,7 @@ public class MainActivity extends AppCompatActivity {
                                         starMovers,
                                         MainImageTranslationMover.Mode.NONE
                                 ).setBorders(borderX, borderY)
-                        ).setName("Exceptione");
+                        );
 
                         mode = Mode.GRAVITY;
                         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
@@ -428,7 +428,7 @@ public class MainActivity extends AppCompatActivity {
                             /*i/5*/20,
                             Pair.create((float)borderX % i, (float) borderY % i)
                     ).setBorders(borderX, borderY)
-            );
+            ).setName("Star " + Integer.toString(i));
 
             starMover.setSideQuest(starMover.moveSideQuest.setClosure(binder.bindViewToClosure(view)));
             starMover.start();
@@ -449,18 +449,23 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(binder.bindViewToClosure(mainView)));
         mainMover.start();
 
-        exampleDaemon = new ExampleDaemon(new Example())
-                .setName("ExampleDaemon")
-                .evenMoreComplicated(
+        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
+        exampleDaemon.evenMoreComplicated(
                         "Constantly updated from another thread: ",
                         update -> textView.setText(update.get()),
                         ret -> {
-                            textView.setText(ret.get());
+                            try {
+                                textView.setText(ret.checkAndGet());
+                            } catch (DaemonException e) {
+                                Log.e("DAEMON ERROR", Log.getStackTraceString(e));
+                                textView.setText(e.getMessage());
+                                return;
+                            }
                             exampleDaemon.evenMoreComplicated(
                                     "Here we go again: ",
                                     update -> textView.setText(update.get()),
                                     ret2 ->  textView.setText(ret2.get())
-                                    );
+                            );
                         }
                 );
 

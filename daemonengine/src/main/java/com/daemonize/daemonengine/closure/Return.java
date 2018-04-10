@@ -6,31 +6,33 @@ import com.daemonize.daemonengine.exceptions.DaemonRuntimeError;
 
 public class Return<T> {
 
-    protected volatile T result;
-    protected volatile Exception error;
+    private volatile T result;
+    private volatile Exception error;
+    private volatile String daemonDescription;
 
-    @SuppressWarnings("unchecked")
-    public <K extends Return<T>> K setResult(T result) {
+    void setResult(T result) {
         this.result = result;
-        return (K) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <K extends Return<T>> K setError(Exception error) {
+    void setError(Exception error, String daemonDescription) {
         this.error = error;
-        return (K) this;
+        this.daemonDescription = daemonDescription;
     }
 
     public T checkAndGet() throws DaemonException {
         if (error != null) {
-            throw new DaemonException(error);
+            DaemonException exc = new DaemonException(daemonDescription, error);
+            exc.setStackTrace(new StackTraceElement[]{});
+            throw exc;
         }
         return result;
     }
 
     public T get() {
         if(error != null) {
-            throw new DaemonRuntimeError(error);
+            DaemonRuntimeError err = new DaemonRuntimeError(daemonDescription, error);
+            err.setStackTrace(new StackTraceElement[]{});
+            throw err;
         }
         return result;
     }
