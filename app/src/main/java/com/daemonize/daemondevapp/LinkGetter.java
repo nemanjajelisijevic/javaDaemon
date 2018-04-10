@@ -22,11 +22,11 @@ public class LinkGetter<K> {
     private static final String GOOGLE_SEARCH = "https://google.com/search?q=";
 
     @SideQuest(SLEEP = 10000)
-    public List<String> getDeviantArt() throws InterruptedException {
+    public List<String> getDeviantArt() throws InterruptedException, IOException {
         return getLinks("deviant art");
     }
 
-    public List<String> getLinks(String search)  {
+    public List<String> getLinks(String search) throws IOException {
 
         Request request = new Request.Builder()
                 .url(GOOGLE_SEARCH + search)
@@ -34,13 +34,9 @@ public class LinkGetter<K> {
 
         Response response;
         String responseString;
-        try {
-            response = client.newCall(request).execute();
-             responseString = response.body().string();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+        response = client.newCall(request).execute();
+        responseString = response.body().string();
 
         Log.d(Thread.currentThread().getName() + ", Thread Id: " + Long.toString(Thread.currentThread().getId()), responseString);
 

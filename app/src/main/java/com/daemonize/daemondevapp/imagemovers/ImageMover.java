@@ -10,18 +10,18 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 @Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
 
-    class Momentum {
-        public float velocity;
+    class Velocity {
+        public float intensity;
         public Direction direction;
 
-        public Momentum(float velocity, Direction direction) {
-            this.velocity = velocity;
+        public Velocity(float intensity, Direction direction) {
+            this.intensity = intensity;
             this.direction = direction;
         }
 
         //copy construct
-        public Momentum(Momentum other) {
-            this.velocity = other.velocity;
+        public Velocity(Velocity other) {
+            this.intensity = other.intensity;
             this.direction = new Direction(other.direction.coeficientX, other.direction.coeficientY);
         }
     }
@@ -45,11 +45,11 @@ public interface ImageMover {
 
     PositionedBitmap setLastCoordinates(float lastX, float lastY);
 
-    void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, Momentum momentum);
+    void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, Velocity velocity);
 
     void setDirection(Direction direction);
 
-    void setMomentum(Momentum momentum);
+    void setVelocity(Velocity velocity);
 
     void setTouchDirection(float x, float y);
 

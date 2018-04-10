@@ -37,17 +37,17 @@ public class MainImageTranslationMover extends ImageTranslationMover {
     @Override
     public PositionedBitmap move() {
 
-        if(momentum.velocity > 0 ) {
+        if(velocity.intensity > 0 ) {
 
             for (ImageMoverDaemon observer : observers) {
                 if(mode.equals(Mode.CHASE)) {
                     observer.setTouchDirection(lastX, lastY); //TODO CHASER
                 } else if (mode.equals(Mode.COLLIDE)) {
-                    observer.checkCollisionAndBounce(Pair.create(lastX, lastY), momentum); //TODO Collisions
+                    observer.checkCollisionAndBounce(Pair.create(lastX, lastY), velocity); //TODO Collisions
                 }
             }
 
-            momentum.velocity -= 0.1;
+            velocity.intensity -= 0.1;
             return super.move();
         }
 

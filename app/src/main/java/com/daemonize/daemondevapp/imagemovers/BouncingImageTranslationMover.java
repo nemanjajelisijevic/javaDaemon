@@ -23,12 +23,12 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
 
     public void checkCollisionAndBounce(
             Pair<Float, Float> colliderCoordinates,
-            Momentum momentum
+            Velocity velocity
     ) {
 
         if(Math.abs(lastX - colliderCoordinates.first) < proximityDistance
                 && Math.abs(lastY - colliderCoordinates.second) < proximityDistance) {
-            setMomentum(new Momentum(momentum));
+            setVelocity(new Velocity(velocity));
         }
     }
 
@@ -40,8 +40,8 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
 
     @Override
     public PositionedBitmap move() {
-        if(momentum.velocity > 0) {
-            momentum.velocity -= 0.3;
+        if(velocity.intensity > 0) {
+            velocity.intensity -= 0.3;
             return super.move();
         }
         return null;

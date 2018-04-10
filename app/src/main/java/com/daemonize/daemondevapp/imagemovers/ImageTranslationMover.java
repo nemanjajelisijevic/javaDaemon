@@ -12,7 +12,7 @@ public class ImageTranslationMover implements ImageMover {
     protected Iterator<Bitmap> spriteIterator;
     protected  float initVelocity = 20;
 
-    protected Momentum momentum;
+    protected Velocity velocity;
 
     protected float lastX;
     protected float lastY;
@@ -48,7 +48,7 @@ public class ImageTranslationMover implements ImageMover {
     public ImageTranslationMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
         this.sprite = sprite;
         this.initVelocity = velocity;
-        this.momentum = new Momentum(velocity, new Direction(80, 20));
+        this.velocity = new Velocity(velocity, new Direction(80, 20));
         lastX = startingPos.first;
         lastY = startingPos.second;
         spriteIterator = sprite.iterator();
@@ -64,12 +64,12 @@ public class ImageTranslationMover implements ImageMover {
 
     @Override
     public void setDirection(Direction direction) {
-        this.momentum.direction = direction;
+        this.velocity.direction = direction;
     }
 
     @Override
-    public void setMomentum(Momentum momentum) {
-        this.momentum = momentum;
+    public void setVelocity(Velocity velocity) {
+        this.velocity = velocity;
     }
 
     @Override
@@ -85,11 +85,11 @@ public class ImageTranslationMover implements ImageMover {
         if (Math.abs(diffY) >= Math.abs(diffX)) {
             a = Math.abs((100*diffX)/diffY);
             float aY =  100 - a;
-            momentum.direction = new Direction(signX ? a : - a, signY ? aY : - aY);
+            velocity.direction = new Direction(signX ? a : - a, signY ? aY : - aY);
         } else {
             a = Math.abs((100*diffY)/diffX);
             float aX =  100 - a;
-            momentum.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
+            velocity.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
         }
     }
 
@@ -103,13 +103,13 @@ public class ImageTranslationMover implements ImageMover {
 
     @Override
     public void setVelocity(float velocity) {
-        this.momentum.velocity = velocity;
+        this.velocity.intensity = velocity;
     }
 
     @Override
     public void checkCollisionAndBounce(
             Pair<Float, Float> colliderCoordinates,
-            Momentum momentum
+            Velocity velocity
     ) {}
 
     @Override
@@ -120,24 +120,24 @@ public class ImageTranslationMover implements ImageMover {
 
         //check borders and recalculate
         if (lastX <= 0) {
-            momentum.direction.coeficientX = - momentum.direction.coeficientX;
+            velocity.direction.coeficientX = - velocity.direction.coeficientX;
             lastX = 0;
         } else if (lastX >= borderX) {
-            momentum.direction.coeficientX = - momentum.direction.coeficientX;
+            velocity.direction.coeficientX = - velocity.direction.coeficientX;
             lastX = borderX;
         }
 
         if(lastY <= 0) {
-            momentum.direction.coeficientY = - momentum.direction.coeficientY;
+            velocity.direction.coeficientY = - velocity.direction.coeficientY;
             lastY = 0;
         } else if( lastY >= borderY) {
-            momentum.direction.coeficientY = - momentum.direction.coeficientY;
+            velocity.direction.coeficientY = - velocity.direction.coeficientY;
             lastY = borderY;
         }
 
         if (!paused) {
-            lastX += momentum.velocity * (momentum.direction.coeficientX * 0.01f);
-            lastY += momentum.velocity * (momentum.direction.coeficientY * 0.01f);
+            lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
+            lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
         }
 
         ret.positionX = lastX;
