@@ -25,7 +25,7 @@ public abstract class MainQuest<T> extends Quest<T> {
       T result = pursue();
       if (!Thread.currentThread().isInterrupted() && result != null) {
         if (!setResultAndUpdate(result)) {
-          System.out.println(DaemonUtils.tag() + description + ": Could not enqueue result to consumer's event queue.");
+          System.err.println(DaemonUtils.tag() + description + ": Could not enqueue result to consumer's event queue.");
         }
       }
     } catch (InterruptedException ex) {
@@ -34,7 +34,7 @@ public abstract class MainQuest<T> extends Quest<T> {
         if (getIsVoid())
             returnRunnable = new ReturnRunnable<>(closure);
         if (!setErrorAndUpdate(ex))
-            System.out.println(DaemonUtils.tag() + description + ": Could not enqueue error to consumer's event queue.");
+            System.err.println(DaemonUtils.tag() + description + ": Could not enqueue error to consumer's event queue.");
         //System.out.println(DaemonUtils.tag() + "Error in void returning method: " + description + ":");
         //ex.printStackTrace();
     }

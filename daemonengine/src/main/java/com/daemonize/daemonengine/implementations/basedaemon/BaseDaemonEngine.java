@@ -58,12 +58,12 @@ public abstract class BaseDaemonEngine implements Daemon {
       currentQuest = getQuest();
 
       if (currentQuest == null) {
-        System.out.println(DaemonUtils.tag() + "No quest set. Terminating daemon...");
+        System.err.println(DaemonUtils.tag() + "No quest set. Terminating daemon...");
         break;
       }
 
       if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null) {
-        System.out.println(
+        System.err.println(
                 DaemonUtils.tag()
                 + " No returnRunnable set for current quest: "
                 + currentQuest.getDescription() + " (" + currentQuest.getState()
