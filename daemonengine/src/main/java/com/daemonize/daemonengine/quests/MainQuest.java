@@ -1,6 +1,7 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
@@ -32,11 +33,14 @@ public abstract class MainQuest<T> extends Quest<T> {
         System.out.println(DaemonUtils.tag() + description + " interrupted.");
     } catch (Exception ex) {
         if (getIsVoid())
-            returnRunnable = new ReturnRunnable<>(closure);
+            returnRunnable = new ReturnRunnable<>(new Closure<T>() {
+              @Override
+              public void onReturn(Return<T> ret) {
+                ret.get();
+              }
+            });
         if (!setErrorAndUpdate(ex))
             System.err.println(DaemonUtils.tag() + description + ": Could not enqueue error to consumer's event queue.");
-        //System.out.println(DaemonUtils.tag() + "Error in void returning method: " + description + ":");
-        //ex.printStackTrace();
     }
   }
 }

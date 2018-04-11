@@ -452,21 +452,21 @@ public class MainActivity extends AppCompatActivity {
         ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
         exampleDaemon.evenMoreComplicated(
                         "Constantly updated from another thread: ",
-                        update -> textView.setText(update.get()),
-                        ret -> {
-                            try {
-                                textView.setText(ret.checkAndGet());
-                            } catch (DaemonException e) {
-                                Log.e("DAEMON ERROR", Log.getStackTraceString(e));
-                                textView.setText(e.getMessage());
-                                return;
-                            }
-                            exampleDaemon.evenMoreComplicated(
-                                    "Here we go again: ",
-                                    update -> textView.setText(update.get()),
-                                    ret2 ->  textView.setText(ret2.get())
-                            );
-                        }
+                        update -> textView.setText(update.get())
+//                        ret -> {
+//                            try {
+//                                textView.setText(ret.checkAndGet());
+//                            } catch (DaemonException e) {
+//                                Log.e("DAEMON ERROR", Log.getStackTraceString(e));
+//                                textView.setText(e.getMessage());
+//                                return;
+//                            }
+//                            exampleDaemon.evenMoreComplicated(
+//                                    "Here we go again: ",
+//                                    update -> textView.setText(update.get()),
+//                                    ret2 ->  textView.setText(ret2.get())
+//                            );
+//                        }
                 );
 
 //        RestClientTestScript restClientTestScript = new RestClientTestScript(

@@ -46,7 +46,7 @@ public class Example {
         return ret;
     }
 
-    public String evenMoreComplicated(String text, Closure<String> update) throws InterruptedException {
+    public void evenMoreComplicated(String text, Closure<String> update) throws InterruptedException {
 
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -60,7 +60,7 @@ public class Example {
             Thread.sleep(1000);
         }
 
-        return "DONE!";
+        //return "DONE!";
     }
 
     @CallingThread
