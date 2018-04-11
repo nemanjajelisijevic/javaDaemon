@@ -28,12 +28,16 @@ public class Return<T> {
         return result;
     }
 
-    public T get() {
+    public T uncheckAndGet() {
         if(error != null) {
             DaemonRuntimeError err = new DaemonRuntimeError(daemonDescription, error);
             err.setStackTrace(new StackTraceElement[]{});
             throw err;
         }
+        return result;
+    }
+
+    public T get() {
         return result;
     }
 

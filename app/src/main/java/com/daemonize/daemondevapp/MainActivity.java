@@ -2,12 +2,9 @@ package com.daemonize.daemondevapp;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +39,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,16 +49,22 @@ public class MainActivity extends AppCompatActivity {
         COLLIDE
     }
 
+    private ConstraintLayout layout;
+
     private Mode mode = Mode.GRAVITY;
 
     private List<Bitmap> sprite;
     private List<Bitmap> spriteMain;
+    private List<Bitmap> bulletSprite;
 
     private List<ImageView> views;
     private List<ImageMoverDaemon> starMovers;
 
     private ImageMoverDaemon mainMover;
     private ImageView mainView;
+
+    private Bitmap targetImage;
+    private ImageView target;
 
     private int borderX;
     private int borderY;
@@ -92,15 +95,29 @@ public class MainActivity extends AppCompatActivity {
             switch (mode) {
                 case GRAVITY:
                     if(event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                        target.setX(event.getX());
+                        target.setY(event.getY());
+
+                        mainMover.setTouchDirection(event.getX(), event.getY());
                         for(ImageMoverDaemon starMover : starMovers) {
                             starMover.setTouchDirection(event.getX(), event.getY());
                         }
                     }
                     break;
                 case CHASE:
+                    if (!gestureDetector.onTouchEvent(event) && event.getAction() == MotionEvent.ACTION_DOWN) {
+                        target.setX(event.getX());
+                        target.setY(event.getY());
+                    }
+                    break;
                 case COLLIDE:
                     if (!gestureDetector.onTouchEvent(event) && event.getAction() == MotionEvent.ACTION_DOWN) {
-                        mainMover.setTouchDirection(event.getX(), event.getY());
+
+                        target.setX(event.getX() - (targetImage.getWidth() / 2));
+                        target.setY(event.getY() - (targetImage.getHeight()));
+
+                        //mainMover.setTouchDirection(event.getX(), event.getY());
                     }
                     break;
             }
@@ -120,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
 
-        private WeakReference<ImageView> view;
+        protected WeakReference<ImageView> view;
 
         public ImageMoveClosure(ImageView view) {
             this.view = new WeakReference<>(view);
@@ -134,6 +151,71 @@ public class MainActivity extends AppCompatActivity {
             if (returnVal.image != null)
                 view.get().setImageBitmap(returnVal.image);
         }
+    }
+
+    private class BulletClosure extends ImageMoveClosure {
+
+        private ImageMoverDaemon daemon;
+
+        public BulletClosure setDaemon(ImageMoverDaemon daemon) {
+            this.daemon = daemon;
+            return this;
+        }
+
+        public BulletClosure(ImageView view) {
+            super(view);
+        }
+
+        @Override
+        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
+
+            if (
+                    ret.get().positionX <= 20
+                    || ret.get().positionX >= borderX - 20
+                    || ret.get().positionY <= 20
+                    || ret.get().positionY >= borderY - 20
+                    ) {
+
+                daemon.stop();
+                layout.removeView(view.get());
+                return;
+            }
+
+            for (ImageMoverDaemon starMover : starMovers) {
+                Pair<Float, Float> starMoverPos = starMover.getLastCoordinates();
+                if(Math.abs(ret.get().positionX - starMoverPos.first) <= sprite.get(0).getWidth()
+                        && Math.abs(ret.get().positionY - starMoverPos.second) <= sprite.get(0).getHeight()) {
+
+                    switch (mode) {
+                        case GRAVITY:
+                        case CHASE:
+                            starMover.stop();
+                            break;
+                        case COLLIDE: {
+                            starMover.setVelocity(daemon.getVelocity());
+                            daemon.stop();
+                            layout.removeView(view.get());
+                            return;
+                        }
+
+                    }
+
+                }
+            }
+
+            super.onReturn(ret);
+        }
+    }
+
+    private ImageView createBulletView() {
+        ImageView bulletView = new ImageView(getApplicationContext());
+        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+        );
+        bulletView.setLayoutParams(lp);
+        layout.addView(bulletView);
+        return bulletView;
     }
 
     private ViewBinder binder = ImageMoveClosure::new;
@@ -212,25 +294,43 @@ public class MainActivity extends AppCompatActivity {
                 borderY/2 + 20
         );
 
+        layout = findViewById(R.id.cl);
+
+        target = createBulletView();
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                    if(!paused) {
-                        for(ImageMoverDaemon starMover : starMovers) {
-                            starMover.pause();
-                        }
-                        paused = true;
-                    } else {
-                        for(ImageMoverDaemon starMover : starMovers) {
-                            starMover.resume();
-                        }
-                        paused = false;
-                    }
-                }
+        fab.setOnClickListener(view -> {
 
-        });
+                Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
+                Pair<Float, Float> initBulletCoord = Pair.create(
+                        lastMainCoord.first + (spriteMain.get(0).getWidth() / 2),
+                        lastMainCoord.second + (spriteMain.get(0).getHeight() / 2)
+                );
+
+                ImageView bulletView = createBulletView();
+
+                ImageMoverDaemon bullet = new ImageMoverDaemon(
+                  new ImageTranslationMover(
+                          bulletSprite,
+                          50,
+                          initBulletCoord
+                  ).setBorders(borderX, borderY)
+                ).setName("Bullet");
+
+                bullet.setVelocity(50);
+
+                bullet.setSideQuest(bullet.moveSideQuest.setClosure(
+                        new BulletClosure(bulletView).setDaemon(bullet)
+                        )
+                );
+                bullet.start();
+                bullet.setTouchDirection(
+                        target.getX() + (targetImage.getWidth() / 2),
+                        target.getY() + (targetImage.getHeight())
+                );
+
+            }
+        );
 
         FloatingActionButton fab1 = findViewById(R.id.fab1);
         fab1.setOnClickListener(new View.OnClickListener() {
@@ -245,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
                             starMover.setPrototype(
                                     new ImageTranslationMover(
                                             sprite,
-                                            i / 14,
+                                            30,
                                             Pair.create((float) borderX/2, (float) borderY/2)
                                     ).setBorders(borderX, borderY)
                             );
@@ -255,12 +355,17 @@ public class MainActivity extends AppCompatActivity {
                         mainMover.setPrototype(
                                 new MainImageTranslationMover(
                                         spriteMain,
-                                        40f,
+                                        0f,
                                         Pair.create(borderX / 2f, borderY / 2f),
-                                        starMovers,
+                                        null,
+//                                        starMovers,
                                         MainImageTranslationMover.Mode.CHASE
                                 ).setBorders(borderX, borderY)
                         );
+
+                        //mainMover.setLastCoordinates(borderX /2, borderY / 2, ret -> {});
+                        mainView.setX(borderX / 2);
+                        mainView.setY(borderY / 2);
 
                         mode = Mode.CHASE;
                         Toast.makeText(MainActivity.this, "MODE: CHASE", Toast.LENGTH_LONG).show();
@@ -287,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
                         mainMover.setPrototype(
                                 new MainImageTranslationMover(
                                         spriteMain,
-                                        50f,
+                                        10f,
                                         Pair.create(borderX/2f, borderY/2f),
                                         starMovers,
                                         MainImageTranslationMover.Mode.COLLIDE
@@ -316,7 +421,7 @@ public class MainActivity extends AppCompatActivity {
                         mainMover.setPrototype(
                                 new MainImageTranslationMover(
                                         spriteMain,
-                                        50f,
+                                        30f,
                                         Pair.create(borderX/2f, borderY/2f),
                                         starMovers,
                                         MainImageTranslationMover.Mode.NONE
@@ -342,11 +447,37 @@ public class MainActivity extends AppCompatActivity {
         initViews(views);
 
         try {
+
+            targetImage = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("target.png")), 80, 80, false);
+            target.setImageBitmap(targetImage);
+
             sprite = new ArrayList<>();
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 100, 100, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 100, 100, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 100, 100, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 100, 100, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
+
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
+
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
+
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
+            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
+
+            bulletSprite = new ArrayList<>();
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), 60, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), 40, 40, false));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -354,11 +485,19 @@ public class MainActivity extends AppCompatActivity {
         try {
             spriteMain = new ArrayList<>();
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
+//
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
+//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
 
             spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
             spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
@@ -409,12 +548,6 @@ public class MainActivity extends AppCompatActivity {
             spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
             spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
             spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-
-
-            //spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 100, 100, false));
-            //spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), 100, 100, false));
-            //spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), 100, 100, false));
-            //spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), 100, 100, false));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -439,7 +572,7 @@ public class MainActivity extends AppCompatActivity {
         mainMover = new ImageMoverDaemon(
                 new MainImageTranslationMover(
                         spriteMain,
-                        30f,
+                        20f,
                         Pair.create(borderX/2f, borderY/2f),
                         starMovers,
                         MainImageTranslationMover.Mode.NONE
@@ -452,21 +585,21 @@ public class MainActivity extends AppCompatActivity {
         ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
         exampleDaemon.evenMoreComplicated(
                         "Constantly updated from another thread: ",
-                        update -> textView.setText(update.get())
-//                        ret -> {
-//                            try {
-//                                textView.setText(ret.checkAndGet());
-//                            } catch (DaemonException e) {
-//                                Log.e("DAEMON ERROR", Log.getStackTraceString(e));
-//                                textView.setText(e.getMessage());
-//                                return;
-//                            }
-//                            exampleDaemon.evenMoreComplicated(
-//                                    "Here we go again: ",
-//                                    update -> textView.setText(update.get()),
-//                                    ret2 ->  textView.setText(ret2.get())
-//                            );
-//                        }
+                        update -> textView.setText(update.get()),
+                        ret -> {
+                            try {
+                                textView.setText(ret.checkAndGet());
+                            } catch (DaemonException e) {
+                                Log.e("DAEMON ERROR", Log.getStackTraceString(e));
+                                textView.setText(e.getMessage());
+                                return;
+                            }
+                            exampleDaemon.evenMoreComplicated(
+                                    "Here we go again: ",
+                                    update -> textView.setText(update.get()),
+                                    ret2 ->  textView.setText(ret2.get())
+                            );
+                        }
                 );
 
 //        RestClientTestScript restClientTestScript = new RestClientTestScript(
@@ -514,21 +647,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private static Bitmap drawTextOnBitmap(Bitmap bitmap, String text) {
-
-        Bitmap ret = Bitmap.createBitmap(bitmap);
-        Canvas canvas = new Canvas(ret);
-
-        Paint paint = new Paint();
-        paint.setColor(BLACK);
-        paint.setStrokeWidth(300);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-        canvas.drawBitmap(ret, 0, 0, paint);
-        canvas.drawText(text, 60, 60, paint);
-
-        return ret;
     }
 
 }

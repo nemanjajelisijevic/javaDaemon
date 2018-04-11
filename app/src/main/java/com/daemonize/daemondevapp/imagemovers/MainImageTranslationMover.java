@@ -39,13 +39,14 @@ public class MainImageTranslationMover extends ImageTranslationMover {
 
         if(velocity.intensity > 0 ) {
 
-            for (ImageMoverDaemon observer : observers) {
-                if(mode.equals(Mode.CHASE)) {
-                    observer.setTouchDirection(lastX, lastY); //TODO CHASER
-                } else if (mode.equals(Mode.COLLIDE)) {
-                    observer.checkCollisionAndBounce(Pair.create(lastX, lastY), velocity); //TODO Collisions
+            if (observers != null)
+                for (ImageMoverDaemon observer : observers) {
+                    if(mode.equals(Mode.CHASE)) {
+                        observer.setTouchDirection(lastX, lastY); //TODO CHASER
+                    } else if (mode.equals(Mode.COLLIDE)) {
+                        observer.checkCollisionAndBounce(Pair.create(lastX, lastY), velocity); //TODO Collisions
+                    }
                 }
-            }
 
             velocity.intensity -= 0.1;
             return super.move();

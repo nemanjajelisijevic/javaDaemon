@@ -10,12 +10,22 @@ public class ImageTranslationMover implements ImageMover {
 
     protected List<Bitmap> sprite;
     protected Iterator<Bitmap> spriteIterator;
-    protected  float initVelocity = 20;
+    protected float initVelocity = 20;
 
-    protected Velocity velocity;
+    protected volatile Velocity velocity;
 
-    protected float lastX;
-    protected float lastY;
+    protected volatile float lastX;
+    protected volatile float lastY;
+
+    @Override
+    public Pair<Float, Float> getLastCoordinates() {
+        return Pair.create(lastX, lastY);
+    }
+
+    @Override
+    public Velocity getVelocity() {
+        return velocity;
+    }
 
     @Override
     public PositionedBitmap setLastCoordinates(float lastX, float lastY) {

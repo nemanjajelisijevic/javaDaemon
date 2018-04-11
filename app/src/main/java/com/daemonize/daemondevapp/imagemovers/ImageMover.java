@@ -43,6 +43,12 @@ public interface ImageMover {
         }
     }
 
+    @CallingThread
+    Pair<Float, Float> getLastCoordinates();
+
+    @CallingThread
+    Velocity getVelocity();
+
     PositionedBitmap setLastCoordinates(float lastX, float lastY);
 
     void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, Velocity velocity);

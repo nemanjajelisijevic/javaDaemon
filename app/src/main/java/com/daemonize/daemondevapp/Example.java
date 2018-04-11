@@ -46,21 +46,21 @@ public class Example {
         return ret;
     }
 
-    public void evenMoreComplicated(String text, Closure<String> update) throws InterruptedException {
+    public String evenMoreComplicated(String text, Closure<String> update) throws InterruptedException {
 
         Handler handler = new Handler(Looper.getMainLooper());
 
         for (int i = 1; i < 20; ++i) {
 
-            if(i % 7 == 0) {
-                throw new IllegalStateException("Testing exception stack trace");
-            }
+//            if(i % 7 == 0) {
+//                throw new IllegalStateException("Testing exception stack trace");
+//            }
 
             handler.post(new ReturnRunnable<>(update).setResult(text + Integer.toString(i)));
             Thread.sleep(1000);
         }
 
-        //return "DONE!";
+        return "DONE!";
     }
 
     @CallingThread
