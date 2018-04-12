@@ -282,6 +282,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private long bulletCounter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -323,7 +325,7 @@ public class MainActivity extends AppCompatActivity {
                           50,
                           initBulletCoord
                   ).setBorders(borderX, borderY)
-                ).setName("Bullet");
+                ).setName("Bullet " + Long.toString(++bulletCounter));
 
                 bullet.setVelocity(50);
 
@@ -338,10 +340,10 @@ public class MainActivity extends AppCompatActivity {
 //                        lastTouchY
                 );
                 //bullet.start();
-
-
             }
         );
+
+
 
         FloatingActionButton fab1 = findViewById(R.id.fab1);
         fab1.setOnClickListener(new View.OnClickListener() {
