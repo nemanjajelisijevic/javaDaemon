@@ -119,8 +119,8 @@ public class MainActivity extends AppCompatActivity {
                 case COLLIDE:
                     if (!gestureDetector.onTouchEvent(event) && event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                        target.setX(event.getX() - (targetImage.getWidth() / 2));
-                        target.setY(event.getY() - (targetImage.getHeight()) / 2);
+                        target.setX(event.getX() /*+ (targetImage.getWidth() / 2)*/);
+                        target.setY(event.getY() /*+ (targetImage.getHeight()) / 2*/);
 
                         lastTouchX = event.getX();
                         lastTouchY = event.getY();
@@ -296,13 +296,13 @@ public class MainActivity extends AppCompatActivity {
         borderX = getResources().getDisplayMetrics().widthPixels - 100;
         borderY = getResources().getDisplayMetrics().heightPixels - 200;
 
-        final Border mapBorder = new MapBorder(0, borderX, 0, borderY);
-        final Border centerBorderSquare = new OuterRectangleBorder(
-                borderX/2 - 20,
-                borderX/2 + 20,
-                borderY/2 - 20,
-                borderY/2 + 20
-        );
+//        final Border mapBorder = new MapBorder(0, borderX, 0, borderY);
+//        final Border centerBorderSquare = new OuterRectangleBorder(
+//                borderX/2 - 20,
+//                borderX/2 + 20,
+//                borderY/2 - 20,
+//                borderY/2 + 20
+//        );
 
         layout = findViewById(R.id.cl);
 
@@ -336,8 +336,6 @@ public class MainActivity extends AppCompatActivity {
                 bullet.setTouchDirection(
                         target.getX() + (targetImage.getWidth() / 2),
                         target.getY() + (targetImage.getHeight() / 2)
-//                        lastTouchX,
-//                        lastTouchY
                 );
                 //bullet.start();
             }
