@@ -15,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -85,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
     });
 
 
+    private float lastTouchX;
+    private float lastTouchY;
+
     private interface EventHandler {
         void handleEvent(MotionEvent event);
     }
@@ -109,13 +111,19 @@ public class MainActivity extends AppCompatActivity {
                     if (!gestureDetector.onTouchEvent(event) && event.getAction() == MotionEvent.ACTION_DOWN) {
                         target.setX(event.getX());
                         target.setY(event.getY());
+
+                        lastTouchX = event.getX();
+                        lastTouchY = event.getY();
                     }
                     break;
                 case COLLIDE:
                     if (!gestureDetector.onTouchEvent(event) && event.getAction() == MotionEvent.ACTION_DOWN) {
 
                         target.setX(event.getX() - (targetImage.getWidth() / 2));
-                        target.setY(event.getY() - (targetImage.getHeight()));
+                        target.setY(event.getY() - (targetImage.getHeight()) / 2);
+
+                        lastTouchX = event.getX();
+                        lastTouchY = event.getY();
 
                         //mainMover.setTouchDirection(event.getX(), event.getY());
                     }
@@ -155,10 +163,10 @@ public class MainActivity extends AppCompatActivity {
 
     private class BulletClosure extends ImageMoveClosure {
 
-        private ImageMoverDaemon daemon;
+        private ImageMoverDaemon bulletDaemon;
 
-        public BulletClosure setDaemon(ImageMoverDaemon daemon) {
-            this.daemon = daemon;
+        public BulletClosure setBulletDaemon(ImageMoverDaemon bulletDaemon) {
+            this.bulletDaemon = bulletDaemon;
             return this;
         }
 
@@ -176,15 +184,15 @@ public class MainActivity extends AppCompatActivity {
                     || ret.get().positionY >= borderY - 20
                     ) {
 
-                daemon.stop();
+                bulletDaemon.stop();
                 layout.removeView(view.get());
                 return;
             }
 
             for (ImageMoverDaemon starMover : starMovers) {
                 Pair<Float, Float> starMoverPos = starMover.getLastCoordinates();
-                if(Math.abs(ret.get().positionX - starMoverPos.first) <= sprite.get(0).getWidth()
-                        && Math.abs(ret.get().positionY - starMoverPos.second) <= sprite.get(0).getHeight()) {
+                if(Math.abs(ret.get().positionX - starMoverPos.first) <= bulletSprite.get(0).getWidth()
+                        && Math.abs(ret.get().positionY - starMoverPos.second) <= bulletSprite.get(0).getHeight()) {
 
                     switch (mode) {
                         case GRAVITY:
@@ -192,8 +200,8 @@ public class MainActivity extends AppCompatActivity {
                             starMover.stop();
                             break;
                         case COLLIDE: {
-                            starMover.setVelocity(daemon.getVelocity());
-                            daemon.stop();
+                            starMover.setVelocity(bulletDaemon.getVelocity());
+                            bulletDaemon.stop();
                             layout.removeView(view.get());
                             return;
                         }
@@ -320,14 +328,17 @@ public class MainActivity extends AppCompatActivity {
                 bullet.setVelocity(50);
 
                 bullet.setSideQuest(bullet.moveSideQuest.setClosure(
-                        new BulletClosure(bulletView).setDaemon(bullet)
+                        new BulletClosure(bulletView).setBulletDaemon(bullet)
                         )
                 );
-                bullet.start();
                 bullet.setTouchDirection(
                         target.getX() + (targetImage.getWidth() / 2),
-                        target.getY() + (targetImage.getHeight())
+                        target.getY() + (targetImage.getHeight() / 2)
+//                        lastTouchX,
+//                        lastTouchY
                 );
+                //bullet.start();
+
 
             }
         );
@@ -421,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
                         mainMover.setPrototype(
                                 new MainImageTranslationMover(
                                         spriteMain,
-                                        30f,
+                                        10f,
                                         Pair.create(borderX/2f, borderY/2f),
                                         starMovers,
                                         MainImageTranslationMover.Mode.NONE
@@ -449,6 +460,11 @@ public class MainActivity extends AppCompatActivity {
         try {
 
             targetImage = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("target.png")), 80, 80, false);
+
+            target.getLayoutParams().height = targetImage.getHeight();
+            target.getLayoutParams().width = targetImage.getWidth();
+            target.requestLayout();
+
             target.setImageBitmap(targetImage);
 
             sprite = new ArrayList<>();
@@ -572,7 +588,7 @@ public class MainActivity extends AppCompatActivity {
         mainMover = new ImageMoverDaemon(
                 new MainImageTranslationMover(
                         spriteMain,
-                        20f,
+                        10f,
                         Pair.create(borderX/2f, borderY/2f),
                         starMovers,
                         MainImageTranslationMover.Mode.NONE

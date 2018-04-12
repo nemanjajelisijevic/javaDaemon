@@ -84,7 +84,7 @@ public abstract class BaseDaemonEngine implements Daemon {
   public void start() {
     DaemonState initState = getState();
     if (!(initState.equals(DaemonState.STOPPED))) {
-      System.out.println(DaemonUtils.tag() +  name + "already running. State: " + getState());
+      System.out.println(DaemonUtils.tag() +  name + " already running. State: " + getState());
     } else {
       daemonThread = new Thread(new Runnable() {
         @Override

@@ -27,7 +27,7 @@ mode (prototype method annotated with a @SideQuest annotation) constantly execut
 
 To use the Daemon you'll need two jars: daemonengine.jar and daemonprocessor.jar.
 
-Daemonengine is an android os dependent library that holds the classes needed to run the daemon.
+Daemonengine is an android os dependent library that holds the classes needed to run the bulletDaemon.
 
 Daemonprocessor is an annotation processor that generates the Daemon class (.java source file using Javapoet and Java apt 
 api) with dependencies to the daemonengine lib, by parsing your prototype class.
@@ -176,7 +176,7 @@ So it can be used:
 
     //sweet, sweet lambda as Closure 
     //ret.get() throws a runtime error if an exception has been thrown
-    //in daemon thread's context
+    //in bulletDaemon thread's context
     exampleDaemon.add(48, 54, ret -> view.setText(ret.get().toString()));
     
     //or without the lambda syntax:
