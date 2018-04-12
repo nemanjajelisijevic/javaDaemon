@@ -165,13 +165,9 @@ public class MainActivity extends AppCompatActivity {
 
         private ImageMoverDaemon bulletDaemon;
 
-        public BulletClosure setBulletDaemon(ImageMoverDaemon bulletDaemon) {
-            this.bulletDaemon = bulletDaemon;
-            return this;
-        }
-
-        public BulletClosure(ImageView view) {
+        public BulletClosure(ImageView view, ImageMoverDaemon bulletdaemon) {
             super(view);
+            this.bulletDaemon = bulletdaemon;
         }
 
         @Override
@@ -329,10 +325,7 @@ public class MainActivity extends AppCompatActivity {
 
                 bullet.setVelocity(50);
 
-                bullet.setSideQuest(bullet.moveSideQuest.setClosure(
-                        new BulletClosure(bulletView).setBulletDaemon(bullet)
-                        )
-                );
+                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
                 bullet.setTouchDirection(
                         target.getX() + (targetImage.getWidth() / 2),
                         target.getY() + (targetImage.getHeight() / 2)
