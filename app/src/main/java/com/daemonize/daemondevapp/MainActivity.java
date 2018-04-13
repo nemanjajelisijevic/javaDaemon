@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -83,10 +84,6 @@ public class MainActivity extends AppCompatActivity {
         }
     });
 
-
-    private float lastTouchX;
-    private float lastTouchY;
-
     private interface EventHandler {
         void handleEvent(MotionEvent event);
     }
@@ -111,9 +108,6 @@ public class MainActivity extends AppCompatActivity {
                     if (!gestureDetector.onTouchEvent(event) && event.getAction() == MotionEvent.ACTION_DOWN) {
                         target.setX(event.getX());
                         target.setY(event.getY());
-
-                        lastTouchX = event.getX();
-                        lastTouchY = event.getY();
                     }
                     break;
                 case COLLIDE:
@@ -121,10 +115,6 @@ public class MainActivity extends AppCompatActivity {
 
                         target.setX(event.getX() /*+ (targetImage.getWidth() / 2)*/);
                         target.setY(event.getY() /*+ (targetImage.getHeight()) / 2*/);
-
-                        lastTouchX = event.getX();
-                        lastTouchY = event.getY();
-
                         //mainMover.setTouchDirection(event.getX(), event.getY());
                     }
                     break;
@@ -185,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            for (ImageMoverDaemon starMover : starMovers) {
+            starMovers.forEach(starMover -> {
                 Pair<Float, Float> starMoverPos = starMover.getLastCoordinates();
                 if(Math.abs(ret.get().positionX - starMoverPos.first) <= bulletSprite.get(0).getWidth()
                         && Math.abs(ret.get().positionY - starMoverPos.second) <= bulletSprite.get(0).getHeight()) {
@@ -193,19 +183,66 @@ public class MainActivity extends AppCompatActivity {
                     switch (mode) {
                         case GRAVITY:
                         case CHASE:
-                            starMover.stop();
-                            break;
                         case COLLIDE: {
                             starMover.setVelocity(bulletDaemon.getVelocity());
                             bulletDaemon.stop();
                             layout.removeView(view.get());
-                            return;
                         }
+                        default:
+                        break;
 
                     }
 
                 }
+            });
+
+            super.onReturn(ret);
+        }
+    }
+
+    private class RafalBulletClosure extends ImageMoveClosure {
+
+        private ImageMoverDaemon bulletDaemon;
+
+        public RafalBulletClosure(ImageView view, ImageMoverDaemon bulletdaemon) {
+            super(view);
+            this.bulletDaemon = bulletdaemon;
+        }
+
+        @Override
+        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
+
+            if (
+                    ret.get().positionX <= 20
+                            || ret.get().positionX >= borderX - 20
+                            || ret.get().positionY <= 20
+                            || ret.get().positionY >= borderY - 20
+                    ) {
+
+                bulletDaemon.stop();
+                layout.removeView(view.get());
+                return;
             }
+
+            starMovers.forEach(starMover -> {
+                Pair<Float, Float> starMoverPos = starMover.getLastCoordinates();
+                if(Math.abs(ret.get().positionX - starMoverPos.first) <= bulletSprite.get(0).getWidth()
+                        && Math.abs(ret.get().positionY - starMoverPos.second) <= bulletSprite.get(0).getHeight()) {
+
+                    switch (mode) {
+                        case GRAVITY:
+                        case CHASE:
+                        case COLLIDE: {
+                            starMover.setVelocity(bulletDaemon.getVelocity());
+                            bulletDaemon.stop();
+                        }
+                        default:
+                            break;
+
+                    }
+
+                }
+            });
 
             super.onReturn(ret);
         }
@@ -280,6 +317,84 @@ public class MainActivity extends AppCompatActivity {
 
     private long bulletCounter;
 
+    private boolean up = false;
+    private boolean down = false;
+    private boolean left = false;
+    private boolean right = false;
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_D:
+                right = true;
+                resolveKeyboardMovement();
+                return true;
+            case KeyEvent.KEYCODE_A:
+                left = true;
+                resolveKeyboardMovement();
+                return true;
+            case KeyEvent.KEYCODE_W:
+                up = true;
+                resolveKeyboardMovement();
+                return true;
+            case KeyEvent.KEYCODE_S:
+                down = true;
+                resolveKeyboardMovement();
+                return true;
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_D:
+                right = false;
+                resolveKeyboardMovement();
+                return true;
+            case KeyEvent.KEYCODE_A:
+                left = false;
+                resolveKeyboardMovement();
+                return true;
+            case KeyEvent.KEYCODE_W:
+                up = false;
+                resolveKeyboardMovement();
+                return true;
+            case KeyEvent.KEYCODE_S:
+                down = false;
+                resolveKeyboardMovement();
+                return true;
+            default:
+                return super.onKeyUp(keyCode, event);
+        }
+    }
+
+
+    private void resolveKeyboardMovement () {
+
+        if (up && left) {
+            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(-50, -50)));
+        } else if (up && right) {
+            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(-50, 50)));
+        } else if(up) {
+            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(0, -100)));
+        } else if (down && left) {
+            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(-50, 50)));
+        } else if (down && right) {
+            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(50, 50)));
+        } else if (down) {
+            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(0, 100)));
+        } else if (left) {
+            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(-100, 0)));
+        } else if (right) {
+            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(100, 0)));
+        }
+
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -291,14 +406,6 @@ public class MainActivity extends AppCompatActivity {
 
         borderX = getResources().getDisplayMetrics().widthPixels - 100;
         borderY = getResources().getDisplayMetrics().heightPixels - 200;
-
-//        final Border mapBorder = new MapBorder(0, borderX, 0, borderY);
-//        final Border centerBorderSquare = new OuterRectangleBorder(
-//                borderX/2 - 20,
-//                borderX/2 + 20,
-//                borderY/2 - 20,
-//                borderY/2 + 20
-//        );
 
         layout = findViewById(R.id.cl);
 
@@ -333,8 +440,6 @@ public class MainActivity extends AppCompatActivity {
                 //bullet.start();
             }
         );
-
-
 
         FloatingActionButton fab1 = findViewById(R.id.fab1);
         fab1.setOnClickListener(new View.OnClickListener() {
@@ -611,12 +716,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                 );
 
-//        RestClientTestScript restClientTestScript = new RestClientTestScript(
-//                textView,
-//                new RestClientDaemon(new RestClient("https://reqres.in"))
-//        );
-
-//        restClientTestScript.run();
         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
 
     }
