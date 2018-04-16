@@ -2,7 +2,12 @@ package com.daemonize.daemondevapp.imagemovers;
 
 
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Pair;
+
+import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
 
 import java.util.List;
 
@@ -78,4 +83,12 @@ public class MainImageTranslationMover extends ImageTranslationMover {
         setVelocity(initVelocity);
     }
 
+    @Override
+    public void shoot(int bullets, int interval, Closure<Void> hit) throws InterruptedException {
+        Handler handler = new Handler(Looper.getMainLooper());
+        for (int i = 0; i < bullets; ++i) {
+            handler.post(new ReturnRunnable<>(hit));
+            Thread.sleep(interval);
+        }
+    }
 }

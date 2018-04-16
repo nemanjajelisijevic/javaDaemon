@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static android.graphics.Color.WHITE;
 
@@ -133,6 +134,9 @@ public class MainActivity extends AppCompatActivity {
         ImageMoveClosure bindViewToClosure(ImageView view);
     }
 
+    private long cnt;
+    private long startTime;
+
     private class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
 
         protected WeakReference<ImageView> view;
@@ -143,11 +147,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
+
+            if ( view.get() == null)
+                return;
+
             ImageMover.PositionedBitmap returnVal = ret.get();
             view.get().setX(returnVal.positionX);
             view.get().setY(returnVal.positionY);
             if (returnVal.image != null)
                 view.get().setImageBitmap(returnVal.image);
+
+            cnt++;
         }
     }
 
@@ -175,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            starMovers.forEach(starMover -> {
+            for (ImageMoverDaemon starMover : starMovers) {
                 Pair<Float, Float> starMoverPos = starMover.getLastCoordinates();
                 if(Math.abs(ret.get().positionX - starMoverPos.first) <= bulletSprite.get(0).getWidth()
                         && Math.abs(ret.get().positionY - starMoverPos.second) <= bulletSprite.get(0).getHeight()) {
@@ -189,12 +199,12 @@ public class MainActivity extends AppCompatActivity {
                             layout.removeView(view.get());
                         }
                         default:
-                        break;
+                            break;
 
                     }
 
                 }
-            });
+            }
 
             super.onReturn(ret);
         }
@@ -224,11 +234,10 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            starMovers.forEach(starMover -> {
+            for (ImageMoverDaemon starMover : starMovers) {
                 Pair<Float, Float> starMoverPos = starMover.getLastCoordinates();
                 if(Math.abs(ret.get().positionX - starMoverPos.first) <= bulletSprite.get(0).getWidth()
                         && Math.abs(ret.get().positionY - starMoverPos.second) <= bulletSprite.get(0).getHeight()) {
-
                     switch (mode) {
                         case GRAVITY:
                         case CHASE:
@@ -240,9 +249,8 @@ public class MainActivity extends AppCompatActivity {
                             break;
 
                     }
-
                 }
-            });
+            }
 
             super.onReturn(ret);
         }
@@ -317,84 +325,26 @@ public class MainActivity extends AppCompatActivity {
 
     private long bulletCounter;
 
-    private boolean up = false;
-    private boolean down = false;
-    private boolean left = false;
-    private boolean right = false;
-
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_D:
-                right = true;
-                resolveKeyboardMovement();
+                mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(100, 0)));
                 return true;
             case KeyEvent.KEYCODE_A:
-                left = true;
-                resolveKeyboardMovement();
+                mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(- 100, 0)));
                 return true;
             case KeyEvent.KEYCODE_W:
-                up = true;
-                resolveKeyboardMovement();
+                mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(0, - 100)));
                 return true;
             case KeyEvent.KEYCODE_S:
-                down = true;
-                resolveKeyboardMovement();
+                mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(0,  100)));
                 return true;
             default:
                 return super.onKeyUp(keyCode, event);
         }
     }
-
-    @Override
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_D:
-                right = false;
-                resolveKeyboardMovement();
-                return true;
-            case KeyEvent.KEYCODE_A:
-                left = false;
-                resolveKeyboardMovement();
-                return true;
-            case KeyEvent.KEYCODE_W:
-                up = false;
-                resolveKeyboardMovement();
-                return true;
-            case KeyEvent.KEYCODE_S:
-                down = false;
-                resolveKeyboardMovement();
-                return true;
-            default:
-                return super.onKeyUp(keyCode, event);
-        }
-    }
-
-
-    private void resolveKeyboardMovement () {
-
-        if (up && left) {
-            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(-50, -50)));
-        } else if (up && right) {
-            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(-50, 50)));
-        } else if(up) {
-            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(0, -100)));
-        } else if (down && left) {
-            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(-50, 50)));
-        } else if (down && right) {
-            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(50, 50)));
-        } else if (down) {
-            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(0, 100)));
-        } else if (left) {
-            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(-100, 0)));
-        } else if (right) {
-            mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(100, 0)));
-        }
-
-
-    }
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -414,32 +364,71 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(view -> {
 
-                Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
-                Pair<Float, Float> initBulletCoord = Pair.create(
-                        lastMainCoord.first + (spriteMain.get(0).getWidth() / 2),
-                        lastMainCoord.second + (spriteMain.get(0).getHeight() / 2)
-                );
+            float offset = (bulletCounter % 3) * 50;
+
+            Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
+            Pair<Float, Float> initBulletCoord = Pair.create(
+                    lastMainCoord.first + (spriteMain.get(0).getWidth() / 2) + offset,
+                    lastMainCoord.second + (spriteMain.get(0).getHeight() / 2) + offset
+            );
+
+            mainMover.shoot(5, 100, ret -> {
 
                 ImageView bulletView = createBulletView();
 
                 ImageMoverDaemon bullet = new ImageMoverDaemon(
-                  new ImageTranslationMover(
-                          bulletSprite,
-                          50,
-                          initBulletCoord
-                  ).setBorders(borderX, borderY)
+                        new ImageTranslationMover(
+                                bulletSprite,
+                                50,
+                                initBulletCoord
+                        ).setBorders(borderX, borderY)
                 ).setName("Bullet " + Long.toString(++bulletCounter));
 
                 bullet.setVelocity(50);
 
                 bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
                 bullet.setTouchDirection(
-                        target.getX() + (targetImage.getWidth() / 2),
-                        target.getY() + (targetImage.getHeight() / 2)
+                        target.getX() + (targetImage.getWidth() / 2) + offset,
+                        target.getY() + (targetImage.getHeight() / 2) + offset
                 );
-                //bullet.start();
-            }
-        );
+
+
+                bulletView = createBulletView();
+                bullet = new ImageMoverDaemon(
+                        new ImageTranslationMover(
+                                bulletSprite,
+                                50,
+                                initBulletCoord
+                        ).setBorders(borderX, borderY)
+                ).setName("Bullet " + Long.toString(++bulletCounter));
+
+                bullet.setVelocity(50);
+
+                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                bullet.setTouchDirection(
+                        target.getX() + (targetImage.getWidth() / 2) + offset,
+                        target.getY() + (targetImage.getHeight() / 2) + 200
+                );
+
+                bulletView = createBulletView();
+                bullet = new ImageMoverDaemon(
+                        new ImageTranslationMover(
+                                bulletSprite,
+                                50,
+                                initBulletCoord
+                        ).setBorders(borderX, borderY)
+                ).setName("Bullet " + Long.toString(++bulletCounter));
+
+                bullet.setVelocity(50);
+
+                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                bullet.setTouchDirection(
+                        target.getX() + (targetImage.getWidth() / 2) + offset,
+                        target.getY() + (targetImage.getHeight() / 2) - 200
+                );
+
+            });
+        });
 
         FloatingActionButton fab1 = findViewById(R.id.fab1);
         fab1.setOnClickListener(new View.OnClickListener() {

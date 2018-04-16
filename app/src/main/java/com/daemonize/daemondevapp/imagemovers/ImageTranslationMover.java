@@ -3,6 +3,8 @@ package com.daemonize.daemondevapp.imagemovers;
 import android.graphics.Bitmap;
 import android.util.Pair;
 
+import com.daemonize.daemonengine.closure.Closure;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -154,6 +156,11 @@ public class ImageTranslationMover implements ImageMover {
         ret.positionY = lastY;
 
         return ret;
+    }
+
+    @Override
+    public void shoot(int bullets, int interval, Closure<Void> hit) throws InterruptedException {
+        throw new IllegalStateException("Stub");
     }
 }
 

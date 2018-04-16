@@ -3,6 +3,7 @@ package com.daemonize.daemondevapp.imagemovers;
 import android.graphics.Bitmap;
 import android.util.Pair;
 
+import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
@@ -72,5 +73,7 @@ public interface ImageMover {
 
     @SideQuest(SLEEP = 25)
     PositionedBitmap move();
+
+    void shoot(int bullets, int interval, Closure<Void> hit) throws InterruptedException;
 
 }
