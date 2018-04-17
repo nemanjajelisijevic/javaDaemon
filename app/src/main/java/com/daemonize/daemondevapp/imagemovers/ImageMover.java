@@ -74,6 +74,6 @@ public interface ImageMover {
     @SideQuest(SLEEP = 25)
     PositionedBitmap move();
 
-    void shoot(int bullets, int interval, Closure<Void> hit) throws InterruptedException;
+    void shoot(int bullets, int interval, Closure<PositionedBitmap> mainupdate, Closure<Void> hit) throws InterruptedException;
 
 }

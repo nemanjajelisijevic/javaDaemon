@@ -134,8 +134,6 @@ public class MainActivity extends AppCompatActivity {
         ImageMoveClosure bindViewToClosure(ImageView view);
     }
 
-    private long cnt;
-    private long startTime;
 
     private class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
 
@@ -148,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
 
-            if ( view.get() == null)
+            if (view.get() == null || ret.get() == null)
                 return;
 
             ImageMover.PositionedBitmap returnVal = ret.get();
@@ -156,8 +154,6 @@ public class MainActivity extends AppCompatActivity {
             view.get().setY(returnVal.positionY);
             if (returnVal.image != null)
                 view.get().setImageBitmap(returnVal.image);
-
-            cnt++;
         }
     }
 
@@ -344,7 +340,8 @@ public class MainActivity extends AppCompatActivity {
                 return super.onKeyUp(keyCode, event);
         }
     }
-    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -372,62 +369,66 @@ public class MainActivity extends AppCompatActivity {
                     lastMainCoord.second + (spriteMain.get(0).getHeight() / 2) + offset
             );
 
-            mainMover.shoot(5, 100, ret -> {
 
-                ImageView bulletView = createBulletView();
+            mainMover.shoot(
+                    2,
+                    25,
+                    binder.bindViewToClosure(mainView),
+                    ret -> {
 
-                ImageMoverDaemon bullet = new ImageMoverDaemon(
-                        new ImageTranslationMover(
-                                bulletSprite,
-                                50,
-                                initBulletCoord
-                        ).setBorders(borderX, borderY)
-                ).setName("Bullet " + Long.toString(++bulletCounter));
+                        ImageView bulletView = createBulletView();
 
-                bullet.setVelocity(50);
+                        ImageMoverDaemon bullet = new ImageMoverDaemon(
+                                new ImageTranslationMover(
+                                        bulletSprite,
+                                        50,
+                                        initBulletCoord
+                                ).setBorders(borderX, borderY)
+                        ).setName("Bullet " + Long.toString(++bulletCounter));
 
-                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                bullet.setTouchDirection(
-                        target.getX() + (targetImage.getWidth() / 2) + offset,
-                        target.getY() + (targetImage.getHeight() / 2) + offset
-                );
+                        bullet.setVelocity(50);
+
+                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                        bullet.setTouchDirection(
+                                target.getX() + (targetImage.getWidth() / 2) + offset,
+                                target.getY() + (targetImage.getHeight() / 2) + offset
+                        );
 
 
-                bulletView = createBulletView();
-                bullet = new ImageMoverDaemon(
-                        new ImageTranslationMover(
-                                bulletSprite,
-                                50,
-                                initBulletCoord
-                        ).setBorders(borderX, borderY)
-                ).setName("Bullet " + Long.toString(++bulletCounter));
+                        bulletView = createBulletView();
+                        bullet = new ImageMoverDaemon(
+                                new ImageTranslationMover(
+                                        bulletSprite,
+                                        50,
+                                        initBulletCoord
+                                ).setBorders(borderX, borderY)
+                        ).setName("Bullet " + Long.toString(++bulletCounter));
 
-                bullet.setVelocity(50);
+                        bullet.setVelocity(50);
 
-                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                bullet.setTouchDirection(
-                        target.getX() + (targetImage.getWidth() / 2) + offset,
-                        target.getY() + (targetImage.getHeight() / 2) + 200
-                );
+                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                        bullet.setTouchDirection(
+                                target.getX() + (targetImage.getWidth() / 2) + offset,
+                                target.getY() + (targetImage.getHeight() / 2) + 200
+                        );
 
-                bulletView = createBulletView();
-                bullet = new ImageMoverDaemon(
-                        new ImageTranslationMover(
-                                bulletSprite,
-                                50,
-                                initBulletCoord
-                        ).setBorders(borderX, borderY)
-                ).setName("Bullet " + Long.toString(++bulletCounter));
+                        bulletView = createBulletView();
+                        bullet = new ImageMoverDaemon(
+                                new ImageTranslationMover(
+                                        bulletSprite,
+                                        50,
+                                        initBulletCoord
+                                ).setBorders(borderX, borderY)
+                        ).setName("Bullet " + Long.toString(++bulletCounter));
 
-                bullet.setVelocity(50);
+                        bullet.setVelocity(50);
 
-                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                bullet.setTouchDirection(
-                        target.getX() + (targetImage.getWidth() / 2) + offset,
-                        target.getY() + (targetImage.getHeight() / 2) - 200
-                );
-
-            });
+                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                        bullet.setTouchDirection(
+                                target.getX() + (targetImage.getWidth() / 2) + offset,
+                                target.getY() + (targetImage.getHeight() / 2) - 200
+                        );
+                    });
         });
 
         FloatingActionButton fab1 = findViewById(R.id.fab1);
@@ -588,19 +589,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             spriteMain = new ArrayList<>();
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 200, 200, false));
-//
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-//            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
 
             spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
             spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));

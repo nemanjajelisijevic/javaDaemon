@@ -84,11 +84,19 @@ public class MainImageTranslationMover extends ImageTranslationMover {
     }
 
     @Override
-    public void shoot(int bullets, int interval, Closure<Void> hit) throws InterruptedException {
+    public void shoot(int bullets, int interval, Closure<PositionedBitmap> mainupdate, Closure<Void> hit) throws InterruptedException {
         Handler handler = new Handler(Looper.getMainLooper());
-        for (int i = 0; i < bullets; ++i) {
-            handler.post(new ReturnRunnable<>(hit));
+        int cnt = 4 * bullets;
+
+        while (bullets > 0) {
+            handler.post(new ReturnRunnable<>(mainupdate).setResult(move()));
+            if(cnt % 4 == 0) {
+                handler.post(new ReturnRunnable<>(hit));
+                bullets--;
+            }
+
             Thread.sleep(interval);
+            cnt--;
         }
     }
 }

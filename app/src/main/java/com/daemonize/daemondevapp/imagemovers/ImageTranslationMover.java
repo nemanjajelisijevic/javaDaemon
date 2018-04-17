@@ -159,7 +159,7 @@ public class ImageTranslationMover implements ImageMover {
     }
 
     @Override
-    public void shoot(int bullets, int interval, Closure<Void> hit) throws InterruptedException {
+    public void shoot(int bullets, int interval, Closure<PositionedBitmap> mainupdate, Closure<Void> hit) throws InterruptedException {
         throw new IllegalStateException("Stub");
     }
 }
