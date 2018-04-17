@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                 mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(0,  100)));
                 return true;
             default:
-                return super.onKeyUp(keyCode, event);
+                return super.onKeyDown(keyCode, event);
         }
     }
 
