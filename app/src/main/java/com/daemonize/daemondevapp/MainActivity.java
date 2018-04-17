@@ -206,52 +206,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class RafalBulletClosure extends ImageMoveClosure {
-
-        private ImageMoverDaemon bulletDaemon;
-
-        public RafalBulletClosure(ImageView view, ImageMoverDaemon bulletdaemon) {
-            super(view);
-            this.bulletDaemon = bulletdaemon;
-        }
-
-        @Override
-        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
-
-            if (
-                    ret.get().positionX <= 20
-                            || ret.get().positionX >= borderX - 20
-                            || ret.get().positionY <= 20
-                            || ret.get().positionY >= borderY - 20
-                    ) {
-
-                bulletDaemon.stop();
-                layout.removeView(view.get());
-                return;
-            }
-
-            for (ImageMoverDaemon starMover : starMovers) {
-                Pair<Float, Float> starMoverPos = starMover.getLastCoordinates();
-                if(Math.abs(ret.get().positionX - starMoverPos.first) <= bulletSprite.get(0).getWidth()
-                        && Math.abs(ret.get().positionY - starMoverPos.second) <= bulletSprite.get(0).getHeight()) {
-                    switch (mode) {
-                        case GRAVITY:
-                        case CHASE:
-                        case COLLIDE: {
-                            starMover.setVelocity(bulletDaemon.getVelocity());
-                            bulletDaemon.stop();
-                        }
-                        default:
-                            break;
-
-                    }
-                }
-            }
-
-            super.onReturn(ret);
-        }
-    }
-
     private ImageView createBulletView() {
         ImageView bulletView = new ImageView(getApplicationContext());
         ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
@@ -376,58 +330,29 @@ public class MainActivity extends AppCompatActivity {
                     binder.bindViewToClosure(mainView),
                     ret -> {
 
-                        ImageView bulletView = createBulletView();
+                        ImageView bulletView;
+                        ImageMoverDaemon bullet;
 
-                        ImageMoverDaemon bullet = new ImageMoverDaemon(
-                                new ImageTranslationMover(
-                                        bulletSprite,
-                                        50,
-                                        initBulletCoord
-                                ).setBorders(borderX, borderY)
-                        ).setName("Bullet " + Long.toString(++bulletCounter));
+                        for (int i = 0; i < 3; ++i) {
 
-                        bullet.setVelocity(50);
+                            bulletView = createBulletView();
+                            bullet = new ImageMoverDaemon(
+                                    new ImageTranslationMover(
+                                            bulletSprite,
+                                            50,
+                                            initBulletCoord
+                                    ).setBorders(borderX, borderY)
+                            ).setName("Bullet " + Long.toString(++bulletCounter));
 
-                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                        bullet.setTouchDirection(
-                                target.getX() + (targetImage.getWidth() / 2) + offset,
-                                target.getY() + (targetImage.getHeight() / 2) + offset
-                        );
+                            bullet.setVelocity(50);
 
+                            bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                            bullet.setTouchDirection(
+                                    target.getX() + (targetImage.getWidth() / 2) + offset,
+                                    target.getY() + (targetImage.getHeight() / 2) + (float) (Math.pow(-i, i) * 30)
+                            );
 
-                        bulletView = createBulletView();
-                        bullet = new ImageMoverDaemon(
-                                new ImageTranslationMover(
-                                        bulletSprite,
-                                        50,
-                                        initBulletCoord
-                                ).setBorders(borderX, borderY)
-                        ).setName("Bullet " + Long.toString(++bulletCounter));
-
-                        bullet.setVelocity(50);
-
-                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                        bullet.setTouchDirection(
-                                target.getX() + (targetImage.getWidth() / 2) + offset,
-                                target.getY() + (targetImage.getHeight() / 2) + 200
-                        );
-
-                        bulletView = createBulletView();
-                        bullet = new ImageMoverDaemon(
-                                new ImageTranslationMover(
-                                        bulletSprite,
-                                        50,
-                                        initBulletCoord
-                                ).setBorders(borderX, borderY)
-                        ).setName("Bullet " + Long.toString(++bulletCounter));
-
-                        bullet.setVelocity(50);
-
-                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                        bullet.setTouchDirection(
-                                target.getX() + (targetImage.getWidth() / 2) + offset,
-                                target.getY() + (targetImage.getHeight() / 2) - 200
-                        );
+                        }
                     });
         });
 
