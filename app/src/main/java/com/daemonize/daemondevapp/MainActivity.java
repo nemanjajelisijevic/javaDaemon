@@ -26,11 +26,9 @@ import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.borders.Border;
-import com.daemonize.daemondevapp.imagemovers.borders.MapBorder;
-import com.daemonize.daemondevapp.imagemovers.borders.OuterRectangleBorder;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
+import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
 import com.daemonize.daemonengine.exceptions.DaemonException;
 
 
@@ -38,7 +36,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static android.graphics.Color.WHITE;
 
@@ -137,23 +134,23 @@ public class MainActivity extends AppCompatActivity {
 
     private class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
 
-        protected WeakReference<ImageView> view;
+        protected ImageView view;
 
         public ImageMoveClosure(ImageView view) {
-            this.view = new WeakReference<>(view);
+            this.view = view;
         }
 
         @Override
         public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
 
-            if (view.get() == null || ret.get() == null)
+            if (ret.get() == null)
                 return;
 
             ImageMover.PositionedBitmap returnVal = ret.get();
-            view.get().setX(returnVal.positionX);
-            view.get().setY(returnVal.positionY);
-            if (returnVal.image != null)
-                view.get().setImageBitmap(returnVal.image);
+            view.setX(returnVal.positionX);
+            view.setY(returnVal.positionY);
+            //if (returnVal.image != null)
+            view.setImageBitmap(returnVal.image);
         }
     }
 
@@ -177,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     ) {
 
                 bulletDaemon.stop();
-                layout.removeView(view.get());
+                layout.removeView(view);
                 return;
             }
 
@@ -192,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                         case COLLIDE: {
                             starMover.setVelocity(bulletDaemon.getVelocity());
                             bulletDaemon.stop();
-                            layout.removeView(view.get());
+                            layout.removeView(view);
                         }
                         default:
                             break;
@@ -295,6 +292,43 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private class MachineGunSpell implements DaemonSpell {
+
+        private float offset;
+        private Pair<Float, Float> initBulletCoord;
+
+        public MachineGunSpell(float offset, Pair<Float, Float> initBulletCoord) {
+            this.offset = offset;
+            this.initBulletCoord = initBulletCoord;
+        }
+
+        @Override
+        public void cast() {
+            ImageView bulletView;
+            ImageMoverDaemon bullet;
+
+            for (int i = 0; i < 3; ++i) {
+
+                bulletView = createBulletView();
+                bullet = new ImageMoverDaemon(
+                        new ImageTranslationMover(
+                                bulletSprite,
+                                50,
+                                initBulletCoord
+                        ).setBorders(borderX, borderY)
+                ).setName("Bullet " + Long.toString(++bulletCounter));
+
+                bullet.setVelocity(50);
+
+                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                bullet.setTouchDirection(
+                        target.getX() + (targetImage.getWidth() / 2) + offset,
+                        target.getY() + (targetImage.getHeight() / 2) + (float) (Math.pow(-i, i) * 30)
+                );
+
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -316,50 +350,25 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(view -> {
 
             float offset = (bulletCounter % 3) * 50;
-
             Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
-            Pair<Float, Float> initBulletCoord = Pair.create(
-                    lastMainCoord.first + (spriteMain.get(0).getWidth() / 2) + offset,
-                    lastMainCoord.second + (spriteMain.get(0).getHeight() / 2) + offset
-            );
 
+            MachineGunSpell rafal = new MachineGunSpell(
+                    offset,
+                    Pair.create(
+                            lastMainCoord.first + (spriteMain.get(0).getWidth() / 2) + offset,
+                            lastMainCoord.second + (spriteMain.get(0).getHeight() / 2) + offset
+                    )
+            );
 
             mainMover.shoot(
                     2,
                     25,
                     binder.bindViewToClosure(mainView),
-                    ret -> {
-
-                        ImageView bulletView;
-                        ImageMoverDaemon bullet;
-
-                        for (int i = 0; i < 3; ++i) {
-
-                            bulletView = createBulletView();
-                            bullet = new ImageMoverDaemon(
-                                    new ImageTranslationMover(
-                                            bulletSprite,
-                                            50,
-                                            initBulletCoord
-                                    ).setBorders(borderX, borderY)
-                            ).setName("Bullet " + Long.toString(++bulletCounter));
-
-                            bullet.setVelocity(50);
-
-                            bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                            bullet.setTouchDirection(
-                                    target.getX() + (targetImage.getWidth() / 2) + offset,
-                                    target.getY() + (targetImage.getHeight() / 2) + (float) (Math.pow(-i, i) * 30)
-                            );
-
-                        }
-                    });
+                    ret -> rafal.cast());
         });
 
         FloatingActionButton fab1 = findViewById(R.id.fab1);
-        fab1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        fab1.setOnClickListener(view -> {
 
                 switch (mode) {
                     case GRAVITY: {
@@ -460,9 +469,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-            }
-
-        });
+            });
 
         mode = Mode.GRAVITY;
         mainView = findViewById(R.id.imageViewMain);

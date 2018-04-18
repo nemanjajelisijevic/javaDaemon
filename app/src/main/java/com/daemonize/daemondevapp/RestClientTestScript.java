@@ -5,9 +5,9 @@ import android.widget.TextView;
 
 import com.daemonize.daemondevapp.restcliententities.DelayedGetResponse;
 
-import com.daemonize.daemonengine.daemonscript.DaemonChainScroll;
-import com.daemonize.daemonengine.daemonscript.DaemonLink;
-import com.daemonize.daemonengine.daemonscript.DaemonScroll;
+import com.daemonize.daemonengine.daemonscroll.DaemonChainScroll;
+import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
+import com.daemonize.daemonengine.daemonscroll.DaemonScroll;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class RestClientTestScript implements DaemonScroll {
@@ -18,7 +18,7 @@ public class RestClientTestScript implements DaemonScroll {
     private RestClientDaemon restClientDaemon;
 
     {
-        chain.addLink(() ->
+        chain.addSpell(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
@@ -36,7 +36,7 @@ public class RestClientTestScript implements DaemonScroll {
                                 );
                         }
                 )
-        ).addLink(() ->
+        ).addSpell(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
@@ -46,7 +46,7 @@ public class RestClientTestScript implements DaemonScroll {
                             chain.next();
                         }
                 )
-        ).addLink(() ->
+        ).addSpell(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
@@ -56,7 +56,7 @@ public class RestClientTestScript implements DaemonScroll {
                             chain.next();
                         }
                 )
-        ).addLink(() ->
+        ).addSpell(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
@@ -76,8 +76,8 @@ public class RestClientTestScript implements DaemonScroll {
 
     @Override
     @SuppressWarnings("unchecked")
-    public RestClientTestScript addLink(DaemonLink link) {
-        chain.addLink(link);
+    public RestClientTestScript addSpell(DaemonSpell spell) {
+        chain.addSpell(spell);
         return this;
     }
 
