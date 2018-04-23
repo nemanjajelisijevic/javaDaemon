@@ -23,35 +23,41 @@ public class RestClientTestScript implements DaemonScroll {
     private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     {
-        chain.addSpell(() ->
-                restClientDaemon.get(
-                        "/api/users?delay=3",
-                        DelayedGetResponse.class,
-                        ret -> {
-                            mainHandler.post(() -> textView.setText(ret.get().toString()));
-                            Log.d(DaemonUtils.tag(), "LINK 1");
+        chain.addSpell(() -> {
+            restClientDaemon.get(
+                    "/api/users?delay=3",
+                    DelayedGetResponse.class,
+                    ret -> {
+                        mainHandler.post(() -> textView.setText(ret.get().toString()));
+                        Log.d(DaemonUtils.tag(), "LINK 1");
 
-                            if (ret.get().total_pages > 0)
-                                next();
-                            else
-                                Log.e(
-                                        DaemonUtils.tag(),
-                                        "Total pages: " + Integer.toString(ret.get().total_pages)
-                                );
-                        }
-                )
-        ).addSpell(() ->
-                restClientDaemon.get(
-                        "/api/users?delay=3",
-                        DelayedGetResponse.class,
-                        aReturn -> {
-                            String res = "AGAIN!!!!!\n" + aReturn.get().toString();
-                            mainHandler.post(() -> textView.setText(res));
-                            Log.d(DaemonUtils.tag(), "LINK 2");
-                            chain.next();
-                        }
-                )
-        ).addSpell(() ->
+                        if (ret.get().total_pages > 0)
+                            next();
+                        else
+                            Log.e(
+                                    DaemonUtils.tag(),
+                                    "Total pages: " + Integer.toString(ret.get().total_pages)
+                            );
+                    }
+            );
+
+            Log.e(DaemonUtils.tag(), "FUCK OFF!!!!");
+
+        }).addSpell(() -> {
+            restClientDaemon.get(
+                    "/api/users?delay=3",
+                    DelayedGetResponse.class,
+                    aReturn -> {
+                        String res = "AGAIN!!!!!\n" + aReturn.get().toString();
+                        mainHandler.post(() -> textView.setText(res));
+                        Log.d(DaemonUtils.tag(), "LINK 2");
+                        chain.next();
+                    }
+            );
+
+            Log.e(DaemonUtils.tag(), "FUCK OFF!!!!");
+
+        }).addSpell(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
@@ -97,6 +103,6 @@ public class RestClientTestScript implements DaemonScroll {
 
     @Override
     public void run() {
-        chain.run();
+        consumer.enqueue(() -> chain.run());
     }
 }
