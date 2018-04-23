@@ -19,7 +19,7 @@ public class RestClientTestScript implements DaemonScroll {
 
     private TextView textView;
     private RestClientDaemon restClientDaemon;
-    public DaemonConsumer consumer = new DaemonConsumer(this.getClass().getSimpleName() + " consumer");
+    private DaemonConsumer consumer = new DaemonConsumer(this.getClass().getSimpleName() + " consumer");
     private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     {

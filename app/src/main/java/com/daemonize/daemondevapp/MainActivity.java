@@ -30,6 +30,7 @@ import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
 import com.daemonize.daemonengine.exceptions.DaemonException;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
@@ -379,10 +380,10 @@ public class MainActivity extends AppCompatActivity {
                                     new ImageTranslationMover(
                                             sprite,
                                             30,
-                                            Pair.create((float) borderX/2, (float) borderY/2)
+                                            Pair.create((float) borderX/2 + i , (float) borderY/2 + i)
                                     ).setBorders(borderX, borderY)
                             );
-                            i+=5;
+                            i = - (i + 5);
                         }
 
                         mainMover.setPrototype(
@@ -606,25 +607,31 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(binder.bindViewToClosure(mainView)));
         mainMover.start();
 
-        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
-        exampleDaemon.evenMoreComplicated(
-                        "Constantly updated from another thread: ",
-                        update -> textView.setText(update.get()),
-                        ret -> {
-                            try {
-                                textView.setText(ret.checkAndGet());
-                            } catch (DaemonException e) {
-                                Log.e("DAEMON ERROR", Log.getStackTraceString(e));
-                                textView.setText(e.getMessage());
-                                return;
-                            }
-                            exampleDaemon.evenMoreComplicated(
-                                    "Here we go again: ",
-                                    update -> textView.setText(update.get()),
-                                    ret2 ->  textView.setText(ret2.get())
-                            );
-                        }
-                );
+//        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
+//        exampleDaemon.evenMoreComplicated(
+//                        "Constantly updated from another thread: ",
+//                        update -> textView.setText(update.get()),
+//                        ret -> {
+//                            try {
+//                                textView.setText(ret.checkAndGet());
+//                            } catch (DaemonException e) {
+//                                Log.e("DAEMON ERROR", Log.getStackTraceString(e));
+//                                textView.setText(e.getMessage());
+//                                return;
+//                            }
+//                            exampleDaemon.evenMoreComplicated(
+//                                    "Here we go again: ",
+//                                    update -> textView.setText(update.get()),
+//                                    ret2 ->  textView.setText(ret2.get())
+//                            );
+//                        }
+//                );
+
+
+        new RestClientTestScript(
+                textView,
+                new RestClientDaemon(new RestClient("https://reqres.in"))
+        ).run();
 
         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
 
