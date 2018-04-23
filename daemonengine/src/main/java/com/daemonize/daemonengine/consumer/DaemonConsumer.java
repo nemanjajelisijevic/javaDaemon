@@ -34,23 +34,6 @@ public class DaemonConsumer implements Consumer, Daemon {
         return ret;
     }
 
-    private Runnable dequeue() {
-        Runnable ret = null;
-        try {
-            closureLock.lock();
-            while (closureQueue.isEmpty()) {
-                state = DaemonState.IDLE;
-                closureAvailable.await();
-            }
-            ret = closureQueue.poll();
-        } catch (InterruptedException ex) {
-            System.out.println(DaemonUtils.tag() + " Waiting on a closure interrupted");
-        } finally { //TODO Handle Exceptions
-            closureLock.unlock();
-        }
-        return ret;
-    }
-
     private void loop() {
         while (!state.equals(DaemonState.STOPPED)) {
 
@@ -60,19 +43,13 @@ public class DaemonConsumer implements Consumer, Daemon {
                     state = DaemonState.IDLE;
                     closureAvailable.await();
                 }
-                closureQueue.poll().run();
+                closureQueue.poll().run();//TODO null safety
             } catch (InterruptedException ex) {
                 System.out.println(DaemonUtils.tag() + " Waiting on a closure interrupted");
                 break;
             } finally { //TODO Handle Exceptions
                 closureLock.unlock();
             }
-
-//            Runnable currentRunnable = dequeue();
-//            if (currentRunnable == null) {
-//                break;
-//            }
-//            dequeue().run();
         }
     }
 
