@@ -51,6 +51,9 @@ public class DaemonConsumer implements Consumer, Daemon {
                 closureLock.unlock();
             }
         }
+
+        state = DaemonState.STOPPED;
+        System.out.println(DaemonUtils.tag() + "Daemon stopped!");
     }
 
     @Override
