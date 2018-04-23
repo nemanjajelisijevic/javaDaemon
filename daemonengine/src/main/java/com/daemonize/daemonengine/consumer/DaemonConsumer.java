@@ -98,4 +98,9 @@ public class DaemonConsumer implements Consumer, Daemon {
     public <K extends Daemon> K setConsumer(Consumer consumer) {
         throw new IllegalStateException("This object already encapsulates a consumer thread. This operation is not permitted!");
     }
+
+    public DaemonConsumer registerDaemon(Daemon daemon) {
+        daemon.setConsumer(this);
+        return this;
+    }
 }
