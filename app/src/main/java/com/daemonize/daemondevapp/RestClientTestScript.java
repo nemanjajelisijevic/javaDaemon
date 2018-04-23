@@ -23,7 +23,7 @@ public class RestClientTestScript implements DaemonScroll {
     private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     {
-        chain.addSpell(() -> {
+        chain.addSpell(() ->
             restClientDaemon.get(
                     "/api/users?delay=3",
                     DelayedGetResponse.class,
@@ -38,10 +38,9 @@ public class RestClientTestScript implements DaemonScroll {
                                     DaemonUtils.tag(),
                                     "Total pages: " + Integer.toString(ret.get().total_pages)
                             );
-                    }
-            );
+                    })
 
-        }).addSpell(() -> {
+        ).addSpell(() ->
             restClientDaemon.get(
                     "/api/users?delay=3",
                     DelayedGetResponse.class,
@@ -51,9 +50,8 @@ public class RestClientTestScript implements DaemonScroll {
                         Log.d(DaemonUtils.tag(), "LINK 2");
                         chain.next();
                     }
-            );
-
-        }).addSpell(() ->
+            )
+        ).addSpell(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
