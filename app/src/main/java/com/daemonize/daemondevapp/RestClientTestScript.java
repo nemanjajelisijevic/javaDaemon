@@ -1,10 +1,13 @@
 package com.daemonize.daemondevapp;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
 import com.daemonize.daemondevapp.restcliententities.DelayedGetResponse;
 
+import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscroll.DaemonChainScroll;
 import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
 import com.daemonize.daemonengine.daemonscroll.DaemonScroll;
@@ -16,6 +19,8 @@ public class RestClientTestScript implements DaemonScroll {
 
     private TextView textView;
     private RestClientDaemon restClientDaemon;
+    public DaemonConsumer consumer = new DaemonConsumer(this.getClass().getSimpleName() + " consumer");
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     {
         chain.addSpell(() ->
@@ -23,8 +28,7 @@ public class RestClientTestScript implements DaemonScroll {
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
                         ret -> {
-
-                            textView.setText(ret.get().toString());
+                            mainHandler.post(() -> textView.setText(ret.get().toString()));
                             Log.d(DaemonUtils.tag(), "LINK 1");
 
                             if (ret.get().total_pages > 0)
@@ -41,7 +45,8 @@ public class RestClientTestScript implements DaemonScroll {
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
                         aReturn -> {
-                            textView.append(aReturn.get().toString());
+                            String res = "AGAIN!!!!!\n" + aReturn.get().toString();
+                            mainHandler.post(() -> textView.setText(res));
                             Log.d(DaemonUtils.tag(), "LINK 2");
                             chain.next();
                         }
@@ -51,7 +56,8 @@ public class RestClientTestScript implements DaemonScroll {
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
                         aReturn -> {
-                            textView.append(aReturn.get().toString());
+                            String res = "AND AGAIN!!!!!\n" + aReturn.get().toString();
+                            mainHandler.post(() -> textView.setText(res));
                             Log.d(DaemonUtils.tag(), "LINK 3");
                             chain.next();
                         }
@@ -61,9 +67,10 @@ public class RestClientTestScript implements DaemonScroll {
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
                         aReturn -> {
-                            textView.append(aReturn.get().toString());
+                            String res = "LAST TIME!!!!!\n" + aReturn.get().toString();
+                            mainHandler.post(() -> textView.setText(res));
                             Log.d(DaemonUtils.tag(), "LINK 4");
-                            chain.next();
+                            consumer.stop();
                         }
                 )
         );
@@ -72,6 +79,8 @@ public class RestClientTestScript implements DaemonScroll {
     public RestClientTestScript(TextView textView, RestClientDaemon restClientDaemon) {
         this.textView = textView;
         this.restClientDaemon = restClientDaemon;
+        this.restClientDaemon.setConsumer(consumer);
+        consumer.start();
     }
 
     @Override
