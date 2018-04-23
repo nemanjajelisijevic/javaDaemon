@@ -41,8 +41,6 @@ public class RestClientTestScript implements DaemonScroll {
                     }
             );
 
-            Log.e(DaemonUtils.tag(), "FUCK OFF!!!!");
-
         }).addSpell(() -> {
             restClientDaemon.get(
                     "/api/users?delay=3",
@@ -54,8 +52,6 @@ public class RestClientTestScript implements DaemonScroll {
                         chain.next();
                     }
             );
-
-            Log.e(DaemonUtils.tag(), "FUCK OFF!!!!");
 
         }).addSpell(() ->
                 restClientDaemon.get(
