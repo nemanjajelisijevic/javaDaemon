@@ -39,7 +39,6 @@ public class RestClientTestScript implements DaemonScroll {
                                     "Total pages: " + Integer.toString(ret.get().total_pages)
                             );
                     })
-
         ).addSpell(() ->
             restClientDaemon.get(
                     "/api/users?delay=3",
@@ -49,8 +48,7 @@ public class RestClientTestScript implements DaemonScroll {
                         mainHandler.post(() -> textView.setText(res));
                         Log.d(DaemonUtils.tag(), "LINK 2");
                         chain.next();
-                    }
-            )
+                    })
         ).addSpell(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
@@ -60,8 +58,7 @@ public class RestClientTestScript implements DaemonScroll {
                             mainHandler.post(() -> textView.setText(res));
                             Log.d(DaemonUtils.tag(), "LINK 3");
                             chain.next();
-                        }
-                )
+                        })
         ).addSpell(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
@@ -71,8 +68,7 @@ public class RestClientTestScript implements DaemonScroll {
                             mainHandler.post(() -> textView.setText(res));
                             Log.d(DaemonUtils.tag(), "LINK 4");
                             consumer.stop();
-                        }
-                )
+                        })
         );
     }
 
