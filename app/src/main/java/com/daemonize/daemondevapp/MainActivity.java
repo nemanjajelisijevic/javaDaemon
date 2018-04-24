@@ -136,10 +136,12 @@ public class MainActivity extends AppCompatActivity {
                 if(Math.abs(ret.get().positionX - starMoverPos.first) <= bulletSprite.get(0).getWidth()
                         && Math.abs(ret.get().positionY - starMoverPos.second) <= bulletSprite.get(0).getHeight()) {
 
-                    bulletDaemon.stop();
-                    layout.removeView(view);
+
 
                     if (!((ImageTranslationMover) starMover.getPrototype()).isExploading()) {
+
+                        bulletDaemon.stop();
+                        layout.removeView(view);
 
                         starMover.explode(
                                 explosionSprite,
