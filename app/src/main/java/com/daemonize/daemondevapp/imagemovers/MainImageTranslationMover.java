@@ -38,7 +38,7 @@ public class MainImageTranslationMover extends ImageTranslationMover {
 
             if (observers != null)
                 for (ImageMoverDaemon observer : observers) {
-                    Velocity vel = new Velocity(velocity.intensity * 0.4F, velocity.direction);
+                    Velocity vel = new Velocity(velocity.intensity * 0.2F, velocity.direction);
                     observer.setTouchDirection(lastX, lastY, vel.intensity); //TODO CHASER
                     observer.checkCollisionAndBounce(Pair.create(lastX, lastY), vel); //TODO Collisions
                 }

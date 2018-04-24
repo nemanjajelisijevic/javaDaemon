@@ -42,8 +42,8 @@
 
     <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"
         android:id="@+id/joystickLeft"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:visibility="visible"
         custom:JV_backgroundColor="#00009688"
         custom:JV_borderColor="#00796B"
@@ -55,8 +55,8 @@
 
     <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"
         android:id="@+id/joystickRight"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:visibility="visible"
         custom:JV_backgroundColor="#00009688"
         custom:JV_borderColor="#00796B"
