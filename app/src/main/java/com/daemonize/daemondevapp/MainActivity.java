@@ -147,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
             ImageMover.PositionedBitmap returnVal = ret.get();
             view.setX(returnVal.positionX);
             view.setY(returnVal.positionY);
-            //if (returnVal.image != null)
             view.setImageBitmap(returnVal.image);
         }
     }
@@ -184,28 +183,17 @@ public class MainActivity extends AppCompatActivity {
                     bulletDaemon.stop();
                     layout.removeView(view);
 
-                    switch (mode) {
-                        case GRAVITY:
-                        case CHASE:
-                        case COLLIDE: {
+                    if (!((ImageTranslationMover) starMover.getPrototype()).isExploading()) {
 
-                            if (!((ImageTranslationMover) starMover.getPrototype()).isExploading()) {
-
-                                starMover.explode(
-                                        explosionSprite,
-                                        binder.bindViewToClosure(((ImageTranslationMover) starMover.getPrototype()).getView()),
-                                        ret1 -> {
-                                            ((ImageTranslationMover) starMover.getPrototype()).getView().setImageBitmap(ret1.get().image);
-                                            starMover.stop();
-                                        }
-                                );
-                            }
-                        }
-                        default:
-                            break;
-
+                        starMover.explode(
+                                explosionSprite,
+                                binder.bindViewToClosure(((ImageTranslationMover) starMover.getPrototype()).getView()),
+                                ret1 -> {
+                                    ((ImageTranslationMover) starMover.getPrototype()).getView().setImageBitmap(ret1.get().image);
+                                    starMover.stop();
+                                }
+                        );
                     }
-
                 }
             }
 
