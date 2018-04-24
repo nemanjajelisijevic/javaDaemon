@@ -177,8 +177,11 @@ public class ImageTranslationMover implements ImageMover {
         return ret;
     }
 
-
     private volatile boolean exploading;
+
+    public void setExplode(boolean boom) {
+        exploading = boom;
+    }
 
     public boolean isExploading() {
         return exploading;
@@ -189,7 +192,7 @@ public class ImageTranslationMover implements ImageMover {
 
         Handler handler = new Handler(Looper.getMainLooper());
         PositionedBitmap updatePB = new PositionedBitmap();
-        exploading = true;
+        //exploading = true;
 
         for (Bitmap bmp : explodeSprite) {
 
@@ -200,7 +203,7 @@ public class ImageTranslationMover implements ImageMover {
             Thread.sleep(25);
         }
 
-        exploading = false;
+        //exploading = false;
         updatePB.image = explodeSprite.get(explodeSprite.size() - 1);
         return updatePB;
     }

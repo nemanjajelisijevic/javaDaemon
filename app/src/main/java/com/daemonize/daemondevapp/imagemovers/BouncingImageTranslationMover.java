@@ -26,7 +26,7 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
             Velocity velocity
     ) {
 
-        if(Math.abs(lastX - colliderCoordinates.first) < proximityDistance
+        if(!isExploading() && Math.abs(lastX - colliderCoordinates.first) < proximityDistance
                 && Math.abs(lastY - colliderCoordinates.second) < proximityDistance) {
             setVelocity(new Velocity(velocity));
         }

@@ -38,6 +38,7 @@ import java.util.List;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 import static android.graphics.Color.WHITE;
+import static android.graphics.Color.isInColorSpace;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -136,19 +137,22 @@ public class MainActivity extends AppCompatActivity {
                 if(Math.abs(ret.get().positionX - starMoverPos.first) <= bulletSprite.get(0).getWidth()
                         && Math.abs(ret.get().positionY - starMoverPos.second) <= bulletSprite.get(0).getHeight()) {
 
+                    ImageTranslationMover prototype = (ImageTranslationMover) starMover.getPrototype();
 
+                    if (!prototype.isExploading()) {
 
-                    if (!((ImageTranslationMover) starMover.getPrototype()).isExploading()) {
-
+                        prototype.setExplode(true);
                         bulletDaemon.stop();
                         layout.removeView(view);
 
                         starMover.explode(
                                 explosionSprite,
-                                binder.bindViewToClosure(((ImageTranslationMover) starMover.getPrototype()).getView()),
+                                binder.bindViewToClosure(prototype.getView()),
                                 ret1 -> {
-                                    ((ImageTranslationMover) starMover.getPrototype()).getView().setImageBitmap(ret1.get().image);
-                                    starMover.stop();
+                                    prototype.getView().setImageBitmap(ret1.get().image);
+                                    prototype.setExplode(false);
+                                    //starMover.stop();
+                                    prototype.setLastCoordinates(0,0);
                                 }
                         );
                     }
