@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
                                     prototype.getView().setImageBitmap(ret1.get().image);
                                     prototype.setExplode(false);
                                     //starMover.stop();
-                                    prototype.setLastCoordinates(0,0);
+                                    prototype.setLastCoordinates(10,10);
                                 }
                         );
                     }
