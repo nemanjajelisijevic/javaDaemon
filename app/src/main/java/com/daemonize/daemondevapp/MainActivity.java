@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -27,11 +28,14 @@ import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 import static android.graphics.Color.WHITE;
 
@@ -45,8 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ConstraintLayout layout;
 
-    private Mode mode = Mode.GRAVITY;
-
     private List<Bitmap> sprite;
     private List<Bitmap> spriteMain;
     private List<Bitmap> bulletSprite;
@@ -59,13 +61,11 @@ public class MainActivity extends AppCompatActivity {
     private ImageMoverDaemon mainMover;
     private ImageView mainView;
 
-    private Bitmap targetImage;
-    private ImageView target;
-
     private int borderX;
     private int borderY;
 
-    private boolean paused = false;
+    private JoystickView joystickViewLeft;
+    private JoystickView joystickViewRight;
 
     private TextView textView;
 
@@ -79,50 +79,6 @@ public class MainActivity extends AppCompatActivity {
             );
         }
     });
-
-    private interface EventHandler {
-        void handleEvent(MotionEvent event);
-    }
-
-    private EventHandler onTouch = new EventHandler() {
-        @Override
-        public void handleEvent(MotionEvent event) {
-            switch (mode) {
-                case GRAVITY:
-                    if(event.getAction() == MotionEvent.ACTION_DOWN) {
-
-                        target.setX(event.getX());
-                        target.setY(event.getY());
-
-                        mainMover.setTouchDirection(event.getX(), event.getY());
-                        for(ImageMoverDaemon starMover : starMovers) {
-                            starMover.setTouchDirection(event.getX(), event.getY());
-                        }
-                    }
-                    break;
-                case CHASE:
-                    if (!gestureDetector.onTouchEvent(event) && event.getAction() == MotionEvent.ACTION_DOWN) {
-                        target.setX(event.getX());
-                        target.setY(event.getY());
-                    }
-                    break;
-                case COLLIDE:
-                    if (!gestureDetector.onTouchEvent(event) && event.getAction() == MotionEvent.ACTION_DOWN) {
-
-                        target.setX(event.getX() /*+ (targetImage.getWidth() / 2)*/);
-                        target.setY(event.getY() /*+ (targetImage.getHeight()) / 2*/);
-                        //mainMover.setTouchDirection(event.getX(), event.getY());
-                    }
-                    break;
-            }
-        }
-    };
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        onTouch.handleEvent(event);
-        return true;
-    }
 
     @FunctionalInterface
     private interface ViewBinder {
@@ -292,12 +248,14 @@ public class MainActivity extends AppCompatActivity {
 
     private class MachineGunSpell implements DaemonSpell {
 
-        private float offset;
         private Pair<Float, Float> initBulletCoord;
+        private ImageMover.Velocity velocity;
+        private float offset = -3;
 
-        public MachineGunSpell(float offset, Pair<Float, Float> initBulletCoord) {
+        public MachineGunSpell(float offset, Pair<Float, Float> initBulletCoord, ImageMover.Velocity velocity) {
             this.offset = offset;
             this.initBulletCoord = initBulletCoord;
+            this.velocity = velocity;
         }
 
         @Override
@@ -319,10 +277,9 @@ public class MainActivity extends AppCompatActivity {
                 bullet.setVelocity(50);
 
                 bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                bullet.setTouchDirection(
-                        target.getX() + (targetImage.getWidth() / 2) + offset,
-                        target.getY() + (targetImage.getHeight() / 2) + (float) (Math.pow(-i, i) * 30)
-                );
+                velocity.direction.coeficientX += Math.pow(offset, i);
+                velocity.direction.coeficientY -= Math.pow(offset, i);
+                bullet.setVelocity(velocity);
 
             }
         }
@@ -348,17 +305,7 @@ public class MainActivity extends AppCompatActivity {
 
         layout = findViewById(R.id.cl);
 
-        target = createBulletView();
-
         try {
-
-            targetImage = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("target.png")), 80, 80, false);
-
-            target.getLayoutParams().height = targetImage.getHeight();
-            target.getLayoutParams().width = targetImage.getWidth();
-            target.requestLayout();
-
-            target.setImageBitmap(targetImage);
 
             sprite = new ArrayList<>();
             sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
@@ -525,30 +472,45 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(binder.bindViewToClosure(mainView)));
         mainMover.start();
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
 
-            float offset = (bulletCounter % 3) * 50;
-            Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
-
-            MachineGunSpell rafal = new MachineGunSpell(
-                    offset,
-                    Pair.create(
-                            lastMainCoord.first + (spriteMain.get(0).getWidth() / 2) + offset,
-                            lastMainCoord.second + (spriteMain.get(0).getHeight() / 2) + offset
-                    )
-            );
-
-            mainMover.shoot(
-                    2,
-                    25,
-                    binder.bindViewToClosure(mainView),
-                    ret -> rafal.cast());
+        joystickViewLeft = findViewById(R.id.joystickLeft);
+        joystickViewLeft.setOnMoveListener((angle, strength) -> {
+            float angleF = (float) angle * 0.0174533F;
+            mainMover.setVelocity(new ImageMover.Velocity(
+                    strength % 40,
+                    new ImageMover.Direction((float)Math.cos(angleF) * 100,  - (float)Math.sin(angleF) * 100)
+            ));
         });
 
+        joystickViewRight = findViewById(R.id.joystickRight);
+        joystickViewRight.setOnMoveListener((angle, strength) -> {
+            float angleF = (float) angle * 0.0174533F;
 
-        mode = Mode.COLLIDE;
-        Toast.makeText(MainActivity.this, "MODE: COLLIDE", Toast.LENGTH_LONG).show();
+            ImageView bulletView;
+            ImageMoverDaemon bullet;
+
+            Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
+
+            bulletView = createBulletView();
+            bullet = new ImageMoverDaemon(
+                    new ImageTranslationMover(
+                            bulletSprite,
+                            50,
+                            Pair.create(
+                                    lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
+                                    lastMainCoord.second + spriteMain.get(0).getHeight() / 2
+                            )
+                    ).setBorders(borderX, borderY)
+            ).setName("Bullet " + Long.toString(++bulletCounter));
+
+            bullet.setVelocity(50);
+
+            bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+            bullet.setVelocity(new ImageMover.Velocity(
+                    50,
+                    new ImageMover.Direction((float)Math.cos(angleF) * 100,  - (float)Math.sin(angleF) * 100)
+            ));
+        });
 
 //        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
 //        exampleDaemon.evenMoreComplicated(
