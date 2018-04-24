@@ -103,7 +103,7 @@ public class ImageTranslationMover implements ImageMover {
     }
 
     @Override
-    public void setTouchDirection(float x, float y) {
+    public void setTouchDirection(float x, float y, float velocityInt) {
 
         float dX = x - lastX;
         float dY = y - lastY;
@@ -111,6 +111,7 @@ public class ImageTranslationMover implements ImageMover {
         float a;
         boolean signY = dY >= 0;
         boolean signX = dX >= 0;
+        velocity.intensity = velocityInt;
 
         if (Math.abs(dY) >= Math.abs(dX)) {
             a = Math.abs((100*dX)/dY);
@@ -176,10 +177,6 @@ public class ImageTranslationMover implements ImageMover {
         return ret;
     }
 
-    @Override
-    public void shoot(int bullets, int interval, Closure<PositionedBitmap> mainupdate, Closure<Void> hit) throws InterruptedException {
-        throw new IllegalStateException("Stub");
-    }
 
     private volatile boolean exploading;
 

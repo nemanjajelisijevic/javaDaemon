@@ -463,8 +463,7 @@ public class MainActivity extends AppCompatActivity {
                             spriteMain,
                             10f,
                             Pair.create(borderX/2f, borderY/2f),
-                            starMovers,
-                            MainImageTranslationMover.Mode.COLLIDE
+                            starMovers
                     ).setBorders(borderX, borderY)
         ).setName("Exceptione");
 

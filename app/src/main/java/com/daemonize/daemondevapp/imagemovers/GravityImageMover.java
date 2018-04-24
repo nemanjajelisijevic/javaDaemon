@@ -22,10 +22,10 @@ public class GravityImageMover extends ImageTranslationMover {
     }
 
     @Override
-    public void setTouchDirection(float x, float y) {
+    public void setTouchDirection(float x, float y, float velocityInt) {
         velocity.intensity = initVelocity;
         touched = true;
-        super.setTouchDirection(x, y);
+        super.setTouchDirection(x, y, velocityInt);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class GravityImageMover extends ImageTranslationMover {
 
             if(velocity.intensity <= 0) {
                 falling = true;
-                setTouchDirection(lastX, borderY);
+                setTouchDirection(lastX, borderY, velocity.intensity);
                 velocity.intensity = initVelocity;
                 return super.move();
             }

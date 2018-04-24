@@ -60,7 +60,7 @@ public interface ImageMover {
 
     void setVelocity(Velocity velocity);
 
-    void setTouchDirection(float x, float y);
+    void setTouchDirection(float x, float y, float velocityInt);
 
     void setVelocity(float velocity);
 
@@ -75,8 +75,6 @@ public interface ImageMover {
 
     @SideQuest(SLEEP = 25)
     PositionedBitmap move();
-
-    void shoot(int bullets, int interval, Closure<PositionedBitmap> mainupdate, Closure<Void> hit) throws InterruptedException;
 
     PositionedBitmap explode(List<Bitmap> explodeSprite, Closure<PositionedBitmap> update) throws InterruptedException;
 

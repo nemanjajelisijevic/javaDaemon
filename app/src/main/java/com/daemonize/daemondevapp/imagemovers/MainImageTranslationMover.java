@@ -15,22 +15,14 @@ public class MainImageTranslationMover extends ImageTranslationMover {
 
     private final List<ImageMoverDaemon> observers;
 
-    public enum Mode {
-        NONE,
-        CHASE,
-        COLLIDE
-    }
-
-    private Mode mode;
 
     public MainImageTranslationMover(
             List<Bitmap> sprite,
             float velocity,
             Pair<Float, Float> startingPos,
-            List<ImageMoverDaemon> observers, Mode mode) {
+            List<ImageMoverDaemon> observers) {
         super(sprite, velocity, startingPos);
         this.observers = observers;
-        this.mode = mode;
     }
 
     @Override
@@ -46,11 +38,8 @@ public class MainImageTranslationMover extends ImageTranslationMover {
 
             if (observers != null)
                 for (ImageMoverDaemon observer : observers) {
-                    if(mode.equals(Mode.CHASE)) {
-                        observer.setTouchDirection(lastX, lastY); //TODO CHASER
-                    } else if (mode.equals(Mode.COLLIDE)) {
-                        observer.checkCollisionAndBounce(Pair.create(lastX, lastY), velocity); //TODO Collisions
-                    }
+                    observer.setTouchDirection(lastX, lastY, velocity.intensity * 0.4F); //TODO CHASER
+                    observer.checkCollisionAndBounce(Pair.create(lastX, lastY), velocity); //TODO Collisions
                 }
 
             velocity.intensity -= 0.1;
@@ -61,7 +50,7 @@ public class MainImageTranslationMover extends ImageTranslationMover {
     }
 
     @Override
-    public void setTouchDirection(float x, float y) {
+    public void setTouchDirection(float x, float y, float velocityInt) {
 
         float diffX = x - lastX;
         float diffY = y - lastY;
@@ -81,22 +70,5 @@ public class MainImageTranslationMover extends ImageTranslationMover {
         }
 
         setVelocity(initVelocity);
-    }
-
-    @Override
-    public void shoot(int bullets, int interval, Closure<PositionedBitmap> mainupdate, Closure<Void> hit) throws InterruptedException {
-        Handler handler = new Handler(Looper.getMainLooper());
-        int cnt = 4 * bullets;
-
-        while (bullets > 0) {
-            handler.post(new ReturnRunnable<>(mainupdate).setResult(move()));
-            if(cnt % 4 == 0) {
-                handler.post(new ReturnRunnable<>(hit));
-                bullets--;
-            }
-
-            Thread.sleep(interval);
-            cnt--;
-        }
     }
 }
