@@ -8,6 +8,8 @@ import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
+import java.util.List;
+
 @Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
 
@@ -75,5 +77,7 @@ public interface ImageMover {
     PositionedBitmap move();
 
     void shoot(int bullets, int interval, Closure<PositionedBitmap> mainupdate, Closure<Void> hit) throws InterruptedException;
+
+    PositionedBitmap explode(List<Bitmap> explodeSprite, Closure<PositionedBitmap> update) throws InterruptedException;
 
 }

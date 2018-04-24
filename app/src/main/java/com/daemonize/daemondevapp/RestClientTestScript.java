@@ -26,8 +26,8 @@ public class RestClientTestScript implements DaemonScroll {
         chain.addSpell(() ->
             restClientDaemon.get(
                     "/api/users?delay=3",
-                    DelayedGetResponse.class,
-                    ret -> {
+                     DelayedGetResponse.class,
+                     ret -> {
                         mainHandler.post(() -> textView.setText(ret.get().toString()));
                         Log.d(DaemonUtils.tag(), "LINK 1");
 

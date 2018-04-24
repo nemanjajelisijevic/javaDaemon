@@ -1,9 +1,14 @@
 package com.daemonize.daemondevapp.imagemovers;
 
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Pair;
+import android.widget.ImageView;
 
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
+import com.daemonize.daemonprocessor.annotations.CallingThread;
 
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +23,19 @@ public class ImageTranslationMover implements ImageMover {
 
     protected volatile float lastX;
     protected volatile float lastY;
+
+    private ImageView view;
+
+    @CallingThread
+    public ImageView getView() {
+        return view;
+    }
+
+    @CallingThread
+    public ImageTranslationMover setView(ImageView view) {
+        this.view = view;
+        return this;
+    }
 
     @Override
     public Pair<Float, Float> getLastCoordinates() {
@@ -161,6 +179,33 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void shoot(int bullets, int interval, Closure<PositionedBitmap> mainupdate, Closure<Void> hit) throws InterruptedException {
         throw new IllegalStateException("Stub");
+    }
+
+    private volatile boolean exploading;
+
+    public boolean isExploading() {
+        return exploading;
+    }
+
+    @Override
+    public PositionedBitmap explode(List<Bitmap> explodeSprite, Closure<PositionedBitmap> update) throws InterruptedException {
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        PositionedBitmap updatePB = new PositionedBitmap();
+        exploading = true;
+
+        for (Bitmap bmp : explodeSprite) {
+
+            updatePB.image = bmp;
+            updatePB.positionX = lastX;
+            updatePB.positionY = lastY;
+            handler.post(new ReturnRunnable<>(update).setResult(updatePB));
+            Thread.sleep(25);
+        }
+
+        exploading = false;
+        updatePB.image = explodeSprite.get(explodeSprite.size() - 1);
+        return updatePB;
     }
 }
 
