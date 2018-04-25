@@ -166,7 +166,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ViewBinder binder = ImageMoveClosure::new;
-    private long bulletCounter;
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -214,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                                 50,
                                 initBulletCoord
                         ).setBorders(borderX, borderY)
-                ).setName("Bullet " + Long.toString(++bulletCounter));
+                ).setName("Bullet");
 
                 bullet.setVelocity(50);
 
@@ -442,7 +441,7 @@ public class MainActivity extends AppCompatActivity {
                         new ImageMover.Direction((float) Math.cos(angleF) * 100, -(float) Math.sin(angleF) * 100)
                 ));
             }
-        }, 100);
+        }, 200);
 
         joystickViewRight = findViewById(R.id.joystickRight);
         joystickViewRight.setOnMoveListener((angle, strength) -> {
@@ -464,7 +463,7 @@ public class MainActivity extends AppCompatActivity {
                                     lastMainCoord.second + spriteMain.get(0).getHeight() / 2
                             )
                     ).setBorders(borderX, borderY)
-            ).setName("Bullet " + Long.toString(++bulletCounter));
+            ).setName("Bullet");
 
             bullet.setVelocity(50);
 
@@ -485,7 +484,7 @@ public class MainActivity extends AppCompatActivity {
                                     lastMainCoord.second + spriteMain.get(0).getHeight() / 2
                             )
                     ).setBorders(borderX, borderY)
-            ).setName("Bullet " + Long.toString(++bulletCounter));
+            ).setName("Bullet");
 
             bullet.setVelocity(50);
 
@@ -506,7 +505,7 @@ public class MainActivity extends AppCompatActivity {
                                     lastMainCoord.second + spriteMain.get(0).getHeight() / 2
                             )
                     ).setBorders(borderX, borderY)
-            ).setName("Bullet " + Long.toString(++bulletCounter));
+            ).setName("Bullet");
 
             bullet.setVelocity(50);
 

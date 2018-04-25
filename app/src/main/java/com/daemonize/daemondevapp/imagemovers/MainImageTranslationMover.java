@@ -17,13 +17,10 @@ public class MainImageTranslationMover extends ImageTranslationMover {
     private final List<ImageMoverDaemon> observers;
 
     private int hp = 1000;
+    private Handler guihandler = new Handler(Looper.getMainLooper());
 
     public void setHp(int hp) {
         this.hp = hp;
-    }
-
-    public int getHp() {
-        return hp;
     }
 
     private Closure<Integer> hpClosure;
@@ -59,8 +56,10 @@ public class MainImageTranslationMover extends ImageTranslationMover {
                     observer.setDirectionAndMove(lastX, lastY, vel.intensity); //TODO CHASER
                     //observer.checkCollisionAndBounce(Pair.create(lastX, lastY), vel); //TODO Collisions
                     Pair<Float, Float> obsLastCoord = observer.getLastCoordinates();
-                    if (!((ImageTranslationMover) observer.getPrototype()).isExploading() && Math.abs(lastX - obsLastCoord.first) < 40 && Math.abs(lastY - obsLastCoord.second) < 40) {
-                      new Handler(Looper.getMainLooper()).post(new ReturnRunnable<>(hpClosure).setResult(--hp));
+                    if (!((ImageTranslationMover) observer.getPrototype()).isExploading()
+                            && Math.abs(lastX - obsLastCoord.first) < 40
+                            && Math.abs(lastY - obsLastCoord.second) < 40) {
+                      guihandler.post(new ReturnRunnable<>(hpClosure).setResult((--hp) / 10));
                     }
                 }
 

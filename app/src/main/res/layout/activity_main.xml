@@ -42,10 +42,20 @@
 
 
     <TextView
+        android:id="@+id/response"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginTop="12dp"
+        android:text="EXPLOSIONS COUNTER: 0"
+        android:layout_gravity="top|start"/>
+
+    <TextView
         android:id="@+id/hp"
-        android:layout_width="189dp"
-        android:layout_height="492dp"
-        android:text="HP: 1000"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="HP: 100"
         android:layout_gravity="top|end"/>
 
     <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"

@@ -9,17 +9,6 @@
     tools:context="com.daemonize.daemondevapp.MainActivity"
     tools:showIn="@layout/activity_main">
 
-
-
-    <TextView
-        android:id="@+id/response"
-        android:layout_width="189dp"
-        android:layout_height="492dp"
-        android:layout_marginTop="12dp"
-        android:text="EXPLOSIONS COUNTER: "
-        tools:layout_editor_absoluteX="0dp" />
-
-
 <!--    <ScrollView
         android:id="@+id/SCROLLER_ID"
         android:layout_width="fill_parent"
