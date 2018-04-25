@@ -431,7 +431,6 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(binder.bindViewToClosure(mainView)));
         mainMover.start();
 
-
         joystickViewLeft = findViewById(R.id.joystickLeft);
         joystickViewLeft.setOnMoveListener((angle, strength) -> {
             if (strength > 0) {
@@ -441,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
                         new ImageMover.Direction((float) Math.cos(angleF) * 100, -(float) Math.sin(angleF) * 100)
                 ));
             }
-        }, 200);
+        }, 100);
 
         joystickViewRight = findViewById(R.id.joystickRight);
         joystickViewRight.setOnMoveListener((angle, strength) -> {
