@@ -5,9 +5,7 @@ import android.graphics.BitmapFactory;
 
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.util.Pair;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -20,7 +18,6 @@ import android.widget.Toast;
 
 
 import com.daemonize.daemondevapp.imagemovers.BouncingImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.GravityImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
@@ -28,7 +25,6 @@ import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
@@ -38,15 +34,8 @@ import java.util.List;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 import static android.graphics.Color.WHITE;
-import static android.graphics.Color.isInColorSpace;
 
 public class MainActivity extends AppCompatActivity {
-
-    private enum Mode {
-        GRAVITY,
-        CHASE,
-        COLLIDE
-    }
 
     private ConstraintLayout layout;
 
@@ -54,9 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private List<Bitmap> spriteMain;
     private List<Bitmap> bulletSprite;
     private List<Bitmap> explosionSprite;
-    private Bitmap grave;
+    //private Bitmap grave;
 
-    private List<ImageView> views;
     private List<ImageMoverDaemon> starMovers;
 
     private ImageMoverDaemon mainMover;
@@ -69,17 +57,6 @@ public class MainActivity extends AppCompatActivity {
     private JoystickView joystickViewRight;
 
     private TextView textView;
-
-    final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
-        public void onLongPress(MotionEvent e) {
-            mainMover.setVelocity(0);
-            mainMover.setLastCoordinates(
-                    e.getX(),
-                    e.getY(),
-                    binder.bindViewToClosure(mainView)
-            );
-        }
-    });
 
     @FunctionalInterface
     private interface ViewBinder {
@@ -163,73 +140,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private ImageView createBulletView() {
-        ImageView bulletView = new ImageView(getApplicationContext());
+    private ImageView createImageView(int width, int height) {
+        ImageView view = new ImageView(getApplicationContext());
         ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT
         );
-        bulletView.setLayoutParams(lp);
-        layout.addView(bulletView);
-        return bulletView;
+        view.setLayoutParams(lp);
+        view.getLayoutParams().height = height;
+        view.getLayoutParams().width = width;
+        layout.addView(view);
+        view.requestLayout();
+        return view;
     }
 
     private ViewBinder binder = ImageMoveClosure::new;
-
-    private void initViews(List<ImageView> views) {
-
-        views.clear();
-
-        views.add((ImageView) findViewById(R.id.imageView));
-        views.add((ImageView) findViewById(R.id.imageView2));
-        views.add((ImageView) findViewById(R.id.imageView3));
-        views.add((ImageView) findViewById(R.id.imageView4));
-        views.add((ImageView) findViewById(R.id.imageView5));
-
-        views.add((ImageView) findViewById(R.id.imageView6));
-        views.add((ImageView) findViewById(R.id.imageView7));
-        views.add((ImageView) findViewById(R.id.imageView8));
-        views.add((ImageView) findViewById(R.id.imageView9));
-        views.add((ImageView) findViewById(R.id.imageView10));
-
-        views.add((ImageView) findViewById(R.id.imageView11));
-        views.add((ImageView) findViewById(R.id.imageView12));
-        views.add((ImageView) findViewById(R.id.imageView13));
-        views.add((ImageView) findViewById(R.id.imageView14));
-        views.add((ImageView) findViewById(R.id.imageView15));
-
-        views.add((ImageView) findViewById(R.id.imageView16));
-        views.add((ImageView) findViewById(R.id.imageView17));
-        views.add((ImageView) findViewById(R.id.imageView18));
-        views.add((ImageView) findViewById(R.id.imageView19));
-        views.add((ImageView) findViewById(R.id.imageView20));
-
-        views.add((ImageView) findViewById(R.id.imageView21));
-        views.add((ImageView) findViewById(R.id.imageView22));
-        views.add((ImageView) findViewById(R.id.imageView23));
-        views.add((ImageView) findViewById(R.id.imageView24));
-        views.add((ImageView) findViewById(R.id.imageView25));
-
-        views.add((ImageView) findViewById(R.id.imageView26));
-        views.add((ImageView) findViewById(R.id.imageView27));
-        views.add((ImageView) findViewById(R.id.imageView28));
-        views.add((ImageView) findViewById(R.id.imageView29));
-        views.add((ImageView) findViewById(R.id.imageView30));
-
-        views.add((ImageView) findViewById(R.id.imageView31));
-        views.add((ImageView) findViewById(R.id.imageView32));
-        views.add((ImageView) findViewById(R.id.imageView33));
-        views.add((ImageView) findViewById(R.id.imageView34));
-        views.add((ImageView) findViewById(R.id.imageView35));
-
-        views.add((ImageView) findViewById(R.id.imageView36));
-        views.add((ImageView) findViewById(R.id.imageView37));
-        views.add((ImageView) findViewById(R.id.imageView38));
-        views.add((ImageView) findViewById(R.id.imageView39));
-        views.add((ImageView) findViewById(R.id.imageView40));
-
-    }
-
     private long bulletCounter;
 
     @Override
@@ -271,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int i = 0; i < 3; ++i) {
 
-                bulletView = createBulletView();
+                bulletView = createImageView(40, 40);
                 bullet = new ImageMoverDaemon(
                         new ImageTranslationMover(
                                 bulletSprite,
@@ -298,10 +223,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mainView = findViewById(R.id.imageViewMain);
-        views = new ArrayList<>(40);
-        starMovers = new ArrayList<>(40);
-        initViews(views);
-
+        starMovers = new ArrayList<>(60);
 
         textView = findViewById(R.id.response);
         textView.setTextColor(WHITE);
@@ -379,8 +301,8 @@ public class MainActivity extends AppCompatActivity {
             explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 80, 80, false));
             explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 80, 80, false));
 
-            grave = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("grave.png")), 80, 80, false);
-            explosionSprite.add(grave);
+            //grave = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("grave.png")), 80, 80, false);
+            //explosionSprite.add(grave);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -446,7 +368,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         int i = 5;
-        for(ImageView view : views) {
+        for(int j = 0; j < 60; ++j) {
+
+            ImageView view = createImageView(80, 80);
             ImageMoverDaemon starMover = new ImageMoverDaemon(
                     new BouncingImageTranslationMover(
                             sprite,
@@ -496,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
 
             Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
 
-            bulletView = createBulletView();
+            bulletView = createImageView(40, 40);
             bullet = new ImageMoverDaemon(
                     new ImageTranslationMover(
                             bulletSprite,
