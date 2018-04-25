@@ -7,9 +7,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Pair;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -31,10 +29,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
+import static android.graphics.Color.RED;
 import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,7 +56,12 @@ public class MainActivity extends AppCompatActivity {
     private JoystickView joystickViewLeft;
     private JoystickView joystickViewRight;
 
-    private TextView textView;
+    private long wastedCounter;
+    private String wastedCntText = "EXPLOSIONS COUNTER: ";
+    private TextView wastedCntView;
+
+    public TextView hpView;
+    private String hpText = "HP: ";
 
     @FunctionalInterface
     private interface ViewBinder {
@@ -123,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
                         bulletDaemon.stop();
                         layout.removeView(view);
 
+                        wastedCntView.setText(wastedCntText + Long.toString(++wastedCounter));
                         starMover.explode(
                                 explosionSprite,
                                 binder.bindViewToClosure(prototype.getView()),
@@ -232,8 +236,11 @@ public class MainActivity extends AppCompatActivity {
         mainView = findViewById(R.id.imageViewMain);
         starMovers = new ArrayList<>(60);
 
-        textView = findViewById(R.id.response);
-        textView.setTextColor(WHITE);
+        wastedCntView = findViewById(R.id.response);
+        wastedCntView.setTextColor(WHITE);
+
+        hpView = findViewById(R.id.hp);
+        hpView.setTextColor(WHITE);
 
         borderX = getResources().getDisplayMetrics().widthPixels - 100;
         borderY = getResources().getDisplayMetrics().heightPixels - 200;
@@ -401,7 +408,24 @@ public class MainActivity extends AppCompatActivity {
                             10f,
                             Pair.create(borderX/2f, borderY/2f),
                             starMovers
-                    ).setBorders(borderX, borderY)
+                    )
+                    .setBorders(borderX, borderY)
+                    .setHpClosure(hp -> {
+                        if (hp.get() <= 0) {
+                            for (ImageMoverDaemon star : starMovers) {
+                                star.stop();
+                            }
+                            wastedCounter = 0;
+                            mainMover.stop();
+                            hpView.setTextColor(RED);
+                            hpView.setText("!!!!!!WASTED!!!!!!!!!");
+                            ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
+
+                        } else {
+                            hpView.setTextColor(WHITE);
+                            hpView.setText(hpText + hp.get().toString());
+                        }
+                    })
         ).setName("exceptione");
 
 
@@ -497,26 +521,26 @@ public class MainActivity extends AppCompatActivity {
 //        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
 //        exampleDaemon.evenMoreComplicated(
 //                        "Constantly updated from another thread: ",
-//                        update -> textView.setText(update.get()),
+//                        update -> wastedCntView.setText(update.get()),
 //                        ret -> {
 //                            try {
-//                                textView.setText(ret.checkAndGet());
+//                                wastedCntView.setText(ret.checkAndGet());
 //                            } catch (DaemonException e) {
 //                                Log.e("DAEMON ERROR", Log.getStackTraceString(e));
-//                                textView.setText(e.getMessage());
+//                                wastedCntView.setText(e.getMessage());
 //                                return;
 //                            }
 //                            exampleDaemon.evenMoreComplicated(
 //                                    "Here we go again: ",
-//                                    update -> textView.setText(update.get()),
-//                                    ret2 ->  textView.setText(ret2.get())
+//                                    update -> wastedCntView.setText(update.get()),
+//                                    ret2 ->  wastedCntView.setText(ret2.get())
 //                            );
 //                        }
 //                );
 
 
 //        new RestClientTestScript(
-//                textView,
+//                wastedCntView,
 //                new RestClientDaemon(new RestClient("https://reqres.in"))
 //        ).run();
 

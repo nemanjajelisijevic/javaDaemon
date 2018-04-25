@@ -40,6 +40,14 @@
         <!--android:layout_margin="@dimen/fab_margin"-->
         <!--app:srcCompat="@android:drawable/ic_dialog_email" />-->
 
+
+    <TextView
+        android:id="@+id/hp"
+        android:layout_width="189dp"
+        android:layout_height="492dp"
+        android:text="HP: 1000"
+        android:layout_gravity="top|end"/>
+
     <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"
         android:id="@+id/joystickLeft"
         android:layout_width="200dp"

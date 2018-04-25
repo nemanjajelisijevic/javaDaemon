@@ -8,6 +8,7 @@ import android.util.Pair;
 
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
+import com.daemonize.daemonprocessor.annotations.CallingThread;
 
 import java.util.List;
 
@@ -15,6 +16,22 @@ public class MainImageTranslationMover extends ImageTranslationMover {
 
     private final List<ImageMoverDaemon> observers;
 
+    private int hp = 1000;
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    private Closure<Integer> hpClosure;
+
+    public MainImageTranslationMover setHpClosure(Closure<Integer> hpClosure) {
+        this.hpClosure = hpClosure;
+        return this;
+    }
 
     public MainImageTranslationMover(
             List<Bitmap> sprite,
@@ -41,6 +58,10 @@ public class MainImageTranslationMover extends ImageTranslationMover {
                     Velocity vel = new Velocity(velocity.intensity * 0.3F, velocity.direction);
                     observer.setDirectionAndMove(lastX, lastY, vel.intensity); //TODO CHASER
                     //observer.checkCollisionAndBounce(Pair.create(lastX, lastY), vel); //TODO Collisions
+                    Pair<Float, Float> obsLastCoord = observer.getLastCoordinates();
+                    if (!((ImageTranslationMover) observer.getPrototype()).isExploading() && Math.abs(lastX - obsLastCoord.first) < 40 && Math.abs(lastY - obsLastCoord.second) < 40) {
+                      new Handler(Looper.getMainLooper()).post(new ReturnRunnable<>(hpClosure).setResult(--hp));
+                    }
                 }
 
             velocity.intensity -= 0.1;
