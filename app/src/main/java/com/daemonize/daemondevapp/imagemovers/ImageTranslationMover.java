@@ -26,12 +26,10 @@ public class ImageTranslationMover implements ImageMover {
 
     private ImageView view;
 
-    @CallingThread
     public ImageView getView() {
         return view;
     }
 
-    @CallingThread
     public ImageTranslationMover setView(ImageView view) {
         this.view = view;
         return this;
@@ -104,6 +102,8 @@ public class ImageTranslationMover implements ImageMover {
 
     @Override
     public void setDirectionAndMove(float x, float y, float velocityInt) {
+
+        exploading = false;
 
         float dX = x - lastX;
         float dY = y - lastY;
@@ -179,10 +179,10 @@ public class ImageTranslationMover implements ImageMover {
 
     private volatile boolean exploading;
 
-    public void setExplode(boolean boom) {
-        exploading = boom;
-    }
-
+//    public void setExplode(boolean boom) {
+//        exploading = boom;
+//    }
+//
     public boolean isExploading() {
         return exploading;
     }
@@ -192,7 +192,7 @@ public class ImageTranslationMover implements ImageMover {
 
         Handler handler = new Handler(Looper.getMainLooper());
         PositionedBitmap updatePB = new PositionedBitmap();
-        //exploading = true;
+        exploading = true;
 
         for (Bitmap bmp : explodeSprite) {
 
@@ -204,8 +204,6 @@ public class ImageTranslationMover implements ImageMover {
         }
 
         Thread.sleep(3000);
-
-        //exploading = false;
         updatePB.image = explodeSprite.get(explodeSprite.size() - 1);
         return updatePB;
     }

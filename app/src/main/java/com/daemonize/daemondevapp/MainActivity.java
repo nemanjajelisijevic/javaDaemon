@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
                     if (!prototype.isExploading()) {
 
-                        prototype.setExplode(true);
                         bulletDaemon.stop();
                         layout.removeView(view);
 
@@ -129,8 +128,6 @@ public class MainActivity extends AppCompatActivity {
                                 binder.bindViewToClosure(prototype.getView()),
                                 ret1 -> {
                                     prototype.getView().setImageBitmap(ret1.get().image);
-                                    prototype.setExplode(false);
-                                    //starMover.stop();
                                     prototype.setLastCoordinates(
                                             getRandomInt(0, borderX),
                                             getRandomInt(0, borderY)
