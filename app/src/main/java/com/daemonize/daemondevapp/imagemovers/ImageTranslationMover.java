@@ -103,7 +103,7 @@ public class ImageTranslationMover implements ImageMover {
     }
 
     @Override
-    public void setTouchDirection(float x, float y, float velocityInt) {
+    public void setDirectionAndMove(float x, float y, float velocityInt) {
 
         float dX = x - lastX;
         float dY = y - lastY;

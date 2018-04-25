@@ -60,7 +60,7 @@ public interface ImageMover {
 
     void setVelocity(Velocity velocity);
 
-    void setTouchDirection(float x, float y, float velocityInt);
+    void setDirectionAndMove(float x, float y, float velocityInt);
 
     void setVelocity(float velocity);
 

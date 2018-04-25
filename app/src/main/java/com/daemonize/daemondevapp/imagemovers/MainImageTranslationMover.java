@@ -39,8 +39,8 @@ public class MainImageTranslationMover extends ImageTranslationMover {
             if (observers != null)
                 for (ImageMoverDaemon observer : observers) {
                     Velocity vel = new Velocity(velocity.intensity * 0.3F, velocity.direction);
-                    observer.setTouchDirection(lastX, lastY, vel.intensity); //TODO CHASER
-                    observer.checkCollisionAndBounce(Pair.create(lastX, lastY), vel); //TODO Collisions
+                    observer.setDirectionAndMove(lastX, lastY, vel.intensity); //TODO CHASER
+                    //observer.checkCollisionAndBounce(Pair.create(lastX, lastY), vel); //TODO Collisions
                 }
 
             velocity.intensity -= 0.1;
@@ -51,7 +51,7 @@ public class MainImageTranslationMover extends ImageTranslationMover {
     }
 
     @Override
-    public void setTouchDirection(float x, float y, float velocityInt) {
+    public void setDirectionAndMove(float x, float y, float velocityInt) {
 
         float diffX = x - lastX;
         float diffY = y - lastY;
