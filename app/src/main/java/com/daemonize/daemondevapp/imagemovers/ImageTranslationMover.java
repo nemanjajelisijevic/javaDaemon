@@ -203,6 +203,8 @@ public class ImageTranslationMover implements ImageMover {
             Thread.sleep(25);
         }
 
+        Thread.sleep(3000);
+
         //exploading = false;
         updatePB.image = explodeSprite.get(explodeSprite.size() - 1);
         return updatePB;

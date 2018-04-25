@@ -30,6 +30,8 @@ import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
@@ -129,7 +131,10 @@ public class MainActivity extends AppCompatActivity {
                                     prototype.getView().setImageBitmap(ret1.get().image);
                                     prototype.setExplode(false);
                                     //starMover.stop();
-                                    prototype.setLastCoordinates(10,10);
+                                    prototype.setLastCoordinates(
+                                            getRandomInt(0, borderX),
+                                            getRandomInt(0, borderY)
+                                    );
                                 }
                         );
                     }
@@ -138,6 +143,11 @@ public class MainActivity extends AppCompatActivity {
 
             super.onReturn(ret);
         }
+    }
+
+    private static int getRandomInt(int min, int max) {
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
     }
 
     private ImageView createImageView(int width, int height) {
@@ -404,12 +414,14 @@ public class MainActivity extends AppCompatActivity {
 
         joystickViewLeft = findViewById(R.id.joystickLeft);
         joystickViewLeft.setOnMoveListener((angle, strength) -> {
-            float angleF = (float) angle * 0.0174533F;
-            mainMover.setVelocity(new ImageMover.Velocity(
-                    strength % 40,
-                    new ImageMover.Direction((float)Math.cos(angleF) * 100,  - (float)Math.sin(angleF) * 100)
-            ));
-        });
+            if (strength > 0) {
+                float angleF = (float) angle * 0.0174533F;
+                mainMover.setVelocity(new ImageMover.Velocity(
+                        strength % 40,
+                        new ImageMover.Direction((float) Math.cos(angleF) * 100, -(float) Math.sin(angleF) * 100)
+                ));
+            }
+        }, 100);
 
         joystickViewRight = findViewById(R.id.joystickRight);
         joystickViewRight.setOnMoveListener((angle, strength) -> {
@@ -420,6 +432,7 @@ public class MainActivity extends AppCompatActivity {
 
             Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
 
+            //bullet 1
             bulletView = createImageView(40, 40);
             bullet = new ImageMoverDaemon(
                     new ImageTranslationMover(
@@ -439,6 +452,49 @@ public class MainActivity extends AppCompatActivity {
                     50,
                     new ImageMover.Direction((float)Math.cos(angleF) * 100,  - (float)Math.sin(angleF) * 100)
             ));
+
+            //bullet 2
+            bulletView = createImageView(40, 40);
+            bullet = new ImageMoverDaemon(
+                    new ImageTranslationMover(
+                            bulletSprite,
+                            50,
+                            Pair.create(
+                                    lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
+                                    lastMainCoord.second + spriteMain.get(0).getHeight() / 2
+                            )
+                    ).setBorders(borderX, borderY)
+            ).setName("Bullet " + Long.toString(++bulletCounter));
+
+            bullet.setVelocity(50);
+
+            bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+            bullet.setVelocity(new ImageMover.Velocity(
+                    50,
+                    new ImageMover.Direction((float)Math.cos(angleF - 0.2) * 100,  - (float)Math.sin(angleF - 0.2) * 100)
+            ));
+
+            //bullet 3
+            bulletView = createImageView(40, 40);
+            bullet = new ImageMoverDaemon(
+                    new ImageTranslationMover(
+                            bulletSprite,
+                            50,
+                            Pair.create(
+                                    lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
+                                    lastMainCoord.second + spriteMain.get(0).getHeight() / 2
+                            )
+                    ).setBorders(borderX, borderY)
+            ).setName("Bullet " + Long.toString(++bulletCounter));
+
+            bullet.setVelocity(50);
+
+            bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+            bullet.setVelocity(new ImageMover.Velocity(
+                    50,
+                    new ImageMover.Direction((float)Math.cos(angleF + 0.2) * 100,  - (float)Math.sin(angleF + 0.2) * 100)
+            ));
+
         });
 
 //        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
