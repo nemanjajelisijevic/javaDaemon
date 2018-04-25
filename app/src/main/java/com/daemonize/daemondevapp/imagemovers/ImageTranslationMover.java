@@ -179,10 +179,6 @@ public class ImageTranslationMover implements ImageMover {
 
     private volatile boolean exploading;
 
-//    public void setExplode(boolean boom) {
-//        exploading = boom;
-//    }
-//
     public boolean isExploading() {
         return exploading;
     }

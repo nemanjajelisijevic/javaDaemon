@@ -402,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
                             Pair.create(borderX/2f, borderY/2f),
                             starMovers
                     ).setBorders(borderX, borderY)
-        ).setName("Exceptione");
+        ).setName("exceptione");
 
 
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(binder.bindViewToClosure(mainView)));
@@ -492,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
                     new ImageMover.Direction((float)Math.cos(angleF + 0.2) * 100,  - (float)Math.sin(angleF + 0.2) * 100)
             ));
 
-        });
+        }, 100);
 
 //        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
 //        exampleDaemon.evenMoreComplicated(
