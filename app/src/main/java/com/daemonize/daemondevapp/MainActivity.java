@@ -249,25 +249,23 @@ public class MainActivity extends AppCompatActivity {
         try {
 
             sprite = new ArrayList<>();
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
 
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
+            int i = 0;
+            for (; i < 3; ++i) {
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
+            }
 
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
+            for (; i < 6; ++i) {
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
+            }
 
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
-            sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
+            for (; i < 9; ++i) {
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
+            }
+
+            for (; i < 12; ++i) {
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
+            }
 
             bulletSprite = new ArrayList<>();
             bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 40, 40, false));
@@ -381,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         int i = 5;
-        for(int j = 0; j < 60; ++j) {
+        for(int j = 0; j < 50; ++j) {
 
             ImageView view = createImageView(80, 80);
             ImageMoverDaemon starMover = new ImageMoverDaemon(
@@ -436,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
             if (strength > 0) {
                 float angleF = (float) angle * 0.0174533F;
                 mainMover.setVelocity(new ImageMover.Velocity(
-                        strength % 40,
+                        strength / 3,
                         new ImageMover.Direction((float) Math.cos(angleF) * 100, -(float) Math.sin(angleF) * 100)
                 ));
             }
@@ -444,8 +442,11 @@ public class MainActivity extends AppCompatActivity {
 
         joystickViewRight = findViewById(R.id.joystickRight);
         joystickViewRight.setOnMoveListener((angle, strength) -> {
-            float angleF = (float) angle * 0.0174533F;
 
+            if (mainMover.getVelocity().intensity < 1)
+                return;
+
+            float angleF = (float) angle * 0.0174533F;
             ImageView bulletView;
             ImageMoverDaemon bullet;
 
@@ -469,52 +470,106 @@ public class MainActivity extends AppCompatActivity {
             bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
             bullet.setVelocity(new ImageMover.Velocity(
                     50,
-                    new ImageMover.Direction((float)Math.cos(angleF) * 100,  - (float)Math.sin(angleF) * 100)
+                    new ImageMover.Direction((float) Math.cos(angleF) * 100, -(float) Math.sin(angleF) * 100)
             ));
 
-            //bullet 2
-            bulletView = createImageView(40, 40);
-            bullet = new ImageMoverDaemon(
-                    new ImageTranslationMover(
-                            bulletSprite,
+            if (strength > 30) {
+
+                //bullet 2
+                bulletView = createImageView(40, 40);
+                bullet = new ImageMoverDaemon(
+                        new ImageTranslationMover(
+                                bulletSprite,
+                                50,
+                                Pair.create(
+                                        lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
+                                        lastMainCoord.second + spriteMain.get(0).getHeight() / 2
+                                )
+                        ).setBorders(borderX, borderY)
+                ).setName("Bullet");
+
+                bullet.setVelocity(50);
+
+                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                bullet.setVelocity(new ImageMover.Velocity(
+                        50,
+                        new ImageMover.Direction((float) Math.cos(angleF - 0.2) * 100, -(float) Math.sin(angleF - 0.2) * 100)
+                ));
+
+                if (strength > 60) {
+
+                    //bullet 3
+                    bulletView = createImageView(40, 40);
+                    bullet = new ImageMoverDaemon(
+                            new ImageTranslationMover(
+                                    bulletSprite,
+                                    50,
+                                    Pair.create(
+                                            lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
+                                            lastMainCoord.second + spriteMain.get(0).getHeight() / 2
+                                    )
+                            ).setBorders(borderX, borderY)
+                    ).setName("Bullet");
+
+                    bullet.setVelocity(50);
+
+                    bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                    bullet.setVelocity(new ImageMover.Velocity(
                             50,
-                            Pair.create(
-                                    lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
-                                    lastMainCoord.second + spriteMain.get(0).getHeight() / 2
-                            )
-                    ).setBorders(borderX, borderY)
-            ).setName("Bullet");
+                            new ImageMover.Direction((float) Math.cos(angleF + 0.2) * 100, -(float) Math.sin(angleF + 0.2) * 100)
+                    ));
 
-            bullet.setVelocity(50);
+                    if (strength > 80) {
 
-            bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-            bullet.setVelocity(new ImageMover.Velocity(
-                    50,
-                    new ImageMover.Direction((float)Math.cos(angleF - 0.2) * 100,  - (float)Math.sin(angleF - 0.2) * 100)
-            ));
+                        //bullet 4
+                        bulletView = createImageView(40, 40);
+                        bullet = new ImageMoverDaemon(
+                                new ImageTranslationMover(
+                                        bulletSprite,
+                                        50,
+                                        Pair.create(
+                                                lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
+                                                lastMainCoord.second + spriteMain.get(0).getHeight() / 2
+                                        )
+                                ).setBorders(borderX, borderY)
+                        ).setName("Bullet");
 
-            //bullet 3
-            bulletView = createImageView(40, 40);
-            bullet = new ImageMoverDaemon(
-                    new ImageTranslationMover(
-                            bulletSprite,
-                            50,
-                            Pair.create(
-                                    lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
-                                    lastMainCoord.second + spriteMain.get(0).getHeight() / 2
-                            )
-                    ).setBorders(borderX, borderY)
-            ).setName("Bullet");
+                        bullet.setVelocity(50);
 
-            bullet.setVelocity(50);
+                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                        bullet.setVelocity(new ImageMover.Velocity(
+                                50,
+                                new ImageMover.Direction((float) Math.cos(angleF - 0.1) * 100, -(float) Math.sin(angleF - 0.1) * 100)
+                        ));
+                    }
 
-            bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-            bullet.setVelocity(new ImageMover.Velocity(
-                    50,
-                    new ImageMover.Direction((float)Math.cos(angleF + 0.2) * 100,  - (float)Math.sin(angleF + 0.2) * 100)
-            ));
+                    if (strength > 98) {
 
+                        //bullet 5
+                        bulletView = createImageView(40, 40);
+                        bullet = new ImageMoverDaemon(
+                                new ImageTranslationMover(
+                                        bulletSprite,
+                                        50,
+                                        Pair.create(
+                                                lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
+                                                lastMainCoord.second + spriteMain.get(0).getHeight() / 2
+                                        )
+                                ).setBorders(borderX, borderY)
+                        ).setName("Bullet");
+
+                        bullet.setVelocity(50);
+
+                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                        bullet.setVelocity(new ImageMover.Velocity(
+                                50,
+                                new ImageMover.Direction((float) Math.cos(angleF + 0.1) * 100, -(float) Math.sin(angleF + 0.1) * 100)
+                        ));
+                    }
+                }
+            }
         }, 100);
+
 
 //        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
 //        exampleDaemon.evenMoreComplicated(

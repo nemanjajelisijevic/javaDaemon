@@ -59,17 +59,6 @@ public class ImageTranslationMover implements ImageMover {
         return ret;
     }
 
-    private volatile boolean paused = false;
-
-    public void pause(){
-        paused = true;
-    }
-
-    @Override
-    public void resume() {
-        paused = false;
-    }
-
     protected float borderX;
     protected float borderY;
 
@@ -151,25 +140,20 @@ public class ImageTranslationMover implements ImageMover {
 
         //check borders and recalculate
         if (lastX <= 0) {
-            velocity.direction.coeficientX = - velocity.direction.coeficientX;
             lastX = 0;
         } else if (lastX >= borderX) {
-            velocity.direction.coeficientX = - velocity.direction.coeficientX;
             lastX = borderX;
         }
 
         if(lastY <= 0) {
-            velocity.direction.coeficientY = - velocity.direction.coeficientY;
             lastY = 0;
         } else if( lastY >= borderY) {
-            velocity.direction.coeficientY = - velocity.direction.coeficientY;
             lastY = borderY;
         }
 
-        if (!paused) {
-            lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
-            lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
-        }
+        lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
+        lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
+
 
         ret.positionX = lastX;
         ret.positionY = lastY;

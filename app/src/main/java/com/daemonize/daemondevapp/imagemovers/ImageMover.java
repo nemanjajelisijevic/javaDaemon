@@ -67,12 +67,6 @@ public interface ImageMover {
     @CallingThread
     <K extends ImageMover> K setBorders(float x, float y);
 
-    @CallingThread
-    void pause();
-
-    @CallingThread
-    void resume();
-
     @SideQuest(SLEEP = 25)
     PositionedBitmap move();
 
