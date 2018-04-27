@@ -226,6 +226,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void fireBullet(Pair<Float, Float> sourceCoord, float angleInRadians) {
+        ImageView bulletView = createImageView(40, 40);
+        ImageMoverDaemon bullet = new ImageMoverDaemon(
+                new ImageTranslationMover(
+                        bulletSprite,
+                        50,
+                        Pair.create(
+                                sourceCoord.first + spriteMain.get(0).getWidth() / 2,
+                                sourceCoord.second + spriteMain.get(0).getHeight() / 2
+                        )
+                ).setBorders(borderX, borderY)
+        ).setName("Bullet");
+
+        bullet.setVelocity(50);
+
+        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+        bullet.setVelocity(new ImageMover.Velocity(
+                50,
+                new ImageMover.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)
+        ));
+    }
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -447,124 +471,25 @@ public class MainActivity extends AppCompatActivity {
                 return;
 
             float angleF = (float) angle * 0.0174533F;
-            ImageView bulletView;
-            ImageMoverDaemon bullet;
-
             Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
 
             //bullet 1
-            bulletView = createImageView(40, 40);
-            bullet = new ImageMoverDaemon(
-                    new ImageTranslationMover(
-                            bulletSprite,
-                            50,
-                            Pair.create(
-                                    lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
-                                    lastMainCoord.second + spriteMain.get(0).getHeight() / 2
-                            )
-                    ).setBorders(borderX, borderY)
-            ).setName("Bullet");
-
-            bullet.setVelocity(50);
-
-            bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-            bullet.setVelocity(new ImageMover.Velocity(
-                    50,
-                    new ImageMover.Direction((float) Math.cos(angleF) * 100, -(float) Math.sin(angleF) * 100)
-            ));
+            fireBullet(lastMainCoord, angleF);
 
             if (strength > 30) {
 
                 //bullet 2
-                bulletView = createImageView(40, 40);
-                bullet = new ImageMoverDaemon(
-                        new ImageTranslationMover(
-                                bulletSprite,
-                                50,
-                                Pair.create(
-                                        lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
-                                        lastMainCoord.second + spriteMain.get(0).getHeight() / 2
-                                )
-                        ).setBorders(borderX, borderY)
-                ).setName("Bullet");
-
-                bullet.setVelocity(50);
-
-                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                bullet.setVelocity(new ImageMover.Velocity(
-                        50,
-                        new ImageMover.Direction((float) Math.cos(angleF - 0.2) * 100, -(float) Math.sin(angleF - 0.2) * 100)
-                ));
-
+                fireBullet(lastMainCoord, angleF - 0.2F);
                 if (strength > 60) {
-
                     //bullet 3
-                    bulletView = createImageView(40, 40);
-                    bullet = new ImageMoverDaemon(
-                            new ImageTranslationMover(
-                                    bulletSprite,
-                                    50,
-                                    Pair.create(
-                                            lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
-                                            lastMainCoord.second + spriteMain.get(0).getHeight() / 2
-                                    )
-                            ).setBorders(borderX, borderY)
-                    ).setName("Bullet");
-
-                    bullet.setVelocity(50);
-
-                    bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                    bullet.setVelocity(new ImageMover.Velocity(
-                            50,
-                            new ImageMover.Direction((float) Math.cos(angleF + 0.2) * 100, -(float) Math.sin(angleF + 0.2) * 100)
-                    ));
-
+                    fireBullet(lastMainCoord, angleF + 0.2F);
                     if (strength > 80) {
-
                         //bullet 4
-                        bulletView = createImageView(40, 40);
-                        bullet = new ImageMoverDaemon(
-                                new ImageTranslationMover(
-                                        bulletSprite,
-                                        50,
-                                        Pair.create(
-                                                lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
-                                                lastMainCoord.second + spriteMain.get(0).getHeight() / 2
-                                        )
-                                ).setBorders(borderX, borderY)
-                        ).setName("Bullet");
-
-                        bullet.setVelocity(50);
-
-                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                        bullet.setVelocity(new ImageMover.Velocity(
-                                50,
-                                new ImageMover.Direction((float) Math.cos(angleF - 0.1) * 100, -(float) Math.sin(angleF - 0.1) * 100)
-                        ));
-                    }
-
-                    if (strength > 98) {
-
-                        //bullet 5
-                        bulletView = createImageView(40, 40);
-                        bullet = new ImageMoverDaemon(
-                                new ImageTranslationMover(
-                                        bulletSprite,
-                                        50,
-                                        Pair.create(
-                                                lastMainCoord.first + spriteMain.get(0).getWidth() / 2,
-                                                lastMainCoord.second + spriteMain.get(0).getHeight() / 2
-                                        )
-                                ).setBorders(borderX, borderY)
-                        ).setName("Bullet");
-
-                        bullet.setVelocity(50);
-
-                        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
-                        bullet.setVelocity(new ImageMover.Velocity(
-                                50,
-                                new ImageMover.Direction((float) Math.cos(angleF + 0.1) * 100, -(float) Math.sin(angleF + 0.1) * 100)
-                        ));
+                        fireBullet(lastMainCoord, angleF - 0.1F);
+                        if (strength > 98) {
+                            //bullet 5
+                            fireBullet(lastMainCoord, angleF + 0.1F);
+                        }
                     }
                 }
             }

@@ -73,19 +73,19 @@ public class MainImageTranslationMover extends ImageTranslationMover {
     @Override
     public void setDirectionAndMove(float x, float y, float velocityInt) {
 
-        float diffX = x - lastX;
-        float diffY = y - lastY;
+        float dX = x - lastX;
+        float dY = y - lastY;
 
         float a;
-        boolean signY = diffY >= 0;
-        boolean signX = diffX >= 0;
+        boolean signY = dY >= 0;
+        boolean signX = dX >= 0;
 
-        if (Math.abs(diffY) >= Math.abs(diffX)) {
-            a = Math.abs((100*diffX)/diffY);
+        if (Math.abs(dY) >= Math.abs(dX)) {
+            a = Math.abs((100*dX)/dY);
             float aY =  100 - a;
             setDirection(new Direction(signX ? a : - a, signY ? aY : - aY));
         } else {
-            a = Math.abs((100*diffY)/diffX);
+            a = Math.abs((100*dY)/dX);
             float aX =  100 - a;
             setDirection(new Direction(signX ? aX : -aX, signY ? a : -a));
         }
