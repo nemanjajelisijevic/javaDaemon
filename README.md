@@ -1,5 +1,5 @@
-# androidDaemon
-async library for android
+# javaDaemon
+async library for java (for now tested on android)
 
 
 Generates a wrapper (Daemon) class which is an async representation of an annotated prototype class. Or an interface.
@@ -18,16 +18,16 @@ the prototype method returns.
     
 Closure exposes an abstract method onReturn() for implementation, which takes the prototype methods return value as an
 argument.
+That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the to the settable consumer
+thread.
 
-That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the MAIN thread.
-For now :)
-
-Underneath, Daemon is a thread that constantly checks a queue for a called method (consumer), or if configured in service 
+Underneath, Daemon is a thread that waits on a queue for a called method, or if configured in service 
 mode (prototype method annotated with a @SideQuest annotation) constantly executing the sidequest method.
 
-To use the Daemon you'll need two jars: daemonengine.jar and daemonprocessor.jar.
+To use the Daemon you'll need two java libs: daemonengine and daemonprocessor and an platform dependent lib for a consumer.
+For now, only implemented in android as a main looper wrapper.
 
-Daemonengine is an android os dependent library that holds the classes needed to run the bulletDaemon.
+Daemonengine is an android os independent library that holds the classes needed to run the Daemons.
 
 Daemonprocessor is an annotation processor that generates the Daemon class (.java source file using Javapoet and Java apt 
 api) with dependencies to the daemonengine lib, by parsing your prototype class.
@@ -176,7 +176,7 @@ So it can be used:
 
     //sweet, sweet lambda as Closure 
     //ret.get() throws a runtime error if an exception has been thrown
-    //in bulletDaemon thread's context
+    //in Daemon thread's context
     exampleDaemon.add(48, 54, ret -> view.setText(ret.get().toString()));
     
     //or without the lambda syntax:
