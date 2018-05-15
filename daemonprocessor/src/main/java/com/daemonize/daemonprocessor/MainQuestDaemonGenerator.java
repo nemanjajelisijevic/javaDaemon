@@ -85,7 +85,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 daemonEngineSimpleName
         );
 
-        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, platform.getPlatformConsumer());
+        ClassName consumer = ClassName.get(CONSUMER_PACKAGE + "." + platform.getImplementationPackage(), platform.getPlatformConsumer());
 
         FieldSpec daemonEngine = FieldSpec.builder(
                 daemonEngineClass,
