@@ -3,9 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/androidDaemon.iml" filepath="$PROJECT_DIR$/androidDaemon.iml" />
-      <module fileurl="file://C:\Users\nemanja.jelisijevic\StudioProjects\androidDaemon\.idea\androidDaemon.iml" filepath="C:\Users\nemanja.jelisijevic\StudioProjects\androidDaemon\.idea\androidDaemon.iml" />
+      <module fileurl="file://C:/Users/nemanja.jelisijevic/StudioProjects/androidDaemon/.idea/androidDaemon.iml" filepath="C:/Users/nemanja.jelisijevic/StudioProjects/androidDaemon/.idea/androidDaemon.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\nemanja.jelisijevic\StudioProjects\androidDaemon\daemondev.iml" filepath="C:\Users\nemanja.jelisijevic\StudioProjects\androidDaemon\daemondev.iml" />
+      <module fileurl="file://C:/Users/nemanja.jelisijevic/StudioProjects/androidDaemon/daemondev.iml" filepath="C:/Users/nemanja.jelisijevic/StudioProjects/androidDaemon/daemondev.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonengine/daemonengine.iml" filepath="$PROJECT_DIR$/daemonengine/daemonengine.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" filepath="$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" />
     </modules>

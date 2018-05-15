@@ -59,7 +59,7 @@ public class MainImageTranslationMover extends ImageTranslationMover {
                     if (!((ImageTranslationMover) observer.getPrototype()).isExploading()
                             && Math.abs(lastX - obsLastCoord.first) < 40
                             && Math.abs(lastY - obsLastCoord.second) < 40) {
-                      guihandler.post(new ReturnRunnable<>(hpClosure).setResult((--hp) / 10));
+                      guihandler.post(new ReturnRunnable<>(hpClosure).setResult((--hp)));
                     }
                 }
 

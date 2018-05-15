@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -20,9 +21,13 @@ import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
+import com.daemonize.daemondevapp.imagemovers.MassiveImageMoverDaemon;
+import com.daemonize.daemondevapp.imagemovers.MassiveImageTranslationMover;
+import com.daemonize.daemondevapp.imagemovers.StackedSpriteImageTranslationMover;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
@@ -43,13 +48,17 @@ public class MainActivity extends AppCompatActivity {
     private List<Bitmap> spriteMain;
     private List<Bitmap> bulletSprite;
     private List<Bitmap> explosionSprite;
-    //private Bitmap grave;
+
+    private Bitmap grave;
+    private ImageMoverDaemon graveDaemon;
 
     private List<ImageMoverDaemon> starMovers;
 
     private ImageMoverDaemon mainMover;
     private ImageView mainView;
 
+    private MassiveImageMoverDaemon massiveDaemon;
+    private List<ImageView> massiveViews;
     private int borderX;
     private int borderY;
 
@@ -136,6 +145,8 @@ public class MainActivity extends AppCompatActivity {
                                             getRandomInt(0, borderX),
                                             getRandomInt(0, borderY)
                                     );
+
+
                                 }
                         );
                     }
@@ -336,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
             explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 80, 80, false));
             explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 80, 80, false));
 
-            //grave = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("grave.png")), 80, 80, false);
+            grave = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("grave.png")), 80, 80, false);
             //explosionSprite.add(grave);
 
         } catch (IOException e) {
@@ -402,6 +413,53 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        ImageView graveView = createImageView(80, 80);
+        graveDaemon = new ImageMoverDaemon(
+                new StackedSpriteImageTranslationMover(
+                        bulletSprite,
+                        10,
+                        Pair.create((float) borderX / 2, (float) borderY / 2)
+                ).setBorders(borderX, borderY)
+        ).setName("GRAVE (stackedImageMover)");
+        graveDaemon.setSideQuest(graveDaemon.moveSideQuest.setClosure(binder.bindViewToClosure(graveView)));
+        graveDaemon.start();
+
+
+        List<ImageMover> masivePrototypes = new ArrayList<>(10);
+        massiveViews = new ArrayList<>(10);
+
+        for (int k = 0; k < 10; ++k) {
+            masivePrototypes.add(
+                    new BouncingImageTranslationMover(
+                            bulletSprite,
+                            10,
+                            Pair.create(
+                                    (float)getRandomInt(borderX / 4, borderX * 3 / 4),
+                                    (float)getRandomInt(borderY / 4, borderY * 3 / 4)
+                            )
+                    ).setBorders(borderX, borderY)
+            );
+            massiveViews.add(createImageView(60, 60));
+        }
+
+
+        massiveDaemon = new MassiveImageMoverDaemon(
+                new MassiveImageTranslationMover(masivePrototypes)
+        ).setName("MASSIVEEEE");
+
+        massiveDaemon.setSideQuest(massiveDaemon.moveSideQuest.setClosure(
+                ret -> {
+                    int i = 0;
+                    for (ImageMover.PositionedBitmap pb : ret.get()) {
+                        massiveViews.get(i).setX(pb.positionX);
+                        massiveViews.get(i).setY(pb.positionY);
+                        massiveViews.get(i).setImageBitmap(pb.image);
+                        i++;
+                    }
+                }));
+
+        massiveDaemon.start();
+
         int i = 5;
         for(int j = 0; j < 50; ++j) {
 
@@ -443,8 +501,20 @@ public class MainActivity extends AppCompatActivity {
                             ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
 
                         } else {
+                            if (hp.get() % 100 == 0) {
+                                StackedSpriteImageTranslationMover stacker = ((StackedSpriteImageTranslationMover) graveDaemon.getPrototype());
+                                stacker.setVelocity(new ImageMover.Velocity(10, mainMover.getVelocity().direction));
+                                stacker.pushSprite(explosionSprite);
+                                stacker.pushSprite(sprite);
+                                stacker.pushSprite(spriteMain);
+
+                                massiveDaemon.breakFormation(15);
+                            } else if (hp.get() % 50 == 0) {
+                                massiveDaemon.setDirectionAndMove((float) getRandomInt(0, borderX), (float) getRandomInt(0, borderY), 20);
+                            }
+
                             hpView.setTextColor(WHITE);
-                            hpView.setText(hpText + hp.get().toString());
+                            hpView.setText(hpText + new Integer(hp.get() / 10).toString());
                         }
                     })
         ).setName("exceptione");
@@ -495,8 +565,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 100);
 
-
-//        ExampleDaemon exampleDaemon = new ExampleDaemon(new Example()).setName("ExampleDaemon");
+//
+//        ExampleDaemon exampleDaemon = new ExampleDaemon(
+//                new Example()
+//        ).setName("ExampleDaemon");
 //        exampleDaemon.evenMoreComplicated(
 //                        "Constantly updated from another thread: ",
 //                        update -> wastedCntView.setText(update.get()),
@@ -530,10 +602,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         //exampleDaemon.stop();
+        graveDaemon.stop();
         mainMover.stop();
         for(ImageMoverDaemon mover : starMovers) {
             mover.stop();
         }
+        massiveDaemon.stop();
     }
 
     @Override
