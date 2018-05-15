@@ -68,7 +68,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         FieldSpec daemonEngine = FieldSpec.builder(
                 daemonEngineClass,
                 DAEMON_ENGINE_STRING
-        ).addModifiers(Modifier.PRIVATE).initializer(
+        ).addModifiers(Modifier.PROTECTED).initializer(
                 "new $N(new $T()).setName(this.getClass().getSimpleName())",
                 daemonEngineSimpleName,
                 consumer
