@@ -7,9 +7,14 @@ import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
-public abstract class SideQuest<T> extends Quest<T> {
+public abstract class SideQuest<T, M> extends Quest<T> {
 
   private int sleepInterval;
+  protected M prototype;
+
+  public void setPrototype(M prototype) {
+    this.prototype = prototype;
+  }
 
   @SuppressWarnings("unchecked")
   public <K extends SideQuest> K setSleepInterval(int milliseconds) {
@@ -22,7 +27,7 @@ public abstract class SideQuest<T> extends Quest<T> {
   }
 
   @SuppressWarnings("unchecked")
-  public SideQuest<T> setClosure(Closure<T> closure) {
+  public SideQuest<T, M> setClosure(Closure<T> closure) {
     this.returnRunnable = new ReturnRunnable<>(closure);
     return this;
   }

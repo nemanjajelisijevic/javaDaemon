@@ -375,7 +375,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         return builder;
     }
 
-    private void addTimeMeasureCode(MethodSpec.Builder builder, String daemonName, TimeUnits units, String usefulCode) {
+    protected void addTimeMeasureCode(MethodSpec.Builder builder, String daemonName, TimeUnits units, String usefulCode) {
 
         if (!daemonName.isEmpty()) {
 

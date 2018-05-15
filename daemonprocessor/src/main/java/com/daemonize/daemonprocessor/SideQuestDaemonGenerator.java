@@ -21,6 +21,7 @@ import javax.lang.model.element.TypeElement;
 public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
 
     private Set<String> overloadedSideQuestPrototypeMethods = new TreeSet<>();
+    private String sideQuestName;
 
     {
         QUEST_TYPE_NAME = "SideQuest";
@@ -120,10 +121,11 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         ClassName sideQuestClassName = ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME);
         TypeName sideQuestOfRet = ParameterizedTypeName.get(
                 sideQuestClassName,
-                prototypeMethodData.getMethodRetTypeName()
+                prototypeMethodData.getMethodRetTypeName(),
+                TypeName.get(classElement.asType())
         );
 
-        String sideQuestName = Character.valueOf(
+        sideQuestName = Character.valueOf(
                 prototypeMethodData.getMethodName().charAt(0)
         ).toString().toUpperCase() + prototypeMethodData.getMethodName().substring(1);
 
@@ -135,11 +137,17 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         TypeSpec.Builder sideQuestBuilder = TypeSpec.classBuilder(sideQuestName + QUEST_TYPE_NAME)
                 .superclass(sideQuestOfRet)
-                .addModifiers(Modifier.PRIVATE, Modifier.FINAL);
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL);
+
+
+        FieldSpec prototype = FieldSpec.builder(
+                ClassName.get(classElement.asType()),
+                "prot"
+        ).addModifiers(Modifier.PRIVATE).build();
 
         //SideQuest construct
         MethodSpec.Builder sideQuestConstructorBuilder = MethodSpec.constructorBuilder()
-                .addModifiers(Modifier.PRIVATE)
+                .addModifiers(Modifier.PUBLIC)
                 .addStatement("this.description = \"$N\"", prototypeMethodData.getMethodName());
 
         if(prototypeMethodData.isVoid()) {
@@ -147,6 +155,12 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         }
 
         MethodSpec sideQuestConstructor = sideQuestConstructorBuilder.build();
+
+        MethodSpec prototypeSetter = MethodSpec.methodBuilder("setPrototype")
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(classElement.asType()), "prot")
+                .addStatement("this.prot = prot")
+                .returns(void.class).build();
 
         MethodSpec pursue =  createPursue(
                 prototypeMethodData.getMethodName(),
@@ -157,6 +171,8 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 prototypeSideQuestMethod.getAnnotation(LogExecutionTime.class)
         );
 
+        sideQuestBuilder.addField(prototype);
+        sideQuestBuilder.addMethod(prototypeSetter);
         sideQuestBuilder.addMethod(pursue);
         sideQuestBuilder.addMethod(sideQuestConstructor);
 
@@ -188,6 +204,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                         .addModifiers(Modifier.PUBLIC)
                         .returns(void.class)
                         .addParameter(ClassName.get(QUEST_PACKAGE, "SideQuest"), "sideQuest")
+                        .addStatement("sideQuest.setPrototype(prototype)", sideQuestName)
                         .addStatement(DAEMON_ENGINE_STRING + ".setSideQuest($N)", "sideQuest")
                         .build()
         );
@@ -202,6 +219,50 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         );
 
         return ret;
+    }
+
+    @Override
+    protected MethodSpec createPursue(
+            String methodName,
+            TypeName methodRetTypeName,
+            String arguments,
+            boolean isVoid,
+            boolean isStatic,
+            LogExecutionTime logExecutionTime
+    ) {
+
+        MethodSpec.Builder pursueImplementation = MethodSpec.methodBuilder("pursue")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PROTECTED, Modifier.FINAL);
+
+        pursueImplementation.returns(methodRetTypeName);
+        pursueImplementation.addException(Exception.class);//TODO check this shit
+
+        //String instanceOrClass = isStatic ? prototypeClassSimpleName : PROTOTYPE_STRING;
+
+
+        if (!isVoid) {
+
+
+            if (logExecutionTime != null) {
+                addTimeMeasureCode(
+                        pursueImplementation,
+                        logExecutionTime.daemonName(),
+                        logExecutionTime.timeUnits(),
+                        methodRetTypeName.toString() + " ret = prot." + methodName + "(" + arguments + ")"//TODO fix ret
+                );
+            } else {
+                pursueImplementation.addStatement("return prot."
+                        + methodName + "(" + arguments + ")");
+            }
+
+        } else {
+            pursueImplementation.addStatement("prot."
+                    + methodName + "(" + arguments + ")");
+            pursueImplementation.addStatement("return null");
+        }
+
+        return pursueImplementation.build();
     }
 
 
