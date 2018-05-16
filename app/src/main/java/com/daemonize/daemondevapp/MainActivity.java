@@ -11,7 +11,9 @@ import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +45,11 @@ import static android.graphics.Color.WHITE;
 public class MainActivity extends AppCompatActivity {
 
     private ConstraintLayout layout;
+
+    private HorizontalScrollView horizontalSv;
+    private ScrollView verticalSv;
+
+    private BackgroundScrollerDaemon backgroundScrollerDaemon;
 
     private List<Bitmap> sprite;
     private List<Bitmap> spriteMain;
@@ -266,6 +273,9 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        horizontalSv = findViewById(R.id.horizontalSv);
+        verticalSv = findViewById(R.id.verticalSv);
 
         mainView = findViewById(R.id.imageViewMain);
         starMovers = new ArrayList<>(60);
@@ -535,10 +545,22 @@ public class MainActivity extends AppCompatActivity {
                     .setHpClosure(hp -> {
                         if (hp.get() <= 0) {
                             for (ImageMoverDaemon star : starMovers) {
-                                star.stop();
+                                //star.stop();
+                                BouncingImageTranslationMover prototype = ((BouncingImageTranslationMover) star.getPrototype());
+                                star.explode(explosionSprite,
+                                        binder.bindViewToClosure(prototype.getView()),
+                                        ret1 -> {
+                                            prototype.getView().setImageBitmap(ret1.get().image);
+                                            prototype.setLastCoordinates(
+                                                    getRandomInt(0, borderX),
+                                                    getRandomInt(0, borderY)
+                                            );
+                                            star.stop();
+                                        });
                             }
                             wastedCounter = 0;
-                            mainMover.stop();
+//                            mainMover.stop();
+//                            backgroundScrollerDaemon.stop();
                             hpView.setTextColor(RED);
                             hpView.setText("!!!!!!WASTED!!!!!!!!!");
                             ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
@@ -568,13 +590,22 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(binder.bindViewToClosure(mainView)));
         mainMover.start();
 
+        backgroundScrollerDaemon = new BackgroundScrollerDaemon(new BackgroundScroller(mainMover)).setName("Background scroller");
+        backgroundScrollerDaemon.setSideQuest(backgroundScrollerDaemon.scrollSideQuest.setClosure(ret -> {
+            horizontalSv.scrollTo(ret.get().first, ret.get().second);
+            verticalSv.scrollTo(ret.get().first, ret.get().second);
+        }));
+        backgroundScrollerDaemon.start();
+
         joystickViewLeft = findViewById(R.id.joystickLeft);
         joystickViewLeft.setOnMoveListener((angle, strength) -> {
             if (strength > 0) {
                 float angleF = (float) angle * 0.0174533F;
+                float coeficientX = (float) Math.cos(angleF) * 100;
+                float coeficientY = -(float) Math.sin(angleF) * 100;
                 mainMover.setVelocity(new ImageMover.Velocity(
                         strength / 3,
-                        new ImageMover.Direction((float) Math.cos(angleF) * 100, -(float) Math.sin(angleF) * 100)
+                        new ImageMover.Direction(coeficientX, coeficientY)
                 ));
             }
         }, 100);
@@ -653,6 +684,7 @@ public class MainActivity extends AppCompatActivity {
             mover.stop();
         }
         massiveDaemon.stop();
+        backgroundScrollerDaemon.stop();
     }
 
     @Override

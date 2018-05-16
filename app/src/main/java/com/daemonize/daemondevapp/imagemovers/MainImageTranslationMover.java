@@ -61,6 +61,9 @@ public class MainImageTranslationMover extends StackedSpriteImageTranslationMove
                             && Math.abs(lastY - obsLastCoord.second) < 40) {
                       guihandler.post(new ReturnRunnable<>(hpClosure).setResult((--hp)));
                     }
+
+                    if (hp < 0)
+                        return null;
                 }
 
             velocity.intensity -= 0.1;
