@@ -73,12 +73,6 @@ public class MainActivity extends AppCompatActivity {
     public TextView hpView;
     private String hpText = "HP: ";
 
-    @FunctionalInterface
-    private interface ViewBinder {
-        ImageMoveClosure bindViewToClosure(ImageView view);
-    }
-
-
     public static class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
 
         protected ImageView view;
@@ -175,6 +169,11 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(view);
         view.requestLayout();
         return view;
+    }
+
+    @FunctionalInterface
+    private interface ViewBinder {
+        ImageMoveClosure bindViewToClosure(ImageView view);
     }
 
     private ViewBinder binder = ImageMoveClosure::new;
@@ -519,8 +518,10 @@ public class MainActivity extends AppCompatActivity {
 
             starMover.setSideQuest(starMover.moveSideQuest.setClosure(binder.bindViewToClosure(view)));
             starMover.start();
+
             starMovers.add(starMover);
             i += 5;
+
         }
 
         mainMover = new ImageMoverDaemon(

@@ -33,11 +33,13 @@ public class RestClientTestScript implements DaemonScroll {
 
                         if (ret.get().total_pages > 0)
                             next();
-                        else
+                        else {
                             Log.e(
                                     DaemonUtils.tag(),
                                     "Total pages: " + Integer.toString(ret.get().total_pages)
                             );
+                            consumer.stop();
+                        }
                     })
         ).addSpell(() ->
             restClientDaemon.get(
@@ -47,7 +49,7 @@ public class RestClientTestScript implements DaemonScroll {
                         String res = "AGAIN!!!!!\n" + aReturn.get().toString();
                         mainHandler.post(() -> textView.setText(res));
                         Log.d(DaemonUtils.tag(), "LINK 2");
-                        chain.next();
+                        next();
                     })
         ).addSpell(() ->
                 restClientDaemon.get(
@@ -57,7 +59,7 @@ public class RestClientTestScript implements DaemonScroll {
                             String res = "AND AGAIN!!!!!\n" + aReturn.get().toString();
                             mainHandler.post(() -> textView.setText(res));
                             Log.d(DaemonUtils.tag(), "LINK 3");
-                            chain.next();
+                            next();
                         })
         ).addSpell(() ->
                 restClientDaemon.get(
