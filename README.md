@@ -27,7 +27,7 @@ mode (prototype method annotated with a @SideQuest annotation) constantly execut
 To use the Daemon you'll need two java libs: daemonengine and daemonprocessor and an platform dependent lib for a consumer.
 For now, consumer implementation is android only as a main looper wrapper.
 
-Daemonengine is an android os independent library that holds the classes needed to run the Daemons.
+Daemonengine is a library that holds the classes needed to run the Daemons.
 
 Daemonprocessor is an annotation processor that generates the Daemon class (.java source file using Javapoet and Java apt 
 api) with dependencies to the daemonengine lib, by parsing your prototype class.
