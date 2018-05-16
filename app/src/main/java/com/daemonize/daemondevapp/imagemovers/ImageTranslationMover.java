@@ -23,25 +23,25 @@ public class ImageTranslationMover implements ImageMover {
 
     protected volatile Velocity velocity;
 
-    private Lock moveLock = new ReentrantLock();
-    private Condition moveCondition = moveLock.newCondition();
-
-    protected void startMoving() {
-        moveLock.lock();
-        moveCondition.signalAll();
-        moveLock.unlock();
-    }
-
-    protected void awaitForMovement() throws InterruptedException {
-        moveLock.lock();
-        try {
-            while (velocity.intensity <= 0) {
-                moveCondition.await();
-            }
-        } finally {
-            moveLock.unlock();
-        }
-    }
+//    private Lock moveLock = new ReentrantLock();
+//    private Condition moveCondition = moveLock.newCondition();
+//
+//    protected void startMoving() {
+//        moveLock.lock();
+//        moveCondition.signalAll();
+//        moveLock.unlock();
+//    }
+//
+//    protected void awaitForMovement() throws InterruptedException {
+//        moveLock.lock();
+//        try {
+//            while (velocity.intensity <= 0) {
+//                moveCondition.await();
+//            }
+//        } finally {
+//            moveLock.unlock();
+//        }
+//    }
 
 
     protected volatile float lastX;
@@ -110,7 +110,7 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void setVelocity(Velocity velocity) {
         this.velocity = velocity;
-        startMoving();
+        //startMoving();
     }
 
     @Override
@@ -136,7 +136,7 @@ public class ImageTranslationMover implements ImageMover {
             velocity.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
         }
 
-        startMoving();
+        //startMoving();
     }
 
     @Override
@@ -164,11 +164,11 @@ public class ImageTranslationMover implements ImageMover {
 
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
-        try {
-            awaitForMovement();
-        } catch (InterruptedException e) {
-            //
-        }
+//        try {
+//            awaitForMovement();
+//        } catch (InterruptedException e) {
+//            //
+//        }
 
         //check borders and recalculate
         if (lastX <= 0) {
