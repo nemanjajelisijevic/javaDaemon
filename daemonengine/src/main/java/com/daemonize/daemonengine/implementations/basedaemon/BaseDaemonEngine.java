@@ -53,7 +53,7 @@ public abstract class BaseDaemonEngine implements Daemon {
     System.out.println(DaemonUtils.tag() + "Daemon started!");
     Quest currentQuest;
 
-    while (!state.equals(DaemonState.STOPPED)) {
+    while (!state.equals(DaemonState.GONE_DAEMON)) {
 
       currentQuest = getQuest();
 
@@ -99,8 +99,8 @@ public abstract class BaseDaemonEngine implements Daemon {
   }
 
   @Override
-  public void stop() {//TODO check final
-    state = DaemonState.STOPPED;
+  public void stop() {
+    state = DaemonState.GONE_DAEMON;
     if (daemonThread != null
         && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stop from daemon thread
         && daemonThread.isAlive()) {

@@ -1,9 +1,10 @@
 package com.daemonize.daemonengine;
 
 public enum DaemonState {
-    STOPPED,
-    INITIALIZING,
-    IDLE,
+    MAIN_QUEST,
     SIDE_QUEST,
-    MAIN_QUEST
+    IDLE,
+    INITIALIZING,
+    GONE_DAEMON,
+    STOPPED
 }

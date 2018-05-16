@@ -35,7 +35,7 @@ public class DaemonConsumer implements Consumer, Daemon {
     }
 
     private void loop() {
-        while (!state.equals(DaemonState.STOPPED)) {
+        while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             try {
                 closureLock.lock();
@@ -76,7 +76,7 @@ public class DaemonConsumer implements Consumer, Daemon {
 
     @Override
     public void stop() {
-        state = DaemonState.STOPPED;
+        state = DaemonState.GONE_DAEMON;
         if (looperThread != null && !Thread.currentThread().equals(looperThread) && looperThread.isAlive()) {
             looperThread.interrupt();
         }
