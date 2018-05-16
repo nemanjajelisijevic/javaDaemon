@@ -1,5 +1,5 @@
 # javaDaemon
-async library for java (for now tested on android)
+java code generator/library (for now operational on android) for concurrent execution. Based on thread per object idea.
 
 
 Generates a wrapper (Daemon) class which is an async representation of an annotated prototype class. Or an interface.
@@ -14,12 +14,13 @@ differing in one thing. The return value is mapped to an output type argument
     }
     
 which is implemented and instantiated upon the Daemon method's call, and handed to the main looper for execution once 
-the prototype method returns.
+the prototype method returns in Daemon threads context.
     
 Closure exposes an abstract method onReturn() for implementation, which takes the prototype methods return value as an
 argument.
-That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the to the settable consumer
-thread.
+
+That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the to the settable
+consumer thread (MAIN thread in android for updating the UI).
 
 Underneath, Daemon is a thread that waits on a queue for a called method, or if configured in service 
 mode (prototype method annotated with a @SideQuest annotation) constantly executing the sidequest method.
@@ -198,10 +199,5 @@ So it can be used:
     
     //the 'add' call is enqueued to Daemons call queue and returns immediatelty. Closure holding the result is
     //handed over to the main loopers queue once the prototype 'add' method returns
-
-There are three implementations of a Daemon (daemonengine package):
-1. MainQuestDaemonEngine
-2. SideQuestDaemonEngine
-3. HybridDaemonEngine
 
 To be continued...
