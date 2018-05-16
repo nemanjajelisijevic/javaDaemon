@@ -198,6 +198,6 @@ So it can be used:
     });
     
     //the 'add' call is enqueued to Daemons call queue and returns immediatelty. Closure holding the result is
-    //handed over to the main loopers queue once the prototype 'add' method returns
+    //handed over to the main loopers queue once the prototype 'add' method returns (10 sec in this case)
 
 To be continued...
