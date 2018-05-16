@@ -12,7 +12,7 @@ import com.daemonize.daemonprocessor.annotations.CallingThread;
 
 import java.util.List;
 
-public class MainImageTranslationMover extends ImageTranslationMover {
+public class MainImageTranslationMover extends StackedSpriteImageTranslationMover {
 
     private final List<ImageMoverDaemon> observers;
 

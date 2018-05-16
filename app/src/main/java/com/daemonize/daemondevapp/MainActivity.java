@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Bitmap> spriteMain;
     private List<Bitmap> bulletSprite;
     private List<Bitmap> explosionSprite;
+    private List<Bitmap> bigExplosionSprite;
 
     private Bitmap grave;
     private ImageMoverDaemon graveDaemon;
@@ -347,6 +348,47 @@ public class MainActivity extends AppCompatActivity {
             explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 80, 80, false));
             explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 80, 80, false));
 
+
+            bigExplosionSprite = new ArrayList<>();
+
+
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion1.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion2.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion3.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion4.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion5.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion6.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion7.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion8.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion9.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion10.png")), 200, 200, false));
+
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion11.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion12.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion13.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion14.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion15.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion16.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion17.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion18.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion19.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion20.png")), 200, 200, false));
+
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion21.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion22.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion23.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion24.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion25.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion26.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion27.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion28.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion29.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion30.png")), 200, 200, false));
+
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion31.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 200, 200, false));
+            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 200, 200, false));
+
             grave = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("grave.png")), 80, 80, false);
             //explosionSprite.add(grave);
 
@@ -501,6 +543,7 @@ public class MainActivity extends AppCompatActivity {
                             ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
 
                         } else {
+
                             if (hp.get() % 100 == 0) {
                                 StackedSpriteImageTranslationMover stacker = ((StackedSpriteImageTranslationMover) graveDaemon.getPrototype());
                                 stacker.setVelocity(new ImageMover.Velocity(10, mainMover.getVelocity().direction));
@@ -510,6 +553,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 massiveDaemon.breakFormation(15);
                             } else if (hp.get() % 50 == 0) {
+                                ((MainImageTranslationMover) mainMover.getPrototype()).pushSprite(bigExplosionSprite);
                                 massiveDaemon.setDirectionAndMove((float) getRandomInt(0, borderX), (float) getRandomInt(0, borderY), 20);
                             }
 

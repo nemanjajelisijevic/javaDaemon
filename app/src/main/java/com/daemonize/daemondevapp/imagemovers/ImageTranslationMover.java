@@ -8,10 +8,12 @@ import android.widget.ImageView;
 
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ImageTranslationMover implements ImageMover {
 
@@ -20,6 +22,27 @@ public class ImageTranslationMover implements ImageMover {
     protected float initVelocity = 20;
 
     protected volatile Velocity velocity;
+
+    private Lock moveLock = new ReentrantLock();
+    private Condition moveCondition = moveLock.newCondition();
+
+    protected void startMoving() {
+        moveLock.lock();
+        moveCondition.signalAll();
+        moveLock.unlock();
+    }
+
+    protected void awaitForMovement() throws InterruptedException {
+        moveLock.lock();
+        try {
+            while (velocity.intensity <= 0) {
+                moveCondition.await();
+            }
+        } finally {
+            moveLock.unlock();
+        }
+    }
+
 
     protected volatile float lastX;
     protected volatile float lastY;
@@ -74,6 +97,11 @@ public class ImageTranslationMover implements ImageMover {
 
     protected Bitmap iterateSprite() {
         if(!spriteIterator.hasNext()) {
+            try {
+                awaitForMovement();
+            } catch (InterruptedException e) {
+                //
+            }
             spriteIterator = sprite.iterator();
         }
         return spriteIterator.next();
@@ -87,6 +115,7 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void setVelocity(Velocity velocity) {
         this.velocity = velocity;
+        startMoving();
     }
 
     @Override
@@ -111,6 +140,8 @@ public class ImageTranslationMover implements ImageMover {
             float aX =  100 - a;
             velocity.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
         }
+
+        startMoving();
     }
 
     @Override
@@ -124,6 +155,7 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void setVelocity(float velocity) {
         this.velocity.intensity = velocity;
+//        startMoving();
     }
 
     @Override

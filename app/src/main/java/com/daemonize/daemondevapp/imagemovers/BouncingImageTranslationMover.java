@@ -40,41 +40,51 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
 
     @Override
     public PositionedBitmap move() {
-        if(velocity.intensity > 0) {
 
-            velocity.intensity -= 0.3;
+        try {
 
-            PositionedBitmap ret = new PositionedBitmap();
-            ret.image = iterateSprite();
+            awaitForMovement();
 
-            //check borders and recalculate
-            if (lastX <= 0) {
-                velocity.direction.coeficientX = - velocity.direction.coeficientX;
-                lastX = 0;
-            } else if (lastX >= borderX) {
-                velocity.direction.coeficientX = - velocity.direction.coeficientX;
-                lastX = borderX;
+            if(velocity.intensity > 0) {
+
+                velocity.intensity -= 0.3;
+
+                PositionedBitmap ret = new PositionedBitmap();
+                ret.image = iterateSprite();
+
+                //check borders and recalculate
+                if (lastX <= 0) {
+                    velocity.direction.coeficientX = - velocity.direction.coeficientX;
+                    lastX = 0;
+                } else if (lastX >= borderX) {
+                    velocity.direction.coeficientX = - velocity.direction.coeficientX;
+                    lastX = borderX;
+                }
+
+                if(lastY <= 0) {
+                    velocity.direction.coeficientY = - velocity.direction.coeficientY;
+                    lastY = 0;
+                } else if( lastY >= borderY) {
+                    velocity.direction.coeficientY = - velocity.direction.coeficientY;
+                    lastY = borderY;
+                }
+
+
+                lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
+                lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
+
+
+                ret.positionX = lastX;
+                ret.positionY = lastY;
+
+                return ret;
+
             }
 
-            if(lastY <= 0) {
-                velocity.direction.coeficientY = - velocity.direction.coeficientY;
-                lastY = 0;
-            } else if( lastY >= borderY) {
-                velocity.direction.coeficientY = - velocity.direction.coeficientY;
-                lastY = borderY;
-            }
-
-
-            lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
-            lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
-
-
-            ret.positionX = lastX;
-            ret.positionY = lastY;
-
-            return ret;
-
+        } catch (InterruptedException e) {
+            //
         }
+
         return null;
     }
 }
