@@ -2,17 +2,22 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://C:\Users\nemanja.jelisijevic\StudioProjects\androidDaemon\.idea\androidDaemon.iml" filepath="C:\Users\nemanja.jelisijevic\StudioProjects\androidDaemon\.idea\androidDaemon.iml" />
-      <module fileurl="file://C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\androidDaemon.iml" filepath="C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\androidDaemon.iml" />
+      <module fileurl="file://C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/androidDaemon.iml" filepath="C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/androidDaemon.iml" />
+      <module fileurl="file://C:/Users/nemanja.jelisijevic/StudioProjects/androidDaemon/.idea/androidDaemon.iml" filepath="C:/Users/nemanja.jelisijevic/StudioProjects/androidDaemon/.idea/androidDaemon.iml" />
       <module fileurl="file://$PROJECT_DIR$/androidconsumer/androidconsumer.iml" filepath="$PROJECT_DIR$/androidconsumer/androidconsumer.iml" />
-      <module fileurl="file://C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\androidconsumer\androidconsumer.iml" filepath="C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\androidconsumer\androidconsumer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/androidconsumer/androidconsumer.iml" filepath="$PROJECT_DIR$/androidconsumer/androidconsumer.iml" />
+      <module fileurl="file://C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/androidconsumer/androidconsumer.iml" filepath="C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/androidconsumer/androidconsumer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\app\app.iml" filepath="C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\app\app.iml" />
-      <module fileurl="file://C:\Users\nemanja.jelisijevic\StudioProjects\androidDaemon\daemondev.iml" filepath="C:\Users\nemanja.jelisijevic\StudioProjects\androidDaemon\daemondev.iml" />
+      <module fileurl="file://C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/app/app.iml" filepath="C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:/Users/nemanja.jelisijevic/StudioProjects/androidDaemon/daemondev.iml" filepath="C:/Users/nemanja.jelisijevic/StudioProjects/androidDaemon/daemondev.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonengine/daemonengine.iml" filepath="$PROJECT_DIR$/daemonengine/daemonengine.iml" />
-      <module fileurl="file://C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\daemonengine\daemonengine.iml" filepath="C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\daemonengine\daemonengine.iml" />
+      <module fileurl="file://C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/daemonengine/daemonengine.iml" filepath="C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/daemonengine/daemonengine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/daemonengine/daemonengine.iml" filepath="$PROJECT_DIR$/daemonengine/daemonengine.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" filepath="$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" />
-      <module fileurl="file://C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\daemonprocessor\daemonprocessor.iml" filepath="C:\Users\nemanja.jelisijevic\StudioProjects\javaDaemon\daemonprocessor\daemonprocessor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" filepath="$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" />
+      <module fileurl="file://C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/daemonprocessor/daemonprocessor.iml" filepath="C:/Users/nemanja.jelisijevic/StudioProjects/javaDaemon/daemonprocessor/daemonprocessor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/javaDaemon.iml" filepath="$PROJECT_DIR$/.idea/javaDaemon.iml" />
       <module fileurl="file://$PROJECT_DIR$/javaDaemon.iml" filepath="$PROJECT_DIR$/javaDaemon.iml" />
     </modules>
   </component>
