@@ -1,5 +1,5 @@
 # javaDaemon
-java code generator/library (for now operational on android) for concurrent execution. Based on thread per object idea.
+java code generator/library (for now operational on android) for concurrent execution. Based on the thread per object idea.
 
 
 Generates a wrapper (Daemon) class which is an async representation of an annotated prototype class. Or an interface.
@@ -198,6 +198,6 @@ So it can be used:
     });
     
     //the 'add' call is enqueued to Daemons call queue and returns immediatelty. Closure holding the result is
-    //handed over to the main loopers queue once the prototype 'add' method returns
+    //handed over to the main loopers queue once the prototype 'add' method returns (10 sec in this case)
 
 To be continued...
