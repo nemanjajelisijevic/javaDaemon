@@ -97,11 +97,6 @@ public class ImageTranslationMover implements ImageMover {
 
     protected Bitmap iterateSprite() {
         if(!spriteIterator.hasNext()) {
-            try {
-                awaitForMovement();
-            } catch (InterruptedException e) {
-                //
-            }
             spriteIterator = sprite.iterator();
         }
         return spriteIterator.next();
@@ -169,6 +164,11 @@ public class ImageTranslationMover implements ImageMover {
 
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
+        try {
+            awaitForMovement();
+        } catch (InterruptedException e) {
+            //
+        }
 
         //check borders and recalculate
         if (lastX <= 0) {

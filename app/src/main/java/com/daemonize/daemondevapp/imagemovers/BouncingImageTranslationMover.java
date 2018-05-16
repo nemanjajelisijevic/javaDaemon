@@ -43,14 +43,14 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
 
         try {
 
+            PositionedBitmap ret = new PositionedBitmap();
+            ret.image = iterateSprite();
+
             awaitForMovement();
 
             if(velocity.intensity > 0) {
 
                 velocity.intensity -= 0.3;
-
-                PositionedBitmap ret = new PositionedBitmap();
-                ret.image = iterateSprite();
 
                 //check borders and recalculate
                 if (lastX <= 0) {
