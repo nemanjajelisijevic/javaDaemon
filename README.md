@@ -20,12 +20,12 @@ Closure exposes an abstract method onReturn() for implementation, which takes th
 argument.
 
 That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the to the settable
-consumer thread (MAIN thread in android for updating the UI).
+consumer thread (MAIN thread in android, for updating the UI).
 
 Underneath, Daemon is a thread that waits on a queue for a called method, or if configured in service 
 mode (prototype method annotated with a @SideQuest annotation) constantly executing the sidequest method.
 
-To use the Daemon you'll need two java libs: daemonengine and daemonprocessor and an platform dependent lib for a consumer.
+To use the Daemon you'll need two java libs: daemonengine and daemonprocessor and a platform dependent lib for a consumer.
 For now, consumer implementation is android only as a main looper wrapper.
 
 Daemonengine is a library that holds the classes needed to run the Daemons.
