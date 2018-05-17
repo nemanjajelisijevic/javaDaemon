@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ViewBinder binder = ImageMoveClosure::new;
 
+    //keyboard controller
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -199,6 +200,35 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case KeyEvent.KEYCODE_S:
                 mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(0,  100)));
+                return true;
+
+            case KeyEvent.KEYCODE_L:
+                fireBullet(mainMover.getLastCoordinates(), 0);
+                fireBullet(mainMover.getLastCoordinates(),  - 0.2F);
+                fireBullet(mainMover.getLastCoordinates(),  0.2F);
+                fireBullet(mainMover.getLastCoordinates(),  - 0.1F);
+                fireBullet(mainMover.getLastCoordinates(),  0.2F);
+                return true;
+            case KeyEvent.KEYCODE_I:
+                fireBullet(mainMover.getLastCoordinates(), 90 * 0.0174533F);
+                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F - 0.2F);
+                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F + 0.2F);
+                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F - 0.1F);
+                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F + 0.2F);
+                return true;
+            case KeyEvent.KEYCODE_J:
+                fireBullet(mainMover.getLastCoordinates(), 180 * 0.0174533F);
+                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F - 0.2F);
+                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F + 0.2F);
+                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F - 0.1F);
+                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F  +0.1F);
+                return true;
+            case KeyEvent.KEYCODE_K:
+                fireBullet(mainMover.getLastCoordinates(), 270 * 0.0174533F);
+                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F - 0.2F);
+                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F + 0.2F);
+                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F - 0.1F);
+                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F  +0.1F);
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);
@@ -612,7 +642,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        }, 100);
+        }, 200);
 
 //
 //        ExampleDaemon exampleDaemon = new ExampleDaemon(
