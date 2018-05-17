@@ -268,8 +268,6 @@ public class MainActivity extends AppCompatActivity {
         ));
     }
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -367,9 +365,7 @@ public class MainActivity extends AppCompatActivity {
             explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 80, 80, false));
             explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 80, 80, false));
 
-
             bigExplosionSprite = new ArrayList<>();
-
 
             bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion1.png")), 200, 200, false));
             bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion2.png")), 200, 200, false));
@@ -408,11 +404,6 @@ public class MainActivity extends AppCompatActivity {
             bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 200, 200, false));
             bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 200, 200, false));
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
             spriteMain = new ArrayList<>();
 
             spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
@@ -607,9 +598,7 @@ public class MainActivity extends AppCompatActivity {
 
             //bullet 1
             fireBullet(lastMainCoord, angleF);
-
             if (strength > 30) {
-
                 //bullet 2
                 fireBullet(lastMainCoord, angleF - 0.2F);
                 if (strength > 60) {
@@ -663,13 +652,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        //exampleDaemon.stop();
-        //graveDaemon.stop();
+
         mainMover.stop();
         for(ImageMoverDaemon mover : starMovers) {
             mover.stop();
         }
         //massiveDaemon.stop();
+        //exampleDaemon.stop();
         backgroundScrollerDaemon.stop();
     }
 
