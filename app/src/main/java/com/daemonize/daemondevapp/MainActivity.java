@@ -51,14 +51,15 @@ public class MainActivity extends AppCompatActivity {
 
     private BackgroundScrollerDaemon backgroundScrollerDaemon;
 
+    private ImageView background;
+    private Bitmap backgroundImg;
+
+
     private List<Bitmap> sprite;
     private List<Bitmap> spriteMain;
     private List<Bitmap> bulletSprite;
     private List<Bitmap> explosionSprite;
     private List<Bitmap> bigExplosionSprite;
-
-    private Bitmap grave;
-    private ImageMoverDaemon graveDaemon;
 
     private List<ImageMoverDaemon> starMovers;
 
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
 //    private MassiveImageMoverDaemon massiveDaemon;
 //    private List<ImageView> massiveViews;
+
     private int borderX;
     private int borderY;
 
@@ -274,49 +276,57 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        borderX = getResources().getDisplayMetrics().widthPixels - 100;
+        borderY = getResources().getDisplayMetrics().heightPixels - 200;
+
+        layout = findViewById(R.id.cl);
         horizontalSv = findViewById(R.id.horizontalSv);
         verticalSv = findViewById(R.id.verticalSv);
+
+        background = findViewById(R.id.img_large);
 
         mainView = findViewById(R.id.imageViewMain);
         starMovers = new ArrayList<>(60);
 
         wastedCntView = findViewById(R.id.response);
+        wastedCntView.setWidth(borderX / 3);
+        wastedCntView.setHeight(borderY / 10);
         wastedCntView.setTextColor(WHITE);
 
         hpView = findViewById(R.id.hp);
+        hpView.setWidth(borderX / 3);
+        hpView.setHeight(borderY / 10);
         hpView.setTextColor(WHITE);
 
-        borderX = getResources().getDisplayMetrics().widthPixels - 100;
-        borderY = getResources().getDisplayMetrics().heightPixels - 200;
-
-        layout = findViewById(R.id.cl);
-
         try {
+
+            backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), 2 * borderX, 2 * borderY, false);
+            background.setImageBitmap(backgroundImg);
 
             sprite = new ArrayList<>();
 
             int i = 0;
             for (; i < 3; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 80, 80, false));
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
             }
 
             for (; i < 6; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), 80, 80, false));
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
             }
 
             for (; i < 9; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), 80, 80, false));
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
             }
 
             for (; i < 12; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), 80, 80, false));
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
             }
 
             bulletSprite = new ArrayList<>();
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 40, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 40, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 60, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), 60, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), 40, 40, false));
 
             explosionSprite = new ArrayList<>();
 
@@ -398,9 +408,6 @@ public class MainActivity extends AppCompatActivity {
             bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 200, 200, false));
             bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 200, 200, false));
 
-            grave = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("grave.png")), 80, 80, false);
-            //explosionSprite.add(grave);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -464,18 +471,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        ImageView graveView = createImageView(80, 80);
-        graveDaemon = new ImageMoverDaemon(
-                new StackedSpriteImageTranslationMover(
-                        bulletSprite,
-                        10,
-                        Pair.create((float) borderX / 2, (float) borderY / 2)
-                ).setBorders(borderX, borderY)
-        ).setName("GRAVE (stackedImageMover)");
-        graveDaemon.setSideQuest(graveDaemon.moveSideQuest.setClosure(binder.bindViewToClosure(graveView)));
-        graveDaemon.start();
-
-
 //        List<ImageMover> masivePrototypes = new ArrayList<>(10);
 //        massiveViews = new ArrayList<>(10);
 //
@@ -512,13 +507,13 @@ public class MainActivity extends AppCompatActivity {
 //        massiveDaemon.start();
 
         int i = 5;
-        for(int j = 0; j < 50; ++j) {
+        for(int j = 0; j < 40; ++j) {
 
             ImageView view = createImageView(80, 80);
             ImageMoverDaemon starMover = new ImageMoverDaemon(
                     new BouncingImageTranslationMover(
                             sprite,
-                            20,
+                            8,
                             Pair.create(
                                     (float) borderX % i,
                                     (float) borderY % i
@@ -565,13 +560,7 @@ public class MainActivity extends AppCompatActivity {
 
                         } else {
 
-                            if (hp.get() % 100 == 0) {
-                                StackedSpriteImageTranslationMover stacker = ((StackedSpriteImageTranslationMover) graveDaemon.getPrototype());
-                                stacker.setVelocity(new ImageMover.Velocity(10, mainMover.getVelocity().direction));
-                                stacker.pushSprite(explosionSprite);
-                                stacker.pushSprite(sprite);
-                                stacker.pushSprite(spriteMain);
-                            } else if (hp.get() % 50 == 0) {
+                            if (hp.get() % 50 == 0) {
                                 ((MainImageTranslationMover) mainMover.getPrototype()).pushSprite(bigExplosionSprite);
                             }
 
@@ -592,6 +581,8 @@ public class MainActivity extends AppCompatActivity {
         }));
         backgroundScrollerDaemon.start();
 
+
+
         joystickViewLeft = findViewById(R.id.joystickLeft);
         joystickViewLeft.setOnMoveListener((angle, strength) -> {
             if (strength > 0) {
@@ -599,7 +590,7 @@ public class MainActivity extends AppCompatActivity {
                 float coeficientX = (float) Math.cos(angleF) * 100;
                 float coeficientY = -(float) Math.sin(angleF) * 100;
                 mainMover.setVelocity(new ImageMover.Velocity(
-                        strength / 5,
+                        strength / 8,
                         new ImageMover.Direction(coeficientX, coeficientY)
                 ));
             }
@@ -624,7 +615,7 @@ public class MainActivity extends AppCompatActivity {
                 if (strength > 60) {
                     //bullet 3
                     fireBullet(lastMainCoord, angleF + 0.2F);
-                    if (strength > 80) {
+                    if (strength > 70) {
                         //bullet 4
                         fireBullet(lastMainCoord, angleF - 0.1F);
                         if (strength > 98) {
@@ -673,7 +664,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         //exampleDaemon.stop();
-        graveDaemon.stop();
+        //graveDaemon.stop();
         mainMover.stop();
         for(ImageMoverDaemon mover : starMovers) {
             mover.stop();

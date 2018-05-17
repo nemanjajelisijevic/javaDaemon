@@ -30,7 +30,7 @@ public abstract class MainQuest<T> extends Quest<T> {
         }
       }
     } catch (InterruptedException ex) {
-        System.out.println(DaemonUtils.tag() + description + " interrupted.");
+        //System.out.println(DaemonUtils.tag() + description + " interrupted.");
     } catch (Exception ex) {
         if (getIsVoid())
             returnRunnable = new ReturnRunnable<>(new Closure<T>() {

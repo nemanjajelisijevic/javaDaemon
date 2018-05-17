@@ -17,7 +17,7 @@ public class BackgroundScroller {
         this.target = target;
     }
 
-    @SideQuest(SLEEP = 30)
+    @SideQuest(SLEEP = 25)
     public Pair<Integer, Integer> scroll(){
         Pair<Integer, Integer> currentTargetCoord = Pair.create(
                 Math.round(target.getLastCoordinates().first + 100),

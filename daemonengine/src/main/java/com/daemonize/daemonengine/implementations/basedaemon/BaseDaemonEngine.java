@@ -50,7 +50,7 @@ public abstract class BaseDaemonEngine implements Daemon {
 
   private void loop(){
 
-    System.out.println(DaemonUtils.tag() + "Daemon started!");
+    //System.out.println(DaemonUtils.tag() + "Daemon started!");
     Quest currentQuest;
 
     while (!state.equals(DaemonState.GONE_DAEMON)) {
@@ -77,14 +77,14 @@ public abstract class BaseDaemonEngine implements Daemon {
     }
 
     setState(DaemonState.STOPPED);
-    System.out.println(DaemonUtils.tag() + "Daemon stopped!");
+    //System.out.println(DaemonUtils.tag() + "Daemon stopped!");
   }
 
   @Override
   public void start() {
     DaemonState initState = getState();
     if (!(initState.equals(DaemonState.STOPPED))) {
-      System.out.println(DaemonUtils.tag() +  name + " already running. State: " + getState());
+      //System.out.println(DaemonUtils.tag() +  name + " already running. State: " + getState());
     } else {
       daemonThread = new Thread(new Runnable() {
         @Override

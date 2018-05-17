@@ -45,7 +45,7 @@ public class DaemonConsumer implements Consumer, Daemon {
                 }
                 closureQueue.poll().run();//TODO null safety
             } catch (InterruptedException ex) {
-                System.out.println(DaemonUtils.tag() + " Waiting on a closure interrupted");
+                //System.out.println(DaemonUtils.tag() + " Waiting on a closure interrupted");
                 break;
             } finally { //TODO Handle Exceptions
                 closureLock.unlock();
@@ -53,14 +53,14 @@ public class DaemonConsumer implements Consumer, Daemon {
         }
 
         state = DaemonState.STOPPED;
-        System.out.println(DaemonUtils.tag() + "Daemon stopped!");
+        //System.out.println(DaemonUtils.tag() + "Daemon stopped!");
     }
 
     @Override
     public void start() {
         DaemonState initState = getState();
         if (!(initState.equals(DaemonState.STOPPED))) {
-            System.out.println(DaemonUtils.tag() +  name + " already running. State: " + getState());
+            //System.out.println(DaemonUtils.tag() +  name + " already running. State: " + getState());
         } else {
             looperThread = new Thread(new Runnable() {
                 @Override
