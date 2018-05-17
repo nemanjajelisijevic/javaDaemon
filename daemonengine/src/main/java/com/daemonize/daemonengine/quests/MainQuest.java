@@ -25,9 +25,7 @@ public abstract class MainQuest<T> extends Quest<T> {
     try {
       T result = pursue();
       if (!Thread.currentThread().isInterrupted() && result != null) {
-        if (!setResultAndUpdate(result)) {
-          System.err.println(DaemonUtils.tag() + description + ": Could not enqueue result to consumer's event queue.");
-        }
+        setResultAndUpdate(result);
       }
     } catch (InterruptedException ex) {
         //System.out.println(DaemonUtils.tag() + description + " interrupted.");
@@ -39,8 +37,7 @@ public abstract class MainQuest<T> extends Quest<T> {
                 ret.get();
               }
             });
-        if (!setErrorAndUpdate(ex))
-            System.err.println(DaemonUtils.tag() + description + ": Could not enqueue error to consumer's event queue.");
+        setErrorAndUpdate(ex);
     }
   }
 }

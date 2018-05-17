@@ -33,9 +33,7 @@ public abstract class SideQuest<T> extends Quest<T> {
 
       T result = pursue();
       if (!Thread.currentThread().isInterrupted() && result != null) {
-        if (!setResultAndUpdate(result)) {
-          System.err.println(DaemonUtils.tag() + description + ": Could not enqueue result to consumer's event queue.");
-        }
+        setResultAndUpdate(result);
       }
 
       if (sleepInterval > 0) {
@@ -52,8 +50,7 @@ public abstract class SideQuest<T> extends Quest<T> {
             ret.get();
           }
         });
-      if (!setErrorAndUpdate(ex))
-        System.err.println(DaemonUtils.tag() + description + ": Could not enqueue error to consumer's event queue.");
+      setErrorAndUpdate(ex);
     }
   }
 }

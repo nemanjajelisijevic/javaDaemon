@@ -50,7 +50,6 @@ public abstract class BaseDaemonEngine implements Daemon {
 
   private void loop(){
 
-    //System.out.println(DaemonUtils.tag() + "Daemon started!");
     Quest currentQuest;
 
     while (!state.equals(DaemonState.GONE_DAEMON)) {
@@ -58,17 +57,10 @@ public abstract class BaseDaemonEngine implements Daemon {
       currentQuest = getQuest();
 
       if (currentQuest == null) {
-        System.err.println(DaemonUtils.tag() + "No quest set. Terminating daemon...");
         break;
       }
 
       if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null) {
-        System.err.println(
-                DaemonUtils.tag()
-                + " No returnRunnable set for current quest: "
-                + currentQuest.getDescription() + " (" + currentQuest.getState()
-                + ") . Terminating daemon..."
-        );
         break;
       }
 
@@ -77,15 +69,12 @@ public abstract class BaseDaemonEngine implements Daemon {
     }
 
     setState(DaemonState.STOPPED);
-    //System.out.println(DaemonUtils.tag() + "Daemon stopped!");
   }
 
   @Override
   public void start() {
     DaemonState initState = getState();
-    if (!(initState.equals(DaemonState.STOPPED))) {
-      //System.out.println(DaemonUtils.tag() +  name + " already running. State: " + getState());
-    } else {
+    if (initState.equals(DaemonState.STOPPED)) {
       daemonThread = new Thread(new Runnable() {
         @Override
         public void run() {

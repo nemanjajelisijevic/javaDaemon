@@ -191,16 +191,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_D:
-                mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(100, 0)));
+                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(100, 0)));
                 return true;
             case KeyEvent.KEYCODE_A:
-                mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(- 100, 0)));
+                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(- 100, 0)));
                 return true;
             case KeyEvent.KEYCODE_W:
-                mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(0, - 100)));
+                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(0, - 100)));
                 return true;
             case KeyEvent.KEYCODE_S:
-                mainMover.setVelocity(new ImageMover.Velocity(20, new ImageMover.Direction(0,  100)));
+                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(0,  100)));
                 return true;
             default:
                 return super.onKeyDown(keyCode, event);
