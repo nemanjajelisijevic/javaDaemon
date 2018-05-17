@@ -149,8 +149,6 @@ public class MainActivity extends AppCompatActivity {
                                             getRandomInt(0, borderX),
                                             getRandomInt(0, borderY)
                                     );
-
-
                                 }
                         );
                     }
@@ -521,44 +519,44 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mainMover = new ImageMoverDaemon(
-                    new MainImageTranslationMover(
-                            spriteMain,
-                            10f,
-                            Pair.create(borderX/2f, borderY/2f),
-                            starMovers
-                    )
-                    .setBorders(borderX, borderY)
-                    .setHpClosure(hp -> {
-                        if (hp.get() <= 0) {
-                            for (ImageMoverDaemon star : starMovers) {
-                                //star.stop();
-                                BouncingImageTranslationMover prototype = ((BouncingImageTranslationMover) star.getPrototype());
-                                star.explode(explosionSprite,
-                                        binder.bindViewToClosure(prototype.getView()),
-                                        ret1 -> {
-                                            prototype.getView().setImageBitmap(ret1.get().image);
-                                            prototype.setLastCoordinates(
-                                                    getRandomInt(0, borderX),
-                                                    getRandomInt(0, borderY)
-                                            );
-                                            star.stop();
-                                        });
-                            }
-                            wastedCounter = 0;
-                            hpView.setTextColor(RED);
-                            hpView.setText("!!!!!!WASTED!!!!!!!!!");
-                            ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
-
-                        } else {
-
-                            if (hp.get() % 50 == 0) {
-                                ((MainImageTranslationMover) mainMover.getPrototype()).pushSprite(bigExplosionSprite);
-                            }
-
-                            hpView.setTextColor(WHITE);
-                            hpView.setText(hpText + new Integer(hp.get() / 10).toString());
+                new MainImageTranslationMover(
+                        spriteMain,
+                        10f,
+                        Pair.create(borderX/2f, borderY/2f),
+                        starMovers
+                )
+                .setBorders(borderX, borderY)
+                .setHpClosure(hp -> {
+                    if (hp.get() <= 0) {
+                        for (ImageMoverDaemon star : starMovers) {
+                            //star.stop();
+                            BouncingImageTranslationMover prototype = ((BouncingImageTranslationMover) star.getPrototype());
+                            star.explode(explosionSprite,
+                                    binder.bindViewToClosure(prototype.getView()),
+                                    ret1 -> {
+                                        prototype.getView().setImageBitmap(ret1.get().image);
+                                        prototype.setLastCoordinates(
+                                                getRandomInt(0, borderX),
+                                                getRandomInt(0, borderY)
+                                        );
+                                        star.stop();
+                                    });
                         }
-                    })
+                        wastedCounter = 0;
+                        hpView.setTextColor(RED);
+                        hpView.setText("!!!!!!WASTED!!!!!!!!!");
+                        ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
+
+                    } else {
+
+                        if (hp.get() % 50 == 0) {
+                            ((MainImageTranslationMover) mainMover.getPrototype()).pushSprite(bigExplosionSprite);
+                        }
+
+                        hpView.setTextColor(WHITE);
+                        hpView.setText(hpText + new Integer(hp.get() / 10).toString());
+                    }
+                })
         ).setName("Exceptione");
 
 
