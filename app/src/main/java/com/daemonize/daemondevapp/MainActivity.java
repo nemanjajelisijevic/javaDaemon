@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageMoverDaemon mainMover;
     private ImageView mainView;
 
-    private MassiveImageMoverDaemon massiveDaemon;
-    private List<ImageView> massiveViews;
+//    private MassiveImageMoverDaemon massiveDaemon;
+//    private List<ImageView> massiveViews;
     private int borderX;
     private int borderY;
 
@@ -297,26 +297,26 @@ public class MainActivity extends AppCompatActivity {
 
             int i = 0;
             for (; i < 3; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 80, 80, false));
             }
 
             for (; i < 6; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), 80, 80, false));
             }
 
             for (; i < 9; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), 80, 80, false));
             }
 
             for (; i < 12; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
+                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), 80, 80, false));
             }
 
             bulletSprite = new ArrayList<>();
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 40, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), 40, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), 60, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 60, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 40, 40, false));
 
             explosionSprite = new ArrayList<>();
 
@@ -476,40 +476,40 @@ public class MainActivity extends AppCompatActivity {
         graveDaemon.start();
 
 
-        List<ImageMover> masivePrototypes = new ArrayList<>(10);
-        massiveViews = new ArrayList<>(10);
+//        List<ImageMover> masivePrototypes = new ArrayList<>(10);
+//        massiveViews = new ArrayList<>(10);
+//
+//        for (int k = 0; k < 10; ++k) {
+//            masivePrototypes.add(
+//                    new BouncingImageTranslationMover(
+//                            bulletSprite,
+//                            10,
+//                            Pair.create(
+//                                    (float)getRandomInt(borderX / 4, borderX * 3 / 4),
+//                                    (float)getRandomInt(borderY / 4, borderY * 3 / 4)
+//                            )
+//                    ).setBorders(borderX, borderY)
+//            );
+//            massiveViews.add(createImageView(60, 60));
+//        }
 
-        for (int k = 0; k < 10; ++k) {
-            masivePrototypes.add(
-                    new BouncingImageTranslationMover(
-                            bulletSprite,
-                            10,
-                            Pair.create(
-                                    (float)getRandomInt(borderX / 4, borderX * 3 / 4),
-                                    (float)getRandomInt(borderY / 4, borderY * 3 / 4)
-                            )
-                    ).setBorders(borderX, borderY)
-            );
-            massiveViews.add(createImageView(60, 60));
-        }
 
-
-        massiveDaemon = new MassiveImageMoverDaemon(
-                new MassiveImageTranslationMover(masivePrototypes)
-        ).setName("MASSIVEEEE");
-
-        massiveDaemon.setSideQuest(massiveDaemon.moveSideQuest.setClosure(
-                ret -> {
-                    int i = 0;
-                    for (ImageMover.PositionedBitmap pb : ret.get()) {
-                        massiveViews.get(i).setX(pb.positionX);
-                        massiveViews.get(i).setY(pb.positionY);
-                        massiveViews.get(i).setImageBitmap(pb.image);
-                        i++;
-                    }
-                }));
-
-        massiveDaemon.start();
+//        massiveDaemon = new MassiveImageMoverDaemon(
+//                new MassiveImageTranslationMover(masivePrototypes)
+//        ).setName("MASSIVEEEE");
+//
+//        massiveDaemon.setSideQuest(massiveDaemon.moveSideQuest.setClosure(
+//                ret -> {
+//                    int i = 0;
+//                    for (ImageMover.PositionedBitmap pb : ret.get()) {
+//                        massiveViews.get(i).setX(pb.positionX);
+//                        massiveViews.get(i).setY(pb.positionY);
+//                        massiveViews.get(i).setImageBitmap(pb.image);
+//                        i++;
+//                    }
+//                }));
+//
+//        massiveDaemon.start();
 
         int i = 5;
         for(int j = 0; j < 50; ++j) {
@@ -518,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
             ImageMoverDaemon starMover = new ImageMoverDaemon(
                     new BouncingImageTranslationMover(
                             sprite,
-                            i / 20,
+                            20,
                             Pair.create(
                                     (float) borderX % i,
                                     (float) borderY % i
@@ -559,8 +559,6 @@ public class MainActivity extends AppCompatActivity {
                                         });
                             }
                             wastedCounter = 0;
-//                            mainMover.stop();
-//                            backgroundScrollerDaemon.stop();
                             hpView.setTextColor(RED);
                             hpView.setText("!!!!!!WASTED!!!!!!!!!");
                             ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
@@ -573,18 +571,15 @@ public class MainActivity extends AppCompatActivity {
                                 stacker.pushSprite(explosionSprite);
                                 stacker.pushSprite(sprite);
                                 stacker.pushSprite(spriteMain);
-
-                                massiveDaemon.breakFormation(15);
                             } else if (hp.get() % 50 == 0) {
                                 ((MainImageTranslationMover) mainMover.getPrototype()).pushSprite(bigExplosionSprite);
-                                massiveDaemon.setDirectionAndMove((float) getRandomInt(0, borderX), (float) getRandomInt(0, borderY), 20);
                             }
 
                             hpView.setTextColor(WHITE);
                             hpView.setText(hpText + new Integer(hp.get() / 10).toString());
                         }
                     })
-        ).setName("exceptione");
+        ).setName("Exceptione");
 
 
         mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(binder.bindViewToClosure(mainView)));
@@ -604,7 +599,7 @@ public class MainActivity extends AppCompatActivity {
                 float coeficientX = (float) Math.cos(angleF) * 100;
                 float coeficientY = -(float) Math.sin(angleF) * 100;
                 mainMover.setVelocity(new ImageMover.Velocity(
-                        strength / 3,
+                        strength / 5,
                         new ImageMover.Direction(coeficientX, coeficientY)
                 ));
             }
@@ -683,7 +678,7 @@ public class MainActivity extends AppCompatActivity {
         for(ImageMoverDaemon mover : starMovers) {
             mover.stop();
         }
-        massiveDaemon.stop();
+        //massiveDaemon.stop();
         backgroundScrollerDaemon.stop();
     }
 
