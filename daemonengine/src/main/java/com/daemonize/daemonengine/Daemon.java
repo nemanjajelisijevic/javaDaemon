@@ -1,5 +1,6 @@
 package com.daemonize.daemonengine;
 
+import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 
 public interface Daemon {
@@ -8,6 +9,8 @@ public interface Daemon {
 
   void stop();
 
+  void stop (Closure<Void> closure);
+
   DaemonState getState();
 
   <K extends Daemon> K setName(String name);
@@ -15,5 +18,11 @@ public interface Daemon {
   String getName();
 
   <K extends Daemon> K setConsumer(Consumer consumer);
+
+//  <K extends Daemon> K sleep();
+//
+//  <K extends Daemon> K sleep(long millis);
+
+
 
 }

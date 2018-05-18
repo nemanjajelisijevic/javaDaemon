@@ -1,11 +1,14 @@
 package com.daemonize.daemonengine.implementations.mainquestdaemon;
 
 
+import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.quests.StopMainQuest;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -46,4 +49,8 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine {
     return ret;
   }
 
+  @Override
+  public void stop(Closure<Void> closure) {
+    addMainQuest(new StopMainQuest(this, closure));
+  }
 }

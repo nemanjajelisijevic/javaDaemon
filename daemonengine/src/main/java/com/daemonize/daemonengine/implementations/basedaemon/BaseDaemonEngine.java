@@ -3,6 +3,7 @@ package com.daemonize.daemonengine.implementations.basedaemon;
 
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
@@ -91,10 +92,15 @@ public abstract class BaseDaemonEngine implements Daemon {
   public void stop() {
     state = DaemonState.GONE_DAEMON;
     if (daemonThread != null
-        && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stop from daemon thread
+        && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stopDaemon from daemon thread
         && daemonThread.isAlive()) {
       daemonThread.interrupt();
     }
+  }
+
+  @Override
+  public void stop(Closure<Void> closure) {
+    throw new IllegalStateException("This method can only be called from MainQuestDaemonEngine");
   }
 
 }

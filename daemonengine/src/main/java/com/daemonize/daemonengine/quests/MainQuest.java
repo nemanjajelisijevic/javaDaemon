@@ -8,7 +8,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class MainQuest<T> extends Quest<T> {
 
-  private Closure<T> closure;
+  protected Closure<T> closure;
 
   public MainQuest() {
     this.state = DaemonState.MAIN_QUEST;

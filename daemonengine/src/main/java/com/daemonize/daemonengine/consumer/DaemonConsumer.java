@@ -3,7 +3,7 @@ package com.daemonize.daemonengine.consumer;
 
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
-import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonengine.closure.Closure;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -80,13 +80,20 @@ public class DaemonConsumer implements Consumer, Daemon {
     }
 
     @Override
+    public void stop(Closure<Void> closure) {
+        stop();
+    }
+
+    @Override
     public DaemonState getState() {
         return state;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <K extends Daemon> K setName(String name) {
-        return null;
+    public DaemonConsumer setName(String name) {
+        this.name = name;
+        return this;
     }
 
     @Override
