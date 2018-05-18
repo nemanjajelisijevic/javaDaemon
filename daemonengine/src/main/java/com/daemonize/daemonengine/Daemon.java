@@ -1,6 +1,5 @@
 package com.daemonize.daemonengine;
 
-import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 
 public interface Daemon {
@@ -9,7 +8,7 @@ public interface Daemon {
 
   void stop();
 
-  void stop (Closure<Void> closure);
+  void queueStop();
 
   DaemonState getState();
 

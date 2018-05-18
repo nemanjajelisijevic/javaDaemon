@@ -1,7 +1,6 @@
 package com.daemonize.daemonengine.implementations.mainquestdaemon;
 
 
-import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -50,7 +49,7 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine {
   }
 
   @Override
-  public void stop(Closure<Void> closure) {
-    addMainQuest(new StopMainQuest(this, closure));
+  public void queueStop() {
+    addMainQuest(new StopMainQuest(this));
   }
 }

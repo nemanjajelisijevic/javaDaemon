@@ -167,12 +167,11 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         );
 
         ret.add(
-                MethodSpec.methodBuilder("stop")
-                        .addParameter(ParameterizedTypeName.get(ClassName.get(CLOSURE_PACKAGE, CLOSURE_STRING), TypeName.get(Void.class)), "closure")
+                MethodSpec.methodBuilder("queueStop")
                         .addAnnotation(Override.class)
                         .addModifiers(Modifier.PUBLIC)
                         .returns(void.class)
-                        .addStatement("daemonEngine.stop(closure)")
+                        .addStatement("daemonEngine.queueStop()")
                         .build()
         );
 

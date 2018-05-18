@@ -6,7 +6,6 @@ import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseDaemonEngine implements Daemon {
 
@@ -99,7 +98,7 @@ public abstract class BaseDaemonEngine implements Daemon {
   }
 
   @Override
-  public void stop(Closure<Void> closure) {
+  public void queueStop() {
     throw new IllegalStateException("This method can only be called from MainQuestDaemonEngine");
   }
 

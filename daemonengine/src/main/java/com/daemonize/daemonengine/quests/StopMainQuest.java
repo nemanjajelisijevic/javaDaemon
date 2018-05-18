@@ -7,13 +7,14 @@ public class StopMainQuest extends MainQuest<Void> {
 
     private Daemon daemon;
 
-    public StopMainQuest(Daemon daemon, Closure<Void> closure) {
-        super(closure);
+    public StopMainQuest(Daemon daemon) {
+        super();
+        this.daemon = daemon;
     }
 
     @Override
     protected Void pursue() {
-        daemon.stop(closure);
+        daemon.stop();
         return null;
     }
 }

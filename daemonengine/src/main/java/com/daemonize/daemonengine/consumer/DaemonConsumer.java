@@ -80,7 +80,7 @@ public class DaemonConsumer implements Consumer, Daemon {
     }
 
     @Override
-    public void stop(Closure<Void> closure) {
+    public void queueStop() {
         stop();
     }
 
