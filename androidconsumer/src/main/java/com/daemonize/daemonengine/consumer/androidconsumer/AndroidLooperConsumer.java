@@ -17,7 +17,7 @@ public class AndroidLooperConsumer implements Consumer {
     }
 
     @Override
-    public boolean enqueue(Runnable runnable) {
+    public boolean consume(Runnable runnable) {
         return handler.post(runnable);
     }
 }

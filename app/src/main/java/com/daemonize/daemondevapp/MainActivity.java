@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -23,13 +22,9 @@ import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.MassiveImageMoverDaemon;
-import com.daemonize.daemondevapp.imagemovers.MassiveImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.StackedSpriteImageTranslationMover;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
@@ -642,7 +637,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-        }, 200);
+        }, 100);
 
 //
 //        ExampleDaemon exampleDaemon = new ExampleDaemon(

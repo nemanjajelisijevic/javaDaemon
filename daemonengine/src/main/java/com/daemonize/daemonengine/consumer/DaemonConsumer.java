@@ -25,7 +25,7 @@ public class DaemonConsumer implements Consumer, Daemon {
     }
 
     @Override
-    public boolean enqueue(Runnable runnable) {
+    public boolean consume(Runnable runnable) {
         boolean ret;
         closureLock.lock();
         ret = closureQueue.add(runnable);
@@ -35,6 +35,8 @@ public class DaemonConsumer implements Consumer, Daemon {
     }
 
     private void loop() {
+
+        Runnable closure;
         while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             try {
@@ -43,14 +45,18 @@ public class DaemonConsumer implements Consumer, Daemon {
                     state = DaemonState.IDLE;
                     closureAvailable.await();
                 }
-                closureQueue.poll().run();//TODO null safety
+                closure = closureQueue.poll();//TODO null safety
             } catch (InterruptedException ex) {
                 //System.out.println(DaemonUtils.tag() + " Waiting on a closure interrupted");
                 break;
             } finally { //TODO Handle Exceptions
                 closureLock.unlock();
             }
+
+            closure.run();
+
         }
+
 
         state = DaemonState.STOPPED;
     }

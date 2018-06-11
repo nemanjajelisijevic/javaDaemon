@@ -2,5 +2,5 @@ package com.daemonize.daemonengine.consumer;
 
 
 public interface Consumer {
-    boolean enqueue(Runnable runnable);
+    boolean consume(Runnable runnable);
 }

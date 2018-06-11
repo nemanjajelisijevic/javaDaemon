@@ -40,7 +40,7 @@ public class RestClientTestScript implements DaemonScroll {
                             );
                             consumer.stop();
                         }
-                    })
+                    })  
         ).addSpell(() ->
             restClientDaemon.get(
                     "/api/users?delay=3",
@@ -95,6 +95,6 @@ public class RestClientTestScript implements DaemonScroll {
 
     @Override
     public void run() {
-        consumer.enqueue(() -> chain.run());
+        consumer.consume(() -> chain.run());
     }
 }
