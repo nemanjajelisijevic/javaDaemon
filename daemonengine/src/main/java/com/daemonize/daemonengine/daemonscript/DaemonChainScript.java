@@ -1,16 +1,16 @@
-package com.daemonize.daemonengine.daemonscroll;
+package com.daemonize.daemonengine.daemonscript;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class DaemonChainScroll implements DaemonScroll {
+public class DaemonChainScript implements DaemonScript {
 
     private List<DaemonSpell> chain = new ArrayList<>(10);
     private Iterator<DaemonSpell> it;
 
     @SuppressWarnings("unchecked")
-    public DaemonChainScroll addSpell(DaemonSpell spell) {
+    public DaemonChainScript addSpell(DaemonSpell spell) {
         chain.add(spell);
         return this;
     }

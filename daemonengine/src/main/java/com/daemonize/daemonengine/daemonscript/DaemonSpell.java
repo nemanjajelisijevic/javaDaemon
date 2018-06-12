@@ -1,4 +1,4 @@
-package com.daemonize.daemonengine.daemonscroll;
+package com.daemonize.daemonengine.daemonscript;
 
 
 @FunctionalInterface
