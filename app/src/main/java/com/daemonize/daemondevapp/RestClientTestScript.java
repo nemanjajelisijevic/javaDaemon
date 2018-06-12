@@ -33,6 +33,7 @@ public class RestClientTestScript implements DaemonScroll {
 
                         if (ret.get().total_pages > 0)
                             next();
+
                         else {
                             Log.e(
                                     DaemonUtils.tag(),
