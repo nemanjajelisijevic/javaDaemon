@@ -226,45 +226,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class MachineGunSpell implements DaemonSpell {
-
-        private Pair<Float, Float> initBulletCoord;
-        private ImageMover.Velocity velocity;
-        private float offset = -3;
-
-        public MachineGunSpell(float offset, Pair<Float, Float> initBulletCoord, ImageMover.Velocity velocity) {
-            this.offset = offset;
-            this.initBulletCoord = initBulletCoord;
-            this.velocity = velocity;
-        }
-
-        @Override
-        public void cast() {
-            ImageView bulletView;
-            ImageMoverDaemon bullet;
-
-            for (int i = 0; i < 3; ++i) {
-
-                bulletView = createImageView(40, 40);
-                bullet = new ImageMoverDaemon(
-                        new ImageTranslationMover(
-                                bulletSprite,
-                                50,
-                                initBulletCoord
-                        ).setBorders(borderX, borderY)
-                ).setName("Bullet");
-
-                bullet.setVelocity(50)
-                      .setMoveSideQuest()
-                      .setClosure(new BulletClosure(bulletView, bullet));
-                velocity.direction.coeficientX += Math.pow(offset, i);
-                velocity.direction.coeficientY -= Math.pow(offset, i);
-                bullet.setVelocity(velocity);
-
-            }
-        }
-    }
-
     private void fireBullet(Pair<Float, Float> sourceCoord, float angleInRadians) {
         ImageView bulletView = createImageView(40, 40);
         ImageMoverDaemon bullet = new ImageMoverDaemon(
