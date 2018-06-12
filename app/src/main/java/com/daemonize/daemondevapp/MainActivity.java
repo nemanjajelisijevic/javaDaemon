@@ -24,7 +24,7 @@ import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
+import com.daemonize.daemonengine.daemonscript.DaemonSpell;
 
 
 import java.io.IOException;

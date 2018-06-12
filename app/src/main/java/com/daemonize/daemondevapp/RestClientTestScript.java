@@ -10,14 +10,14 @@ import com.daemonize.daemondevapp.restcliententities.DelayedGetResponse;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
-import com.daemonize.daemonengine.daemonscroll.DaemonChainScroll;
-import com.daemonize.daemonengine.daemonscroll.DaemonSpell;
-import com.daemonize.daemonengine.daemonscroll.DaemonScroll;
+import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
+import com.daemonize.daemonengine.daemonscript.DaemonSpell;
+import com.daemonize.daemonengine.daemonscript.DaemonScript;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public class RestClientTestScript implements DaemonScroll {
+public class RestClientTestScript implements DaemonScript {
 
-    private DaemonChainScroll chain = new DaemonChainScroll();
+    private DaemonChainScript chain = new DaemonChainScript();
 
     private TextView textView;
     private RestClientDaemon restClientDaemon;
