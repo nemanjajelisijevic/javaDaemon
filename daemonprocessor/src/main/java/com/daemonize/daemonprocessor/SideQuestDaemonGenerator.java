@@ -168,14 +168,15 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         String methodName = sideQuestMethod.getFirst().getSimpleName().toString();
         int sleep = sideQuestMethod.getSecond().SLEEP();
         TypeSpec sideQuest = createSideQuest(sideQuestMethod.getFirst());
-        PrototypeMethodData prototypeMethodData = new PrototypeMethodData(sideQuestMethod.getFirst());
 
+        //TODO DRY
+        PrototypeMethodData prototypeMethodData = new PrototypeMethodData(sideQuestMethod.getFirst());
         TypeName sideQuestOfRet = ParameterizedTypeName.get(
                 ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME),
                 prototypeMethodData.getMethodRetTypeName()
         );
 
-        MethodSpec sideQuestSetter = MethodSpec.methodBuilder("set" + methodName.toUpperCase() + "SideQuest")
+        MethodSpec sideQuestSetter = MethodSpec.methodBuilder("set" + Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1) + "SideQuest")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(sideQuestOfRet)
                 .addStatement("$T sideQuest = new $N()", sideQuestOfRet, sideQuest)

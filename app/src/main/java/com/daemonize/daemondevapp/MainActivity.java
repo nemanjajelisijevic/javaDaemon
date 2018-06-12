@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
                 ).setName("Bullet");
 
                 bullet.setVelocity(50)
-                      .setMOVESideQuest()
+                      .setMoveSideQuest()
                       .setClosure(new BulletClosure(bulletView, bullet));
                 velocity.direction.coeficientX += Math.pow(offset, i);
                 velocity.direction.coeficientY -= Math.pow(offset, i);
@@ -283,7 +283,7 @@ public class MainActivity extends AppCompatActivity {
         ).setName("Bullet");
 
         bullet.setVelocity(50);
-        bullet.setMOVESideQuest().setClosure(new BulletClosure(bulletView, bullet));
+        bullet.setMoveSideQuest().setClosure(new BulletClosure(bulletView, bullet));
         bullet.setVelocity(new ImageMover.Velocity(
                 50,
                 new ImageMover.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)
@@ -533,7 +533,7 @@ public class MainActivity extends AppCompatActivity {
                             )
                     ).setBorders(borderX, borderY).setView(view)
             ).setName("Star " + Integer.toString(i));
-            starMover.setMOVESideQuest().setClosure(binder.bindViewToClosure(view));
+            starMover.setMoveSideQuest().setClosure(binder.bindViewToClosure(view));
             starMover.start();
 
             starMovers.add(starMover);
@@ -581,11 +581,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
         ).setName("Exceptione");
-        mainMover.setMOVESideQuest().setClosure(binder.bindViewToClosure(mainView));
+        mainMover.setMoveSideQuest().setClosure(binder.bindViewToClosure(mainView));
         mainMover.start();
 
         backgroundScrollerDaemon = new BackgroundScrollerDaemon(new BackgroundScroller(mainMover)).setName("Background scroller");
-        backgroundScrollerDaemon.setSCROLLSideQuest().setClosure(ret -> {
+        backgroundScrollerDaemon.setScrollSideQuest().setClosure(ret -> {
             horizontalSv.scrollTo(ret.get().first, ret.get().second);
             verticalSv.scrollTo(ret.get().first, ret.get().second);
         });
