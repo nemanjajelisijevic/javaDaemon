@@ -18,8 +18,6 @@ public interface Daemon {
 
   <K extends Daemon> K setConsumer(Consumer consumer);
 
-//  <K extends Daemon> K sleep();
-//
 //  <K extends Daemon> K sleep(long millis);
 
 
