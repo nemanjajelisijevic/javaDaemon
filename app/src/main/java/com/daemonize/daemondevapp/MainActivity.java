@@ -87,10 +87,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
-
-            if (ret.get() == null)
-                return;
-
             ImageMover.PositionedBitmap returnVal = ret.get();
             view.setX(returnVal.positionX);
             view.setY(returnVal.positionY);
