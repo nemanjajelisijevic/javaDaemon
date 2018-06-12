@@ -258,9 +258,9 @@ public class MainActivity extends AppCompatActivity {
                         ).setBorders(borderX, borderY)
                 ).setName("Bullet");
 
-                bullet.setVelocity(50);
-
-                bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+                bullet.setVelocity(50)
+                      .setMOVESideQuest()
+                      .setClosure(new BulletClosure(bulletView, bullet));
                 velocity.direction.coeficientX += Math.pow(offset, i);
                 velocity.direction.coeficientY -= Math.pow(offset, i);
                 bullet.setVelocity(velocity);
@@ -283,8 +283,7 @@ public class MainActivity extends AppCompatActivity {
         ).setName("Bullet");
 
         bullet.setVelocity(50);
-
-        bullet.setSideQuest(bullet.moveSideQuest.setClosure(new BulletClosure(bulletView, bullet)));
+        bullet.setMOVESideQuest().setClosure(new BulletClosure(bulletView, bullet));
         bullet.setVelocity(new ImageMover.Velocity(
                 50,
                 new ImageMover.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)
@@ -534,8 +533,7 @@ public class MainActivity extends AppCompatActivity {
                             )
                     ).setBorders(borderX, borderY).setView(view)
             ).setName("Star " + Integer.toString(i));
-
-            starMover.setSideQuest(starMover.moveSideQuest.setClosure(binder.bindViewToClosure(view)));
+            starMover.setMOVESideQuest().setClosure(binder.bindViewToClosure(view));
             starMover.start();
 
             starMovers.add(starMover);
@@ -583,19 +581,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
         ).setName("Exceptione");
-
-
-        mainMover.setSideQuest(mainMover.moveSideQuest.setClosure(binder.bindViewToClosure(mainView)));
+        mainMover.setMOVESideQuest().setClosure(binder.bindViewToClosure(mainView));
         mainMover.start();
 
         backgroundScrollerDaemon = new BackgroundScrollerDaemon(new BackgroundScroller(mainMover)).setName("Background scroller");
-        backgroundScrollerDaemon.setSideQuest(backgroundScrollerDaemon.scrollSideQuest.setClosure(ret -> {
+        backgroundScrollerDaemon.setSCROLLSideQuest().setClosure(ret -> {
             horizontalSv.scrollTo(ret.get().first, ret.get().second);
             verticalSv.scrollTo(ret.get().first, ret.get().second);
-        }));
+        });
         backgroundScrollerDaemon.start();
-
-
 
         joystickViewLeft = findViewById(R.id.joystickLeft);
         joystickViewLeft.setOnMoveListener((angle, strength) -> {

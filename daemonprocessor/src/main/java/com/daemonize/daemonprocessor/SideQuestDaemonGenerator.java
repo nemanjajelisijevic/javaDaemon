@@ -35,11 +35,11 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     }
 
     public TypeSpec generateDaemon(List<ExecutableElement> sideQuestPrototypeMethods) {
-        List<Pair<TypeSpec, FieldSpec>> sideQuestInitializedFields = new ArrayList<>();
+        List<Pair<TypeSpec, MethodSpec>> sideQuestInitializedFields = new ArrayList<>();
 
         for (ExecutableElement method : sideQuestPrototypeMethods) {
             sideQuestInitializedFields.add(
-                    createSideQuestField(
+                    createSideQuest(
                             Pair.create(
                                     method,
                                     method.getAnnotation(SideQuest.class)
@@ -89,8 +89,8 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         daemonClassBuilder.addMethod(daemonConstructor);
 
-        for (Pair<TypeSpec, FieldSpec> initField : sideQuestInitializedFields) {
-            daemonClassBuilder.addField(initField.getSecond());
+        for (Pair<TypeSpec, MethodSpec> initField : sideQuestInitializedFields) {
+            daemonClassBuilder.addMethod(initField.getSecond());
             daemonClassBuilder.addType(initField.getFirst());
         }
 
@@ -163,18 +163,27 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return sideQuestBuilder.build();
     }
 
-    public Pair<TypeSpec, FieldSpec> createSideQuestField(Pair<ExecutableElement, SideQuest> sideQuestMethod) {
+    public Pair<TypeSpec, MethodSpec> createSideQuest(Pair<ExecutableElement, SideQuest> sideQuestMethod) {
 
         String methodName = sideQuestMethod.getFirst().getSimpleName().toString();
         int sleep = sideQuestMethod.getSecond().SLEEP();
         TypeSpec sideQuest = createSideQuest(sideQuestMethod.getFirst());
+        PrototypeMethodData prototypeMethodData = new PrototypeMethodData(sideQuestMethod.getFirst());
 
-        FieldSpec sideQuestField = FieldSpec.builder(sideQuest.superclass, methodName + QUEST_TYPE_NAME)
+        TypeName sideQuestOfRet = ParameterizedTypeName.get(
+                ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME),
+                prototypeMethodData.getMethodRetTypeName()
+        );
+
+        MethodSpec sideQuestSetter = MethodSpec.methodBuilder("set" + methodName.toUpperCase() + "SideQuest")
                 .addModifiers(Modifier.PUBLIC)
-                .initializer("new $N().setSleepInterval($L)", sideQuest, sleep)
+                .returns(sideQuestOfRet)
+                .addStatement("$T sideQuest = new $N()", sideQuestOfRet, sideQuest)
+                .addStatement(DAEMON_ENGINE_STRING + ".setSideQuest(sideQuest.setSleepInterval($L))", sleep)
+                .addStatement("return sideQuest")
                 .build();
 
-        return Pair.create(sideQuest, sideQuestField);
+        return Pair.create(sideQuest, sideQuestSetter);
     }
 
     @Override

@@ -89,10 +89,10 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         List<Pair<ExecutableElement, SideQuest>> sideQuests
                 = getSideQuestMethods(publicPrototypeMethods);
 
-        List<Pair<TypeSpec, FieldSpec>> sideQuestFields = new ArrayList<>();
+        List<Pair<TypeSpec, MethodSpec>> sideQuestFields = new ArrayList<>();
 
         for (Pair<ExecutableElement, SideQuest> sideQuestPair : sideQuests) {
-            sideQuestFields.add(sideGenerator.createSideQuestField(sideQuestPair));
+            sideQuestFields.add(sideGenerator.createSideQuest(sideQuestPair));
         }
 
         Map<TypeSpec, MethodSpec> mainQuestsAndApiMethods = new LinkedHashMap<>();
@@ -111,8 +111,8 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         }
 
         //add side quest fields
-        for (Pair<TypeSpec, FieldSpec> sideQuestField : sideQuestFields) {
-            daemonClassBuilder.addField(sideQuestField.getSecond());
+        for (Pair<TypeSpec, MethodSpec> sideQuestField : sideQuestFields) {
+            daemonClassBuilder.addMethod(sideQuestField.getSecond());
         }
 
         //add main quest methods
@@ -128,7 +128,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         }
 
         //add side quests
-        for (Pair<TypeSpec, FieldSpec> sideQuestField : sideQuestFields) {
+        for (Pair<TypeSpec, MethodSpec> sideQuestField : sideQuestFields) {
             daemonClassBuilder.addType(sideQuestField.getFirst());
         }
 
