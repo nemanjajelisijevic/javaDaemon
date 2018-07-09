@@ -4,17 +4,22 @@ package com.daemonize.daemondevapp.imagemovers;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.util.Pair;
+import android.widget.ImageView;
 
+import com.daemonize.daemondevapp.MainActivity;
+import com.daemonize.daemondevapp.proba.Enemy;
+import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.List;
 
 public class MainImageTranslationMover extends StackedSpriteImageTranslationMover {
 
-    private final List<ImageMoverDaemon> observers;
+    private final List<ImageMoverMDaemon> observers;
 
     private int hp = 1000;
     private Handler guihandler = new Handler(Looper.getMainLooper());
@@ -34,7 +39,7 @@ public class MainImageTranslationMover extends StackedSpriteImageTranslationMove
             List<Bitmap> sprite,
             float velocity,
             Pair<Float, Float> startingPos,
-            List<ImageMoverDaemon> observers) {
+            List<ImageMoverMDaemon> observers) {
         super(sprite, velocity, startingPos);
         this.observers = observers;
     }
@@ -48,29 +53,38 @@ public class MainImageTranslationMover extends StackedSpriteImageTranslationMove
     @Override
     public PositionedBitmap move() {
 
+
         if(velocity.intensity > 0 ) {
+            Log.d(DaemonUtils.tag(), "TEST");
+
 
             if (observers != null)
-                for (ImageMoverDaemon observer : observers) {
-                    Velocity vel = new Velocity(velocity.intensity * 0.3F, velocity.direction);
-                    observer.setDirectionAndMove(lastX, lastY, vel.intensity); //TODO CHASER
-                    //observer.checkCollisionAndBounce(Pair.create(lastX, lastY), vel); //TODO Collisions
-                    Pair<Float, Float> obsLastCoord = observer.getLastCoordinates();
-                    if (!((ImageTranslationMover) observer.getPrototype()).isExploading()
-                            && Math.abs(lastX - obsLastCoord.first) < 40
-                            && Math.abs(lastY - obsLastCoord.second) < 40) {
-                      guihandler.post(new ReturnRunnable<>(hpClosure).setResult((--hp)));
-                    }
-
-                    if (hp < 0)
-                        return null;
+                for (ImageMoverMDaemon observer : observers) {
+                float x = lastX - observer.getLastCoordinates().first;
+                float y = lastY - observer.getLastCoordinates().second;
+                float c = (float) Math.sqrt(x*x + y*y);
+                if (c < 150.0f){
+                    Log.w("Puca","bum");
+                }
+                //                    Velocity vel = new Velocity(velocity.intensity * 0.3F, velocity.direction);
+//                    observerobserver.setDirectionAndMove(lastX, lastY, vel.intensity); //TODO CHASER
+//                    //observer.checkCollisionAndBounce(Pair.create(lastX, lastY), vel); //TODO Collisions
+//                    Pair<Float, Float> obsLastCoord = observer.getLastCoordinates();
+//                    if (!((Enemy) observer.getPrototype()).isExploading()
+//                            && Math.abs(lastX - obsLastCoord.first) < 40
+//                            && Math.abs(lastY - obsLastCoord.second) < 40) {
+//                      guihandler.post(new ReturnRunnable<>(hpClosure).setResult((--hp)));
+//                    }
+//
+//                    if (hp < 0)
+//                        return null;
                 }
 
-            velocity.intensity -= 0.1;
+           velocity.intensity -= 0.1;
             return super.move();
         }
 
-        return null;
+       return null;
     }
 
     @Override
