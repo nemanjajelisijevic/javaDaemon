@@ -32,7 +32,7 @@ public class Heap< T extends     IHeapItem <T> > {
         return firstItem;
 
     }
-    public  void UpdateItem(T item) {
+    public  void updateItem(T item) {
         sortUp(item);
     }
 
@@ -53,12 +53,12 @@ public class Heap< T extends     IHeapItem <T> > {
             if (childIndexLeft < currentItemCount) {
                 swapIndex = childIndexLeft;
                 if (childIndexRight < currentItemCount) {
-                    if (items[childIndexLeft].compareTo(items[childIndexRight]) < 0) {
+                    if (items[childIndexLeft].compareTo(items[childIndexRight]) > 0) {
                         swapIndex = childIndexRight;
                     }
                 }
 
-                if (item.compareTo(items[swapIndex]) < 0){
+                if (item.compareTo(items[swapIndex]) > 0){
                     swap(item,items[swapIndex]);
                 } else {
                     return;
@@ -72,11 +72,11 @@ public class Heap< T extends     IHeapItem <T> > {
     }
 
     void sortUp(T item) {
-        int parentIndex = (item.getHeapIndex() - 1) / 2;
 
         while (true) {
+            int parentIndex = (item.getHeapIndex() - 1) / 2;
             T parentItem = items[parentIndex];
-            if (item.compareTo(parentItem) > 0){
+            if (item.compareTo(parentItem) < 0){
                 swap(item, parentItem);
             } else {
                 break;

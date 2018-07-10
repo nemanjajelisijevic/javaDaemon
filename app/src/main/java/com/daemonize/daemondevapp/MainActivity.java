@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
         hpView.setTextColor(WHITE);
 
         int row = 6;
-        int colon = 12;
+        int colon = 6;
         //        Field[][] playGround = initPlayGround( row,colon);
 //        setWeightOnPlayGroundFromEndPoint(playGround,row,colon);
 //
@@ -564,7 +564,7 @@ public class MainActivity extends AppCompatActivity {
                         sprite,
                         explosionSprite,
                         new ImageMoverM.Velocity(
-                                1,
+                                3,
                                 new ImageMoverM.Direction(
                                         (float) borderX/2,
                                         (float) borderY/2
@@ -606,7 +606,7 @@ public class MainActivity extends AppCompatActivity {
         mainMover = new ImageMoverDaemon(
                 new MainImageTranslationMover(
                         spriteMain,
-                        10f,
+                        1f,
                         Pair.create(borderX/2f, borderY/2f),
                         enemyList
                 )

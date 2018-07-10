@@ -93,18 +93,18 @@ public class Field implements  IHeapItem <Field> {
 
     @Override
     public int compareTo(Field fieldToCompare) {
-        if (fCost() == fieldToCompare.fCost()) {
-            if (hCost == fieldToCompare.hCost) {
+        if (this.fCost() == fieldToCompare.fCost()) {
+            if (this.hCost == fieldToCompare.hCost) {
                 return 0;
             } else {
-                if (hCost < fieldToCompare.hCost) {
+                if (this.hCost < fieldToCompare.hCost) {
                     return -1;
                 } else {
                     return 1;
                 }
             }
         } else {
-            if (fCost() < fieldToCompare.fCost()) {
+            if (this.fCost() < fieldToCompare.fCost()) {
                 return -1;
             } else {
                 return 1;

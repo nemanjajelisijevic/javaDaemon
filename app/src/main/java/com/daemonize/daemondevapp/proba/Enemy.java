@@ -119,22 +119,23 @@ public class Enemy implements ImageMoverM {
         boolean signX = dX >= 0;
         velocity.intensity = velocityInt;
 
-        if (Math.abs(dY) == Math.abs(dX)) {
-            a = Math.abs((100*dX)/dY);
-            b = Math.abs((100*dY)/dX);
+//        if (Math.abs(dY) == Math.abs(dX)) {
+//            a = dY == 0 ? 0 : Math.abs((dX) / dY);
+//            b = dY == 0 ? 0 : Math.abs((dY) / dX);
+            velocity.direction = new Direction(dX, dY);
+//        }
+        //            float aY =  100 - a;
+//        } else if (Math.abs(dY) > Math.abs(dX)) {
+//            a = Math.abs((100*dX)/dY);
+//            b = Math.abs(dY/dX);
 //            float aY =  100 - a;
-            velocity.direction = new Direction(signX ? a : - a, signY ? b : - b);
-        } else if (Math.abs(dY) > Math.abs(dX)) {
-            a = Math.abs((100*dX)/dY);
-            b = Math.abs(dY/dX);
-            float aY =  100 - a;
-            velocity.direction = new Direction(signX ? a : - a, signY ? b : - b);
-        } else {
-            a = Math.abs((100*dY)/dX);
-            b = Math.abs(dX/dY);
-            float aX =  100 - a;
-            velocity.direction = new Direction(signX ? b : - b, signY ? a : -a);
-        }
+//            velocity.direction = new Direction(signX ? a : - a, signY ? b : - b);
+//        } else {
+//            a = Math.abs((100*dY)/dX);
+//            b = Math.abs(dX/dY);
+//            float aX =  100 - a;
+//            velocity.direction = new Direction(signX ? b : - b, signY ? a : -a);
+//        }
 
         //startMoving();
     }
@@ -170,7 +171,7 @@ public class Enemy implements ImageMoverM {
 
         Log.w("Kordinate ","X: "+lastX+", Y "+lastY+";");
 //        Log.w("Kordinate ","Y "+lastY);
-        float r = 1;
+        float r = velocity.intensity;
         if ( lastX < (nextField.getCenterX() + r) && lastX > (nextField.getCenterX() - r ) &&
                 lastY < (nextField.getCenterY() + r) && lastY > (nextField.getCenterY() - r ) ) {
             currentField = nextField;
@@ -184,8 +185,12 @@ public class Enemy implements ImageMoverM {
 //        lastX += velocity.intensity * (velocity.direction.coeficientX *0.001f);
 //        lastY += velocity.intensity * (velocity.direction.coeficientY*0.001f );
 
-        lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
-        lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
+        lastX += (velocity.direction.coeficientX * (velocity.intensity / 100));
+        lastY += (velocity.direction.coeficientY * (velocity.intensity / 100));
+
+//        float dx = velocity.intensity * (velocity.direction.coeficientX );
+//        lastX += dx ;
+//        lastY += dx * (velocity.direction.coeficientY );
 
 
         ret.positionX = lastX;
