@@ -313,8 +313,8 @@ public class MainActivity extends AppCompatActivity {
         hpView.setHeight(borderY / 10);
         hpView.setTextColor(WHITE);
 
-        int row = 6;
-        int colon = 6;
+        int row = 25;
+        int colon = 25;
         //        Field[][] playGround = initPlayGround( row,colon);
 //        setWeightOnPlayGroundFromEndPoint(playGround,row,colon);
 //
@@ -351,7 +351,9 @@ public class MainActivity extends AppCompatActivity {
 //
 
 
-        PathFinding pathFinding = new PathFinding(row,colon,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+//        PathFinding pathFinding = new PathFinding(row,colon,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+        PathFinding pathFinding = new PathFinding();
+        pathFinding.dijkstra(row,colon,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
         //pathFinding.pathToString();
         Log.w("border","x: "+borderX+" y: "+borderY);
         //        pathFinding.getGrid().getPath()

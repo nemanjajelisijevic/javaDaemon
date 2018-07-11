@@ -1,35 +1,35 @@
 package com.daemonize.daemondevapp.tabel;
 
+import android.util.Pair;
+
 import com.daemonize.daemondevapp.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Grid {
+    PathFinding pathFinding;
 
-    Field[][] grid;
+   private Field[][] grid;
 
-    List<Field> path;
+    private List<Field> path;
 
     public  Grid (int row, int colon) {
+        pathFinding = new PathFinding();
         grid = new Field[row][colon];
 
-        int x = 70;
-        int y = 70;
-        int a = 140;
         for (int i = 0; i < row; i++) {
-            y = 70 + i*140;
+            int y = 70 + i*140;
 
             for (int j=0; j<colon; j++) {
-                x = 70 + j*140;
+                int x = 70 + j*140;
 
                 Field field = new Field(x, y, i, j,0,true);
-//                if ( i == (row - 1) && ( j % 2 ) == 0 ) {
-//                    field.setWeight(Integer.MAX_VALUE);
-//                }
+                field.gCost = Integer.MAX_VALUE;
                 grid[i][j] = field;
             }
         }
+        pathFinding.dijkstra(this,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
 
     }
 
@@ -37,8 +37,12 @@ public class Grid {
         return grid;
     }
 
-    public  void  setTower (int row,int colon ) {
-         grid[row][colon].setWalkable(false);
+    public void setPath(List<Field> path) {
+        this.path = path;
+    }
+
+    public  void  setTower (int row, int colon ) {
+        grid[row][colon].setWalkable(false);
         for (int i = -1 ; i <= 1; i++ ) {
             for (int j = -1; j <= 1; j++) {
                 if (i==0 && j==0) {
@@ -177,7 +181,7 @@ public class Grid {
         for (int i=0;i<grid.length;i++){
             for(int j = 0;j<grid[i].length;j++){
 
-                String pomstr = grid[i][j].isWalkable() ? grid[i][j].fCost()+"" : "T";
+                String pomstr = grid[i][j].isWalkable() ? (grid[i][j].fCost() == Integer.MAX_VALUE ? "H" : grid[i][j].fCost() + "") : "T";
                 str +="\t"+pomstr+"\t";
             }
             str+='\n';
@@ -185,11 +189,12 @@ public class Grid {
         return str;
     }
 
-    public List<Field> getPath() {
-        List<Field> retpath = new ArrayList<>();
-        for (int i = path.size() - 1; i >-1 ; i--) {
-            retpath.add(path.get(i));
-        }
-        return retpath;
+    public List<Field> getPath(Pair<Integer,Integer> statPoint, Pair<Integer,Integer> endPoint) {
+        List<Field> path = new ArrayList<>();
+        Field startNode = grid[endPoint.first][endPoint.second];
+        Field endNode = grid[statPoint.first][statPoint.second];
+//        Field currentField =
+//        while ()
+        return path;
     }
 }
