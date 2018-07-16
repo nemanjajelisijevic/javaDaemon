@@ -94,7 +94,7 @@ public class PathFinding {
 
             if ( currentNode.equals(endNode)){
                 grid.setPath( retracePath(startNode,endNode));
-                Log.w("Putanja", pathToString(grid.getPath()));
+               // Log.w("Putanja", pathToString(grid.getPath()));
                 Log.w("MATRICA \n", grid.gridToString());
 
                 return;
@@ -131,7 +131,7 @@ public class PathFinding {
 
     }
 
-    public void dijkstra(Grid grid,Pair<Integer,Integer> statPoint, Pair<Integer,Integer> endPoint ) {
+    public boolean dijkstra(Grid grid,Pair<Integer,Integer> statPoint, Pair<Integer,Integer> endPoint ) {
 
 //        grid = new Grid(row,colon);
 //
@@ -209,9 +209,10 @@ public class PathFinding {
             if ( currentNode.equals(endNode)){
                 //grid.path = retracePath(startNode,endNode);
                 //Log.w("Putanja", pathToString(grid.getPath()));
+                startNode.gCost = 0;
+//                grid.getGrid()[endPoint.first][endPoint.second].gCost = 0;
                 Log.w("MATRICA \n", grid.gridToString());
-
-                return;
+                return true;
             }
 
 
@@ -236,12 +237,15 @@ public class PathFinding {
             //Log.w("MATRICA DIJKSTRA  \n", grid.gridToString());
         }
 
+        grid.getGrid()[endPoint.first][endPoint.second].gCost = 0;
+
+        return false;
         //        grid.path = retracePath(startNode,endNode);
         //                        Log.w("Putanja", pathToString(grid.getPath()));
-        Log.w("MATRICA DIJKSTRA \n", grid.gridToString());
-        if (openSet.size() == 0) {
-            Log.w("PUTANJA","Ne postoji putanja !!!");
-        }
+//        Log.w("MATRICA DIJKSTRA \n", grid.gridToString());
+//        if (openSet.size() == 0) {
+//            Log.w("PUTANJA","Ne postoji putanja !!!");
+//        }
     }
 
      List<Field> retracePath (Field start, Field end ){

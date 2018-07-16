@@ -25,6 +25,7 @@ import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemondevapp.proba.Enemy;
 import com.daemonize.daemondevapp.proba.ImageMoverM;
 import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
+import com.daemonize.daemondevapp.tabel.Grid;
 import com.daemonize.daemondevapp.tabel.PathFinding;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
@@ -313,8 +314,8 @@ public class MainActivity extends AppCompatActivity {
         hpView.setHeight(borderY / 10);
         hpView.setTextColor(WHITE);
 
-        int row = 25;
-        int colon = 25;
+        int row = 6;
+        int colon = 6;
         //        Field[][] playGround = initPlayGround( row,colon);
 //        setWeightOnPlayGroundFromEndPoint(playGround,row,colon);
 //
@@ -353,7 +354,27 @@ public class MainActivity extends AppCompatActivity {
 
 //        PathFinding pathFinding = new PathFinding(row,colon,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
         PathFinding pathFinding = new PathFinding();
-        pathFinding.dijkstra(row,colon,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+        Grid grid = new Grid(row,colon);
+                grid.setTower(1,2);
+                grid.setTower(1,3);
+                grid.setTower(1,0);
+                grid.setTower(1,4);
+
+                grid.setTower(3,2);
+                grid.setTower(3,3);
+                grid.setTower(3,4);
+                grid.setTower(3,5);
+                grid.setTower(3,1);
+
+                grid.setTower(4,1);
+                grid.setTower(4,3);
+                grid.setTower(4,5);
+
+
+                grid.setTower(5,2);
+                grid.setTower(5,0);
+                grid.setTower(5,4);
+        pathFinding.dijkstra(grid, new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
         //pathFinding.pathToString();
         Log.w("border","x: "+borderX+" y: "+borderY);
         //        pathFinding.getGrid().getPath()
@@ -573,8 +594,9 @@ public class MainActivity extends AppCompatActivity {
                                 )
                         ),
                         Pair.create( (float)0, (float)0),
-                        pathFinding.getGrid().getPath()
+                        grid
                         ).setView(enemyView)
+                        .setBorders(borderX,borderY)
         ).setName("Enemy");
 
         enemy.setMoveSideQuest().setClosure(binderm.bindViewToClosureM(enemyView));

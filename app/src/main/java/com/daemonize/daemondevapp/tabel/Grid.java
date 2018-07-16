@@ -11,26 +11,41 @@ public class Grid {
     PathFinding pathFinding;
 
    private Field[][] grid;
+   int fieldWith = 140;
 
     private List<Field> path;
 
     public  Grid (int row, int colon) {
         pathFinding = new PathFinding();
-        grid = new Field[row][colon];
+        grid = createFieldGround(row, colon);
+        //pathFinding.dijkstra(this,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+
+    }
+
+    Field[][] createFieldGround(int row, int colon){
+        Field[][] gridtemp = new Field[row][colon];
 
         for (int i = 0; i < row; i++) {
-            int y = 70 + i*140;
+            int y = fieldWith/2 + i*fieldWith;
 
             for (int j=0; j<colon; j++) {
-                int x = 70 + j*140;
+                int x = fieldWith/2 + j*fieldWith;
 
                 Field field = new Field(x, y, i, j,0,true);
                 field.gCost = Integer.MAX_VALUE;
-                grid[i][j] = field;
+                gridtemp[i][j] = field;
             }
         }
-        pathFinding.dijkstra(this,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+        return gridtemp;
+    }
 
+    public Field getField(int row, int colon){
+        return grid[row][colon];
+    }
+    public Field getField(float x, float y){
+        int row = (int) (y / fieldWith);
+        int colon = (int) (x / fieldWith);
+        return grid[row][colon];
     }
 
     public Field[][] getGrid() {
@@ -42,20 +57,28 @@ public class Grid {
     }
 
     public  void  setTower (int row, int colon ) {
-        grid[row][colon].setWalkable(false);
-        for (int i = -1 ; i <= 1; i++ ) {
-            for (int j = -1; j <= 1; j++) {
-                if (i==0 && j==0) {
-                    continue;
-                }
-                int realX = row + i;
-                int realY = colon + j;
 
-                if( realX >= 0 && realX < grid.length && realY >=0 && realY < grid[row].length){
-                   grid[realX][realY].setWeight(grid[realX][realY].getWeight() + 1);
-                }
-            }
+        Field[][] gridTemp = new Field[grid.length][grid[0].length];
+
+        gridTemp[row][colon].setWalkable(false);
+
+        boolean acceptTower = pathFinding.dijkstra(gridTemp, new Pair<>(0,0), new Pair<>(row - 1, colon - 1));
+        if (acceptTower) {
+
         }
+//        for (int i = -1 ; i <= 1; i++ ) {
+//            for (int j = -1; j <= 1; j++) {
+//                if (i==0 && j==0) {
+//                    continue;
+//                }
+//                int realX = row + i;
+//                int realY = colon + j;
+//
+//                if( realX >= 0 && realX < grid.length && realY >=0 && realY < grid[row].length){
+//                   grid[realX][realY].setWeight(grid[realX][realY].getWeight() + 1);
+//                }
+//            }
+//        }
     }
 
     public List<Field> getNeighbors(int row,int colon){
@@ -63,13 +86,32 @@ public class Grid {
 
         for (int i = -1 ; i <= 1; i++ ) {
             for (int j = -1; j <= 1; j++) {
-                if (i==0 && j==0) {
+                if (i == 0 && j == 0) {
                     continue;
                 }
                 int realX = row + i;
                 int realY = colon + j;
 
-                if( realX >= 0 && realX < grid.length && realY >=0 && realY < grid[row].length){
+                if( realX >= 0 && realX < grid.length && realY >= 0 && realY < grid[row].length){
+                    neighbors.add(grid[realX][realY]);
+                }
+            }
+        }
+
+        return neighbors;
+    }
+    public List<Field> getNeighbors(Field [][] grid, int row,int colon){
+        List<Field> neighbors = new ArrayList<>();
+
+        for (int i = -1 ; i <= 1; i++ ) {
+            for (int j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0) {
+                    continue;
+                }
+                int realX = row + i;
+                int realY = colon + j;
+
+                if( realX >= 0 && realX < grid.length && realY >= 0 && realY < grid[row].length){
                     neighbors.add(grid[realX][realY]);
                 }
             }
@@ -78,102 +120,40 @@ public class Grid {
         return neighbors;
     }
 
-    public Field getMinWeightOfNeighbors2(Field[][] playGround, int i, int j){
-        int minWeight = Integer.MAX_VALUE ;
-        Field minNeighbor = null;
-        int iMax = playGround.length;
-        int jMax = playGround[0].length;
-        //List<Integer> neighborWight = new ArrayList<>(4);
-        if(j%2==0){ //parni
-            if (j+1 < jMax) {
-                int weight = playGround[i][j+1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i][j+1];
-                }
-                if (i+1 < iMax  ){
-                    weight = playGround[i+1][j+1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                        minNeighbor = playGround[i+1][j+1];
-                    }
-                }
-            }
-            if ( i+1 < iMax ) {
-                int weight = playGround[i+1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i+1][j];
-                }
-            }
-            if ( i-1 > -1 ) {
-                int weight = playGround[i-1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i-1][j];
-                }
-            }
-            if (j-1 > -1) {
-                int weight = playGround[i][j-1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i][j-1];
-                }
-                if (i+1 < iMax  ){
-                    weight = playGround[i+1][j-1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                        minNeighbor = playGround[i+1][j-1];
-                    }
-                }
-            }
-        } else { //neparni
 
-            if ( j+1 < jMax ){
-                int weight = playGround[i][j+1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i][j+1];
+
+    public Field getMinWeightOfNeighbors(Field field) {
+        return getMinWeightOfNeighbors(field.getRow(), field.getColon());
+    }
+
+    public Field getMinWeightOfNeighbors(int row, int colon) {
+        List<Field> neighbors = new ArrayList<>();
+        for (int i = -1 ; i <= 1; i++ ) {
+            for (int j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0) {
+                    continue;
                 }
-                if ( i-1 > -1 ){
-                    weight = playGround[i-1][j+1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                        minNeighbor = playGround[i-1][j+1];
-                    }
-                }
-            }
-            if ( i+1 < iMax ) {
-                int weight = playGround[i+1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i+1][j];
-                }
-            }
-            if ( i-1 > -1 ) {
-                int weight = playGround[i-1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i-1][j];
-                }
-            }
-            if ( j-1 > -1 ){
-                int weight = playGround[i][j-1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i][j-1];
-                }
-                if ( i-1 > -1 ){
-                    weight = playGround[i-1][j-1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                        minNeighbor = playGround[i-1][j-1];
-                    }
+                int realX = row + i;
+                int realY = colon + j;
+
+                if( realX >= 0 && realX < grid.length && realY >= 0 && realY < grid[row].length){
+                    neighbors.add(grid[realX][realY]);
                 }
             }
         }
-
-        return minNeighbor;
+        Field currentMinField = neighbors.get(0);
+        for (Field field: neighbors){
+            if (currentMinField.fCost() >= field.fCost()) {
+                if (currentMinField.fCost() == field.fCost()){
+                    //they are same, we choose random one
+                    int randomNum = (int) (Math.random() * 101);
+                    currentMinField = ( randomNum < 50 ? currentMinField : field);
+                } else {
+                  currentMinField = field;
+                }
+            }
+        }
+        return currentMinField;
     }
 
     public String gridToString(){

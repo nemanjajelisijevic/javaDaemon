@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.tabel.Field;
+import com.daemonize.daemondevapp.tabel.Grid;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 
@@ -33,13 +34,14 @@ public class Enemy implements ImageMoverM {
     protected float borderX;
     protected float borderY;
 
-    List<Field> path;
     Field currentField, nextField ;
-    int currentIndexField, nextIndexField ;
+    Grid grid;
+
+    boolean reachDestiny = false;
 
     private ImageView view;
 
-    public Enemy(int hp, List<Bitmap> sprite, List<Bitmap> explodeSprite, Velocity velocity,  Pair<Float, Float> startingPos, List<Field> path) {
+    public Enemy(int hp, List<Bitmap> sprite, List<Bitmap> explodeSprite, Velocity velocity,  Pair<Float, Float> startingPos,Grid grid) {
         this.hp = hp;
         this.sprite = sprite;
         this.explodeSprite = explodeSprite;
@@ -48,10 +50,9 @@ public class Enemy implements ImageMoverM {
         lastX = startingPos.first;
         lastY = startingPos.second;
         spriteIterator = sprite.iterator();
-        this.path = path;
-        currentField = path.get(0);
-        currentIndexField = -1;
-        nextField = path.get(0);
+        this.grid = grid;
+        currentField = grid.getField(0, 0);
+        nextField = grid.getMinWeightOfNeighbors(currentField);
         setDirectionAndMove(currentField.getCenterX(),currentField.getCenterY(),velocity.intensity);
     }
 
@@ -161,41 +162,31 @@ public class Enemy implements ImageMoverM {
 
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
-//        try {
-//            awaitForMovement();
-//        } catch (InterruptedException e) {
-//            //
-//        }
-
-        //check borders and recalculate
-
-        Log.w("Kordinate ","X: "+lastX+", Y "+lastY+";");
-//        Log.w("Kordinate ","Y "+lastY);
-        float r = velocity.intensity;
-        if ( lastX < (nextField.getCenterX() + r) && lastX > (nextField.getCenterX() - r ) &&
-                lastY < (nextField.getCenterY() + r) && lastY > (nextField.getCenterY() - r ) ) {
-            currentField = nextField;
-            currentIndexField ++;
-            if ( path.size() > currentIndexField + 1) {
-                nextField = path.get(currentIndexField + 1);
+        if(!reachDestiny) {
+            Log.w("Kordinate ", "X: " + lastX + ", Y " + lastY + ";");
+            //        Log.w("Kordinate ","Y "+lastY);
+            float r = velocity.intensity;
+            if (lastX < (nextField.getCenterX() + r) && lastX > (nextField.getCenterX() - r)
+                    && lastY < (nextField.getCenterY() + r) && lastY > (nextField.getCenterY() - r) ) {
+                Field previous = currentField;
+                currentField = nextField;
+                nextField = grid.getMinWeightOfNeighbors(currentField);
+                if (!nextField.equals(previous)) {
+                    setDirectionAndMove(nextField.getCenterX(), nextField.getCenterY(), velocity
+                            .intensity);
+                }
             }
-            setDirectionAndMove(nextField.getCenterX(),nextField.getCenterY(),velocity.intensity);
+
+
+            lastX += (velocity.direction.coeficientX * (velocity.intensity / 100));
+            lastY += (velocity.direction.coeficientY * (velocity.intensity / 100));
+
+            if (lastX > borderX || lastY > borderY) {
+                reachDestiny = true;
+            }
+            ret.positionX = lastX;
+            ret.positionY = lastY;
         }
-//
-//        lastX += velocity.intensity * (velocity.direction.coeficientX *0.001f);
-//        lastY += velocity.intensity * (velocity.direction.coeficientY*0.001f );
-
-        lastX += (velocity.direction.coeficientX * (velocity.intensity / 100));
-        lastY += (velocity.direction.coeficientY * (velocity.intensity / 100));
-
-//        float dx = velocity.intensity * (velocity.direction.coeficientX );
-//        lastX += dx ;
-//        lastY += dx * (velocity.direction.coeficientY );
-
-
-        ret.positionX = lastX;
-        ret.positionY = lastY;
-
         return ret;
     }
 
