@@ -13,6 +13,7 @@ public class Grid {
    private Field[][] grid;
    int fieldWith = 140;
 
+
     private List<Field> path;
 
     public  Grid (int row, int colon) {
@@ -56,15 +57,29 @@ public class Grid {
         this.path = path;
     }
 
-    public  void  setTower (int row, int colon ) {
+    public  boolean  setTower (int row, int colon ) {
 
+        if (!grid[row][colon].isWalkable()) return false;
+
+        //copy of grid
         Field[][] gridTemp = new Field[grid.length][grid[0].length];
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                Field field = new Field(grid[i][j]);
+                gridTemp[i][j] = field;
+                grid[i][j].gCost = Integer.MAX_VALUE;
+            }
+        }
 
-        gridTemp[row][colon].setWalkable(false);
+        grid[row][colon].setWalkable(false);
 
-        boolean acceptTower = pathFinding.dijkstra(gridTemp, new Pair<>(0,0), new Pair<>(row - 1, colon - 1));
+        boolean acceptTower = pathFinding.dijkstra(this, new Pair<>(0,0), new Pair<>(grid.length - 1, grid[0].length - 1));
         if (acceptTower) {
-
+            return true;
+        } else {
+            grid = gridTemp;
+            pathFinding.dijkstra(this, new Pair<>(0,0), new Pair<>(grid.length - 1, grid[0].length - 1));
+            return false;
         }
 //        for (int i = -1 ; i <= 1; i++ ) {
 //            for (int j = -1; j <= 1; j++) {
@@ -143,13 +158,15 @@ public class Grid {
         }
         Field currentMinField = neighbors.get(0);
         for (Field field: neighbors){
-            if (currentMinField.fCost() >= field.fCost()) {
-                if (currentMinField.fCost() == field.fCost()){
-                    //they are same, we choose random one
-                    int randomNum = (int) (Math.random() * 101);
-                    currentMinField = ( randomNum < 50 ? currentMinField : field);
-                } else {
-                  currentMinField = field;
+            if(field.isWalkable()) {
+                if (currentMinField.fCost() >= field.fCost()) {
+                    if (currentMinField.fCost() == field.fCost()) {
+                        //they are same, we choose random one
+                        int randomNum = (int) (Math.random() * 101);
+                        currentMinField = (randomNum < 50 ? currentMinField : field);
+                    } else {
+                        currentMinField = field;
+                    }
                 }
             }
         }

@@ -52,7 +52,7 @@ public class Enemy implements ImageMoverM {
         spriteIterator = sprite.iterator();
         this.grid = grid;
         currentField = grid.getField(0, 0);
-        nextField = grid.getMinWeightOfNeighbors(currentField);
+        nextField = grid.getField(0, 0);//grid.getMinWeightOfNeighbors(currentField);
         setDirectionAndMove(currentField.getCenterX(),currentField.getCenterY(),velocity.intensity);
     }
 
@@ -163,15 +163,15 @@ public class Enemy implements ImageMoverM {
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
         if(!reachDestiny) {
-            Log.w("Kordinate ", "X: " + lastX + ", Y " + lastY + ";");
+            Log.w("Koordinate ", "X: " + lastX + ", Y " + lastY + ";");
             //        Log.w("Kordinate ","Y "+lastY);
             float r = velocity.intensity;
             if (lastX < (nextField.getCenterX() + r) && lastX > (nextField.getCenterX() - r)
                     && lastY < (nextField.getCenterY() + r) && lastY > (nextField.getCenterY() - r) ) {
                 Field previous = currentField;
                 currentField = nextField;
-                nextField = grid.getMinWeightOfNeighbors(currentField);
-                if (!nextField.equals(previous)) {
+                if (!(currentField.getRow() ==  5 && currentField.getColon() == 5)) {//(!nextField.equals(previous)) {
+                    nextField = grid.getMinWeightOfNeighbors(currentField);
                     setDirectionAndMove(nextField.getCenterX(), nextField.getCenterY(), velocity
                             .intensity);
                 }
@@ -181,7 +181,7 @@ public class Enemy implements ImageMoverM {
             lastX += (velocity.direction.coeficientX * (velocity.intensity / 100));
             lastY += (velocity.direction.coeficientY * (velocity.intensity / 100));
 
-            if (lastX > borderX || lastY > borderY) {
+            if (Math.abs(lastX) > borderX || Math.abs(lastY) > borderY) {
                 reachDestiny = true;
             }
             ret.positionX = lastX;

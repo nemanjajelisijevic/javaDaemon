@@ -355,16 +355,23 @@ public class MainActivity extends AppCompatActivity {
 //        PathFinding pathFinding = new PathFinding(row,colon,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
         PathFinding pathFinding = new PathFinding();
         Grid grid = new Grid(row,colon);
-                grid.setTower(1,2);
-                grid.setTower(1,3);
-                grid.setTower(1,0);
-                grid.setTower(1,4);
 
-                grid.setTower(3,2);
-                grid.setTower(3,3);
-                grid.setTower(3,4);
-                grid.setTower(3,5);
-                grid.setTower(3,1);
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,2) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,3) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,0) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,1) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,4) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,5) ? " accept ":" rejected "));
+
+
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,2) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,3) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,4) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,5) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,1) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,5) ? " accept ":" rejected "));
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,0) ? " accept ":" rejected "));
+
 
                 grid.setTower(4,1);
                 grid.setTower(4,3);
@@ -374,6 +381,7 @@ public class MainActivity extends AppCompatActivity {
                 grid.setTower(5,2);
                 grid.setTower(5,0);
                 grid.setTower(5,4);
+
         pathFinding.dijkstra(grid, new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
         //pathFinding.pathToString();
         Log.w("border","x: "+borderX+" y: "+borderY);
