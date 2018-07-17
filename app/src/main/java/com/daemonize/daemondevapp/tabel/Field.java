@@ -16,8 +16,6 @@ public class Field implements  IHeapItem <Field> {
     int weight;
 
     boolean walkable;
-//    Field parent;
-
     int heapIndex;
 
     public Field(int centerX, int centerY, int row, int colon, int weight, boolean walkable) {

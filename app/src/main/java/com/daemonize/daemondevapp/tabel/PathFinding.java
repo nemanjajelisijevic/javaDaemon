@@ -12,11 +12,11 @@ public class PathFinding {
     public PathFinding () {
 
     }
-    public boolean aStarAlg (Grid grid,Pair<Integer,Integer> statPoint, Pair<Integer,Integer> endPoint) {
+    public boolean aStarAlg (Grid grid) {
 
 
-        Field startNode = grid.getGrid()[endPoint.first][endPoint.second];
-        Field endNode = grid.getGrid()[statPoint.first][statPoint.second];
+        Field startNode =  grid.getGrid()[grid.startPoint.first][grid.startPoint.second];
+        Field endNode = grid.getGrid()[grid.endPoint.first][grid.endPoint.second];
 
         Field [] heapArray = new Field[grid.getGrid().length * grid.getGrid()[0].length];
 //        List<Field> openSet = new ArrayList<>() ;
@@ -44,7 +44,7 @@ public class PathFinding {
             if ( currentNode.equals(endNode)){
                 grid.setPath( retracePath(startNode,endNode));
                // Log.w("Putanja", pathToString(grid.getPath()));
-                Log.w("MATRICA \n", grid.gridToString());
+                Log.w("MATRICA \n", grid.gridToString().toString());
 
                 return true;
             }
@@ -70,7 +70,7 @@ public class PathFinding {
             }
         }
 
-        Log.w("MATRICA \n", grid.gridToString());
+        Log.w("MATRICA \n", grid.gridToString().toString());
         if (openSet.size() == 0) {
             Log.w("PUTANJA","Ne postoji putanja !!!");
         }
@@ -78,10 +78,10 @@ public class PathFinding {
 
     }
 
-    public boolean dijkstra(Grid grid,Pair<Integer,Integer> statPoint, Pair<Integer,Integer> endPoint ) {
+    public boolean dijkstra(Grid grid ) {
 
-        Field startNode =  grid.getGrid()[endPoint.first][endPoint.second];
-        Field endNode = grid.getGrid()[statPoint.first][statPoint.second];
+        Field startNode =  grid.getGrid()[grid.endPoint.first][grid.endPoint.second];
+        Field endNode = grid.getGrid()[grid.startPoint.first][grid.startPoint.second];
 
         Field [] heapArray = new Field[ grid.getGrid().length * grid.getGrid()[0].length];
         //        List<Field> openSet = new ArrayList<>() ;
@@ -110,7 +110,7 @@ public class PathFinding {
                 //Log.w("Putanja", pathToString(grid.getPath()));
                 startNode.gCost = 0;
 //                grid.getGrid()[endPoint.first][endPoint.second].gCost = 0;
-                Log.w("MATRICA \n", grid.gridToString());
+                Log.w("MATRICA \n", grid.gridToString().toString());
                 return true;
             }
             for (Field neighbour : grid.getNeighbors(currentNode.getRow(),currentNode.getColon())) {
@@ -129,7 +129,7 @@ public class PathFinding {
             }
         }
 
-        grid.getGrid()[endPoint.first][endPoint.second].gCost = 0;
+        grid.getGrid()[grid.endPoint.first][grid.endPoint.second].gCost = 0;
 
         return false;
         //        grid.path = retracePath(startNode,endNode);

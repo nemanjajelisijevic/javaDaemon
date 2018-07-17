@@ -314,8 +314,8 @@ public class MainActivity extends AppCompatActivity {
         hpView.setHeight(borderY / 10);
         hpView.setTextColor(WHITE);
 
-        int row = 6;
-        int colon = 6;
+        int row = 11;
+        int colon = 20;
         //        Field[][] playGround = initPlayGround( row,colon);
 //        setWeightOnPlayGroundFromEndPoint(playGround,row,colon);
 //
@@ -354,21 +354,22 @@ public class MainActivity extends AppCompatActivity {
 
 //        PathFinding pathFinding = new PathFinding(row,colon,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
         PathFinding pathFinding = new PathFinding();
-        Grid grid = new Grid(row,colon);
+        Grid grid = new Grid(row, colon, new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
 
         Log.w("ADD TOWER","Tower is " + (grid.setTower(1,2) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(1,3) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(1,0) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,1) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,1) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(1,4) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(1,5) ? " accept ":" rejected "));
 
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(2,5) ? " accept ":" rejected "));
 
         Log.w("ADD TOWER","Tower is " + (grid.setTower(3,2) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(3,3) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(3,4) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(3,5) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,1) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,1) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(3,5) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(3,0) ? " accept ":" rejected "));
 
@@ -382,7 +383,7 @@ public class MainActivity extends AppCompatActivity {
                 grid.setTower(5,0);
                 grid.setTower(5,4);
 
-        pathFinding.dijkstra(grid, new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+        pathFinding.dijkstra(grid);
         //pathFinding.pathToString();
         Log.w("border","x: "+borderX+" y: "+borderY);
         //        pathFinding.getGrid().getPath()

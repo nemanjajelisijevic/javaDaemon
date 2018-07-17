@@ -10,13 +10,18 @@ import java.util.List;
 public class Grid {
     PathFinding pathFinding;
 
+    Pair<Integer,Integer> startPoint;
+    Pair<Integer,Integer> endPoint;
+
    private Field[][] grid;
-   int fieldWith = 140;
+   int fieldWith = 80;
 
 
     private List<Field> path;
 
-    public  Grid (int row, int colon) {
+    public  Grid (int row, int colon,Pair<Integer,Integer> startPoint, Pair<Integer,Integer> endPoint) {
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
         pathFinding = new PathFinding();
         grid = createFieldGround(row, colon);
         //pathFinding.dijkstra(this,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
@@ -73,12 +78,12 @@ public class Grid {
 
         grid[row][colon].setWalkable(false);
 
-        boolean acceptTower = pathFinding.dijkstra(this, new Pair<>(0,0), new Pair<>(grid.length - 1, grid[0].length - 1));
+        boolean acceptTower = pathFinding.dijkstra(this);
         if (acceptTower) {
             return true;
         } else {
             grid = gridTemp;
-            pathFinding.dijkstra(this, new Pair<>(0,0), new Pair<>(grid.length - 1, grid[0].length - 1));
+            pathFinding.dijkstra(this);
             return false;
         }
 //        for (int i = -1 ; i <= 1; i++ ) {
@@ -173,15 +178,15 @@ public class Grid {
         return currentMinField;
     }
 
-    public String gridToString(){
-        String str = "";
+    public StringBuilder gridToString(){
+        StringBuilder str = new StringBuilder("");
         for (int i=0;i<grid.length;i++){
             for(int j = 0;j<grid[i].length;j++){
 
                 String pomstr = grid[i][j].isWalkable() ? (grid[i][j].fCost() == Integer.MAX_VALUE ? "H" : grid[i][j].fCost() + "") : "T";
-                str +="\t"+pomstr+"\t";
+                str.append("\t"+pomstr+"\t");
             }
-            str+='\n';
+            str.append('\n');
         }
         return str;
     }
@@ -193,5 +198,21 @@ public class Grid {
 //        Field currentField =
 //        while ()
         return path;
+    }
+
+    public Pair<Integer, Integer> getStartPoint() {
+        return startPoint;
+    }
+
+    public void setStartPoint(Pair<Integer, Integer> startPoint) {
+        this.startPoint = startPoint;
+    }
+
+    public Pair<Integer, Integer> getEndPoint() {
+        return endPoint;
+    }
+
+    public void setEndPoint(Pair<Integer, Integer> endPoint) {
+        this.endPoint = endPoint;
     }
 }

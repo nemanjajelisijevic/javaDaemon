@@ -170,7 +170,7 @@ public class Enemy implements ImageMoverM {
                     && lastY < (nextField.getCenterY() + r) && lastY > (nextField.getCenterY() - r) ) {
                 Field previous = currentField;
                 currentField = nextField;
-                if (!(currentField.getRow() ==  5 && currentField.getColon() == 5)) {//(!nextField.equals(previous)) {
+                if (!(currentField.getRow() == grid.getEndPoint().first && currentField.getColon() == grid.getEndPoint().second)) {//(!nextField.equals(previous)) {
                     nextField = grid.getMinWeightOfNeighbors(currentField);
                     setDirectionAndMove(nextField.getCenterX(), nextField.getCenterY(), velocity
                             .intensity);
