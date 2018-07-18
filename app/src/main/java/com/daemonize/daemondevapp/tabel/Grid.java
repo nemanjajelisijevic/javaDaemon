@@ -49,8 +49,9 @@ public class Grid {
         return grid[row][colon];
     }
     public Field getField(float x, float y){
-        int row = (int) (y / fieldWith);
-        int colon = (int) (x / fieldWith);
+        int row = (int) ((y-40) / fieldWith);
+        int colon = (int) ((x-40)
+                / fieldWith);
 
         return grid[row][colon];
     }
@@ -61,6 +62,13 @@ public class Grid {
 
     public void setPath(List<Field> path) {
         this.path = path;
+    }
+
+    public  boolean  setTower (float x, float y){
+        int row = (int) ((y-40) / fieldWith);
+        int colon = (int) ((x-40) / fieldWith);
+
+        return setTower(row,colon);
     }
 
     public  boolean  setTower (int row, int colon ) {

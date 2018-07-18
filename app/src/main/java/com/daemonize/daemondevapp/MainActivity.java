@@ -11,6 +11,8 @@ import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -25,6 +27,7 @@ import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemondevapp.proba.Enemy;
 import com.daemonize.daemondevapp.proba.ImageMoverM;
 import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
+import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
 import com.daemonize.daemondevapp.tabel.PathFinding;
 import com.daemonize.daemonengine.closure.Closure;
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap fieldImage;
     private Bitmap fieldImagePath;
     private Bitmap fieldImageTower;
+    private Bitmap fieldImageTowerDen;
 
     private ImageView[][] fieldViews;
 
@@ -79,9 +83,6 @@ public class MainActivity extends AppCompatActivity {
 
     private int borderX;
     private int borderY;
-
-    private JoystickView joystickViewLeft;
-    private JoystickView joystickViewRight;
 
     private long wastedCounter;
     private String wastedCntText = "EXPLOSIONS COUNTER: ";
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            com.daemonize.daemondevapp.tabel.Field field = grid.getField(pb.positionX, pb.positionY);
+            Field field = grid.getField(pb.positionX, pb.positionY);
 
             int row = field.getRow();
             int column = field.getColon();
@@ -341,8 +342,6 @@ public class MainActivity extends AppCompatActivity {
         borderY = getResources().getDisplayMetrics().heightPixels - 200;
 
         layout = findViewById(R.id.cl);
-        horizontalSv = findViewById(R.id.horizontalSv);
-        verticalSv = findViewById(R.id.verticalSv);
 
         background = findViewById(R.id.img_large);
 
@@ -361,49 +360,30 @@ public class MainActivity extends AppCompatActivity {
         hpView.setTextColor(WHITE);
 
 
+        layout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction()==MotionEvent.ACTION_DOWN) {
+                    if (motionEvent.getX() >= 20 *80 || motionEvent.getY() >= 11* 80) {
+                        return false;
+                    }
+                    Field field = grid.getField(motionEvent.getX(), motionEvent.getY());
 
+                    fieldViews[field.getRow()][field.getColon()].setImageBitmap(fieldImageTower);
+
+                    boolean b = grid.setTower(field.getRow(), field.getColon());
+                    Log.w("ADD TOWER", "Tower is " + (b ? " accept " : " rejected "));
+                    //fieldViews[field.getRow()][field.getColon()].setImageBitmap(b ? fieldImageTower : (haveTower?fieldImageTower:fieldImageTowerDen));
+                    fieldViews[field.getRow()][field.getColon()].setImageBitmap(grid.getField(field.getRow(), field.getColon()).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : fieldImageTower);
+
+                }
+                return true;
+            }
+        });
 
 
         int row = 11;
         int colon = 20;
-        //        Field[][] playGround = initPlayGround( row,colon);
-//        setWeightOnPlayGroundFromEndPoint(playGround,row,colon);
-//
-//        setTowerAndRecalculateWeight2(playGround,1,0);
-//        Log.w("matrica putanja\n", findPathToEnd(playGround,row,colon));
-//        setTowerAndRecalculateWeight2(playGround,1,1);
-//        Log.w("matrica putanja\n", findPathToEnd(playGround,row,colon));
-//        setTowerAndRecalculateWeight2(playGround,1,2);
-//        Log.w("matrica putanja\n", findPathToEnd(playGround,row,colon));
-//
-//        setTowerAndRecalculateWeight2(playGround,2,4);
-//        Log.w("matrica putanja\n", findPathToEnd(playGround,row,colon));
-//
-//
-//        setTowerAndRecalculateWeight2(playGround,3,1);
-//        Log.w("matrica putanja3\n", findPathToEnd(playGround,row,colon));
-//        setTowerAndRecalculateWeight2(playGround,3,2);
-//        Log.w("matrica putanja\n", findPathToEnd(playGround,row,colon));
-//        setTowerAndRecalculateWeight2(playGround,3,3);
-//        Log.w("matrica putanja3\n", findPathToEnd(playGround,row,colon));
-//        setTowerAndRecalculateWeight2(playGround,3,5);
-//        Log.w("matrica putanja\n", findPathToEnd(playGround,row,colon));
-//
-//        setTowerAndRecalculateWeight2(playGround,4,1);
-//        Log.w("matrica putanja\n", findPathToEnd(playGround,row,colon));
-//        setTowerAndRecalculateWeight2(playGround,4,4);
-//        Log.w("matrica putanja\n", findPathToEnd(playGround,row,colon));
-//
-////        setTowerAndRecalculateWeight(playGround,1,4);
-////        Log.w("matrica putanja\n", findPathToEnd(playGround,6,6));
-//
-//        setTowerAndRecalculateWeight2(playGround,5,3);
-//        Log.w("matrica putanja\n", findPathToEnd(playGround,row,colon));
-//
-
-
-//        PathFinding pathFinding = new PathFinding(row,colon,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
-        PathFinding pathFinding = new PathFinding();
         grid = new Grid(row, colon, new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
 
 
@@ -436,7 +416,6 @@ public class MainActivity extends AppCompatActivity {
                 grid.setTower(5,0);
                 grid.setTower(5,4);
 
-        pathFinding.dijkstra(grid);
         //pathFinding.pathToString();
         Log.w("border","x: "+borderX+" y: "+borderY);
         //        pathFinding.getGrid().getPath()
@@ -444,8 +423,9 @@ public class MainActivity extends AppCompatActivity {
 
             {
                 fieldImage = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false);
-                fieldImagePath = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("blue.png")), 80, 80, false);
-                fieldImageTower = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), 80, 80, false);
+                fieldImagePath = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false);
+                fieldImageTower = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("blue.png")), 80, 80, false);
+                fieldImageTowerDen = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), 80, 80, false);
             }
 
             fieldViews = new ImageView[row][colon];
@@ -456,7 +436,7 @@ public class MainActivity extends AppCompatActivity {
                     fieldViews[j][i] = view;
                     view.setX(grid.getGrid()[j][i].getCenterX() - (fieldImage.getWidth() / 2) + 40);
                     view.setY(grid.getGrid()[j][i].getCenterY() - (fieldImage.getHeight() / 2) + 40);
-                    view.setImageBitmap(fieldImage);
+                    view.setImageBitmap(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower);
                 }
             }
 
@@ -671,7 +651,7 @@ public class MainActivity extends AppCompatActivity {
                         sprite,
                         explosionSprite,
                         new ImageMoverM.Velocity(
-                                5,
+                                3,
                                 new ImageMoverM.Direction(
                                         (float) borderX/2,
                                         (float) borderY/2
@@ -874,763 +854,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private class Field {
-        int centerX;
-        int centerY;
-        int row; //i - n
-        int colon;//j - m
-        int weight;
-
-        public Field(int centerX, int centerY, int row, int colon, int weight) {
-            this.centerX = centerX;
-            this.centerY = centerY;
-            this.row = row;
-            this.colon = colon;
-            this.weight = weight;
-        }
-
-        public int getCenterX() {
-            return centerX;
-        }
-
-        public void setCenterX(int centerX) {
-            this.centerX = centerX;
-        }
-
-        public int getCenterY() {
-            return centerY;
-        }
-
-        public void setCenterY(int centerY) {
-            this.centerY = centerY;
-        }
-
-        public int getRow() {
-            return row;
-        }
-
-        public void setRow(int row) {
-            this.row = row;
-        }
-
-        public int getColon() {
-            return colon;
-        }
-
-        public void setColon(int colon) {
-            this.colon = colon;
-        }
-
-        public int getWeight() {
-            return weight;
-        }
-
-        public void setWeight(int weight) {
-            this.weight = weight;
-        }
-    }
-
-    int endPointJ ;
-    int endPointI;
-
-    public Field[][] initPlayGround(int n, int m){
-        Field[][] playGround = new Field[n][m];
-        //initialize playGround on start
-        for (int i = 0; i < n;i++){
-            for(int j=0; j<m;j++){
-                Field field = new Field(i,j,i,j,0);
-                if (i == (n-1) && (j%2) == 0){
-                    field.setWeight(Integer.MAX_VALUE);
-                }
-                playGround[i][j] = field;
-            }
-        }
-        return playGround;
-    }
-    // endPointI<playGround
-    public void setWeightOnPlayGroundFromEndPoint(Field[][] playGround, int endPointI, int endPointJ){
-        Field temp = playGround[endPointI-1][endPointJ-1];
-        temp.setWeight(1);
-        this.endPointI = endPointI;
-        this.endPointJ = endPointJ;
-        int row = playGround.length;
-        int colon = playGround[0].length;
-        for (int j = colon - 1 ;  j > -1; j-- ) {
-            for (int i = row - 1; i > -1; i--) {
-                Field field = playGround[i][j];
-                if (field.getWeight() == 0) {
-
-                    int minWeight = getMinWeightOfNeighbors(playGround,i,j);
-                    field.setWeight(minWeight + 1);
-
-                }
-
-            }
-        }
-        String str = toString(playGround);
-        Log.w("matrica\n",str);
-    }
-
-    public String toString(Field[][] playGround){
-        String str = "" ;
-        for (int i=0;i<playGround.length;i++){
-            for(int j = 0;j<playGround[i].length;j++){
-                String pomstr = playGround[i][j].getWeight() == Integer.MAX_VALUE ? "T" : playGround[i][j].getWeight()+"";
-                str +="\t"+pomstr+"\t";
-            }
-            str+='\n';
-        }
-        return str;
-    }
-
-    public int getMinWeightOfNeighbors(Field[][] playGround, int i, int j){
-        int minWeight = Integer.MAX_VALUE ;
-        int iMax = playGround.length;
-        int jMax = playGround[0].length;
-        //List<Integer> neighborWight = new ArrayList<>(4);
-        if(j%2==0){ //parni
-            if (j+1 < jMax) {
-                int weight = playGround[i][j+1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                }
-                if (i+1 < iMax  ){
-                    weight = playGround[i+1][j+1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                    }
-                }
-            }
-            if ( i+1 < iMax ) {
-                int weight = playGround[i+1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                }
-            }
-        } else { //neparni
-            if ( i-1 > -1 ){
-                int weight = playGround[i-1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                }
-                if ( j+1 < jMax ){
-                    weight = playGround[i-1][j+1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                    }
-                }
-            }
-            if ( j+1 < jMax ){
-                int weight = playGround[i][j+1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                }
-            }
-            if ( i+1 < iMax ){
-                int weight = playGround[i+1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                }
-            }
-        }
-        return minWeight;
-    }
-
-    public Field getMinWeightOfNeighbors2(Field[][] playGround, int i, int j){
-        int minWeight = Integer.MAX_VALUE ;
-        Field minNeighbor = null;
-        int iMax = playGround.length;
-        int jMax = playGround[0].length;
-        //List<Integer> neighborWight = new ArrayList<>(4);
-        if(j%2==0){ //parni
-            if (j+1 < jMax) {
-                int weight = playGround[i][j+1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i][j+1];
-                }
-                if (i+1 < iMax  ){
-                    weight = playGround[i+1][j+1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                        minNeighbor = playGround[i+1][j+1];
-                    }
-                }
-            }
-            if ( i+1 < iMax ) {
-                int weight = playGround[i+1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i+1][j];
-                }
-            }
-            if ( i-1 > -1 ) {
-                int weight = playGround[i-1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i-1][j];
-                }
-            }
-            if (j-1 > -1) {
-                int weight = playGround[i][j-1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i][j-1];
-                }
-                if (i+1 < iMax  ){
-                    weight = playGround[i+1][j-1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                        minNeighbor = playGround[i+1][j-1];
-                    }
-                }
-            }
-        } else { //neparni
-
-            if ( j+1 < jMax ){
-                int weight = playGround[i][j+1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i][j+1];
-                }
-                if ( i-1 > -1 ){
-                    weight = playGround[i-1][j+1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                        minNeighbor = playGround[i-1][j+1];
-                    }
-                }
-            }
-            if ( i+1 < iMax ) {
-                int weight = playGround[i+1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i+1][j];
-                }
-            }
-            if ( i-1 > -1 ) {
-                int weight = playGround[i-1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i-1][j];
-                }
-            }
-            if ( j-1 > -1 ){
-                int weight = playGround[i][j-1].weight;
-                if(weight != 0 && weight < minWeight) {
-                    minWeight = weight;
-                    minNeighbor = playGround[i][j-1];
-                }
-                if ( i-1 > -1 ){
-                    weight = playGround[i-1][j-1].weight;
-                    if(weight != 0 && weight < minWeight) {
-                        minWeight = weight;
-                        minNeighbor = playGround[i-1][j-1];
-                    }
-                }
-            }
-        }
-
-        return minNeighbor;
-    }
-
-    public void increaseNeighborsWeight(Field[][] playGround, int i, int j){
-        int minWeight = Integer.MAX_VALUE ;
-        Field minNeighbor = null;
-        int iMax = playGround.length;
-        int jMax = playGround[0].length;
-        //List<Integer> neighborWight = new ArrayList<>(4);
-        if(j%2==0){ //parni
-            if (j+1 < jMax) {
-                int weight = playGround[i][j+1].weight;
-                if(weight != Integer.MAX_VALUE ) {
-                    weight+=1;
-                    playGround[i][j+1].setWeight(weight);
-                }
-                if (i+1 < iMax  ){
-                    weight = playGround[i+1][j+1].weight;
-                    if(weight != Integer.MAX_VALUE ) {
-                        weight+=1;
-                        playGround[i+1][j+1].setWeight(weight);
-                    }
-                }
-            }
-            if ( i+1 < iMax ) {
-                int weight = playGround[i+1][j].weight;
-                if(weight != 0 && weight < minWeight) {
-                    if(weight != Integer.MAX_VALUE ) {
-                        weight+=1;
-                        playGround[i+1][j].setWeight(weight);
-                    }
-                }
-            }
-            if ( i-1 > -1 ) {
-                int weight = playGround[i-1][j].weight;
-                if(weight != Integer.MAX_VALUE ) {
-                    weight+=1;
-                    playGround[i-1][j].setWeight(weight);
-                }
-            }
-            if (j-1 > -1) {
-                int weight = playGround[i][j-1].weight;
-                if(weight != Integer.MAX_VALUE ) {
-                    weight+=1;
-                    playGround[i][j-1].setWeight(weight);
-                }
-                if (i+1 < iMax  ){
-                    weight = playGround[i+1][j-1].weight;
-                    if(weight != Integer.MAX_VALUE ) {
-                        weight+=1;
-                        playGround[i+1][j-1].setWeight(weight);
-                    }
-                }
-            }
-        } else { //neparni
-
-            if ( j+1 < jMax ){
-                int weight = playGround[i][j+1].weight;
-                if(weight != Integer.MAX_VALUE ) {
-                    weight+=1;
-                    playGround[i][j+1].setWeight(weight);
-                }
-                if ( i-1 > -1 ){
-                    weight = playGround[i-1][j+1].weight;
-                    if(weight != Integer.MAX_VALUE ) {
-                        weight+=1;
-                        playGround[i-1][j+1].setWeight(weight);
-                    }
-                }
-            }
-            if ( i+1 < iMax ) {
-                int weight = playGround[i + 1][j].weight;
-                if (weight != Integer.MAX_VALUE) {
-                    weight += 1;
-                    playGround[i + 1][j].setWeight(weight);
-                }
-            }
-            if ( i-1 > -1 ) {
-                int weight = playGround[i-1][j].weight;
-                if(weight != Integer.MAX_VALUE ) {
-                    weight+=1;
-                    playGround[i-1][j].setWeight(weight);
-                }
-            }
-            if ( j-1 > -1 ){
-                int weight = playGround[i][j-1].weight;
-                if(weight != Integer.MAX_VALUE ) {
-                    weight+=1;
-                    playGround[i][j-1].setWeight(weight);
-                }
-                if ( i-1 > -1 ){
-                    weight = playGround[i-1][j-1].weight;
-                    if(weight != Integer.MAX_VALUE ) {
-                        weight+=1;
-                        playGround[i-1][j-1].setWeight(weight);
-                    }
-                }
-            }
-        }
-    }
-
-    private void checkTower (int i,int j){}
-
-    private  Field getMinFieldFromRow(Field[][] playGround, int row){
-        Field minField = playGround[row][0];
-        for (int j = 1; j < playGround[row].length; j++ ) {
-            if (playGround[row][j].getWeight()<minField.getWeight()) {
-                minField =playGround[row][j];
-            }
-        }
-        return minField;
-    }
-    private  Field getMinFieldFromColon(Field[][] playGround, int colon){
-        Field minField = playGround[0][colon];
-        for (int i = 1; i < playGround.length; i++ ) {
-            if (playGround[i][colon].getWeight()<minField.getWeight()) {
-                minField =playGround[i][colon];
-            }
-        }
-        return minField;
-    }
-
-    public void setTowerAndRecalculateWeight2(Field[][] playGround, int iTower,int jTower) {
-        long startTime = System.nanoTime();
-        Log.w("matrica2 start  :",   " start  time: "+(startTime));
-        playGround[iTower][jTower].setWeight(Integer.MAX_VALUE);
-
-
-        int row = playGround.length;
-        int colon = playGround[0].length;
-
-        //reset all cost
-        for (int i = 0; i < row;i++){
-            for(int j=0; j<colon;j++){
-                if (playGround[i][j].getWeight() != Integer.MAX_VALUE) {
-                    playGround[i][j].setWeight(0);
-                }
-            }
-        }
-        //recalculate
-        Field temp = playGround[endPointI-1][endPointJ-1];
-        temp.setWeight(1);
-        for (int j = colon - 1 ;  j > -1; j-- ) {
-            for (int i = row - 1; i > -1; i--) { //from down to top
-                Field field = playGround[i][j];
-                if ( j == endPointJ-1 && i == endPointI-1 ) {
-
-                } else {
-                    if (field.getWeight() != Integer.MAX_VALUE) {
-                        Field minElem = getMinWeightOfNeighbors2(playGround, i, j);
-                        int minWeight = -1;
-                        if (minElem != null) {
-                            minWeight = minElem.getWeight();
-                        }
-                        if(playGround[i][j].getWeight() == 0){
-                            playGround[i][j].setWeight(minWeight + 1);
-                        } else {
-                            if ((minWeight + 1) != 0 && (minWeight + 1) < playGround[i][j].getWeight()) {
-
-                                playGround[i][j].setWeight(minWeight + 1);
-                            }
-                        }
-                        //check if in this colon is no  zero element
-                        //if it is true there is no need for top down search
-                    }
-                }
-            }
-            for (int i = 0; i < row; i++) { //from top to down
-                Field field = playGround[i][j];
-                if (field.getWeight() != Integer.MAX_VALUE) {
-                    Field minElem = getMinWeightOfNeighbors2(playGround,i,j);
-                    int minWeight = -1;
-                    if (minElem != null){
-                        minWeight = minElem.getWeight();
-                    }
-                    if(playGround[i][j].getWeight() == 0){
-                        playGround[i][j].setWeight(minWeight + 1);
-                    } else {
-                        if ((minWeight + 1) != 0 && (minWeight + 1) < playGround[i][j].getWeight()) {
-
-                            playGround[i][j].setWeight(minWeight + 1);
-                        }
-                    }
-
-                }
-
-            }
-        }
-        String str = toString(playGround);
-        Log.w("matrica2 first for \n",str);
-        for (int i = row - 1; i > -1; i--) {
-            for (int j = 0; j < colon; j++) {  //        ^ -------------->> in this direction
-                if (playGround[i][j].getWeight() != Integer.MAX_VALUE) {
-                    Field minElem = getMinWeightOfNeighbors2(playGround, i, j);
-                    int minWeight = -1;
-                    if (minElem != null) {
-                        minWeight = minElem.getWeight();
-                    }
-                    if (playGround[i][j].getWeight() == 0) {
-                        playGround[i][j].setWeight(minWeight + 1);
-                    } else {
-                        if ((minWeight + 1) != 0 && (minWeight + 1) < playGround[i][j].getWeight()) {
-
-                            playGround[i][j].setWeight(minWeight + 1);
-                        }
-                    }
-                }
-            }
-            for (int j = colon - 1; j > -1; j--) {  //         <<-------------- in this direction
-                if(playGround[i][j].getWeight() != Integer.MAX_VALUE){
-                    Field minElem = getMinWeightOfNeighbors2(playGround,i,j);
-                    int minWeight = -1;
-                    if (minElem != null){
-                        minWeight = minElem.getWeight();
-                    }
-                    if(playGround[i][j].getWeight() == 0){
-                        playGround[i][j].setWeight(minWeight + 1);
-                    } else {
-                        if ((minWeight + 1) != 0 && (minWeight + 1) < playGround[i][j].getWeight()) {
-
-                            playGround[i][j].setWeight(minWeight + 1);
-                        }
-                    }
-                }
-            }
-
-        }
-        for (int i = 0; i < row; i++){
-            for (int j = 0; j < colon; j++) {  //        ^ -------------->> in this direction
-                if (playGround[i][j].getWeight() != Integer.MAX_VALUE) {
-                    Field minElem = getMinWeightOfNeighbors2(playGround, i, j);
-                    int minWeight = -1;
-                    if (minElem != null) {
-                        minWeight = minElem.getWeight();
-                    }
-                    if (playGround[i][j].getWeight() == 0) {
-                        playGround[i][j].setWeight(minWeight + 1);
-                    } else {
-                        if ((minWeight + 1) != 0 && (minWeight + 1) < playGround[i][j].getWeight()) {
-
-                            playGround[i][j].setWeight(minWeight + 1);
-                        }
-                    }
-                }
-            }
-            for (int j = colon - 1; j > -1; j--) {  //         <<-------------- in this direction
-                if(playGround[i][j].getWeight() != Integer.MAX_VALUE){
-                    Field minElem = getMinWeightOfNeighbors2(playGround,i,j);
-                    int minWeight = -1;
-                    if (minElem != null){
-                        minWeight = minElem.getWeight();
-                    }
-                    if(playGround[i][j].getWeight() == 0){
-                        playGround[i][j].setWeight(minWeight + 1);
-                    } else {
-                        if ((minWeight + 1) != 0 && (minWeight + 1) < playGround[i][j].getWeight()) {
-
-                            playGround[i][j].setWeight(minWeight + 1);
-                        }
-                    }
-                }
-            }
-        }
-
-        String str1 = toString(playGround);
-        Log.w("matrica2 second for \n",str1);
-        Log.w("matrica2 second for :",   " end time: "+(System.nanoTime()-startTime));
-
-    }
-    public void setTowerAndRecalculateWeight(Field[][] playGround, int iTower,int jTower) {
-        playGround[iTower][jTower].setWeight(Integer.MAX_VALUE);
-       // increaseNeighborsWeight(playGround,iTower,jTower);
-        //check is in this colon more then one free fields
-        int cntTower =0;
-        for(int i=0;i<playGround.length;i++){
-            if(playGround[i][jTower].getWeight() == Integer.MAX_VALUE){
-                cntTower++;
-            }
-        }
-        int iMax = playGround.length;
-        int jMAx = playGround[0].length;
-
-        if (cntTower== playGround.length-1){
-            //okreni racunanje
-
-            for (int j = jTower - 1;j>-1;j--) {
-                for (int i = 0;i < iMax;i++){
-                    if (playGround[i][j].getWeight() != Integer.MAX_VALUE) {
-                        playGround[i][j].setWeight(0);
-                    }
-                }
-            }
-            //find mini in row where did tower set
-            Field minField = getMinFieldFromColon(playGround,jTower);
-
-            if( minField.getWeight() == Integer.MAX_VALUE){
-                Log.e("matrica2","Ceio jedan red je popunjen kulicama !");
-                return;
-            }
-
-            //set path costs in row above tower start form min element
-            int colon = jTower -1;
-            if( colon > -1) {
-                if (playGround[minField.getRow()][colon].getWeight() != Integer.MAX_VALUE) {
-                    playGround[minField.getRow()][colon].setWeight(getMinWeightOfNeighbors2(playGround, minField.getRow(),colon).getWeight()+1);
-                }
-                for (int i = minField.getRow()-1; i> -1; i--) {  //         <<-------------- in this direction
-                    if(playGround[i][colon].getWeight() != Integer.MAX_VALUE){
-                        //                    int minWeight = getMinWeightOfNeighbors2(playGround,row,j).getWeight();
-                        Field minElem = getMinWeightOfNeighbors2(playGround,i,colon);
-                        int minWeight = -1;
-                        if (minElem != null){
-                            minWeight = minElem.getWeight();
-                        }
-                        playGround[i][colon].setWeight(minWeight + 1);
-                    }
-                }
-                for (int i = minField.getRow()+1; i <iMax; i++) {  //         -------------->> in this direction
-                    if(playGround[i][colon].getWeight() != Integer.MAX_VALUE){
-                        //                    int minWeight = getMinWeightOfNeighbors2(playGround,row,j).getWeight();
-                        Field minElem = getMinWeightOfNeighbors2(playGround,i,colon);
-                        int minWeight = -1;
-                        if (minElem != null){
-                            minWeight = minElem.getWeight();
-                        }
-                        playGround[i][colon].setWeight(minWeight + 1);
-                    }
-                }
-
-                for (int j = colon - 1; j > -1; j--){
-                    for (int i = 0; i < iMax; i++) {  //         -------------->> in this direction
-                        if(playGround[i][j].getWeight() != Integer.MAX_VALUE){
-                            Field minElem = getMinWeightOfNeighbors2(playGround,i,j);
-                            int minWeight = -1;
-                            if (minElem != null){
-                                minWeight = minElem.getWeight();
-                            }
-
-                            playGround[i][j].setWeight(minWeight + 1);
-                        }
-                    }
-                    for (int i = iMax - 1; i> -1; i--) {  //         <<-------------- in this direction
-                        if(playGround[i][j].getWeight() != Integer.MAX_VALUE){
-                            Field minElem = getMinWeightOfNeighbors2(playGround,i,j);
-                            int minWeight = -1;
-                            if (minElem != null){
-                                minWeight = minElem.getWeight();
-                            }
-                            playGround[i][j].setWeight(minWeight + 1);
-                        }
-                    }
-                }
-
-            }
-            String str = toString(playGround);
-            Log.w("matrica2 then \n",str);
-
-        }
-        else {
-            // all cost above tower are reset to 0;
-            for(int i = iTower - 1;i>-1;i--){
-                for(int j=0;j<jMAx;j++){
-                    if(playGround[i][j].getWeight()!=Integer.MAX_VALUE){
-                        playGround[i][j].setWeight(0);
-                    }
-                }
-            }
-            //find mini in row where did tower set
-            Field minField = getMinFieldFromRow(playGround,iTower);
-
-            if( minField.getWeight() == Integer.MAX_VALUE){
-                Log.e("matrica2","Ceio jedan red je popunjen kulicama !");
-                return;
-            }
-
-            //set path costs in row above tower start form min element
-            int row = iTower -1;
-            if( row > -1) {
-                if (playGround[row][minField.getColon()].getWeight() != Integer.MAX_VALUE) {
-                    playGround[iTower - 1][minField.getColon()].setWeight(getMinWeightOfNeighbors2(playGround, iTower - 1, minField.getColon()).getWeight()+1);
-                }
-                for (int j = minField.getColon()-1; j > -1; j--) {  //         <<-------------- in this direction
-                    if(playGround[row][j].getWeight() != Integer.MAX_VALUE){
-                        //                    int minWeight = getMinWeightOfNeighbors2(playGround,row,j).getWeight();
-                        Field minElem = getMinWeightOfNeighbors2(playGround,row,j);
-                        int minWeight = -1;
-                        if (minElem != null){
-                            minWeight = minElem.getWeight();
-                        }
-                        playGround[row][j].setWeight(minWeight + 1);
-                    }
-                }
-                for (int j = minField.getColon()+1; j <jMAx; j++) {  //         -------------->> in this direction
-                    if(playGround[row][j].getWeight() != Integer.MAX_VALUE){
-                        //                    int minWeight = getMinWeightOfNeighbors2(playGround,row,j).getWeight();
-                        Field minElem = getMinWeightOfNeighbors2(playGround,row,j);
-                        int minWeight = -1;
-                        if (minElem != null){
-                            minWeight = minElem.getWeight();
-                        }
-                        playGround[row][j].setWeight(minWeight + 1);
-                    }
-                }
-
-                for (int i = row - 1; i > -1; i--){
-                    for (int j = 0; j < jMAx; j++) {  //         -------------->> in this direction
-                        if(playGround[i][j].getWeight() != Integer.MAX_VALUE){
-                            Field minElem = getMinWeightOfNeighbors2(playGround,i,j);
-                            int minWeight = -1;
-                            if (minElem != null){
-                                minWeight = minElem.getWeight();
-                            }
-
-                            playGround[i][j].setWeight(minWeight + 1);
-                        }
-                    }
-                    for (int j = jMAx - 1; j > -1; j--) {  //         <<-------------- in this direction
-                        if(playGround[i][j].getWeight() != Integer.MAX_VALUE){
-                            Field minElem = getMinWeightOfNeighbors2(playGround,i,j);
-                            int minWeight = -1;
-                            if (minElem != null){
-                                minWeight = minElem.getWeight();
-                            }
-                            playGround[i][j].setWeight(minWeight + 1);
-                        }
-                    }
-                }
-
-            }
-
-            String str = toString(playGround);
-            Log.w("matrica2 else \n",str);
-        }
-
-
-
-
-
-
-
-
-//        for (int j = jMAx-1; j > -1; j-- ) {
-//            for(int i = iMax-1; i > -1; i--) {
-//                Field field = playGround[i][j];
-//                if ( field.getWeight() != 1 && field.getWeight() != Integer.MAX_VALUE){
-////todo check if field is null?????
-//                    int minWeight = getMinWeightOfNeighbors2(playGround,i,j).getWeight();
-//
-//                    field.setWeight(minWeight + 1);
-//
-//                }
-//            }
-//
-//        }
-
-    }
-
-    public String findPathToEnd(Field[][] playGround, int iEnd, int jEnd){
-        String str= "";
-        List<Field> path = new ArrayList<>();
-        int i=0;
-        int j=0;
-        Field previous = playGround[0][0];
-        while ( i != iEnd - 1 || j != jEnd - 1 ) {
-
-            Field next = getMinWeightOfNeighbors2(playGround,i,j);
-            if(next == null ){
-                return "Nema puta do izlaza !";
-            }
-           // Field nextOfNext = getMinWeightOfNeighbors2(playGround,next.getRow(),next.getColon());
-//            if(previous.equals(nextOfNext)){
-//                break;
-//            } else {
-//                previous = next;
-//            }
-            if (next.getWeight() >= previous.getWeight() ){
-                Field nextOfNext = getMinWeightOfNeighbors2(playGround,next.getRow(),next.getColon());
-                if(previous.equals(nextOfNext)){
-                    break;
-                }
-            }
-            if (next==null) {
-//                str= "Nema puta do izlaza !";
-                break;
-            }
-            previous = next;
-            path.add(next);
-            i = next.getRow();
-            j = next.getColon();
-        }
-        if(path.get(path.size()-1).row == iEnd-1 && path.get(path.size()-1).colon == jEnd-1){
-            for(int k =0;k<path.size();k++){
-                str+="\t("+path.get(k).getRow()+","+path.get(k).getColon()+")" ;
-            }
-        }else {
-            str= "Nema puta do izlaza !";
-        }
-
-        return  str;
     }
 }
