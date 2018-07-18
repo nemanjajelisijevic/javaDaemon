@@ -162,6 +162,9 @@ public class MainActivity extends AppCompatActivity {
                 fieldViews[8][14].setImageBitmap(fieldImageTower);
             }
 
+//            if (row > 0 && column > 0)
+//                fieldViews[row - 1][column - 1].setImageBitmap(fieldImage);
+
             fieldViews[row][column].setImageBitmap(fieldImagePath);
 
             super.onReturn(ret);
