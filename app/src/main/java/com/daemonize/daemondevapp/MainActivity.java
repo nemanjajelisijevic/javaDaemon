@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private HorizontalScrollView horizontalSv;
     private ScrollView verticalSv;
 
-    private BackgroundScrollerDaemon backgroundScrollerDaemon;
+    //private BackgroundScrollerDaemon backgroundScrollerDaemon;
 
     private ImageView background;
     private Bitmap backgroundImg;
@@ -314,6 +314,10 @@ public class MainActivity extends AppCompatActivity {
         hpView.setHeight(borderY / 10);
         hpView.setTextColor(WHITE);
 
+
+
+
+
         int row = 11;
         int colon = 20;
         //        Field[][] playGround = initPlayGround( row,colon);
@@ -389,7 +393,7 @@ public class MainActivity extends AppCompatActivity {
         //        pathFinding.getGrid().getPath()
         try {
 
-            backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), 2 * borderX, 2 * borderY, false);
+            backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false);
             background.setImageBitmap(backgroundImg);
 
             sprite = new ArrayList<>();
@@ -679,12 +683,12 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setMoveSideQuest().setClosure(binder.bindViewToClosure(mainView));
         mainMover.start();
 
-        backgroundScrollerDaemon = new BackgroundScrollerDaemon(new BackgroundScroller(mainMover)).setName("Background scroller");
-        backgroundScrollerDaemon.setScrollSideQuest().setClosure(ret -> {
-            horizontalSv.scrollTo(ret.get().first, ret.get().second);
-            verticalSv.scrollTo(ret.get().first, ret.get().second);
-        });
-        backgroundScrollerDaemon.start();
+//        backgroundScrollerDaemon = new BackgroundScrollerDaemon(new BackgroundScroller(mainMover)).setName("Background scroller");
+//        backgroundScrollerDaemon.setScrollSideQuest().setClosure(ret -> {
+//            horizontalSv.scrollTo(ret.get().first, ret.get().second);
+//            verticalSv.scrollTo(ret.get().first, ret.get().second);
+//        });
+//        backgroundScrollerDaemon.start();
 
         joystickViewLeft = findViewById(R.id.joystickLeft);
         joystickViewLeft.setOnMoveListener((angle, strength) -> {
@@ -771,7 +775,7 @@ public class MainActivity extends AppCompatActivity {
         }
         //massiveDaemon.stop();
         //exampleDaemon.stop();
-        backgroundScrollerDaemon.stop();
+        //backgroundScrollerDaemon.stop();
     }
 
     @Override
