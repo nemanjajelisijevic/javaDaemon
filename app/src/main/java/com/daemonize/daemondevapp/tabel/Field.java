@@ -7,7 +7,7 @@ public class Field implements  IHeapItem <Field> {
     int centerY;
 
     int row; //i - n
-    int colon;//j - m
+    int column;//j - m
 
 
     public int gCost;
@@ -18,11 +18,11 @@ public class Field implements  IHeapItem <Field> {
     boolean walkable;
     int heapIndex;
 
-    public Field(int centerX, int centerY, int row, int colon, int weight, boolean walkable) {
+    public Field(int centerX, int centerY, int row, int column, int weight, boolean walkable) {
         this.centerX = centerX;
         this.centerY = centerY;
         this.row = row;
-        this.colon = colon;
+        this.column = column;
         this.walkable = walkable;
         this.weight = weight;
     }
@@ -30,7 +30,7 @@ public class Field implements  IHeapItem <Field> {
         this.centerX = field.centerX;
         this.centerY = field.centerY;
         this.row = field.getRow();
-        this.colon = field.getColon();
+        this.column = field.getColumn();
         this.walkable = field.isWalkable();
         this.weight = field.getWeight();
         this.gCost = field.gCost;
@@ -64,12 +64,12 @@ public class Field implements  IHeapItem <Field> {
         this.row = row;
     }
 
-    public int getColon() {
-        return colon;
+    public int getColumn() {
+        return column;
     }
 
-    public void setColon(int colon) {
-        this.colon = colon;
+    public void setColumn(int column) {
+        this.column = column;
     }
 
     public int getWeight() {

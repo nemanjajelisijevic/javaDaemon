@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             Field field = grid.getField(pb.positionX, pb.positionY);
 
             int row = field.getRow();
-            int column = field.getColon();
+            int column = field.getColumn();
 
             if(row == 7 && column == 13) {
                 grid.setTower(8, 14);
@@ -369,12 +369,12 @@ public class MainActivity extends AppCompatActivity {
                     }
                     Field field = grid.getField(motionEvent.getX(), motionEvent.getY());
 
-                    fieldViews[field.getRow()][field.getColon()].setImageBitmap(fieldImageTower);
+                    fieldViews[field.getRow()][field.getColumn()].setImageBitmap(fieldImageTower);
 
-                    boolean b = grid.setTower(field.getRow(), field.getColon());
+                    boolean b = grid.setTower(field.getRow(), field.getColumn());
                     Log.w("ADD TOWER", "Tower is " + (b ? " accept " : " rejected "));
-                    //fieldViews[field.getRow()][field.getColon()].setImageBitmap(b ? fieldImageTower : (haveTower?fieldImageTower:fieldImageTowerDen));
-                    fieldViews[field.getRow()][field.getColon()].setImageBitmap(grid.getField(field.getRow(), field.getColon()).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : fieldImageTower);
+                    //fieldViews[field.getRow()][field.getColumn()].setImageBitmap(b ? fieldImageTower : (haveTower?fieldImageTower:fieldImageTowerDen));
+                    fieldViews[field.getRow()][field.getColumn()].setImageBitmap(grid.getField(field.getRow(), field.getColumn()).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : fieldImageTower);
 
                 }
                 return true;
@@ -383,8 +383,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         int row = 11;
-        int colon = 20;
-        grid = new Grid(row, colon, new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+        int column = 20;
+        grid = new Grid(row, column, new Pair<>(0,0),new Pair<>(row - 1,column - 1));
 
 
         Log.w("ADD TOWER","Tower is " + (grid.setTower(1,2) ? " accept ":" rejected "));
@@ -428,10 +428,10 @@ public class MainActivity extends AppCompatActivity {
                 fieldImageTowerDen = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), 80, 80, false);
             }
 
-            fieldViews = new ImageView[row][colon];
+            fieldViews = new ImageView[row][column];
 
             for(int j = 0; j < row; ++j ) {
-                for (int i = 0; i < colon; ++i) {
+                for (int i = 0; i < column; ++i) {
                     ImageView view = createImageView(fieldImage.getWidth(), fieldImage.getHeight());
                     fieldViews[j][i] = view;
                     view.setX(grid.getGrid()[j][i].getCenterX() - (fieldImage.getWidth() / 2) + 40);

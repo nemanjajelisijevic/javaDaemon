@@ -49,7 +49,7 @@ public class PathFinding {
                 return true;
             }
 
-            for (Field neighbour : grid.getNeighbors(currentNode.getRow(),currentNode.getColon())) {
+            for (Field neighbour : grid.getNeighbors(currentNode.getRow(),currentNode.getColumn())) {
                 if (!neighbour.isWalkable() || closedSet.contains(neighbour)) {
                     continue;
                 }
@@ -113,7 +113,7 @@ public class PathFinding {
                 Log.w("MATRICA \n", grid.gridToString().toString());
                 return true;
             }
-            for (Field neighbour : grid.getNeighbors(currentNode.getRow(),currentNode.getColon())) {
+            for (Field neighbour : grid.getNeighbors(currentNode.getRow(),currentNode.getColumn())) {
                 if (!neighbour.isWalkable() || closedSet.contains(neighbour)) {
                     continue;
                 }
@@ -154,7 +154,7 @@ public class PathFinding {
 
     private int getDistance(Field fieldA, Field fieldB) {
         int distX = Math.abs(fieldA.getRow() - fieldB.getRow());
-        int distY = Math.abs(fieldA.getColon() - fieldB.getColon());
+        int distY = Math.abs(fieldA.getColumn() - fieldB.getColumn());
 
         if (distX > distY) {
             return 14 * distY + 10 * (distX - distY);
@@ -166,7 +166,7 @@ public class PathFinding {
     public String pathToString (List<Field> path){
         String str = "Path : ";
         for (Field field : path) {
-            str += ( "( "+ field.getRow()+" , "+field.getColon()+ " ) \t");
+            str += ( "( "+ field.getRow()+" , "+field.getColumn()+ " ) \t");
         }
         return str;
     }

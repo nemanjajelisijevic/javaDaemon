@@ -19,22 +19,22 @@ public class Grid {
 
     private List<Field> path;
 
-    public  Grid (int row, int colon,Pair<Integer,Integer> startPoint, Pair<Integer,Integer> endPoint) {
+    public  Grid (int row, int column,Pair<Integer,Integer> startPoint, Pair<Integer,Integer> endPoint) {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
         pathFinding = new PathFinding();
-        grid = createFieldGround(row, colon);
-        //pathFinding.dijkstra(this,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+        grid = createFieldGround(row, column);
+        //pathFinding.dijkstra(this,new Pair<>(0,0),new Pair<>(row - 1,column - 1));
 
     }
 
-    Field[][] createFieldGround(int row, int colon){
-        Field[][] gridtemp = new Field[row][colon];
+    Field[][] createFieldGround(int row, int column){
+        Field[][] gridtemp = new Field[row][column];
 
         for (int i = 0; i < row; i++) {
             int y = fieldWith/2 + i*fieldWith;
 
-            for (int j=0; j<colon; j++) {
+            for (int j=0; j<column; j++) {
                 int x = fieldWith/2 + j*fieldWith;
 
                 Field field = new Field(x, y, i, j,0,true);
@@ -45,15 +45,15 @@ public class Grid {
         return gridtemp;
     }
 
-    public Field getField(int row, int colon){
-        return grid[row][colon];
+    public Field getField(int row, int column){
+        return grid[row][column];
     }
     public Field getField(float x, float y){
         int row = (int) ((y-40) / fieldWith);
-        int colon = (int) ((x-40)
+        int column = (int) ((x-40)
                 / fieldWith);
 
-        return grid[row][colon];
+        return grid[row][column];
     }
 
     public Field[][] getGrid() {
@@ -66,14 +66,14 @@ public class Grid {
 
     public  boolean  setTower (float x, float y){
         int row = (int) ((y-40) / fieldWith);
-        int colon = (int) ((x-40) / fieldWith);
+        int column = (int) ((x-40) / fieldWith);
 
-        return setTower(row,colon);
+        return setTower(row,column);
     }
 
-    public  boolean  setTower (int row, int colon ) {
+    public  boolean  setTower (int row, int column ) {
 
-        if (!grid[row][colon].isWalkable()) return false;
+        if (!grid[row][column].isWalkable()) return false;
 
         //copy of grid
         Field[][] gridTemp = new Field[grid.length][grid[0].length];
@@ -85,7 +85,7 @@ public class Grid {
             }
         }
 
-        grid[row][colon].setWalkable(false);
+        grid[row][column].setWalkable(false);
 
         boolean acceptTower = pathFinding.dijkstra(this);
         if (acceptTower) {
@@ -101,7 +101,7 @@ public class Grid {
 //                    continue;
 //                }
 //                int realX = row + i;
-//                int realY = colon + j;
+//                int realY = column + j;
 //
 //                if( realX >= 0 && realX < grid.length && realY >=0 && realY < grid[row].length){
 //                   grid[realX][realY].setWeight(grid[realX][realY].getWeight() + 1);
@@ -110,7 +110,7 @@ public class Grid {
 //        }
     }
 
-    public List<Field> getNeighbors(int row,int colon){
+    public List<Field> getNeighbors(int row,int column){
         List<Field> neighbors = new ArrayList<>();
 
         for (int i = -1 ; i <= 1; i++ ) {
@@ -119,7 +119,7 @@ public class Grid {
                     continue;
                 }
                 int realX = row + i;
-                int realY = colon + j;
+                int realY = column + j;
 
                 if( realX >= 0 && realX < grid.length && realY >= 0 && realY < grid[row].length){
                     neighbors.add(grid[realX][realY]);
@@ -129,7 +129,7 @@ public class Grid {
 
         return neighbors;
     }
-    public List<Field> getNeighbors(Field [][] grid, int row,int colon){
+    public List<Field> getNeighbors(Field [][] grid, int row,int column){
         List<Field> neighbors = new ArrayList<>();
 
         for (int i = -1 ; i <= 1; i++ ) {
@@ -138,7 +138,7 @@ public class Grid {
                     continue;
                 }
                 int realX = row + i;
-                int realY = colon + j;
+                int realY = column + j;
 
                 if( realX >= 0 && realX < grid.length && realY >= 0 && realY < grid[row].length){
                     neighbors.add(grid[realX][realY]);
@@ -152,10 +152,10 @@ public class Grid {
 
 
     public Field getMinWeightOfNeighbors(Field field) {
-        return getMinWeightOfNeighbors(field.getRow(), field.getColon());
+        return getMinWeightOfNeighbors(field.getRow(), field.getColumn());
     }
 
-    public Field getMinWeightOfNeighbors(int row, int colon) {
+    public Field getMinWeightOfNeighbors(int row, int column) {
         List<Field> neighbors = new ArrayList<>();
         for (int i = -1 ; i <= 1; i++ ) {
             for (int j = -1; j <= 1; j++) {
@@ -163,7 +163,7 @@ public class Grid {
                     continue;
                 }
                 int realX = row + i;
-                int realY = colon + j;
+                int realY = column + j;
 
                 if( realX >= 0 && realX < grid.length && realY >= 0 && realY < grid[row].length){
                     neighbors.add(grid[realX][realY]);
