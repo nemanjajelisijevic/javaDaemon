@@ -51,6 +51,7 @@ public class Grid {
     public Field getField(float x, float y){
         int row = (int) (y / fieldWith);
         int colon = (int) (x / fieldWith);
+
         return grid[row][colon];
     }
 

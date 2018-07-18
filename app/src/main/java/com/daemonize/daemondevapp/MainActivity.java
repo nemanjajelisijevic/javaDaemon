@@ -53,6 +53,14 @@ public class MainActivity extends AppCompatActivity {
     private ImageView background;
     private Bitmap backgroundImg;
 
+    private Bitmap fieldImage;
+    private Bitmap fieldImagePath;
+    private Bitmap fieldImageTower;
+
+    private ImageView[][] fieldViews;
+
+    public Grid grid;
+
 
     private List<Bitmap> sprite;
     private List<Bitmap> spriteMain;
@@ -108,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class ImageMoveMClosure implements Closure<ImageMoverM.PositionedBitmap> {
+    public class ImageMoveMClosure implements Closure<ImageMoverM.PositionedBitmap> {
 
         protected ImageView view;
 
@@ -122,6 +130,41 @@ public class MainActivity extends AppCompatActivity {
             view.setX(returnVal.positionX);
             view.setY(returnVal.positionY);
             view.setImageBitmap(returnVal.image);
+        }
+    }
+
+    public class EnemyClosure extends ImageMoveMClosure {
+
+        private ImageMoverMDaemon enemy;
+
+        public EnemyClosure(ImageMoverMDaemon enemy, ImageView view) {
+            super(view);
+            this.enemy = enemy;
+        }
+
+        @Override
+        public void onReturn(Return<ImageMoverM.PositionedBitmap> ret) {
+
+            ImageMoverM.PositionedBitmap pb = ret.get();
+
+            if (pb.positionX >= 20 *80 || pb.positionY >= 11* 80) {
+                enemy.stop();
+                return;
+            }
+
+            com.daemonize.daemondevapp.tabel.Field field = grid.getField(pb.positionX, pb.positionY);
+
+            int row = field.getRow();
+            int column = field.getColon();
+
+            if(row == 7 && column == 13) {
+                grid.setTower(8, 14);
+                fieldViews[8][14].setImageBitmap(fieldImageTower);
+            }
+
+            fieldViews[row][column].setImageBitmap(fieldImagePath);
+
+            super.onReturn(ret);
         }
     }
 
@@ -358,7 +401,8 @@ public class MainActivity extends AppCompatActivity {
 
 //        PathFinding pathFinding = new PathFinding(row,colon,new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
         PathFinding pathFinding = new PathFinding();
-        Grid grid = new Grid(row, colon, new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+        grid = new Grid(row, colon, new Pair<>(0,0),new Pair<>(row - 1,colon - 1));
+
 
         Log.w("ADD TOWER","Tower is " + (grid.setTower(1,2) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(1,3) ? " accept ":" rejected "));
@@ -377,6 +421,8 @@ public class MainActivity extends AppCompatActivity {
         Log.w("ADD TOWER","Tower is " + (grid.setTower(3,5) ? " accept ":" rejected "));
         Log.w("ADD TOWER","Tower is " + (grid.setTower(3,0) ? " accept ":" rejected "));
 
+        Log.w("ADD TOWER","Tower is " + (grid.setTower(5,10) ? " accept ":" rejected "));
+
 
                 grid.setTower(4,1);
                 grid.setTower(4,3);
@@ -392,6 +438,28 @@ public class MainActivity extends AppCompatActivity {
         Log.w("border","x: "+borderX+" y: "+borderY);
         //        pathFinding.getGrid().getPath()
         try {
+
+            {
+                fieldImage = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false);
+                fieldImagePath = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("blue.png")), 80, 80, false);
+                fieldImageTower = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), 80, 80, false);
+            }
+
+            fieldViews = new ImageView[row][colon];
+
+            for(int j = 0; j < row; ++j ) {
+                for (int i = 0; i < colon; ++i) {
+                    ImageView view = createImageView(fieldImage.getWidth(), fieldImage.getHeight());
+                    fieldViews[j][i] = view;
+                    view.setX(grid.getGrid()[j][i].getCenterX() - (fieldImage.getWidth() / 2) + 40);
+                    view.setY(grid.getGrid()[j][i].getCenterY() - (fieldImage.getHeight() / 2) + 40);
+                    view.setImageBitmap(fieldImage);
+                }
+            }
+
+            Log.w("ADD TOWER","Tower is " + (grid.setTower(5,10) ? " accept ":" rejected "));
+            fieldViews[5][10].setImageBitmap(fieldImageTower);
+
 
             backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false);
             background.setImageBitmap(backgroundImg);
@@ -600,7 +668,7 @@ public class MainActivity extends AppCompatActivity {
                         sprite,
                         explosionSprite,
                         new ImageMoverM.Velocity(
-                                3,
+                                5,
                                 new ImageMoverM.Direction(
                                         (float) borderX/2,
                                         (float) borderY/2
@@ -612,7 +680,7 @@ public class MainActivity extends AppCompatActivity {
                         .setBorders(borderX,borderY)
         ).setName("Enemy");
 
-        enemy.setMoveSideQuest().setClosure(binderm.bindViewToClosureM(enemyView));
+        enemy.setMoveSideQuest().setClosure(new EnemyClosure(enemy, enemyView));
         enemy.start();
 
         enemyList.add(enemy);
@@ -690,47 +758,47 @@ public class MainActivity extends AppCompatActivity {
 //        });
 //        backgroundScrollerDaemon.start();
 
-        joystickViewLeft = findViewById(R.id.joystickLeft);
-        joystickViewLeft.setOnMoveListener((angle, strength) -> {
-            if (strength > 0) {
-                float angleF = (float) angle * 0.0174533F;
-                float coeficientX = (float) Math.cos(angleF) * 100;
-                float coeficientY = -(float) Math.sin(angleF) * 100;
-                mainMover.setVelocity(new ImageMover.Velocity(
-                        strength / 8,
-                        new ImageMover.Direction(coeficientX, coeficientY)
-                ));
-            }
-        }, 100);
-
-        joystickViewRight = findViewById(R.id.joystickRight);
-        joystickViewRight.setOnMoveListener((angle, strength) -> {
-
-            if (mainMover.getVelocity().intensity < 1)
-                return;
-
-            float angleF = (float) angle * 0.0174533F;
-            Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
-
-            //bullet 1
-            fireBullet(lastMainCoord, angleF);
-            if (strength > 30) {
-                //bullet 2
-                fireBullet(lastMainCoord, angleF - 0.2F);
-                if (strength > 60) {
-                    //bullet 3
-                    fireBullet(lastMainCoord, angleF + 0.2F);
-                    if (strength > 70) {
-                        //bullet 4
-                        fireBullet(lastMainCoord, angleF - 0.1F);
-                        if (strength > 98) {
-                            //bullet 5
-                            fireBullet(lastMainCoord, angleF + 0.1F);
-                        }
-                    }
-                }
-            }
-        }, 100);
+//        joystickViewLeft = findViewById(R.id.joystickLeft);
+//        joystickViewLeft.setOnMoveListener((angle, strength) -> {
+//            if (strength > 0) {
+//                float angleF = (float) angle * 0.0174533F;
+//                float coeficientX = (float) Math.cos(angleF) * 100;
+//                float coeficientY = -(float) Math.sin(angleF) * 100;
+//                mainMover.setVelocity(new ImageMover.Velocity(
+//                        strength / 8,
+//                        new ImageMover.Direction(coeficientX, coeficientY)
+//                ));
+//            }
+//        }, 100);
+//
+//        joystickViewRight = findViewById(R.id.joystickRight);
+//        joystickViewRight.setOnMoveListener((angle, strength) -> {
+//
+//            if (mainMover.getVelocity().intensity < 1)
+//                return;
+//
+//            float angleF = (float) angle * 0.0174533F;
+//            Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
+//
+//            //bullet 1
+//            fireBullet(lastMainCoord, angleF);
+//            if (strength > 30) {
+//                //bullet 2
+//                fireBullet(lastMainCoord, angleF - 0.2F);
+//                if (strength > 60) {
+//                    //bullet 3
+//                    fireBullet(lastMainCoord, angleF + 0.2F);
+//                    if (strength > 70) {
+//                        //bullet 4
+//                        fireBullet(lastMainCoord, angleF - 0.1F);
+//                        if (strength > 98) {
+//                            //bullet 5
+//                            fireBullet(lastMainCoord, angleF + 0.1F);
+//                        }
+//                    }
+//                }
+//            }
+//        }, 100);
 
 //
 //        ExampleDaemon exampleDaemon = new ExampleDaemon(
