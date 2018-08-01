@@ -109,8 +109,7 @@ public class PathFinding {
                 //grid.path = retracePath(startNode,endNode);
                 //Log.w("Putanja", pathToString(grid.getPath()));
                 startNode.gCost = 0;
-//                grid.getGrid()[endPoint.first][endPoint.second].gCost = 0;
-                Log.w("MATRICA \n", grid.gridToString().toString());
+                //Log.w("MATRICA \n", grid.gridToString().toString());
                 return true;
             }
             for (Field neighbour : grid.getNeighbors(currentNode.getRow(),currentNode.getColumn())) {

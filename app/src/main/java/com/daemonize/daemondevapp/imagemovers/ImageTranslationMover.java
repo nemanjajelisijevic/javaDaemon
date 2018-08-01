@@ -182,10 +182,10 @@ public class ImageTranslationMover implements ImageMover {
         } else if( lastY >= borderY) {
             lastY = borderY;
         }
-
-        lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
-        lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
-
+//
+//        lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
+//        lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
+//
 
         ret.positionX = lastX;
         ret.positionY = lastY;

@@ -24,6 +24,7 @@ import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
+import com.daemonize.daemondevapp.proba.Bullet;
 import com.daemonize.daemondevapp.proba.Enemy;
 import com.daemonize.daemondevapp.proba.ImageMoverM;
 import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
@@ -48,9 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ConstraintLayout layout;
 
-    private HorizontalScrollView horizontalSv;
-    private ScrollView verticalSv;
-
     //private BackgroundScrollerDaemon backgroundScrollerDaemon;
 
     private ImageView background;
@@ -62,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap fieldImageTowerDen;
 
     private ImageView[][] fieldViews;
+    private ArrayList<ImageView> bulletsViews;
 
     public Grid grid;
 
@@ -77,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageMoverDaemon mainMover;
     private ImageView mainView;
+    private ImageMoverDaemon[][] mainMover2;
+
 
 //    private MassiveImageMoverDaemon massiveDaemon;
 //    private List<ImageView> massiveViews;
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             int row = field.getRow();
             int column = field.getColumn();
 
-            if(row == 7 && column == 13) {
+            if(row == 6 && column == 12) {
                 grid.setTower(8, 14);
                 fieldViews[8][14].setImageBitmap(fieldImageTower);
             }
@@ -172,17 +173,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class BulletClosure extends ImageMoveClosure {
+    private class BulletClosure extends ImageMoveMClosure {
 
-        private ImageMoverDaemon bulletDaemon;
+        private ImageMoverMDaemon bulletDaemon;
 
-        public BulletClosure(ImageView view, ImageMoverDaemon bulletdaemon) {
+        public BulletClosure(ImageView view, ImageMoverMDaemon bulletdaemon) {
             super(view);
             this.bulletDaemon = bulletdaemon;
         }
 
         @Override
-        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
+        public void onReturn(Return<ImageMoverM.PositionedBitmap> ret) {
 
             if (
                     ret.get().positionX <= 20
@@ -209,17 +210,19 @@ public class MainActivity extends AppCompatActivity {
                         layout.removeView(view);
 
                         wastedCntView.setText(wastedCntText + Long.toString(++wastedCounter));
-                        enemy.explode(
-                                binderm.bindViewToClosureM(prototype.getView()),
-                                ret1 -> {
-                                    prototype.getView().setImageBitmap(ret1.get().image);
-                                    prototype.setLastCoordinates(
-                                            getRandomInt(0, borderX),
-                                            getRandomInt(0, borderY)
-                                    );
-                                }
-                        );
-                    //}
+                        prototype.setHp(prototype.getHp() - 1);
+                        if (prototype.getHp() == 0) {
+                            enemy.explode(
+                                    binderm.bindViewToClosureM(prototype.getView()),
+                                    ret1 -> {
+                                        prototype.getView().setImageBitmap(ret1.get().image);
+                                        prototype.setLastCoordinates(
+                                                getRandomInt(0, borderX),
+                                                getRandomInt(0, borderY)
+                                        );
+                                    }
+                            );
+                        }
                 }
             }
 
@@ -261,74 +264,77 @@ public class MainActivity extends AppCompatActivity {
     private ViewBinder binder = ImageMoveClosure::new;
 
     //keyboard controller
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_D:
-                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(100, 0)));
-                return true;
-            case KeyEvent.KEYCODE_A:
-                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(- 100, 0)));
-                return true;
-            case KeyEvent.KEYCODE_W:
-                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(0, - 100)));
-                return true;
-            case KeyEvent.KEYCODE_S:
-                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(0,  100)));
-                return true;
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        switch (keyCode) {
+//            case KeyEvent.KEYCODE_D:
+//                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(100, 0)));
+//                return true;
+//            case KeyEvent.KEYCODE_A:
+//                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(- 100, 0)));
+//                return true;
+//            case KeyEvent.KEYCODE_W:
+//                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(0, - 100)));
+//                return true;
+//            case KeyEvent.KEYCODE_S:
+//                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(0,  100)));
+//                return true;
+//
+//            case KeyEvent.KEYCODE_L:
+//                fireBullet(mainMover.getLastCoordinates(), 0);
+//                fireBullet(mainMover.getLastCoordinates(),  - 0.2F);
+//                fireBullet(mainMover.getLastCoordinates(),  0.2F);
+//                fireBullet(mainMover.getLastCoordinates(),  - 0.1F);
+//                fireBullet(mainMover.getLastCoordinates(),  0.2F);
+//                return true;
+//            case KeyEvent.KEYCODE_I:
+//                fireBullet(mainMover.getLastCoordinates(), 90 * 0.0174533F);
+//                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F - 0.2F);
+//                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F + 0.2F);
+//                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F - 0.1F);
+//                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F + 0.2F);
+//                return true;
+//            case KeyEvent.KEYCODE_J:
+//                fireBullet(mainMover.getLastCoordinates(), 180 * 0.0174533F);
+//                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F - 0.2F);
+//                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F + 0.2F);
+//                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F - 0.1F);
+//                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F  +0.1F);
+//                return true;
+//            case KeyEvent.KEYCODE_K:
+//                fireBullet(mainMover.getLastCoordinates(), 270 * 0.0174533F);
+//                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F - 0.2F);
+//                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F + 0.2F);
+//                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F - 0.1F);
+//                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F  +0.1F);
+//                return true;
+//            default:
+//                return super.onKeyDown(keyCode, event);
+//        }
+//    }
 
-            case KeyEvent.KEYCODE_L:
-                fireBullet(mainMover.getLastCoordinates(), 0);
-                fireBullet(mainMover.getLastCoordinates(),  - 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  - 0.1F);
-                fireBullet(mainMover.getLastCoordinates(),  0.2F);
-                return true;
-            case KeyEvent.KEYCODE_I:
-                fireBullet(mainMover.getLastCoordinates(), 90 * 0.0174533F);
-                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F - 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F + 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F - 0.1F);
-                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F + 0.2F);
-                return true;
-            case KeyEvent.KEYCODE_J:
-                fireBullet(mainMover.getLastCoordinates(), 180 * 0.0174533F);
-                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F - 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F + 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F - 0.1F);
-                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F  +0.1F);
-                return true;
-            case KeyEvent.KEYCODE_K:
-                fireBullet(mainMover.getLastCoordinates(), 270 * 0.0174533F);
-                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F - 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F + 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F - 0.1F);
-                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F  +0.1F);
-                return true;
-            default:
-                return super.onKeyDown(keyCode, event);
-        }
-    }
-
-    private void fireBullet(Pair<Float, Float> sourceCoord, float angleInRadians) {
+    private void fireBullet(Pair<Float, Float> sourceCoord, Pair<Float, Float> enemyCoord ) {//float angleInRadians) {
         ImageView bulletView = createImageView(40, 40);
-        ImageMoverDaemon bullet = new ImageMoverDaemon(
-                new ImageTranslationMover(
+        ImageMoverMDaemon bullet = new ImageMoverMDaemon(
+                new Bullet(
                         bulletSprite,
-                        50,
+                        new ImageMoverM.Velocity(
+                        10,
+//                        new ImageMoverM.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)),
+                        new ImageMoverM.Direction(enemyCoord.first, enemyCoord.second)),
+                        1,
                         Pair.create(
                                 sourceCoord.first + spriteMain.get(0).getWidth() / 2,
-                                sourceCoord.second + spriteMain.get(0).getHeight() / 2
-                        )
+                                sourceCoord.second + spriteMain.get(0).getHeight() / 2 )
                 ).setBorders(borderX, borderY)
         ).setName("Bullet");
 
-        bullet.setVelocity(50);
+        bullet.setVelocity(10);
         bullet.setMoveSideQuest().setClosure(new BulletClosure(bulletView, bullet));
-        bullet.setVelocity(new ImageMover.Velocity(
-                50,
-                new ImageMover.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)
-        ));
+//        bullet.setVelocity(new ImageMover.Velocity(
+//                50,
+//                new ImageMover.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)
+//        ));
     }
 
     @Override
@@ -360,6 +366,8 @@ public class MainActivity extends AppCompatActivity {
         hpView.setTextColor(WHITE);
 
 
+
+
         layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -375,7 +383,60 @@ public class MainActivity extends AppCompatActivity {
                     Log.w("ADD TOWER", "Tower is " + (b ? " accept " : " rejected "));
                     //fieldViews[field.getRow()][field.getColumn()].setImageBitmap(b ? fieldImageTower : (haveTower?fieldImageTower:fieldImageTowerDen));
                     fieldViews[field.getRow()][field.getColumn()].setImageBitmap(grid.getField(field.getRow(), field.getColumn()).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : fieldImageTower);
+                    if (b) {
 
+                        mainMover2[field.getRow()][field.getColumn()] = new ImageMoverDaemon(
+                                new MainImageTranslationMover(
+                                        spriteMain,
+                                        1f,
+                                        Pair.create((float)field.getCenterX(), (float)field.getCenterY()),
+                                        enemyList
+                                )
+                                        .setBorders(borderX, borderY)
+                                        .setHpClosure(hp -> {
+                                            Log.w("HpClosure", "izvrsavanje");
+                                            if (hp.get() <= 0) {
+                                                //                        for (ImageMoverDaemon star : starMovers) {
+                                                //                            //star.stop();
+                                                //                            BouncingImageTranslationMover prototype = ((BouncingImageTranslationMover) star.getPrototype());
+                                                //                            star.explode(explosionSprite,
+                                                //                                    binder.bindViewToClosure(prototype.getView()),
+                                                //                                    ret1 -> {
+                                                //                                        prototype.getView().setImageBitmap(ret1.get().image);
+                                                //                                        prototype.setLastCoordinates(
+                                                //                                                getRandomInt(0, borderX),
+                                                //                                                getRandomInt(0, borderY)
+                                                //                                        );
+                                                //                                        star.stop();
+                                                //                                    });
+                                                //                        }
+                                                wastedCounter = 0;
+                                                hpView.setTextColor(RED);
+                                                hpView.setText("!!!!!!WASTED!!!!!!!!!");
+                                               // ((MainImageTranslationMover) mainMover2.getPrototype()).setHp(1000);
+
+                                            } else {
+
+                                                if (hp.get() % 50 == 0) {
+                                                //    ((MainImageTranslationMover) mainMover2.getPrototype()).pushSprite(bigExplosionSprite);
+                                                }
+
+                                                hpView.setTextColor(WHITE);
+                                                hpView.setText(hpText + new Integer(hp.get() / 10).toString());
+                                            }
+                                        })
+                                        .setBulletFireClosure(bf->{
+                                            Pair<Float,Float> enemyCoordinates = bf.get();
+
+                                            //Math.sin();
+                                            //fireBullet(mainMover.getLastCoordinates(), 270 * 0.0174533F);
+                                            fireBullet(mainMover2[field.getRow()][field.getColumn()].getLastCoordinates(),  enemyCoordinates);
+
+                                        })
+                        ).setName("Exceptione");
+                        mainMover2[field.getRow()][field.getColumn()].setMoveSideQuest().setClosure(binder.bindViewToClosure(fieldViews[field.getRow()][field.getColumn()]));
+                        mainMover2[field.getRow()][field.getColumn()].start();
+                    }
                 }
                 return true;
             }
@@ -386,35 +447,35 @@ public class MainActivity extends AppCompatActivity {
         int column = 20;
         grid = new Grid(row, column, new Pair<>(0,0),new Pair<>(row - 1,column - 1));
 
-
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,2) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,3) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,0) ? " accept ":" rejected "));
-//        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,1) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,4) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,5) ? " accept ":" rejected "));
-
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(2,5) ? " accept ":" rejected "));
-
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,2) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,3) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,4) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,5) ? " accept ":" rejected "));
-//        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,1) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,5) ? " accept ":" rejected "));
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,0) ? " accept ":" rejected "));
-
-        Log.w("ADD TOWER","Tower is " + (grid.setTower(5,10) ? " accept ":" rejected "));
-
-
-                grid.setTower(4,1);
-                grid.setTower(4,3);
-                grid.setTower(4,5);
-
-
-                grid.setTower(5,2);
-                grid.setTower(5,0);
-                grid.setTower(5,4);
+//
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,2) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,3) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,0) ? " accept ":" rejected "));
+////        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,1) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,4) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(1,5) ? " accept ":" rejected "));
+//
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(2,5) ? " accept ":" rejected "));
+//
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,2) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,3) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,4) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,5) ? " accept ":" rejected "));
+////        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,1) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,5) ? " accept ":" rejected "));
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(3,0) ? " accept ":" rejected "));
+//
+//        Log.w("ADD TOWER","Tower is " + (grid.setTower(5,10) ? " accept ":" rejected "));
+//
+//
+//                grid.setTower(4,1);
+//                grid.setTower(4,3);
+//                grid.setTower(4,5);
+//
+//
+//                grid.setTower(5,2);
+//                grid.setTower(5,0);
+//                grid.setTower(5,4);
 
         //pathFinding.pathToString();
         Log.w("border","x: "+borderX+" y: "+borderY);
@@ -428,10 +489,17 @@ public class MainActivity extends AppCompatActivity {
                 fieldImageTowerDen = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), 80, 80, false);
             }
 
+            bulletsViews = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                bulletsViews.add(createImageView(fieldImage.getWidth(), fieldImage.getHeight()));
+            }
+
             fieldViews = new ImageView[row][column];
+            mainMover2 =  new ImageMoverDaemon[row][column];
 
             for(int j = 0; j < row; ++j ) {
                 for (int i = 0; i < column; ++i) {
+
                     ImageView view = createImageView(fieldImage.getWidth(), fieldImage.getHeight());
                     fieldViews[j][i] = view;
                     view.setX(grid.getGrid()[j][i].getCenterX() - (fieldImage.getWidth() / 2) + 40);
@@ -551,58 +619,60 @@ public class MainActivity extends AppCompatActivity {
             bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 200, 200, false));
 
             spriteMain = new ArrayList<>();
+            int withM = 80;
+            int heightM = 80;
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), withM, heightM, false));
 
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), withM, heightM, false));
+            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), withM, heightM, false));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -647,7 +717,7 @@ public class MainActivity extends AppCompatActivity {
         ImageMoverMDaemon enemy;
         enemy = new ImageMoverMDaemon(
                 new Enemy(
-                        3,
+                        20,
                         sprite,
                         explosionSprite,
                         new ImageMoverM.Velocity(
@@ -698,41 +768,53 @@ public class MainActivity extends AppCompatActivity {
                         Pair.create(borderX/2f, borderY/2f),
                         enemyList
                 )
-                .setBorders(borderX, borderY)
-                .setHpClosure(hp -> {
-                    if (hp.get() <= 0) {
-//                        for (ImageMoverDaemon star : starMovers) {
-//                            //star.stop();
-//                            BouncingImageTranslationMover prototype = ((BouncingImageTranslationMover) star.getPrototype());
-//                            star.explode(explosionSprite,
-//                                    binder.bindViewToClosure(prototype.getView()),
-//                                    ret1 -> {
-//                                        prototype.getView().setImageBitmap(ret1.get().image);
-//                                        prototype.setLastCoordinates(
-//                                                getRandomInt(0, borderX),
-//                                                getRandomInt(0, borderY)
-//                                        );
-//                                        star.stop();
-//                                    });
-//                        }
-                        wastedCounter = 0;
-                        hpView.setTextColor(RED);
-                        hpView.setText("!!!!!!WASTED!!!!!!!!!");
-                        ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
+                        .setBorders(borderX, borderY)
+                        .setHpClosure(hp -> {
+                            Log.w("HpClosure", "izvrsavanje");
+                            if (hp.get() <= 0) {
+                                //                        for (ImageMoverDaemon star : starMovers) {
+                                //                            //star.stop();
+                                //                            BouncingImageTranslationMover prototype = ((BouncingImageTranslationMover) star.getPrototype());
+                                //                            star.explode(explosionSprite,
+                                //                                    binder.bindViewToClosure(prototype.getView()),
+                                //                                    ret1 -> {
+                                //                                        prototype.getView().setImageBitmap(ret1.get().image);
+                                //                                        prototype.setLastCoordinates(
+                                //                                                getRandomInt(0, borderX),
+                                //                                                getRandomInt(0, borderY)
+                                //                                        );
+                                //                                        star.stop();
+                                //                                    });
+                                //                        }
+                                wastedCounter = 0;
+                                hpView.setTextColor(RED);
+                                hpView.setText("!!!!!!WASTED!!!!!!!!!");
+                                ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
 
-                    } else {
+                            } else {
 
-                        if (hp.get() % 50 == 0) {
-                            ((MainImageTranslationMover) mainMover.getPrototype()).pushSprite(bigExplosionSprite);
-                        }
+                                if (hp.get() % 50 == 0) {
+                                    ((MainImageTranslationMover) mainMover.getPrototype()).pushSprite(bigExplosionSprite);
+                                }
 
-                        hpView.setTextColor(WHITE);
-                        hpView.setText(hpText + new Integer(hp.get() / 10).toString());
-                    }
-                })
+                                hpView.setTextColor(WHITE);
+                                hpView.setText(hpText + new Integer(hp.get() / 10).toString());
+                            }
+                        })
+                        .setBulletFireClosure(bf->{
+                            Pair<Float,Float> enemyCoordinates = bf.get();
+
+                            //Math.sin();
+                            //fireBullet(mainMover.getLastCoordinates(), 270 * 0.0174533F);
+                            fireBullet(mainMover.getLastCoordinates(),  enemyCoordinates);
+
+                        })
         ).setName("Exceptione");
         mainMover.setMoveSideQuest().setClosure(binder.bindViewToClosure(mainView));
         mainMover.start();
+
+        //mainView2 = createImageView(fieldImage.getWidth(), fieldImage.getHeight());
+
 
 //        backgroundScrollerDaemon = new BackgroundScrollerDaemon(new BackgroundScroller(mainMover)).setName("Background scroller");
 //        backgroundScrollerDaemon.setScrollSideQuest().setClosure(ret -> {

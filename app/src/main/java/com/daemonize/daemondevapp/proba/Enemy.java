@@ -19,7 +19,7 @@ import java.util.List;
 
 public class Enemy implements ImageMoverM {
 
-    protected int hp = 1;
+     int hp = 5;
 
     protected List<Bitmap> sprite;
     protected List<Bitmap> explodeSprite;
@@ -70,6 +70,14 @@ public class Enemy implements ImageMoverM {
             spriteIterator = sprite.iterator();
         }
         return spriteIterator.next();
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
     }
 
     @Override
@@ -163,7 +171,7 @@ public class Enemy implements ImageMoverM {
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
         if(!reachDestiny) {
-            Log.w("Koordinate ", "X: " + lastX + ", Y " + lastY + ";");
+           // Log.w("Koordinate ", "X: " + lastX + ", Y " + lastY + ";");
             //        Log.w("Kordinate ","Y "+lastY);
             float r = velocity.intensity;
             if (lastX < (nextField.getCenterX() + r) && lastX > (nextField.getCenterX() - r)

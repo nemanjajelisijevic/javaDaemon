@@ -29,7 +29,22 @@ public class MainImageTranslationMover extends StackedSpriteImageTranslationMove
     }
 
     private Closure<Integer> hpClosure;
+    private boolean fire = false;
+    private Closure<Pair<Float,Float>> bulletFire;
 
+
+    public boolean isFire() {
+        return fire;
+    }
+
+    public void setFire(boolean fire) {
+        this.fire = fire;
+    }
+
+    public MainImageTranslationMover setBulletFireClosure(Closure<Pair<Float,Float>> bulletFire) {
+        this.bulletFire = bulletFire;
+        return this;
+    }
     public MainImageTranslationMover setHpClosure(Closure<Integer> hpClosure) {
         this.hpClosure = hpClosure;
         return this;
@@ -54,17 +69,25 @@ public class MainImageTranslationMover extends StackedSpriteImageTranslationMove
     public PositionedBitmap move() {
 
 
-        if(velocity.intensity > 0 ) {
-            Log.d(DaemonUtils.tag(), "TEST");
+//        if(velocity.intensity > 0 ) {
+
 
 
             if (observers != null)
                 for (ImageMoverMDaemon observer : observers) {
-                float x = lastX - observer.getLastCoordinates().first;
-                float y = lastY - observer.getLastCoordinates().second;
+                float x = Math.abs( lastX - observer.getLastCoordinates().first );
+                float y = Math.abs( lastY - observer.getLastCoordinates().second);
                 float c = (float) Math.sqrt(x*x + y*y);
-                if (c < 150.0f){
-                    Log.w("Puca","bum");
+                if (c < 250.0f){
+                   // Log.w("Puca","bum");
+                    Log.d(DaemonUtils.tag(), "Puca bum  x: "+observer.getLastCoordinates().first+" , y: "+observer.getLastCoordinates().second);
+                    fire = true;
+                    guihandler.post(new ReturnRunnable<>(bulletFire).setResult(observer.getLastCoordinates()));
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 //                    Velocity vel = new Velocity(velocity.intensity * 0.3F, velocity.direction);
 //                    observerobserver.setDirectionAndMove(lastX, lastY, vel.intensity); //TODO CHASER
@@ -82,9 +105,9 @@ public class MainImageTranslationMover extends StackedSpriteImageTranslationMove
 
            velocity.intensity -= 0.1;
             return super.move();
-        }
+        //}
 
-       return null;
+      // return null;
     }
 
     @Override

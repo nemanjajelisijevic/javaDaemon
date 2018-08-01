@@ -41,6 +41,7 @@ public class Bullet implements ImageMoverM {
         lastX = startingPos.first;
         lastY = startingPos.second;
         spriteIterator = sprite.iterator();
+        setDirectionAndMove(velocity.direction.coeficientX, velocity.direction.coeficientY,velocity.intensity);
     }
 
     public ImageView getView() {
@@ -101,21 +102,15 @@ public class Bullet implements ImageMoverM {
         float dX = x - lastX;
         float dY = y - lastY;
 
-        float a;
+        float a,b;
         boolean signY = dY >= 0;
         boolean signX = dX >= 0;
         velocity.intensity = velocityInt;
 
-        if (Math.abs(dY) >= Math.abs(dX)) {
-            a = Math.abs((100*dX)/dY);
-            float aY =  100 - a;
-            velocity.direction = new Direction(signX ? a : - a, signY ? aY : - aY);
-        } else {
-            a = Math.abs((100*dY)/dX);
-            float aX =  100 - a;
-            velocity.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
-        }
-
+        //        if (Math.abs(dY) == Math.abs(dX)) {
+        //            a = dY == 0 ? 0 : Math.abs((dX) / dY);
+        //            b = dY == 0 ? 0 : Math.abs((dY) / dX);
+        velocity.direction = new Direction(dX, dY);
         //startMoving();
     }
 
