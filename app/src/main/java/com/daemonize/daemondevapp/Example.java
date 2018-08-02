@@ -17,6 +17,12 @@ import java.util.List;
 @Daemonize(eager = true, returnDaemonInstance = true)
 public class Example {
 
+    private int count = 0;
+
+    public String increment() throws InterruptedException {
+        Thread.sleep(2000);
+        return Integer.toString(++count);
+    }
 
     @CallingThread
     public Integer add (Integer i, Integer k) {

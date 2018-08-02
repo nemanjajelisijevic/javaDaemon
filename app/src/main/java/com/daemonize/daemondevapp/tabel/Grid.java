@@ -65,8 +65,8 @@ public class Grid {
     }
 
     public  boolean  setTower (float x, float y){
-        int row = (int) ((y-40) / fieldWith);
-        int column = (int) ((x-40) / fieldWith);
+        int row = (int) ((y) / fieldWith);
+        int column = (int) ((x) / fieldWith);
 
         return setTower(row,column);
     }

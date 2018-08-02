@@ -11,6 +11,7 @@ import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
+import com.daemonize.daemondevapp.view.DaemonView;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 
@@ -39,7 +40,7 @@ public class Enemy implements ImageMoverM {
 
     boolean reachDestiny = false;
 
-    private ImageView view;
+    private DaemonView view;
 
     public Enemy(int hp, List<Bitmap> sprite, List<Bitmap> explodeSprite, Velocity velocity,  Pair<Float, Float> startingPos,Grid grid) {
         this.hp = hp;
@@ -56,11 +57,11 @@ public class Enemy implements ImageMoverM {
         setDirectionAndMove(currentField.getCenterX(),currentField.getCenterY(),velocity.intensity);
     }
 
-    public ImageView getView() {
+    public DaemonView getView() {
         return view;
     }
 
-    public Enemy setView(ImageView view) {
+    public Enemy setView(DaemonView view) {
         this.view = view;
         return this;
     }

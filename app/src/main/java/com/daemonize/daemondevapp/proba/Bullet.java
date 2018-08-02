@@ -32,7 +32,7 @@ public class Bullet implements ImageMoverM {
 
     public Bullet(List<Bitmap> sprite,
                   Velocity velocity,
-                  // new Velocity(velocity, new Direction(80, 20)); destination ov enemy
+                  //new Velocity(velocity, new Direction(80, 20)); destination ov enemy
                   int damage,
                   Pair<Float, Float> startingPos ) {
         this.sprite = sprite;
