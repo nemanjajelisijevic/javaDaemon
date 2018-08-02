@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -24,7 +25,10 @@ import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
+import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonSpell;
+import com.daemonize.daemonengine.dummy.DummyDaemon;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView background;
     private Bitmap backgroundImg;
 
+    private DummyDaemon dummyDaemon;
 
     private List<Bitmap> sprite;
     private List<Bitmap> spriteMain;
@@ -619,6 +624,14 @@ public class MainActivity extends AppCompatActivity {
 //                new RestClientDaemon(new RestClient("https://reqres.in"))
 //        ).run();
 
+
+//        dummyDaemon = new DummyDaemon(
+//                new AndroidLooperConsumer(),
+//                500
+//        ).setClosure(ret -> fireBullet(Pair.create((float)0 , (float)0), 340 * 0.0174533F));
+//
+//        dummyDaemon.start();
+
         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
 
     }
@@ -631,6 +644,8 @@ public class MainActivity extends AppCompatActivity {
         for(ImageMoverDaemon mover : starMovers) {
             mover.stop();
         }
+
+        //dummyDaemon.stop();
         //massiveDaemon.stop();
         //exampleDaemon.stop();
         backgroundScrollerDaemon.stop();

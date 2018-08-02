@@ -1,7 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
