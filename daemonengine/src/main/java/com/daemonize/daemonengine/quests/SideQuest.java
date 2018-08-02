@@ -29,7 +29,7 @@ public abstract class SideQuest<T> extends Quest<T> {
   }
 
   @Override
-  public final void run(){
+  public void run(){
     try {
 
       T result = pursue();
