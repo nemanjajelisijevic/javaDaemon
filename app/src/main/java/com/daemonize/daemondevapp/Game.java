@@ -100,6 +100,40 @@ public class Game {
         return this;
     }
 
+    public Game(int rows, int columns, DaemonView[][] viewMatrix, Queue<DaemonView> enemyViews, Queue<DaemonView> bulletQueue) {
+        this.rows = rows;
+        this.columns = columns;
+        this.viewMatrix = viewMatrix;
+        //TODO validate enemyViews
+        this.enemyViews = enemyViews;
+        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, columns - 1));
+        this.enemyGenerator = new DummyDaemon(gameConsumer, 2000);
+        this.bulletQueue = bulletQueue;
+    }
+
+    public Game run() {
+        gameConsumer.start();
+        chain.run();
+        return this;
+    }
+
+    public Game stop(){
+
+        enemyGenerator.stop();
+
+        for(ImageMoverMDaemon enemy : activeEnemies) {
+            enemy.stop();
+        }
+
+        for (DummyDaemon tower : towers) {
+            tower.stop();
+        }
+
+        gameConsumer.stop();
+
+        return this;
+    }
+
     {
         //init spell (state)
         chain.addSpell(()->{
@@ -171,40 +205,6 @@ public class Game {
 
         });
 
-    }
-
-    public Game(int rows, int columns, DaemonView[][] viewMatrix, Queue<DaemonView> enemyViews, Queue<DaemonView> bulletQueue) {
-        this.rows = rows;
-        this.columns = columns;
-        this.viewMatrix = viewMatrix;
-        //TODO validate enemyViews
-        this.enemyViews = enemyViews;
-        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, columns - 1));
-        this.enemyGenerator = new DummyDaemon(gameConsumer, 2000);
-        this.bulletQueue = bulletQueue;
-    }
-
-    public Game run() {
-        gameConsumer.start();
-        chain.run();
-        return this;
-    }
-
-    public Game stop(){
-
-        enemyGenerator.stop();
-
-        for(ImageMoverMDaemon enemy : activeEnemies) {
-            enemy.stop();
-        }
-
-        for (DummyDaemon tower : towers) {
-            tower.stop();
-        }
-
-        gameConsumer.stop();
-
-        return this;
     }
 
     public Game setTower(float x, float y) { //TODO to be called from Activity.onTouch()
