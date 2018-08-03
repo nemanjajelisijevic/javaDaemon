@@ -301,7 +301,9 @@ public class Game {
                         );
                         enemy.queueStop();
                         activeEnemies.remove(enemy);
-                        //enemyViews.add(((Enemy) enemy.getPrototype()).getView().hide());//TODO dead enemy should return a borrowed view
+                        guiConsumer.consume(()-> baddy.getView().hide());
+                        if (!enemyViews.contains(baddy.getView()))
+                            enemyViews.add(baddy.getView());//TODO dead enemy should return a borrowed view
                     }
                     bullet.stop();
                     DaemonView view = ((Bullet) bullet.getPrototype()).getView();
