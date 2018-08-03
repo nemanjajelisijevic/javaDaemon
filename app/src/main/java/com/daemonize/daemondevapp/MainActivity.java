@@ -62,10 +62,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView background;
     private Bitmap backgroundImg;
 
-    private Bitmap fieldImage;
-    private Bitmap fieldImagePath;
-    private Bitmap fieldImageTower;
-    private Bitmap fieldImageTowerDen;
+//    private Bitmap fieldImage;
+//    private Bitmap fieldImagePath;
+//    private Bitmap fieldImageTower;
+//    private Bitmap fieldImageTowerDen;
 
     private AndroidImageView[][] fieldViews;
     private ArrayList<ImageView> bulletsViews;
@@ -74,11 +74,11 @@ public class MainActivity extends AppCompatActivity {
 
     private DummyDaemon dummyDaemon;
 
-    //private List<Bitmap> sprite;
-    private List<Bitmap> spriteMain;
-    private List<Bitmap> bulletSprite;
-    private List<Bitmap> explosionSprite;
-    private List<Bitmap> bigExplosionSprite;
+//    //private List<Bitmap> sprite;
+//    private List<Bitmap> spriteMain;
+//    private List<Bitmap> bulletSprite;
+//    private List<Bitmap> explosionSprite;
+//    private List<Bitmap> bigExplosionSprite;
 
     private List<ImageMoverDaemon> starMovers;
     private List<ImageMoverMDaemon> enemyList;
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 //    private MassiveImageMoverDaemon massiveDaemon;
-//    private List<ImageView> massiveViews;
+    private List<ImageView> massiveViews;
 
     private int borderX;
     private int borderY;
@@ -182,62 +182,62 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class BulletClosure extends ImageMoveMClosure {
-
-        private ImageMoverMDaemon bulletDaemon;
-
-        public BulletClosure(ImageView view, ImageMoverMDaemon bulletdaemon) {
-            super(view);
-            this.bulletDaemon = bulletdaemon;
-        }
-
-        @Override
-        public void onReturn(Return<ImageMoverM.PositionedBitmap> ret) {
-
-            if (
-                    ret.get().positionX <= 20
-                    || ret.get().positionX >= borderX - 20
-                    || ret.get().positionY <= 20
-                    || ret.get().positionY >= borderY - 20
-                    ) {
-
-                bulletDaemon.stop();
-                layout.removeView(view);
-                return;
-            }
-
-            for (ImageMoverMDaemon enemy : enemyList) {
-                Pair<Float, Float> enemyPos = enemy.getLastCoordinates();
-                if(Math.abs(ret.get().positionX - enemyPos.first) <= bulletSprite.get(0).getWidth()
-                        && Math.abs(ret.get().positionY - enemyPos.second) <= bulletSprite.get(0).getHeight()) {
-
-                    Enemy prototype = (Enemy) enemy.getPrototype();
-
-                    //if (!prototype.isExploading()) {
-
-                        bulletDaemon.stop();
-                        layout.removeView(view);
-
-                        wastedCntView.setText(wastedCntText + Long.toString(++wastedCounter));
-                        prototype.setHp(prototype.getHp() - 1);
-//                        if (prototype.getHp() == 0) {
-//                            enemy.explode(
-//                                    binderm.bindViewToClosureM(prototype.getView()),
-//                                    ret1 -> {
-//                                        prototype.getView().setImageBitmap(ret1.get().image);
-//                                        prototype.setLastCoordinates(
-//                                                getRandomInt(0, borderX),
-//                                                getRandomInt(0, borderY)
-//                                        );
-//                                    }
-//                            );
-//                        }
-                }
-            }
-
-            super.onReturn(ret);
-        }
-    }
+//    private class BulletClosure extends ImageMoveMClosure {
+//
+//        private ImageMoverMDaemon bulletDaemon;
+//
+//        public BulletClosure(ImageView view, ImageMoverMDaemon bulletdaemon) {
+//            super(view);
+//            this.bulletDaemon = bulletdaemon;
+//        }
+//
+//        @Override
+//        public void onReturn(Return<ImageMoverM.PositionedBitmap> ret) {
+//
+//            if (
+//                    ret.get().positionX <= 20
+//                    || ret.get().positionX >= borderX - 20
+//                    || ret.get().positionY <= 20
+//                    || ret.get().positionY >= borderY - 20
+//                    ) {
+//
+//                bulletDaemon.stop();
+//                layout.removeView(view);
+//                return;
+//            }
+//
+//            for (ImageMoverMDaemon enemy : enemyList) {
+//                Pair<Float, Float> enemyPos = enemy.getLastCoordinates();
+//                if(Math.abs(ret.get().positionX - enemyPos.first) <= bulletSprite.get(0).getWidth()
+//                        && Math.abs(ret.get().positionY - enemyPos.second) <= bulletSprite.get(0).getHeight()) {
+//
+//                    Enemy prototype = (Enemy) enemy.getPrototype();
+//
+//                    //if (!prototype.isExploading()) {
+//
+//                        bulletDaemon.stop();
+//                        layout.removeView(view);
+//
+//                        wastedCntView.setText(wastedCntText + Long.toString(++wastedCounter));
+//                        prototype.setHp(prototype.getHp() - 1);
+////                        if (prototype.getHp() == 0) {
+////                            enemy.explode(
+////                                    binderm.bindViewToClosureM(prototype.getView()),
+////                                    ret1 -> {
+////                                        prototype.getView().setImageBitmap(ret1.get().image);
+////                                        prototype.setLastCoordinates(
+////                                                getRandomInt(0, borderX),
+////                                                getRandomInt(0, borderY)
+////                                        );
+////                                    }
+////                            );
+////                        }
+//                }
+//            }
+//
+//            super.onReturn(ret);
+//        }
+//    }
 
     private static int getRandomInt(int min, int max) {
         Random r = new Random();
@@ -322,29 +322,29 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //    }
 
-    private void fireBullet(Pair<Float, Float> sourceCoord, Pair<Float, Float> enemyCoord ) {//float angleInRadians) {
-        ImageView bulletView = createImageView(40, 40);
-        ImageMoverMDaemon bullet = new ImageMoverMDaemon(
-                new Bullet(
-                        bulletSprite,
-                        new ImageMoverM.Velocity(
-                        10,
-//                        new ImageMoverM.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)),
-                        new ImageMoverM.Direction(enemyCoord.first, enemyCoord.second)),
-                        1,
-                        Pair.create(
-                                sourceCoord.first + spriteMain.get(0).getWidth() / 2,
-                                sourceCoord.second + spriteMain.get(0).getHeight() / 2 )
-                ).setBorders(borderX, borderY)
-        ).setName("Bullet");
-
-        bullet.setVelocity(10);
-        bullet.setMoveSideQuest().setClosure(new BulletClosure(bulletView, bullet));
-//        bullet.setVelocity(new ImageMover.Velocity(
-//                50,
-//                new ImageMover.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)
-//        ));
-    }
+//    private void fireBullet(Pair<Float, Float> sourceCoord, Pair<Float, Float> enemyCoord ) {//float angleInRadians) {
+//        ImageView bulletView = createImageView(40, 40);
+//        ImageMoverMDaemon bullet = new ImageMoverMDaemon(
+//                new Bullet(
+//                        bulletSprite,
+//                        new ImageMoverM.Velocity(
+//                        10,
+////                        new ImageMoverM.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)),
+//                        new ImageMoverM.Direction(enemyCoord.first, enemyCoord.second)),
+//                        1,
+//                        Pair.create(
+//                                sourceCoord.first + spriteMain.get(0).getWidth() / 2,
+//                                sourceCoord.second + spriteMain.get(0).getHeight() / 2 )
+//                ).setBorders(borderX, borderY)
+//        ).setName("Bullet");
+//
+//        bullet.setVelocity(10);
+//        bullet.setMoveSideQuest().setClosure(new BulletClosure(bulletView, bullet));
+////        bullet.setVelocity(new ImageMover.Velocity(
+////                50,
+////                new ImageMover.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)
+////        ));
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -956,6 +956,53 @@ public class MainActivity extends AppCompatActivity {
                 sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
             }
 
+            //bullet sprite
+            List<Bitmap> bulletSprite = new ArrayList<>();
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), 40, 40, false));
+
+
+            //explosion sprite
+            List<Bitmap> explosionSprite = new ArrayList<>();
+
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion1.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion2.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion3.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion4.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion5.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion6.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion7.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion8.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion9.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion10.png")), 80, 80, false));
+
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion11.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion12.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion13.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion14.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion15.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion16.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion17.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion18.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion19.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion20.png")), 80, 80, false));
+
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion21.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion22.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion23.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion24.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion25.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion26.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion27.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion28.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion29.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion30.png")), 80, 80, false));
+
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion31.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 80, 80, false));
+            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 80, 80, false));
 
 
             //TODO unnecessary background
@@ -969,16 +1016,21 @@ public class MainActivity extends AppCompatActivity {
                 enemyQueue.add(new AndroidImageView(createImageView(80, 80)));
             }
 
-            game = new Game(rows, columns, fieldViews, enemyQueue)
+            Queue<DaemonView> bulletQueue = new LinkedList<>();
+
+            for (int cnt = 0; cnt < 100; ++cnt) {
+                bulletQueue.add(new AndroidImageView(createImageView(40, 40)));
+            }
+
+            game = new Game(rows, columns, fieldViews, enemyQueue, bulletQueue)
                     .setFieldImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false))
                     .setFieldImagePath(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false))
                     .setFieldImageTower(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 80, 80, false))
                     .setFieldImageTowerDen(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), 80, 80, false))
                     .setEnemySprite(sprite)
+                    .setBulletSprite(bulletSprite)
+                    .setExplodeSprite(explosionSprite)
                     .setBorders(borderX, borderY);
-
-
-            game.run();
 
         } catch (IOException ex) {
             Log.e(DaemonUtils.tag(), "Could not init game!", ex);
@@ -992,8 +1044,6 @@ public class MainActivity extends AppCompatActivity {
 //        exampleDaemon.increment(new Closure<String>() {
 //            @Override
 //            public void onReturn(Return<String> aReturn) {
-//
-//
 //                Log.e(DaemonUtils.tag(), aReturn.get());
 //                exampleDaemon.increment(this);
 //            }
@@ -1006,6 +1056,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onTouchEvent(MotionEvent event) {
         game.setTower(event.getX(), event.getY());
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        game.run();
     }
 
     @Override

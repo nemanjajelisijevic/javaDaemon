@@ -1,6 +1,7 @@
 package com.daemonize.daemondevapp.view;
 
 import android.graphics.Bitmap;
+import android.view.View;
 import android.widget.ImageView;
 
 public class AndroidImageView implements DaemonView {
@@ -10,18 +11,38 @@ public class AndroidImageView implements DaemonView {
         this.view = view;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void setX(float x) {
+    public AndroidImageView setX(float x) {
         view.setX(x);
+        return this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void setY(float y) {
+    public AndroidImageView setY(float y) {
         view.setY(y);
+        return this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void setImage(Bitmap image) {
+    public AndroidImageView setImage(Bitmap image) {
         view.setImageBitmap(image);
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AndroidImageView hide() {
+        view.setVisibility(View.INVISIBLE);
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AndroidImageView show() {
+        view.setVisibility(View.VISIBLE);
+        return this;
     }
 }

@@ -35,6 +35,11 @@ public interface ImageMoverM {
         public Bitmap image;
         public float positionX;
         public float positionY;
+
+        @Override
+        public String toString() {
+            return "POS X: " + Float.toString(positionX) + ", POS Y: " + Float.toString(positionY) + ", IMAGE: " + image.toString();
+        }
     }
 
     class Direction {

@@ -4,8 +4,10 @@ import android.graphics.Bitmap;
 
 public interface DaemonView {
 
-    void setX(float x);
-    void setY(float y);
-    void setImage(Bitmap image);
+    <K extends DaemonView> K setX(float x);
+    <K extends DaemonView> K setY(float y);
+    <K extends DaemonView> K setImage(Bitmap image);
+    <K extends DaemonView> K hide();
+    <K extends DaemonView> K show();
 
 }
