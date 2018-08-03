@@ -182,7 +182,8 @@ public class Game {
                         if (posBmp.positionX >= 20 * 80 || posBmp.positionY >= 11 * 80) {
                             enemy.stop();
                             activeEnemies.remove(enemy);
-                            enemyViews.add(((Enemy) enemy.getPrototype()).getView().hide());
+                            guiConsumer.consume(()->((Enemy) enemy.getPrototype()).getView().hide());
+                            enemyViews.add(((Enemy) enemy.getPrototype()).getView());
                         }
                     });
                 });
