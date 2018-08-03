@@ -114,6 +114,8 @@ public class Game {
 
                 if (enemyView == null) //TODO this should never be null
                     return;
+                else
+                    guiConsumer.consume(()->enemyView.show());
 
                 ImageMoverMDaemon enemy = new ImageMoverMDaemon(
                         new Enemy(
@@ -129,7 +131,7 @@ public class Game {
                                 ),
                                 Pair.create( (float)0, (float)0),
                                 grid
-                        ).setBorders(borderX, borderY).setView(enemyView.show()) //TODO check null ref polling
+                        ).setBorders(borderX, borderY).setView(enemyView) //TODO check null ref polling
                 ).setName("Enemy").setConsumer(guiConsumer);
 
                 enemy.setMoveSideQuest().setClosure(aReturn->{ //gui consumer
