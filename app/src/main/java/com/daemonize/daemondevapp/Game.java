@@ -297,11 +297,9 @@ public class Game {
                     } else {
                         enemy.explode(
                                 aReturn -> ((Enemy) enemy.getPrototype()).getView().setImage(aReturn.get().image),
-                                aReturn -> ((Enemy) enemy.getPrototype()).getView().hide()
-                        );
+                                aReturn -> ((Enemy) enemy.getPrototype()).getView().hide());
                         enemy.queueStop();
                         activeEnemies.remove(enemy);
-                        guiConsumer.consume(()-> baddy.getView().hide());
                         if (!enemyViews.contains(baddy.getView()))
                             enemyViews.add(baddy.getView());//TODO dead enemy should return a borrowed view
                     }
