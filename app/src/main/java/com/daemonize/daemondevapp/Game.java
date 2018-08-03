@@ -214,13 +214,13 @@ public class Game {
             guiConsumer.consume(()->viewMatrix[field.getRow()][field.getColumn()].setImage(fieldImageTower));
 
             boolean b = grid.setTower(field.getRow(), field.getColumn());
-            guiConsumer.consume(()->
-                viewMatrix[field.getRow()][field.getColumn()].setImage(
-                        grid.getField(
-                                field.getRow(),
-                                field.getColumn()
-                        ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : fieldImageTower)
-            );
+
+            Bitmap image = grid.getField(
+                    field.getRow(),
+                    field.getColumn()
+            ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : fieldImageTower;
+
+            guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(image));
 
             if (b) {
                 DummyDaemon tower = new DummyDaemon(gameConsumer, 1000).setClosure(ret -> {
