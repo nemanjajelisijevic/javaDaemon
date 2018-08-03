@@ -1054,7 +1054,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        game.setTower(event.getX(), event.getY());
+        if(event.getAction() == MotionEvent.ACTION_DOWN)
+            game.setTower(event.getX(), event.getY());
         return super.onTouchEvent(event);
     }
 

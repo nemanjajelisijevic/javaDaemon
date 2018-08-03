@@ -125,9 +125,9 @@ public class Game {
             enemy.stop();
         }
 
-        for (DummyDaemon tower : towers) {
-            tower.stop();
-        }
+//        for (DummyDaemon tower : towers) {
+//            tower.stop();
+//        }
 
         gameConsumer.stop();
 
@@ -145,6 +145,10 @@ public class Game {
                 Log.d(DaemonUtils.tag(), "Enemy views queue size: " + enemyViews.size());
 
                 DaemonView enemyView = enemyViews.poll();
+
+                if (enemyView == null)
+                    return;
+
                 guiConsumer.consume(()->enemyView.show());
 
                 ImageMoverMDaemon enemy = new ImageMoverMDaemon(
@@ -214,6 +218,14 @@ public class Game {
 
             Field field = grid.getField(x, y);
 
+//            if (field.getTower() != null) {
+//                field.getTower().stop();
+//                field.setTower(null);
+//                guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage));
+//                grid.recalcGrid();
+//                return;
+//            }
+
             guiConsumer.consume(()->viewMatrix[field.getRow()][field.getColumn()].setImage(fieldImageTower));
 
             boolean b = grid.setTower(field.getRow(), field.getColumn());
@@ -242,7 +254,8 @@ public class Game {
                 });
 
                 tower.start();
-                towers.add(tower);
+                field.setTower(tower);
+                //towers.add(tower);
             }
         });
 
@@ -252,6 +265,8 @@ public class Game {
     private void fireBullet(Pair<Float, Float> sourceCoord, ImageMoverMDaemon enemy) {
 
         Pair<Float, Float> enemyCoord = enemy.getLastCoordinates();
+
+        Log.i(DaemonUtils.tag(), "Bullet view queue size: " + bulletQueue.size());
 
         DaemonView bulletView = bulletQueue.poll();
         guiConsumer.consume(()->bulletView.show());
@@ -305,7 +320,8 @@ public class Game {
                     bullet.stop();
                     DaemonView view = ((Bullet) bullet.getPrototype()).getView();
                     guiConsumer.consume(()->view.hide());
-                    bulletQueue.add(view);
+                    if(!bulletQueue.contains(view))
+                        bulletQueue.add(view);
                 }
 
             });

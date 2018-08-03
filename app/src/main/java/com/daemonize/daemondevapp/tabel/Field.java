@@ -2,6 +2,8 @@ package com.daemonize.daemondevapp.tabel;
 
 import android.support.annotation.NonNull;
 
+import com.daemonize.daemonengine.dummy.DummyDaemon;
+
 public class Field implements  IHeapItem <Field> {
     int centerX;
     int centerY;
@@ -17,6 +19,17 @@ public class Field implements  IHeapItem <Field> {
 
     boolean walkable;
     int heapIndex;
+
+    private DummyDaemon tower;
+
+    public DummyDaemon getTower() {
+        return tower;
+    }
+
+    public Field setTower(DummyDaemon tower) {
+        this.tower = tower;
+        return this;
+    }
 
     public Field(int centerX, int centerY, int row, int column, int weight, boolean walkable) {
         this.centerX = centerX;

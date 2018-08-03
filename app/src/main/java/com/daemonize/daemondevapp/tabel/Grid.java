@@ -71,6 +71,10 @@ public class Grid {
         return setTower(row,column);
     }
 
+    public void recalcGrid() {
+        pathFinding.dijkstra(this);
+    }
+
     public  boolean  setTower (int row, int column ) {
 
         if (!grid[row][column].isWalkable()) return false;
