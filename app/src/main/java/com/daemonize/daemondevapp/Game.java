@@ -125,9 +125,9 @@ public class Game {
             enemy.stop();
         }
 
-//        for (DummyDaemon tower : towers) {
-//            tower.stop();
-//        }
+        for (DummyDaemon tower : towers) {
+            tower.stop();
+        }
 
         gameConsumer.stop();
 
@@ -146,14 +146,14 @@ public class Game {
 
                 DaemonView enemyView = enemyViews.poll();
 
-                if (enemyView == null)
+                if (enemyView == null)//TODO should never be null
                     return;
 
                 guiConsumer.consume(()->enemyView.show());
 
                 ImageMoverMDaemon enemy = new ImageMoverMDaemon(
                         new Enemy(
-                                30,
+                                40,
                                 enemySprite,
                                 explodeSprite,
                                 new ImageMoverM.Velocity(
@@ -254,8 +254,8 @@ public class Game {
                 });
 
                 tower.start();
-                field.setTower(tower);
-                //towers.add(tower);
+                //field.setTower(tower);
+                towers.add(tower);
             }
         });
 
