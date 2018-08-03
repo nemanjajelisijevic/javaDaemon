@@ -145,17 +145,13 @@ public class Game {
                 Log.d(DaemonUtils.tag(), "Enemy views queue size: " + enemyViews.size());
 
                 DaemonView enemyView = enemyViews.poll();
-
-                if (enemyView == null) //TODO this should never be null
-                    return;
-                else
-                    guiConsumer.consume(()->enemyView.show());
+                guiConsumer.consume(()->enemyView.show());
 
                 ImageMoverMDaemon enemy = new ImageMoverMDaemon(
                         new Enemy(
                                 30,
                                 enemySprite,
-                                explodeSprite, //TODO fix explosions!!!!!!!!!!!!!!!!!!
+                                explodeSprite,
                                 new ImageMoverM.Velocity(
                                         3,
                                         new ImageMoverM.Direction(
@@ -165,7 +161,7 @@ public class Game {
                                 ),
                                 Pair.create( (float)0, (float)0),
                                 grid
-                        ).setBorders(borderX, borderY).setView(enemyView) //TODO check null ref polling
+                        ).setBorders(borderX, borderY).setView(enemyView)
                 ).setName("Enemy").setConsumer(guiConsumer);
 
                 enemy.setMoveSideQuest().setClosure(aReturn->{ //gui consumer
