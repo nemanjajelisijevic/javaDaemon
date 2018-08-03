@@ -1,6 +1,7 @@
 package com.daemonize.daemondevapp;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.util.Pair;
 
 import com.daemonize.daemondevapp.proba.Bullet;
@@ -15,6 +16,7 @@ import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -105,6 +107,8 @@ public class Game {
             grid.setTower(10, 9);// TODO recalc when instancing grid!
 
             enemyGenerator.setClosure(ret->{
+
+                Log.d(DaemonUtils.tag(), "Enemy views queue size: " + enemyViews.size());
 
                 DaemonView enemyView = enemyViews.poll();
 
@@ -297,6 +301,7 @@ public class Game {
                         );
                         enemy.queueStop();
                         activeEnemies.remove(enemy);
+                        //enemyViews.add(((Enemy) enemy.getPrototype()).getView().hide());//TODO dead enemy should return a borrowed view
                     }
                     bullet.stop();
                     DaemonView view = ((Bullet) bullet.getPrototype()).getView();

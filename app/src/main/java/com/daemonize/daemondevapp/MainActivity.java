@@ -1012,7 +1012,7 @@ public class MainActivity extends AppCompatActivity {
 
             Queue<DaemonView> enemyQueue = new LinkedList<>();
 
-            for (int cnt = 0; cnt < 30; ++cnt) {
+            for (int cnt = 0; cnt < 50; ++cnt) {
                 enemyQueue.add(new AndroidImageView(createImageView(80, 80)));
             }
 
