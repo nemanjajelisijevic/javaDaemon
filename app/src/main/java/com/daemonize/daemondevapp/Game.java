@@ -108,7 +108,7 @@ public class Game {
 
                 DaemonView enemyView = enemyViews.poll();
 
-                if (enemyView == null)
+                if (enemyView == null) //TODO this should never be null
                     return;
 
                 ImageMoverMDaemon enemy = new ImageMoverMDaemon(
