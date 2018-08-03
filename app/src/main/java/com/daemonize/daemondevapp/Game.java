@@ -141,9 +141,8 @@ public class Game {
                     gameConsumer.consume(()-> {
                         if (posBmp.positionX >= 20 * 80 || posBmp.positionY >= 11 * 80) {
                             enemy.stop();
-                            ((Enemy) enemy.getPrototype()).getView().hide();
                             activeEnemies.remove(enemy);
-                            enemyViews.add(((Enemy) enemy.getPrototype()).getView().show());
+                            enemyViews.add(((Enemy) enemy.getPrototype()).getView().hide());
                         }
                     });
                 });
