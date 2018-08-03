@@ -211,14 +211,15 @@ public class Game {
 
             Field field = grid.getField(x, y);
 
-            viewMatrix[field.getRow()][field.getColumn()].setImage(fieldImageTower);
+            guiConsumer.consume(()->viewMatrix[field.getRow()][field.getColumn()].setImage(fieldImageTower));
 
             boolean b = grid.setTower(field.getRow(), field.getColumn());
-            viewMatrix[field.getRow()][field.getColumn()].setImage(
-                    grid.getField(
-                            field.getRow(),
-                            field.getColumn()
-                    ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : fieldImageTower
+            guiConsumer.consume(()->
+                viewMatrix[field.getRow()][field.getColumn()].setImage(
+                        grid.getField(
+                                field.getRow(),
+                                field.getColumn()
+                        ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : fieldImageTower)
             );
 
             if (b) {
