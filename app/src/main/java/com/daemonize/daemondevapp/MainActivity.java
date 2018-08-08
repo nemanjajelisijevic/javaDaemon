@@ -133,14 +133,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        borderX = getResources().getDisplayMetrics().widthPixels - 100;
-        borderY = getResources().getDisplayMetrics().heightPixels - 200;
+        borderX = getResources().getDisplayMetrics().widthPixels ;
+        borderY = getResources().getDisplayMetrics().heightPixels ;
 
         layout = findViewById(R.id.cl);
 
         background = findViewById(R.id.img_large);
 
-        mainView = findViewById(R.id.imageViewMain);
+        //mainView = findViewById(R.id.imageViewMain);
         starMovers = new ArrayList<>(60);
         enemyList = new ArrayList<>(10);
 

@@ -106,7 +106,7 @@ public class Game {
         this.viewMatrix = viewMatrix;
         //TODO validate enemyViews
         this.enemyViews = enemyViews;
-        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, columns - 1));
+        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, 6 - 1));
         this.enemyGenerator = new DummyDaemon(gameConsumer, 2000);
         this.bulletQueue = bulletQueue;
     }
@@ -137,8 +137,6 @@ public class Game {
     {
         //init spell (state)
         chain.addSpell(()->{
-
-            grid.setTower(10, 9);// TODO recalc when instancing grid!
 
             enemyGenerator.setClosure(ret->{
 
@@ -179,12 +177,17 @@ public class Game {
 
                     //check if inside the map
                     gameConsumer.consume(()-> {
-                        if (posBmp.positionX >= 20 * 80 || posBmp.positionY >= 11 * 80) {
+                        if (
+                            posBmp.positionX >= grid.getGridHeight() + 40 ||
+                            posBmp.positionY >= grid.getGridWidth() + 40 ||
+                            grid.getEndPoint().equals(grid.getFieldCoord(posBmp.positionX, posBmp.positionY))
+                                ) {
                             enemy.stop();
                             activeEnemies.remove(enemy);
                             guiConsumer.consume(()->((Enemy) enemy.getPrototype()).getView().hide());
                             enemyViews.add(((Enemy) enemy.getPrototype()).getView());
                         }
+
                     });
                 });
 

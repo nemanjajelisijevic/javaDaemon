@@ -4,11 +4,6 @@ public class Heap< T extends     IHeapItem <T> > {
     T[] items;
     int currentItemCount;
 
-//    public Heap(int maxHeapSize) {
-//        items = (T[maxHeapSize]) new Object[maxHeapSize];
-//    }
-
-
     public Heap(T[] items) {
         this.items = items;
         this.currentItemCount = 0;
