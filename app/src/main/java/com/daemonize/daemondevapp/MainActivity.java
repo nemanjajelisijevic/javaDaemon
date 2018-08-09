@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
     private void fireBullet(Pair<Float, Float> sourceCoord, float angleInRadians) {
         ImageView bulletView = createImageView(40, 40);
         ImageMoverDaemon bullet = new ImageMoverDaemon(
+                new AndroidLooperConsumer(),
                 new ImageTranslationMover(
                         bulletSprite,
                         50,
@@ -486,6 +487,7 @@ public class MainActivity extends AppCompatActivity {
 
             ImageView view = createImageView(80, 80);
             ImageMoverDaemon starMover = new ImageMoverDaemon(
+                    new AndroidLooperConsumer(),
                     new BouncingImageTranslationMover(
                             sprite,
                             8,
@@ -504,6 +506,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mainMover = new ImageMoverDaemon(
+                new AndroidLooperConsumer(),
                 new MainImageTranslationMover(
                         spriteMain,
                         10f,
@@ -546,7 +549,7 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setMoveSideQuest().setClosure(binder.bindViewToClosure(mainView));
         mainMover.start();
 
-        backgroundScrollerDaemon = new BackgroundScrollerDaemon(new BackgroundScroller(mainMover)).setName("Background scroller");
+        backgroundScrollerDaemon = new BackgroundScrollerDaemon(new AndroidLooperConsumer(), new BackgroundScroller(mainMover)).setName("Background scroller");
         backgroundScrollerDaemon.setScrollSideQuest().setClosure(ret -> {
             horizontalSv.scrollTo(ret.get().first, ret.get().second);
             verticalSv.scrollTo(ret.get().first, ret.get().second);
