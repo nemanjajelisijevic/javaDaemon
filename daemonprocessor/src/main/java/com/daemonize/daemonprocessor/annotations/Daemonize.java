@@ -13,6 +13,7 @@ import java.lang.annotation.Target;
 public @interface Daemonize {
     boolean eager() default false;
     boolean returnDaemonInstance() default false;
+    boolean doubleDaemonize() default false;
     String className() default "";
     Platform platform() default Platform.ANDROID;
 }

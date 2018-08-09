@@ -60,6 +60,7 @@ public class DaemonProcessor extends AbstractProcessor {
         for (Element classElement : annotatedElements) {
 
             if (!(classElement.getKind().equals(ElementKind.CLASS) || classElement.getKind().equals(ElementKind.INTERFACE))) {
+
                 messager.printMessage(
                         Diagnostic.Kind.ERROR,
                         "Error processing element: "
@@ -67,7 +68,9 @@ public class DaemonProcessor extends AbstractProcessor {
                                 + " - @Daemonize can only be applied to a class or an interface."
                 );
                 return true;
+
             } else {
+
                 messager.printMessage(
                         Diagnostic.Kind.NOTE,
                         "Annotated type found: " + classElement.asType().toString()
@@ -86,9 +89,20 @@ public class DaemonProcessor extends AbstractProcessor {
                 } else {
 
                     if(publicPrototypeMethods.size() == sideQuestMethods.size()) {
+
                         generator = new SideQuestDaemonGenerator(((TypeElement) classElement));
+
                     } else if (publicPrototypeMethods.size() > sideQuestMethods.size()) {
+
+                        // double threaded daemon
+/*                        if (classElement.getAnnotation(Daemonize.class).doubleDaemonize()) {
+
+                        } else */
+
+                        //single threaded daemon
                         generator = new HybridDaemonGenerator(((TypeElement) classElement));
+
+
                     } else {
                         throw new IllegalStateException(
                                 classElement.toString()
