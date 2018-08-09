@@ -44,6 +44,8 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     protected final String STOP_QUEST_TYPE_NAME = "StopMainQuest";
 
     protected final String CONSUMER_PACKAGE = "com.daemonize.daemonengine.consumer";
+    protected final String CONSUMER_INTERFACE_STRING = "Consumer";
+
     private final String DAEMONUTILS_PACKAGE = "com.daemonize.daemonengine.utils";
     protected final ClassName DAEMON_UTILS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "DaemonUtils");
     private final ClassName TIMEUNITS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "TimeUnits");
@@ -242,7 +244,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
 
         if (!isVoid) {
-
 
             if (logExecutionTime != null) {
                 addTimeMeasureCode(

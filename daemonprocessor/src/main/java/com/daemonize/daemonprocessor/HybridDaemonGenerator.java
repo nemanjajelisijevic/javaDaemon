@@ -63,16 +63,28 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 daemonEngineSimpleName
         );
 
-        ClassName consumer = ClassName.get(CONSUMER_PACKAGE + "." + platform.getImplementationPackage(), platform.getPlatformConsumer());
+//        ClassName consumer = ClassName.get(
+//                CONSUMER_PACKAGE + "." + platform.getImplementationPackage(),
+//                platform.getPlatformConsumer()
+//        );
+
+
+        ClassName consumer = ClassName.get(
+                CONSUMER_PACKAGE,
+                CONSUMER_INTERFACE_STRING
+        );
 
         FieldSpec daemonEngine = FieldSpec.builder(
                 daemonEngineClass,
                 DAEMON_ENGINE_STRING
-        ).addModifiers(Modifier.PROTECTED).initializer(
-                "new $N(new $T()).setName(this.getClass().getSimpleName())",
-                daemonEngineSimpleName,
-                consumer
-        ).build();
+        )
+        .addModifiers(Modifier.PROTECTED)
+//        .initializer(
+//                "new $N(new $T()).setName(this.getClass().getSimpleName())",
+//                daemonEngineSimpleName,
+//                consumer
+//        )
+        .build();
 
         daemonClassBuilder.addField(prototype);
         daemonClassBuilder.addField(daemonEngine);
@@ -80,7 +92,9 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         //daemon construct
         MethodSpec daemonConstructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
+                .addParameter(consumer, "consumer")
                 .addParameter(ClassName.get(classElement.asType()), PROTOTYPE_STRING)
+                .addStatement("this.daemonEngine = new $N(consumer).setName(this.getClass().getSimpleName())", daemonEngineSimpleName)
                 .addStatement("this.$N = $N", PROTOTYPE_STRING, PROTOTYPE_STRING)
                 .build();
 

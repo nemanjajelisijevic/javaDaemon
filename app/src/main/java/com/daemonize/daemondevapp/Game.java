@@ -150,6 +150,7 @@ public class Game {
                 guiConsumer.consume(()->enemyView.show());
 
                 ImageMoverMDaemon enemy = new ImageMoverMDaemon(
+                        guiConsumer,
                         new Enemy(
                                 40,
                                 enemySprite,
@@ -164,7 +165,7 @@ public class Game {
                                 Pair.create( (float)0, (float)0),
                                 grid
                         ).setBorders(borderX, borderY).setView(enemyView)
-                ).setName("Enemy").setConsumer(guiConsumer);
+                ).setName("Enemy");
 
                 enemy.setMoveSideQuest().setClosure(aReturn->{ //gui consumer
 
@@ -275,6 +276,7 @@ public class Game {
         guiConsumer.consume(()->bulletView.show());
 
         ImageMoverMDaemon bullet = new ImageMoverMDaemon(//TODO keep active bullets to destroy them
+                guiConsumer,
                 new Bullet(
                         bulletSprite,
                         new ImageMoverM.Velocity(
@@ -287,7 +289,7 @@ public class Game {
                                 sourceCoord.second + 40
                         )
                 ).setBorders(borderX, borderY).setView(bulletView)
-        ).setName("Bullet").setConsumer(guiConsumer);
+        ).setName("Bullet");
 
         bullet.setMoveSideQuest().setClosure(ret->{ //gui thread
 
