@@ -637,6 +637,25 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
 
+
+//        DoubleExampleDaemon dd = new DoubleExampleDaemon(
+//                new AndroidLooperConsumer(),
+//                new AndroidLooperConsumer(),
+//                new DoubleExample()
+//        );
+//
+//        dd.setLogAndReturnSideQuest().setClosure(aReturn -> Log.e(DaemonUtils.tag(), "DoubleExampleDaemon::LogAndReturnSideQuest returned: " + Integer.toString(aReturn.get())));
+//
+//        dd.start();
+//
+//        dd.increment(new Closure<Boolean>() {
+//            @Override
+//            public void onReturn(Return<Boolean> aReturn) {
+//                dd.increment(this);
+//            }
+//        });
+
+
     }
 
     @Override
