@@ -72,7 +72,6 @@ public class MainImageTranslationMover extends StackedSpriteImageTranslationMove
 //        if(velocity.intensity > 0 ) {
 
 
-
             if (observers != null)
                 for (ImageMoverMDaemon observer : observers) {
                 float x = Math.abs( lastX - observer.getLastCoordinates().first );
@@ -89,7 +88,7 @@ public class MainImageTranslationMover extends StackedSpriteImageTranslationMove
                         e.printStackTrace();
                     }
                 }
-                //                    Velocity vel = new Velocity(velocity.intensity * 0.3F, velocity.direction);
+//                    Velocity vel = new Velocity(velocity.intensity * 0.3F, velocity.direction);
 //                    observerobserver.setDirectionAndMove(lastX, lastY, vel.intensity); //TODO CHASER
 //                    //observer.checkCollisionAndBounce(Pair.create(lastX, lastY), vel); //TODO Collisions
 //                    Pair<Float, Float> obsLastCoord = observer.getLastCoordinates();

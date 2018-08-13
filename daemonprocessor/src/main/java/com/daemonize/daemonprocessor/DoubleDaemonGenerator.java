@@ -162,7 +162,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(generateGetPrototypeDaemonApiMethod());
         apiMethods.add(generateSetPrototypeDaemonApiMethod());
         apiMethods.add(sideGenerator.generateStartDaemonApiMethod());
-        apiMethods.add(sideGenerator.generateStopDaemonApiMethod());
+        apiMethods.add(generateStopDaemonApiMethod());
         apiMethods.add(generateQueueStopDaemonApiMethod());//TODO override !!!!!!!!!!!!!!!!!!!!!!!!!!
         apiMethods.add(mainGenerator.generateGetStateDaemonApiMethod());
         apiMethods.add(generateSetNameDaemonApiMethod());
@@ -186,6 +186,17 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         return daemonClassBuilder.build();
 
 
+    }
+
+    @Override
+    public MethodSpec generateStopDaemonApiMethod() {
+        return MethodSpec.methodBuilder("stop")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(void.class)
+                .addStatement(mainGenerator.getDaemonEngineString() + ".stop()")
+                .addStatement(sideGenerator.getDaemonEngineString() + ".stop()")
+                .build();
     }
 
     @Override

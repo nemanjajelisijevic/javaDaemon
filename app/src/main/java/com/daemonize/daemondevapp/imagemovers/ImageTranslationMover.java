@@ -139,6 +139,13 @@ public class ImageTranslationMover implements ImageMover {
         //startMoving();
     }
 
+
+    @Override
+    public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
+        setDirectionAndMove(x, y, velocityInt);
+        return true;
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public ImageTranslationMover setBorders(float x, float y) {
