@@ -279,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 //        ExampleDaemon exampleDaemon = new ExampleDaemon(
+//                new AndroidLooperConsumer(),
 //                new Example()
 //        ).setName("Example recursion");
 //
