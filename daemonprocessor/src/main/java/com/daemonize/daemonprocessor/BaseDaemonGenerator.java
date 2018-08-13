@@ -30,9 +30,26 @@ import static javax.lang.model.type.TypeKind.VOID;
 public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
 
+    protected boolean autoGenerateApiMethods = true;
+
+    public BaseDaemonGenerator setAutoGenerateApiMethods(boolean autoGenerateApiMethods) {
+        this.autoGenerateApiMethods = autoGenerateApiMethods;
+        return this;
+    }
+
     protected final String PROTOTYPE_STRING = "prototype";
 
-    protected final String DAEMON_ENGINE_STRING = "daemonEngine";
+    protected String daemonEngineString = "daemonEngine";
+
+    public BaseDaemonGenerator setDaemonEngineString(String daemonEngineString) {
+        this.daemonEngineString = daemonEngineString;
+        return this;
+    }
+
+    public String getDaemonEngineString() {
+        return daemonEngineString;
+    }
+
     protected final String DAEMON_ENGINE_PACKAGE_ROOT = "com.daemonize.daemonengine";
     protected final String DAEMON_ENGINE_IMPL_PACKAGE = DAEMON_ENGINE_PACKAGE_ROOT + ".implementations";
 
@@ -64,6 +81,14 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
     protected String daemonPackage;
     protected String daemonEngineSimpleName;
+
+    public String getDaemonPackage() {
+        return daemonPackage;
+    }
+
+    public String getDaemonEngineSimpleName() {
+        return daemonEngineSimpleName;
+    }
 
     protected ClassName daemonInterface = ClassName.get(
             DAEMON_ENGINE_PACKAGE_ROOT,
@@ -124,105 +149,111 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         return ret;
     }
 
-    public abstract TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods);
 
     public List<MethodSpec> generateDaemonApiMethods() {
 
         List<MethodSpec> ret = new ArrayList<>(7);
 
-        ret.add(
-                MethodSpec.methodBuilder("getPrototype")
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(ClassName.get(packageName, prototypeClassSimpleName))
-                        .addStatement("return prototype")
-                        .build()
-        );
-
-        ret.add(
-                MethodSpec.methodBuilder("setPrototype")
-                        .addModifiers(Modifier.PUBLIC)
-                        .addParameter(ClassName.get(packageName, prototypeClassSimpleName), "prototype")
-                        .returns(ClassName.get(packageName, daemonSimpleName))
-                        .addStatement("this.prototype = prototype")
-                        .addStatement("return this")
-                        .build()
-        );
-
-        ret.add(
-                MethodSpec.methodBuilder("start")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                //.returns(ClassName.get(packageName, daemonSimpleName))
-                .returns(void.class)
-                .addStatement(DAEMON_ENGINE_STRING + ".start()")
-                //.addStatement("return this")
-                .build()
-        );
-
-        ret.add(
-                MethodSpec.methodBuilder("stop")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(void.class)
-                .addStatement(DAEMON_ENGINE_STRING + ".stop()")
-                .build()
-        );
-
-        ret.add(
-                MethodSpec.methodBuilder("queueStop")
-                        .addAnnotation(Override.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(void.class)
-                        .addStatement("daemonEngine.queueStop()")
-                        .build()
-        );
-
-        ret.add(
-                MethodSpec.methodBuilder("getState")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(daemonStateClassName)
-                .addStatement("return " + DAEMON_ENGINE_STRING + ".getState()")
-                .build()
-        );
-
-        ret.add(
-                MethodSpec.methodBuilder("setName")
-                        .addParameter(String.class, "name")
-                        .addAnnotation(Override.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(ClassName.get(packageName, daemonSimpleName))
-                        .addStatement("daemonEngine.setName(name)")
-                        .addStatement("return this")
-                        //.addStatement("return " + DAEMON_ENGINE_STRING + ".getState()")
-                        .build()
-        );
-
-        ret.add(
-                MethodSpec.methodBuilder("getName")
-                        .addAnnotation(Override.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(String.class)
-                        .addStatement("return daemonEngine.getName()")
-                        .build()
-        );
-
-        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, "Consumer");
-
-        ret.add(
-                MethodSpec.methodBuilder("setConsumer")
-                        .addParameter(consumer, "consumer")
-                        .addAnnotation(Override.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        //.returns(void.class)
-                        .returns(ClassName.get(packageName, daemonSimpleName))
-                        .addStatement("daemonEngine.setConsumer(consumer)")
-                        .addStatement("return this")
-                        .build()
-        );
+        ret.add(generateGetPrototypeDaemonApiMethod());
+        ret.add(generateSetPrototypeDaemonApiMethod());
+        ret.add(generateStartDaemonApiMethod());
+        ret.add(generateStopDaemonApiMethod());
+        ret.add(generateQueueStopDaemonApiMethod());
+        ret.add(generateGetStateDaemonApiMethod());
+        ret.add(generateSetNameDaemonApiMethod());
+        ret.add(generateGetNameDaemonApiMethod());
+        ret.add(generateSetConsumerDaemonApiMethod());
 
         return ret;
     }
+
+    public MethodSpec generateGetPrototypeDaemonApiMethod() {
+        return MethodSpec.methodBuilder("getPrototype")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, prototypeClassSimpleName))
+                .addStatement("return prototype")
+                .build();
+    }
+
+    public MethodSpec generateSetPrototypeDaemonApiMethod() {
+        return MethodSpec.methodBuilder("setPrototype")
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(packageName, prototypeClassSimpleName), "prototype")
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement("this.prototype = prototype")
+                .addStatement("return this")
+                .build();
+    }
+
+    public MethodSpec generateStartDaemonApiMethod() {
+        return MethodSpec.methodBuilder("start")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(void.class)
+                .addStatement(daemonEngineString + ".start()")
+                .build();
+    }
+
+    public MethodSpec generateStopDaemonApiMethod() {
+        return MethodSpec.methodBuilder("stop")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(void.class)
+                .addStatement(daemonEngineString + ".stop()")
+                .build();
+    }
+
+    public MethodSpec generateQueueStopDaemonApiMethod() {
+        return MethodSpec.methodBuilder("queueStop")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(void.class)
+                .addStatement(daemonEngineString + ".queueStop()")
+                .build();
+    }
+
+    public MethodSpec generateGetStateDaemonApiMethod() {
+        return MethodSpec.methodBuilder("getState")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(daemonStateClassName)
+                .addStatement("return " + daemonEngineString + ".getState()")
+                .build();
+    }
+
+    public MethodSpec generateSetNameDaemonApiMethod() {
+        return MethodSpec.methodBuilder("setName")
+                .addParameter(String.class, "name")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement(daemonEngineString + ".setName(name)")
+                .addStatement("return this")
+                .build();
+    }
+
+    public MethodSpec generateGetNameDaemonApiMethod() {
+        return MethodSpec.methodBuilder("getName")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(String.class)
+                .addStatement("return " + daemonEngineString + ".getName()")
+                .build();
+    }
+
+    public MethodSpec generateSetConsumerDaemonApiMethod() {
+        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, "Consumer");
+        return MethodSpec.methodBuilder("setConsumer")
+                .addParameter(consumer, "consumer")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement(daemonEngineString + ".setConsumer(consumer)")
+                .addStatement("return this")
+                .build();
+    }
+
+    public abstract TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods);
 
     protected MethodSpec createPursue(
             String methodName,
