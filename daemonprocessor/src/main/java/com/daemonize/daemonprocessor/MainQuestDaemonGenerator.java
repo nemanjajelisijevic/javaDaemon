@@ -94,7 +94,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         FieldSpec daemonEngine = FieldSpec.builder(
                 daemonEngineClass,
-                DAEMON_ENGINE_STRING
+                daemonEngineString
         ).addModifiers(Modifier.PROTECTED)
 //                .initializer(
 //                "new $N(new $T()).setName(this.getClass().getSimpleName())",
@@ -123,10 +123,11 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonClassBuilder.addType(entry.getKey());
         }
 
-        List<MethodSpec> daemonApiMethods = generateDaemonApiMethods();
-
-        for (MethodSpec apiMethod : daemonApiMethods) {
-            daemonClassBuilder.addMethod(apiMethod);
+        if (autoGenerateApiMethods) {
+            List<MethodSpec> daemonApiMethods = generateDaemonApiMethods();
+            for (MethodSpec apiMethod : daemonApiMethods) {
+                daemonClassBuilder.addMethod(apiMethod);
+            }
         }
 
         return daemonClassBuilder.build();
@@ -222,7 +223,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         if (!prototypeMethodData.isVoid()) {
             apiMethodBuilder.addParameter(prototypeMethodData.getClosureOfRet(),"closure");
             apiMethodBuilder.addStatement(
-                    DAEMON_ENGINE_STRING + ".pursueQuest(new "
+                    daemonEngineString + ".pursueQuest(new "
                             + currentMainQuestName + "MainQuest("
                             + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ")
                             + "closure))"
@@ -230,7 +231,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             //.addStatement("return closure");
         } else {
             apiMethodBuilder.addStatement(
-                    DAEMON_ENGINE_STRING + ".pursueQuest(new "
+                    daemonEngineString + ".pursueQuest(new "
                             + currentMainQuestName + "MainQuest("
                             + prototypeMethodData.getArguments() + "))"
             );

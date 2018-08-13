@@ -95,13 +95,15 @@ public class DaemonProcessor extends AbstractProcessor {
                     } else if (publicPrototypeMethods.size() > sideQuestMethods.size()) {
 
                         // double threaded daemon
-/*                        if (classElement.getAnnotation(Daemonize.class).doubleDaemonize()) {
+                        if (classElement.getAnnotation(Daemonize.class).doubleDaemonize()) {
 
-                        } else */
+                            generator = new DoubleDaemonGenerator(((TypeElement) classElement));
 
-                        //single threaded daemon
-                        generator = new HybridDaemonGenerator(((TypeElement) classElement));
+                        } else {
 
+                            //single threaded daemon
+                            generator = new HybridDaemonGenerator(((TypeElement) classElement));
+                        }
 
                     } else {
                         throw new IllegalStateException(

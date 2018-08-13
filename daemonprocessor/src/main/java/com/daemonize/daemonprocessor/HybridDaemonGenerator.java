@@ -20,8 +20,8 @@ import javax.lang.model.element.TypeElement;
 
 public class HybridDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
 
-    private MainQuestDaemonGenerator mainGenerator;
-    private SideQuestDaemonGenerator sideGenerator;
+    protected MainQuestDaemonGenerator mainGenerator;
+    protected SideQuestDaemonGenerator sideGenerator;
 
     {
         daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE + ".hybriddaemon";
@@ -76,7 +76,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
 
         FieldSpec daemonEngine = FieldSpec.builder(
                 daemonEngineClass,
-                DAEMON_ENGINE_STRING
+                daemonEngineString
         )
         .addModifiers(Modifier.PROTECTED)
 //        .initializer(
@@ -140,10 +140,11 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         }
 
         //Add API METHODS
-        List<MethodSpec> apiMethods = sideGenerator.generateDaemonApiMethods();
-
-        for(MethodSpec apiMethod : apiMethods) {
-            daemonClassBuilder.addMethod(apiMethod);
+        if (autoGenerateApiMethods) {
+            List<MethodSpec> apiMethods = sideGenerator.generateDaemonApiMethods();
+            for (MethodSpec apiMethod : apiMethods) {
+                daemonClassBuilder.addMethod(apiMethod);
+            }
         }
 
         //add main quests
