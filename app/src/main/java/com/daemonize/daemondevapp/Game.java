@@ -4,13 +4,17 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Pair;
 
+import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
+import com.daemonize.daemondevapp.imagemovers.EnemyDoubleDaemon;
+import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.proba.Bullet;
-import com.daemonize.daemondevapp.proba.Enemy;
 import com.daemonize.daemondevapp.proba.ImageMoverM;
 import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
 import com.daemonize.daemondevapp.view.DaemonView;
+import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
@@ -55,7 +59,7 @@ public class Game {
     private List<DummyDaemon> towers = new ArrayList<>();
 
     private Queue<DaemonView> enemyViews;
-    private Set<ImageMoverMDaemon> activeEnemies = new HashSet<>();
+    private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private List<Bitmap> enemySprite;
 
     private DummyDaemon enemyGenerator;
@@ -107,7 +111,6 @@ public class Game {
         //TODO validate enemyViews
         this.enemyViews = enemyViews;
         this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, 6 - 1));
-        this.enemyGenerator = new DummyDaemon(gameConsumer, 2000);
         this.bulletQueue = bulletQueue;
     }
 
@@ -121,7 +124,7 @@ public class Game {
 
         enemyGenerator.stop();
 
-        for(ImageMoverMDaemon enemy : activeEnemies) {
+        for(EnemyDoubleDaemon enemy : activeEnemies) {
             enemy.stop();
         }
 
@@ -138,7 +141,7 @@ public class Game {
         //init spell (state)
         chain.addSpell(()->{
 
-            enemyGenerator.setClosure(ret->{
+            enemyGenerator = new DummyDaemon(gameConsumer, 2000).setClosure(ret->{
 
                 Log.d(DaemonUtils.tag(), "Enemy views queue size: " + enemyViews.size());
 
@@ -149,51 +152,95 @@ public class Game {
 
                 guiConsumer.consume(()->enemyView.show());
 
-                ImageMoverMDaemon enemy = new ImageMoverMDaemon(
+                Field firstField = grid.getField(1, 1);
+
+                EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
+                        gameConsumer,
                         guiConsumer,
-                        new Enemy(
-                                40,
+                        new CoordinatedImageTranslationMover(
                                 enemySprite,
-                                explodeSprite,
-                                new ImageMoverM.Velocity(
-                                        3,
-                                        new ImageMoverM.Direction(
-                                                (float) borderX/2,
-                                                (float) borderY/2
-                                        )
-                                ),
-                                Pair.create( (float)0, (float)0),
-                                grid
-                        ).setBorders(borderX, borderY).setView(enemyView)
-                ).setName("Enemy");
+                                3,
+                                Pair.create((float)0, (float)0),
+                                Pair.create((float)firstField.getCenterX(), (float)firstField.getCenterY())
+                        ).setView(enemyView)
+                );
 
-                enemy.setMoveSideQuest().setClosure(aReturn->{ //gui consumer
+                enemy.getPrototype().setBorders(borderX, borderY);
 
-                    ImageMoverM.PositionedBitmap posBmp = aReturn.get();
-
-                    //draw enemy
-                    ((Enemy) enemy.getPrototype()).getView().setX(posBmp.positionX);
-                    ((Enemy) enemy.getPrototype()).getView().setY(posBmp.positionY);
-                    ((Enemy) enemy.getPrototype()).getView().setImage(posBmp.image);
-
-                    //check if inside the map
-                    gameConsumer.consume(()-> {
-                        if (
-                            posBmp.positionX >= grid.getGridHeight() + 40 ||
-                            posBmp.positionY >= grid.getGridWidth() + 40 ||
-                            grid.getEndPoint().equals(grid.getFieldCoord(posBmp.positionX, posBmp.positionY))
-                                ) {
-                            enemy.stop();
-                            activeEnemies.remove(enemy);
-                            guiConsumer.consume(()->((Enemy) enemy.getPrototype()).getView().hide());
-                            enemyViews.add(((Enemy) enemy.getPrototype()).getView());
-                        }
-
-                    });
+                enemy.setMoveSideQuest().setClosure(aReturn -> {//gui consumer
+                    ImageMover.PositionedBitmap posBmp = aReturn.get();
+                    enemy.getView().setX(posBmp.positionX);
+                    enemy.getView().setY(posBmp.positionY);
+                    enemy.getView().setImage(posBmp.image);
                 });
 
-                activeEnemies.add(enemy);
                 enemy.start();
+
+                activeEnemies.add(enemy);
+
+                enemy.goTo(firstField.getCenterX(), firstField.getCenterY(), 3,
+                        new Closure<Boolean>() {// gameConsumer
+                            @Override
+                            public void onReturn(Return<Boolean> aReturn) {
+                                Pair<Float, Float> currentCoord = enemy.getPrototype().getLastCoordinates();
+                                Field current = grid.getField(currentCoord.first, currentCoord.second);
+                                Field next = grid.getMinWeightOfNeighbors(current);
+
+                                enemy.goTo(next.getCenterX(), next.getCenterY(), 3, this);
+
+                            }
+                        }
+                );
+
+                enemy.start();
+
+//                ImageMoverMDaemon enemy = new ImageMoverMDaemon(
+//                        guiConsumer,
+//                        new Enemy(
+//                                40,
+//                                enemySprite,
+//                                explodeSprite,
+//                                new ImageMoverM.Velocity(
+//                                        3,
+//                                        new ImageMoverM.Direction(
+//                                                (float) borderX/2,
+//                                                (float) borderY/2
+//                                        )
+//                                ),
+//                                Pair.create( (float)0, (float)0),
+//                                grid
+//                        ).setBorders(borderX, borderY).setView(enemyView)
+//                ).setName("Enemy");
+//
+//                enemy.setMoveSideQuest().setClosure(aReturn->{ //gui consumer
+//
+//                    ImageMoverM.PositionedBitmap posBmp = aReturn.get();
+//
+//                    //draw enemy
+//                    ((Enemy) enemy.getPrototype()).getView().setX(posBmp.positionX);
+//                    ((Enemy) enemy.getPrototype()).getView().setY(posBmp.positionY);
+//                    ((Enemy) enemy.getPrototype()).getView().setImage(posBmp.image);
+//
+//                    //check if inside the map
+//                    gameConsumer.consume(()-> {
+//                        if (
+//                            posBmp.positionX >= grid.getGridHeight() + 40 ||
+//                            posBmp.positionY >= grid.getGridWidth() + 40 ||
+//                            grid.getEndPoint().equals(grid.getFieldCoord(posBmp.positionX, posBmp.positionY))
+//                                ) {
+//                            enemy.stop();
+//                            activeEnemies.remove(enemy);
+//                            guiConsumer.consume(()->((Enemy) enemy.getPrototype()).getView().hide());
+//                            enemyViews.add(((Enemy) enemy.getPrototype()).getView());
+//                        }
+//
+//                    });
+//                });
+//
+//                activeEnemies.add(enemy);
+//                enemy.start();
+
+
             });
 
             enemyGenerator.start();
@@ -244,9 +291,9 @@ public class Game {
             if (b) {
                 DummyDaemon tower = new DummyDaemon(gameConsumer, 1000).setClosure(ret -> {
 
-                    for (ImageMoverMDaemon enemy : activeEnemies) {
+                    for (EnemyDoubleDaemon enemy : activeEnemies) {
 
-                        Pair<Float, Float> enemyCoord = enemy.getLastCoordinates();
+                        Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
 
                         if (Math.abs((float) field.getCenterX() - enemyCoord.first) < 200
                                 && Math.abs((float) field.getCenterY() - enemyCoord.second) < 200) {
@@ -266,9 +313,9 @@ public class Game {
         return this;
     }
 
-    private void fireBullet(Pair<Float, Float> sourceCoord, ImageMoverMDaemon enemy) {
+    private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy) {
 
-        Pair<Float, Float> enemyCoord = enemy.getLastCoordinates();
+        Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
 
         Log.i(DaemonUtils.tag(), "Bullet view queue size: " + bulletQueue.size());
 
@@ -309,18 +356,25 @@ public class Game {
                 } else if (Math.abs(posBmp.positionX - enemyCoord.first) <= bulletSprite.get(0).getWidth()
                         && Math.abs(ret.get().positionY - enemyCoord.second) <= bulletSprite.get(0).getHeight()) {
 
-                    Enemy baddy = ((Enemy) enemy.getPrototype());
-                    int enemyHp = baddy.getHp();
+                    //EnemyDaemon baddy = enemy.getPrototype();
+                    int enemyHp = enemy.getHp();
                     if (enemyHp > 0) {
-                        baddy.setHp(--enemyHp);
+                        enemy.setHp(--enemyHp);
                     } else {
-                        enemy.explode(
-                                aReturn -> ((Enemy) enemy.getPrototype()).getView().setImage(aReturn.get().image),
-                                aReturn -> ((Enemy) enemy.getPrototype()).getView().hide());
-                        enemy.queueStop();
+//                        enemy.explode(
+//                                aReturn -> ((Enemy) enemy.getPrototype()).getView().setImage(aReturn.get().image),
+//                                aReturn -> ((Enemy) enemy.getPrototype()).getView().hide());
+                        //enemy.pushSprite(explodeSprite, aReturn -> {});
+                        enemy.stop();
+                        guiConsumer.consume(()->enemy.getView().hide());
                         activeEnemies.remove(enemy);
-                        if (!enemyViews.contains(baddy.getView()))
-                            enemyViews.add(baddy.getView());//TODO dead enemy should return a borrowed view
+                        if (!enemyViews.contains(enemy.getView()))
+                            enemyViews.add(enemy.getView());//TODO dead enemy should return a borrowed view
+
+
+                        activeEnemies.remove(enemy);
+                        if (!enemyViews.contains(enemy.getView()))
+                            enemyViews.add(enemy.getView());//TODO dead enemy should return a borrowed view
                     }
                     bullet.stop();
                     DaemonView view = ((Bullet) bullet.getPrototype()).getView();

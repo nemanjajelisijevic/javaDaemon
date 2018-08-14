@@ -6,6 +6,7 @@ import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseDaemonEngine implements Daemon {
 
@@ -67,6 +68,8 @@ public abstract class BaseDaemonEngine implements Daemon {
       setState(currentQuest.getState());
       currentQuest.setConsumer(consumer).run();
     }
+
+    System.out.println(DaemonUtils.tag() + "Daemon stopped!");
 
     setState(DaemonState.STOPPED);
   }

@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.util.Pair;
 import android.widget.ImageView;
 
+import com.daemonize.daemondevapp.proba.ImageMoverM;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 
@@ -47,16 +48,16 @@ public class ImageTranslationMover implements ImageMover {
     protected volatile float lastX;
     protected volatile float lastY;
 
-    private ImageView view;
+//    private ImageView view;
+//
+//    public ImageView getView() {
+//        return view;
+//    }
 
-    public ImageView getView() {
-        return view;
-    }
-
-    public ImageTranslationMover setView(ImageView view) {
-        this.view = view;
-        return this;
-    }
+//    public ImageTranslationMover setView(ImageView view) {
+//        this.view = view;
+//        return this;
+//    }
 
     @Override
     public Pair<Float, Float> getLastCoordinates() {
@@ -121,29 +122,22 @@ public class ImageTranslationMover implements ImageMover {
         float dX = x - lastX;
         float dY = y - lastY;
 
-        float a;
-        boolean signY = dY >= 0;
-        boolean signX = dX >= 0;
+//        float a;
+//        boolean signY = dY >= 0;
+//        boolean signX = dX >= 0;
         velocity.intensity = velocityInt;
+        velocity.direction = new ImageMover.Direction(dX, dY);
+//
+//        if (Math.abs(dY) >= Math.abs(dX)) {
+//            a = Math.abs((100*dX)/dY);
+//            float aY =  100 - a;
+//            velocity.direction = new Direction(signX ? a : - a, signY ? aY : - aY);
+//        } else {
+//            a = Math.abs((100*dY)/dX);
+//            float aX =  100 - a;
+//            velocity.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
+//        }
 
-        if (Math.abs(dY) >= Math.abs(dX)) {
-            a = Math.abs((100*dX)/dY);
-            float aY =  100 - a;
-            velocity.direction = new Direction(signX ? a : - a, signY ? aY : - aY);
-        } else {
-            a = Math.abs((100*dY)/dX);
-            float aX =  100 - a;
-            velocity.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
-        }
-
-        //startMoving();
-    }
-
-
-    @Override
-    public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
-        setDirectionAndMove(x, y, velocityInt);
-        return true;
     }
 
     @Override
@@ -157,7 +151,6 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void setVelocity(float velocity) {
         this.velocity.intensity = velocity;
-//        startMoving();
     }
 
     @Override
@@ -171,11 +164,6 @@ public class ImageTranslationMover implements ImageMover {
 
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
-//        try {
-//            awaitForMovement();
-//        } catch (InterruptedException e) {
-//            //
-//        }
 
         //check borders and recalculate
         if (lastX <= 0) {
@@ -189,10 +177,10 @@ public class ImageTranslationMover implements ImageMover {
         } else if( lastY >= borderY) {
             lastY = borderY;
         }
-//
-//        lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
-//        lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
-//
+
+        lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
+        lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
+
 
         ret.positionX = lastX;
         ret.positionY = lastY;

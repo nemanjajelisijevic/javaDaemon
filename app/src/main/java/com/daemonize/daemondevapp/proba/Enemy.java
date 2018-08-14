@@ -124,15 +124,15 @@ public class Enemy implements ImageMoverM {
         float dX = x - lastX;
         float dY = y - lastY;
 
-        float a,b;
-        boolean signY = dY >= 0;
-        boolean signX = dX >= 0;
+//        float a,b;
+//        boolean signY = dY >= 0;
+//        boolean signX = dX >= 0;
         velocity.intensity = velocityInt;
 
 //        if (Math.abs(dY) == Math.abs(dX)) {
 //            a = dY == 0 ? 0 : Math.abs((dX) / dY);
 //            b = dY == 0 ? 0 : Math.abs((dY) / dX);
-            velocity.direction = new Direction(dX, dY);
+        velocity.direction = new Direction(dX, dY);
 //        }
         //            float aY =  100 - a;
 //        } else if (Math.abs(dY) > Math.abs(dX)) {

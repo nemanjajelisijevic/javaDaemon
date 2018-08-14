@@ -62,8 +62,6 @@ public interface ImageMover {
 
     void setDirectionAndMove(float x, float y, float velocityInt);
 
-    boolean goTo(float x, float y, float velocityInt) throws InterruptedException;
-
     void setVelocity(float velocity);
 
     @CallingThread
