@@ -8,6 +8,7 @@ import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 
@@ -42,6 +43,11 @@ public class Example {
 
     protected Integer shouldNorBeHere() {
         return  1;
+    }
+
+    @DedicatedThread
+    public int dedThreadEngineTest(boolean flag, float fp) {
+        return 1;
     }
 
     public List<String> complicated(String text) throws InterruptedException {

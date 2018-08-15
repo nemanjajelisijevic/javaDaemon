@@ -14,27 +14,54 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class StackedSpriteImageTranslationMover extends ImageTranslationMover {
 
-    private Stack<List<Bitmap>> stack = new Stack<>();
+    private static class AwaitedSprite {
 
-    private Lock spriteLock = new ReentrantLock();
-    private Condition spriteDrawnCondition = spriteLock.newCondition();
-    private volatile boolean spriteDrawn = false;
+        private List<Bitmap> sprite;
+
+        public List<Bitmap> getSprite() {
+            return sprite;
+        }
+
+        private Lock spriteLock = new ReentrantLock();
+        private Condition spriteDrawnCondition = spriteLock.newCondition();
+        private volatile boolean spriteDrawn = false;
+
+        public AwaitedSprite(List<Bitmap> sprite) {
+            this.sprite = sprite;
+        }
+
+        public void await() throws InterruptedException {
+            spriteLock.lock();
+            try {
+                while (!spriteDrawn) {
+                    spriteDrawnCondition.await();
+                }
+            } finally {
+                spriteDrawn = false;
+                spriteLock.unlock();
+            }
+        }
+
+        public AwaitedSprite signal() {
+            spriteLock.lock();
+            spriteDrawn = true;
+            spriteDrawnCondition.signal();
+            spriteLock.unlock();
+            return this;
+        }
+
+    }
+
+
+    private Stack<AwaitedSprite> stack = new Stack<>();
+    private List<Bitmap> sprite;
 
     public boolean pushSprite(List<Bitmap> sprite) throws InterruptedException {
 
-        spriteLock.lock();
-        stack.push(sprite);
-        try {
-            while (!spriteDrawn) {
-                try {
-                    spriteDrawnCondition.await();
-                } catch (InterruptedException ex) {}
-            }
-        } finally {
-            spriteDrawn = false;
-            spriteLock.unlock();
-            Log.e(DaemonUtils.tag(), "pushSprite() returns!!!!!!!!!!!!!!!!");
-        }
+        AwaitedSprite awaitedSprite = new AwaitedSprite(sprite);
+        stack.push(awaitedSprite);
+        awaitedSprite.await();
+        Log.e(DaemonUtils.tag(), "pushSprite() returns!!!!!!!!!!!!!!!!");
 
         return true;
     }
@@ -44,15 +71,16 @@ public class StackedSpriteImageTranslationMover extends ImageTranslationMover {
 
         if (!spriteIterator.hasNext()) {
 
-            if (stack.size() > 1) {
-                sprite = stack.pop();
-            } else
-                sprite = stack.peek();
+            AwaitedSprite awaitedSprite;
 
-            spriteLock.lock();
-            spriteDrawn = true;
-            spriteDrawnCondition.signal();
-            spriteLock.unlock();
+            if (stack.size() > 1) {
+                awaitedSprite = stack.pop();
+            } else {
+                awaitedSprite = stack.peek();
+            }
+
+            sprite = awaitedSprite.getSprite();
+            awaitedSprite.signal();
 
             spriteIterator = sprite.iterator();
         }
@@ -62,8 +90,8 @@ public class StackedSpriteImageTranslationMover extends ImageTranslationMover {
 
     public StackedSpriteImageTranslationMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
-        stack.push(sprite);
-        this.sprite = stack.peek();
+        stack.push(new AwaitedSprite(sprite));
+        this.sprite = stack.peek().getSprite();
     }
 
 }

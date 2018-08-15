@@ -6,6 +6,7 @@ import android.util.Pair;
 import com.daemonize.daemondevapp.view.DaemonView;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public class CoordinatedImageTranslationMover extends ImageTranslationMover {
 
     private DaemonView view;
 
-    private volatile int hp = 4;
+    private volatile int hp = 20;
 
     @CallingThread
     public int getHp() {
@@ -53,6 +54,7 @@ public class CoordinatedImageTranslationMover extends ImageTranslationMover {
         this.targetY = targetCoord.second;
     }
 
+    @DedicatedThread
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
 
         super.setDirectionAndMove(x, y, velocityInt);

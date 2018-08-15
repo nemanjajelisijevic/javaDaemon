@@ -364,7 +364,7 @@ public class Game {
 //                        enemy.explode(
 //                                aReturn -> ((Enemy) enemy.getPrototype()).getView().setImage(aReturn.get().image),
 //                                aReturn -> ((Enemy) enemy.getPrototype()).getView().hide());
-                        //enemy.pushSprite(explodeSprite, aReturn -> {});
+                        //enemy.pushSprite(explodeSprite, aReturn -> enemy.stop());
                         enemy.stop();
                         guiConsumer.consume(()->enemy.getView().hide());
                         activeEnemies.remove(enemy);
