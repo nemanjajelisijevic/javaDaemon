@@ -26,7 +26,6 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         QUEST_TYPE_NAME = "SideQuest";
         daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE + ".sidequestdaemon";
         daemonEngineSimpleName = "SideQuestDaemonEngine";
-        daemonInterface = ClassName.get(daemonPackage, "SideQuestDaemon");
     }
 
     //construct
@@ -66,22 +65,10 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 daemonEngineSimpleName
         );
 
-//        ClassName consumer = ClassName.get(CONSUMER_PACKAGE + "." + platform.getImplementationPackage(), platform.getPlatformConsumer());
-
-        ClassName consumer = ClassName.get(
-                CONSUMER_PACKAGE,
-                CONSUMER_INTERFACE_STRING
-        );
-
         FieldSpec daemonEngine = FieldSpec.builder(
                 daemonEngineClass,
                 daemonEngineString
         ).addModifiers(Modifier.PROTECTED)
-//                .initializer(
-//                "new $N(new $T()).setName(this.getClass().getSimpleName())",
-//                daemonEngineSimpleName,
-//                consumer
-//        )
         .build();
 
         daemonClassBuilder.addField(prototype);
@@ -195,34 +182,6 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .build();
 
         return Pair.create(sideQuest, sideQuestSetter);
-    }
-
-    @Override
-    public  List<MethodSpec> generateDaemonApiMethods() {//TODO DEPRECATED due to sideQuest specific setters
-        List<MethodSpec> ret = super.generateDaemonApiMethods();
-        ret.add(generateSetSideQuestDaemonApiMethod());
-        ret.add(generateGetSideQuestDaemonApiMethod());
-        return ret;
-    }
-
-    public MethodSpec generateSetSideQuestDaemonApiMethod(){
-        return MethodSpec.methodBuilder("setSideQuest")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(void.class)
-                .addParameter(ClassName.get(QUEST_PACKAGE, "SideQuest"), "sideQuest")
-                .addStatement(daemonEngineString + ".setSideQuest($N)", "sideQuest")
-                .build();
-    }
-
-
-    public MethodSpec generateGetSideQuestDaemonApiMethod(){
-        return MethodSpec.methodBuilder("getSideQuest")
-                .addAnnotation(Override.class)
-                .addModifiers(Modifier.PUBLIC)
-                .returns(ClassName.get(QUEST_PACKAGE, "SideQuest"))
-                .addStatement("return " + daemonEngineString + ".getSideQuest()")
-                .build();
     }
 
 }
