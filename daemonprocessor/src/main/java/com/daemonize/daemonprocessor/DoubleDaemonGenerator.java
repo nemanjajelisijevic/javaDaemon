@@ -25,15 +25,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
     private final String MAIN_DAEMON_ENGINE_STRING = "mainDaemonEngine";
     private final String SIDE_DAEMON_ENGINE_STRING = "sideDaemonEngine";
 
-
-    {
-        daemonInterface = ClassName.get(
-                DAEMON_ENGINE_IMPL_PACKAGE + ".sidequestdaemon",
-                "SideQuestDaemon"
-        );
-    }
-
-
     public DoubleDaemonGenerator(TypeElement classElement) {
         super(classElement);
         this.mainGenerator = new MainQuestDaemonGenerator(
@@ -64,12 +55,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 PROTOTYPE_STRING
         ).addModifiers(Modifier.PRIVATE).build();
 
-        //consumer class name (will need two arguments)
-        ClassName consumer = ClassName.get(
-                CONSUMER_PACKAGE,
-                CONSUMER_INTERFACE_STRING
-        );
-
         //main quest daemon engine
         ClassName mainDaemonEngineClass = ClassName.get(
                 mainGenerator.getDaemonPackage(),
@@ -82,7 +67,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         )
         .addModifiers(Modifier.PROTECTED)
         .build();
-
 
         //side quest daemon engine
         ClassName sideDaemonEngineClass = ClassName.get(
@@ -102,18 +86,31 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         daemonClassBuilder.addField(sideDaemonEngine);
 
         //daemon construct
-        MethodSpec daemonConstructor = MethodSpec.constructorBuilder()
+        MethodSpec.Builder daemonConstructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(consumer, "mainConsumer")
                 .addParameter(consumer, "sideConsumer")
                 .addParameter(ClassName.get(classElement.asType()), PROTOTYPE_STRING)
                 .addStatement("this.$N = new $N(mainConsumer).setName(this.getClass().getSimpleName() + \" - MAIN\")", MAIN_DAEMON_ENGINE_STRING, mainGenerator.getDaemonEngineSimpleName())
-                .addStatement("this.$N = new $N(sideConsumer).setName(this.getClass().getSimpleName() + \" - SIDE\")", SIDE_DAEMON_ENGINE_STRING, sideGenerator.getDaemonEngineSimpleName())
+                .addStatement("this.$N = new $N(sideConsumer).setName(this.getClass().getSimpleName() + \" - SIDE\")", SIDE_DAEMON_ENGINE_STRING, sideGenerator.getDaemonEngineSimpleName());
+
+        //add dedicated daemon engines
+        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
+            daemonClassBuilder.addField(entry.getValue().getSecond());
+            daemonConstructorBuilder.addStatement(
+                    "this." + entry.getValue().getFirst() +
+                            " = new $N(mainConsumer).setName(this.getClass().getSimpleName() + \" - "
+                            + entry.getValue().getFirst() + "\")",
+                    mainGenerator.getDaemonEngineSimpleName()
+//                    daemonEngineSimpleName
+            );
+        }
+
+        MethodSpec daemonConstructor = daemonConstructorBuilder
                 .addStatement("this.$N = $N", PROTOTYPE_STRING, PROTOTYPE_STRING)
                 .build();
 
         daemonClassBuilder.addMethod(daemonConstructor);
-
 
         //sideQuest daemon fields and methods
         List<Pair<ExecutableElement, SideQuest>> sideQuests
@@ -139,10 +136,20 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 continue;
             }
 
-            mainQuestsAndApiMethods.put(
-                    mainGenerator.createMainQuest(method),
-                    mainGenerator.createApiMethod(method)
-            );
+            if (mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
+                mainQuestsAndApiMethods.put(
+                        mainGenerator.createMainQuest(method),
+                        mainGenerator.createApiMethod(
+                                method,
+                                mainGenerator.getDedicatedThreadEngines().get(method).getFirst()
+                        )
+                );
+            } else {
+                mainQuestsAndApiMethods.put(
+                        mainGenerator.createMainQuest(method),
+                        mainGenerator.createApiMethod(method, mainGenerator.getDaemonEngineString())
+                );
+            }
         }
 
         //add side quests
@@ -171,9 +178,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(generateSetSideConsumerDaemonApiMethod());
         apiMethods.add(generateSetConsumerDaemonApiMethod());
 
-        apiMethods.add(sideGenerator.generateSetSideQuestDaemonApiMethod());//TODO depricated due to sideQuest specific setters
-        apiMethods.add(sideGenerator.generateGetSideQuestDaemonApiMethod());//TODO depricated due to sideQuest specific setters
-
         for(MethodSpec apiMethod : apiMethods) {
             daemonClassBuilder.addMethod(apiMethod);
         }
@@ -185,48 +189,61 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
 
         return daemonClassBuilder.build();
 
-
     }
 
     @Override
     public MethodSpec generateStopDaemonApiMethod() {
-        return MethodSpec.methodBuilder("stop")
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("stop")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(void.class)
                 .addStatement(mainGenerator.getDaemonEngineString() + ".stop()")
-                .addStatement(sideGenerator.getDaemonEngineString() + ".stop()")
-                .build();
+                .addStatement(sideGenerator.getDaemonEngineString() + ".stop()");
+
+        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
+            builder.addStatement( entry.getValue().getFirst() + ".stop()");
+
+        }
+
+        return builder.build();
     }
 
     @Override
     public MethodSpec generateQueueStopDaemonApiMethod() {
 
-        return MethodSpec.methodBuilder("queueStop")
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("queueStop")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(void.class)
                 .addStatement(mainGenerator.getDaemonEngineString() + ".queueStop()")
-                .addStatement(sideGenerator.getDaemonEngineString() + ".stop()")
-                .build();
+                .addStatement(sideGenerator.getDaemonEngineString() + ".stop()");
+
+        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
+            builder.addStatement( entry.getValue().getFirst() + ".queueStop()");
+        }
+
+        return builder.build();
     }
 
     @Override
     public MethodSpec generateSetNameDaemonApiMethod() {
 
-        return MethodSpec.methodBuilder("setName")
+        MethodSpec.Builder builder =  MethodSpec.methodBuilder("setName")
                 .addParameter(String.class, "name")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(mainGenerator.getDaemonEngineString() + ".setName(name + \" - MAIN\")")
-                .addStatement(sideGenerator.getDaemonEngineString() + ".setName(name + \" - SIDE\")")
-                .addStatement("return this")
-                .build();
+                .addStatement(sideGenerator.getDaemonEngineString() + ".setName(name + \" - SIDE\")");
+
+        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
+            builder.addStatement(entry.getValue().getFirst() + ".setName(name +\" - " + entry.getValue().getFirst() + "\")");
+        }
+
+        return builder.addStatement("return this").build();
     }
 
     public MethodSpec generateSetMainConsumerDaemonApiMethod() {
-        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, "Consumer");
         return MethodSpec.methodBuilder("setMainQuestConsumer")
                 .addParameter(consumer, "consumer")
                 .addModifiers(Modifier.PUBLIC)
@@ -237,7 +254,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
     }
 
     public MethodSpec generateSetSideConsumerDaemonApiMethod() {
-        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, "Consumer");
         return MethodSpec.methodBuilder("setSideQuestConsumer")
                 .addParameter(consumer, "consumer")
                 .addModifiers(Modifier.PUBLIC)
@@ -249,7 +265,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
 
     @Override
     public MethodSpec generateSetConsumerDaemonApiMethod() { //TODO check whether to throw or set consumer to both engines
-        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, "Consumer");
         return MethodSpec.methodBuilder("setConsumer")
                 .addParameter(consumer, "consumer")
                 .addAnnotation(Override.class)

@@ -2,6 +2,7 @@ package com.daemonize.daemonprocessor;
 
 
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.LogExecutionTime;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
@@ -40,6 +41,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     protected final String PROTOTYPE_STRING = "prototype";
 
     protected String daemonEngineString = "daemonEngine";
+    protected String daemonConcatEngineString = "DaemonEngine";
 
     public BaseDaemonGenerator setDaemonEngineString(String daemonEngineString) {
         this.daemonEngineString = daemonEngineString;
@@ -62,6 +64,8 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
     protected final String CONSUMER_PACKAGE = "com.daemonize.daemonengine.consumer";
     protected final String CONSUMER_INTERFACE_STRING = "Consumer";
+
+    protected ClassName consumer = ClassName.get(CONSUMER_PACKAGE, CONSUMER_INTERFACE_STRING);
 
     private final String DAEMONUTILS_PACKAGE = "com.daemonize.daemonengine.utils";
     protected final ClassName DAEMON_UTILS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "DaemonUtils");
@@ -149,10 +153,23 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         return ret;
     }
 
+    public static List<Pair<ExecutableElement, DedicatedThread>> getDedicatedThreadMethods(List<ExecutableElement> publicMethods) {
+
+        List<Pair<ExecutableElement, DedicatedThread>> ret = new ArrayList<>();
+
+        for (ExecutableElement method : publicMethods) {
+            if (method.getAnnotation(DedicatedThread.class) != null) {
+                ret.add(Pair.create(method, method.getAnnotation(DedicatedThread.class)));
+            }
+        }
+
+        return ret;
+    }
+
 
     public List<MethodSpec> generateDaemonApiMethods() {
 
-        List<MethodSpec> ret = new ArrayList<>(7);
+        List<MethodSpec> ret = new ArrayList<>(9);
 
         ret.add(generateGetPrototypeDaemonApiMethod());
         ret.add(generateSetPrototypeDaemonApiMethod());
@@ -242,7 +259,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     }
 
     public MethodSpec generateSetConsumerDaemonApiMethod() {
-        ClassName consumer = ClassName.get(CONSUMER_PACKAGE, "Consumer");
         return MethodSpec.methodBuilder("setConsumer")
                 .addParameter(consumer, "consumer")
                 .addAnnotation(Override.class)
