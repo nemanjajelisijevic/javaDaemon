@@ -192,8 +192,6 @@ public class Game {
                         }
                 );
 
-                enemy.start();
-
 //                ImageMoverMDaemon enemy = new ImageMoverMDaemon(
 //                        guiConsumer,
 //                        new Enemy(
@@ -289,7 +287,7 @@ public class Game {
             guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(image));
 
             if (b) {
-                DummyDaemon tower = new DummyDaemon(gameConsumer, 1000).setClosure(ret -> {
+                DummyDaemon tower = new DummyDaemon(gameConsumer, 1200).setClosure(ret -> {
 
                     for (EnemyDoubleDaemon enemy : activeEnemies) {
 
@@ -356,25 +354,17 @@ public class Game {
                 } else if (Math.abs(posBmp.positionX - enemyCoord.first) <= bulletSprite.get(0).getWidth()
                         && Math.abs(ret.get().positionY - enemyCoord.second) <= bulletSprite.get(0).getHeight()) {
 
-                    //EnemyDaemon baddy = enemy.getPrototype();
                     int enemyHp = enemy.getHp();
                     if (enemyHp > 0) {
                         enemy.setHp(--enemyHp);
                     } else {
-//                        enemy.explode(
-//                                aReturn -> ((Enemy) enemy.getPrototype()).getView().setImage(aReturn.get().image),
-//                                aReturn -> ((Enemy) enemy.getPrototype()).getView().hide());
-                        //enemy.pushSprite(explodeSprite, aReturn -> enemy.stop());
-                        enemy.stop();
-                        guiConsumer.consume(()->enemy.getView().hide());
-                        activeEnemies.remove(enemy);
-                        if (!enemyViews.contains(enemy.getView()))
-                            enemyViews.add(enemy.getView());//TODO dead enemy should return a borrowed view
-
-
-                        activeEnemies.remove(enemy);
-                        if (!enemyViews.contains(enemy.getView()))
-                            enemyViews.add(enemy.getView());//TODO dead enemy should return a borrowed view
+                        enemy.pushSprite(explodeSprite, 0, aReturn -> {
+                            enemy.stop();
+                            guiConsumer.consume(()->enemy.getView().hide());
+                            activeEnemies.remove(enemy);
+                            if (!enemyViews.contains(enemy.getView()))
+                                enemyViews.add(enemy.getView());//TODO dead enemy should return a borrowed view
+                        });
                     }
                     bullet.stop();
                     DaemonView view = ((Bullet) bullet.getPrototype()).getView();

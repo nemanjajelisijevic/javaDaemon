@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 @Daemonize(doubleDaemonize = true, className = "EnemyDoubleDaemon")
-public class CoordinatedImageTranslationMover extends ImageTranslationMover {
+public class CoordinatedImageTranslationMover extends StackedSpriteImageTranslationMover {
 
     private Lock coordinateLock = new ReentrantLock();
     private Condition coordinateReachedCondition = coordinateLock.newCondition();
@@ -52,6 +52,11 @@ public class CoordinatedImageTranslationMover extends ImageTranslationMover {
         super(sprite, velocity, startingPos);
         this.targetX = targetCoord.first;
         this.targetY = targetCoord.second;
+    }
+
+    @Override
+    public boolean pushSprite(List<Bitmap> sprite, float velocity) throws InterruptedException {
+        return super.pushSprite(sprite, velocity);
     }
 
     @DedicatedThread
