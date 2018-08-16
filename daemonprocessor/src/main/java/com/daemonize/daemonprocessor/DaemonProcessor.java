@@ -29,7 +29,8 @@ import javax.tools.Diagnostic;
         {
                 "com.daemonize.daemonprocessor.annotations.Daemonize",
                 "com.daemonize.daemonprocessor.annotations.SideQuest",
-                "com.daemonize.daemonprocessor.annotations.CallingThread"
+                "com.daemonize.daemonprocessor.annotations.CallingThread",
+                "com.daemonize.daemonprocessor.annotations.DedicatedThread"
         }
 )
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
