@@ -4,8 +4,6 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Pair;
 
-import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.EnemyDoubleDaemon;
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.proba.Bullet;
 import com.daemonize.daemondevapp.proba.ImageMoverM;
@@ -153,12 +151,12 @@ public class Game {
 
                 guiConsumer.consume(()->enemyView.show());
 
-                Field firstField = grid.getField(1, 1);
+                Field firstField = grid.getField(0, 0);
 
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                         gameConsumer,
                         guiConsumer,
-                        new CoordinatedImageTranslationMover(
+                        new Enemy(
                                 enemySprite,
                                 3,
                                 Pair.create((float)0, (float)0),
@@ -207,7 +205,7 @@ public class Game {
                 }
             });
 
-            //try to garbage collect every 20sec to check fo mem leaks
+            //try to garbage collect every 10sec to check fo mem leaks
             new DummyDaemon(gameConsumer, 10000).setClosure(aReturn -> System.gc()).start();
 
         });
@@ -270,6 +268,10 @@ public class Game {
 
     private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy) {
 
+        if (!enemy.isShootable()) {
+            return;
+        }
+
         Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
 
         Log.i(DaemonUtils.tag(), "Bullet view queue size: " + bulletQueue.size());
@@ -315,7 +317,9 @@ public class Game {
                     if (enemyHp > 0) {
                         enemy.setHp(--enemyHp);
                     } else {
+                        enemy.setShootable(false);
                         enemy.pushSprite(explodeSprite, 0, aReturn -> {
+                            enemy.setShootable(true);
                             enemy.stop();
                             guiConsumer.consume(()->enemy.getView().hide());
                             activeEnemies.remove(enemy);
@@ -328,6 +332,7 @@ public class Game {
                     guiConsumer.consume(()->view.hide());
                     if(!bulletQueue.contains(view))
                         bulletQueue.add(view);
+
                 }
 
             });
