@@ -73,7 +73,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
         targetAngle += dtAngle;
 
 
-        boolean plus = targetAngle >= currentAngle;
+        boolean plus = targetAngle >= currentAngle;//TODO cover when target - current <10
 
         List<Bitmap> rotationSprite = new LinkedList<>();
         int counterAngle = currentAngle;
