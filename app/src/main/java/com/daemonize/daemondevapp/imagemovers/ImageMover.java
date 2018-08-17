@@ -68,7 +68,7 @@ public interface ImageMover {
     <K extends ImageMover> K setBorders(float x, float y);
 
     @SideQuest(SLEEP = 25)
-    PositionedBitmap move();
+    PositionedBitmap animate();
 
     PositionedBitmap explode(List<Bitmap> explodeSprite, Closure<PositionedBitmap> update) throws InterruptedException;
 

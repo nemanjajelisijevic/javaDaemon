@@ -29,13 +29,13 @@ public class GravityImageMover extends ImageTranslationMover {
     }
 
     @Override
-    public PositionedBitmap move() {
+    public PositionedBitmap animate() {
 
             if(velocity.intensity <= 0) {
                 falling = true;
                 setDirectionAndMove(lastX, borderY, velocity.intensity);
                 velocity.intensity = initVelocity;
-                return super.move();
+                return super.animate();
             }
 
             if (Math.abs(lastY - borderY) < 50) {
@@ -50,6 +50,6 @@ public class GravityImageMover extends ImageTranslationMover {
             if(!falling)
                 velocity.intensity -= 0.3;
 
-            return super.move();
+            return super.animate();
     }
 }

@@ -70,7 +70,7 @@ public class MassiveImageTranslationMover implements MassiveImageMover {
     public List<ImageMover.PositionedBitmap> move() {
         List<ImageMover.PositionedBitmap> ret = new ArrayList<>(imageMovers.size());
         for (ImageMover imageMover : imageMovers) {
-            ImageMover.PositionedBitmap moverRet = imageMover.move();
+            ImageMover.PositionedBitmap moverRet = imageMover.animate();
             if (moverRet != null)
                 ret.add(moverRet);
         }

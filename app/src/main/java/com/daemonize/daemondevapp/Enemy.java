@@ -65,7 +65,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
     @SideQuest(SLEEP = 25)
     @Override
-    public PositionedBitmap move() {
-        return super.move();
+    public PositionedBitmap animate() {
+        return super.animate();
     }
 }

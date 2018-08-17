@@ -63,7 +63,7 @@ public class MainImageTranslationMover extends CachedSpriteImageTranslationMover
     }
 
     @Override
-    public PositionedBitmap move() {
+    public PositionedBitmap animate() {
 
 
 //        if(velocity.intensity > 0 ) {
@@ -100,7 +100,7 @@ public class MainImageTranslationMover extends CachedSpriteImageTranslationMover
                 }
 
            velocity.intensity -= 0.1;
-            return super.move();
+            return super.animate();
         //}
 
       // return null;

@@ -22,6 +22,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
@@ -140,7 +141,7 @@ public class Game {
         //init spell (state)
         chain.addSpell(()->{
 
-            enemyGenerator = new DummyDaemon(gameConsumer, 2000).setClosure(ret->{
+            enemyGenerator = new DummyDaemon(gameConsumer, 1200).setClosure(ret->{
 
                 Log.d(DaemonUtils.tag(), "Enemy views queue size: " + enemyViews.size());
 
@@ -166,7 +167,7 @@ public class Game {
 
                 enemy.getPrototype().setBorders(borderX, borderY);
 
-                enemy.setMoveSideQuest().setClosure(aReturn -> {//gui consumer
+                enemy.setAnimateSideQuest().setClosure(aReturn -> {//gui consumer
                     ImageMover.PositionedBitmap posBmp = aReturn.get();
                     enemy.getView().setX(posBmp.positionX);
                     enemy.getView().setY(posBmp.positionY);
@@ -260,6 +261,47 @@ public class Game {
                 tower.start();
                 //field.setTower(tower);
                 towers.add(tower);
+
+
+//                TowerDaemon towerDaemon = new TowerDaemon(
+//                        gameConsumer,
+//                        guiConsumer,
+//                        new Tower(
+//                                towerSprite,
+//                                Pair.create(x, y),
+//                                200
+//                        )
+//                ).setName("TowerX:" + x + "Y:" + y);
+//
+//                towers.add(towerDaemon);
+//
+//                towerDaemon.setAnimateSideQuest().setClosure(aReturn -> {//gui consumer //TODO make a separate closure class
+//                    ImageMover.PositionedBitmap posBmp = aReturn.get();
+//                    towerDaemon.getView().setX(posBmp.positionX);
+//                    towerDaemon.getView().setY(posBmp.positionY);
+//                    towerDaemon.getView().setImage(posBmp.image);
+//                });
+//
+//                towerDaemon.start();
+//
+//                List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
+//
+//                for(EnemyDoubleDaemon enemy : activeEnemies) {
+//                    activeEnemyList.add(enemy);
+//                }
+//
+//                towerDaemon.scan(activeEnemyList, new Closure<EnemyDoubleDaemon>() {
+//                    @Override
+//                    public void onReturn(Return<EnemyDoubleDaemon> aReturn) {
+//
+//                        fireBullet(towerDaemon.getPrototype().getLastCoordinates(), aReturn.get());
+//                        List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
+//                        for(EnemyDoubleDaemon enemy : activeEnemies) {
+//                            activeEnemyList.add(enemy);
+//                        }
+//                        towerDaemon.scan(activeEnemyList, this);
+//                    }
+//                });
             }
         });
 
@@ -319,7 +361,6 @@ public class Game {
                     } else {
                         enemy.setShootable(false);
                         enemy.pushSprite(explodeSprite, 0, aReturn -> {
-                            enemy.setShootable(true);
                             enemy.stop();
                             guiConsumer.consume(()->enemy.getView().hide());
                             activeEnemies.remove(enemy);

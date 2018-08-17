@@ -46,16 +46,16 @@ public class CoordinatedImageTranslationMover extends CachedSpriteImageTranslati
     }
 
     @Override
-    public PositionedBitmap move() {
+    public PositionedBitmap animate() {
 
         if (Math.abs(lastX - targetX)  < velocity.intensity
-                && Math.abs(lastY - targetY)  < velocity.intensity) {//TODO unhardcode this
+                && Math.abs(lastY - targetY)  < velocity.intensity) {
             coordinateLock.lock();
             coordinatesReached = true;
             coordinateReachedCondition.signal();
             coordinateLock.unlock();
         }
 
-        return super.move();
+        return super.animate();
     }
 }

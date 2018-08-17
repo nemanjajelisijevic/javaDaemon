@@ -39,7 +39,7 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
     }
 
     @Override
-    public PositionedBitmap move() {
+    public PositionedBitmap animate() {
 
 
         PositionedBitmap ret = new PositionedBitmap();

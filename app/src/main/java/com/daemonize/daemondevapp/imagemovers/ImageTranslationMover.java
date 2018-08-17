@@ -160,7 +160,7 @@ public class ImageTranslationMover implements ImageMover {
     ) {}
 
     @Override
-    public PositionedBitmap move() {
+    public PositionedBitmap animate() {
 
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
@@ -180,7 +180,6 @@ public class ImageTranslationMover implements ImageMover {
 
         lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
         lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
-
 
         ret.positionX = lastX;
         ret.positionY = lastY;
