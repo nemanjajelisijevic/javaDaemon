@@ -6,10 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
-import android.widget.ImageView;
 
-import com.daemonize.daemondevapp.MainActivity;
-import com.daemonize.daemondevapp.proba.Enemy;
 import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
@@ -17,7 +14,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.List;
 
-public class MainImageTranslationMover extends StackedSpriteImageTranslationMover {
+public class MainImageTranslationMover extends CachedSpriteImageTranslationMover {
 
     private final List<ImageMoverMDaemon> observers;
 
