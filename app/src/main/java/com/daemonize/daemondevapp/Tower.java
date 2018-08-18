@@ -69,20 +69,57 @@ public class Tower extends CachedSpriteImageTranslationMover {
     public void setDirectionForRotation(float x, float y) throws InterruptedException {
 
         //TODO math: calculate the currentAngle
-        float dtAngle = x+y;
-        targetAngle += dtAngle;
+        float dx = lastX - x;
+        float dy = lastY - y;
+        float c = (float) Math.sqrt(dx * dx + dy * dy);
+        if (dx > 0 && dy > 0) {
+            // II kvadrant
+            int alfa = (int) Math.asin(dx / c);
+            targetAngle = 90 + alfa;
+        }else if (dx < 0 && dy > 0) {
+            // I kvadrant
+            int alfa = (int) Math.asin(dx / c);
+            targetAngle = 90 - alfa;
+        }else if (dx > 0 && dy < 0) {
+            // III kvadrant
+            int alfa = (int) Math.asin(dx / c);
+            targetAngle = 180 + alfa;
+        }else if (dx < 0 && dy < 0) {
+            // IV kvadrant
+            int alfa = (int) Math.asin(dx / c);
+            targetAngle = 270 + alfa;
+        }
 
+        boolean plus = true;//targetAngle >= currentAngle;//TODO cover when target - current <10
 
-        boolean plus = targetAngle >= currentAngle;//TODO cover when target - current <10
+        double deltaAlfa = targetAngle - currentAngle;
+
+        if (Math.abs(deltaAlfa) > 180 ) {
+            if (deltaAlfa > 0) {
+                plus = false;
+            } else {
+                plus = true;
+            }
+        }
 
         List<Bitmap> rotationSprite = new LinkedList<>();
-        int counterAngle = currentAngle;
+        double counterAngle = currentAngle;
         while (!(Math.abs(counterAngle - targetAngle) < 10)) {
             rotationSprite.add(angleToImageMap.get(counterAngle));
-            if (plus)
-                counterAngle += 10;
-            else
-                counterAngle -= 10;
+            if (plus) {
+                if ( currentAngle >= 350) {
+                    currentAngle = 0;
+                } else {
+                    counterAngle += 10;
+                }
+            }else {
+                if ( currentAngle <= 10) {
+                    currentAngle = 359;
+                } else {
+                    counterAngle -= 10;
+                }
+            }
+
         }
 
         currentAngle = targetAngle;
