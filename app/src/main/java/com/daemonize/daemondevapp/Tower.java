@@ -1,15 +1,18 @@
 package com.daemonize.daemondevapp;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.CachedSpriteImageTranslationMover;
 import com.daemonize.daemondevapp.view.DaemonView;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,8 +37,8 @@ public class Tower extends CachedSpriteImageTranslationMover {
         this.view = view;
     }
 
-    public Tower(List<Bitmap> sprite,  Pair<Float, Float> startingPos, float range) {
-        super(sprite, 0, startingPos);
+    public Tower(List<Bitmap> init, List<Bitmap> sprite,  Pair<Float, Float> startingPos, float range) {
+        super(init, 0, startingPos);
 
         //TODO validate sprite size (36)
         for (int i = 0; i < 360; ++i) {
@@ -52,6 +55,8 @@ public class Tower extends CachedSpriteImageTranslationMover {
 
     @DedicatedThread
     public EnemyDoubleDaemon scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
+        Log.e(DaemonUtils.tag(), "INSIDE SCAN!!!!!!!!!!!!!!!!!!!!!!!");
+
         for (EnemyDoubleDaemon enemy : activeEnemies) {
             if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().first) < range
                     && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().second) < range) {
@@ -102,19 +107,27 @@ public class Tower extends CachedSpriteImageTranslationMover {
             }
         }
 
+        if(currentAngle == targetAngle){
+            sprite = new ArrayList<>();
+            sprite.add(angleToImageMap.get(targetAngle));
+            return;
+        }
+
         List<Bitmap> rotationSprite = new LinkedList<>();
-        double counterAngle = currentAngle;
+        int counterAngle = currentAngle;
         while (!(Math.abs(counterAngle - targetAngle) < 10)) {
-            rotationSprite.add(angleToImageMap.get(counterAngle));
+            Log.d(DaemonUtils.tag(), "COUNTER ANGLE: " + counterAngle + ", TARGET ANGLE: " + targetAngle);
+            Bitmap toAdd = angleToImageMap.get(counterAngle);
+            rotationSprite.add(toAdd);
             if (plus) {
-                if ( currentAngle >= 350) {
-                    currentAngle = 0;
+                if ( counterAngle >= 350) {
+                    counterAngle = 0;
                 } else {
                     counterAngle += 10;
                 }
             }else {
-                if ( currentAngle <= 10) {
-                    currentAngle = 359;
+                if ( counterAngle <= 10) {
+                    counterAngle = 359;
                 } else {
                     counterAngle -= 10;
                 }
