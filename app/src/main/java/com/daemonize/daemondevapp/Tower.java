@@ -28,6 +28,12 @@ public class Tower extends CachedSpriteImageTranslationMover {
     private Map<Integer, Bitmap> angleToImageMap = new HashMap<>(360);
     private DaemonView view;
 
+    private int scanInterval;
+
+    public void setScanInterval(int scanInterval) {
+        this.scanInterval = scanInterval;
+    }
+
     @CallingThread
     public DaemonView getView() {
         return view;
@@ -37,7 +43,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
         this.view = view;
     }
 
-    public Tower(List<Bitmap> initSprite, List<Bitmap> rotationSprite,  Pair<Float, Float> startingPos, float range) {
+    public Tower(List<Bitmap> initSprite, List<Bitmap> rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
         super(initSprite, 0, startingPos);
 
         //TODO validate sprite size (36)
@@ -46,6 +52,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
         }
 
         this.range = range;
+        this.scanInterval = scanIntervalInMillis;
     }
 
     @Override
@@ -82,7 +89,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
 
         Log.e(DaemonUtils.tag(), "NO ENEMIES FOUND");
 
-        Thread.sleep(1000);
+        Thread.sleep(scanInterval);
         return Pair.create(false, null);
     }
 

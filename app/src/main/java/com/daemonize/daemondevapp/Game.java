@@ -282,7 +282,8 @@ public class Game {
                                 initTower,
                                 towerSprite,
                                 Pair.create((float) field.getCenterX(), (float) field.getCenterY()),
-                                300
+                                300,
+                                1000
                         )
                 ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
 
