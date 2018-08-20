@@ -65,10 +65,8 @@ public class Tower extends CachedSpriteImageTranslationMover {
         return true;
     }
 
-    @DedicatedThread
+    //@DedicatedThread
     public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
-
-
 
         Log.d(DaemonUtils.tag(), "SCANNING.....");
 

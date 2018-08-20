@@ -150,7 +150,7 @@ public class Game {
         //init spell (state)
         chain.addSpell(()->{
 
-            enemyGenerator = new DummyDaemon(gameConsumer, 10000).setClosure(ret->{
+            enemyGenerator = new DummyDaemon(gameConsumer, 6000).setClosure(ret->{
 
                 Log.d(DaemonUtils.tag(), "Enemy views queue size: " + enemyViews.size());
 
@@ -331,14 +331,18 @@ public class Game {
 
         @Override
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
-
-            List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
-            activeEnemyList.addAll(activeEnemies);
-
             if (aReturn.get().first) {
                 fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().second);
-                tower.sleep(sleepInteraval, aReturn1 -> tower.scan(activeEnemyList, this));
+                tower.sleep(sleepInteraval, aReturn1 -> {
+
+                    List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
+                    activeEnemyList.addAll(activeEnemies);
+
+                    tower.scan(activeEnemyList, this);
+                });
             } else {
+                List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
+                activeEnemyList.addAll(activeEnemies);
                 tower.scan(activeEnemyList, this);
             }
         }
