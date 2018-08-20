@@ -1,6 +1,7 @@
 package com.daemonize.daemondevapp;
 
 import android.graphics.Bitmap;
+import android.renderscript.ScriptGroup;
 import android.util.Log;
 import android.util.Pair;
 
@@ -21,6 +22,7 @@ import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,7 +57,7 @@ public class Game {
     private Bitmap fieldImageTower;
     private Bitmap fieldImageTowerDen;
 
-    private List<DummyDaemon> towers = new ArrayList<>();
+    private List<TowerDaemon> towers = new ArrayList<>();
 
     private Queue<DaemonView> enemyViews;
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
@@ -68,6 +70,13 @@ public class Game {
     private List<Bitmap> bulletSprite;
 
     private List<Bitmap> explodeSprite;
+
+    public Game setTowerSprite(List<Bitmap> towerSprite) {
+        this.towerSprite = towerSprite;
+        return this;
+    }
+
+    private List<Bitmap> towerSprite;
 
     public Game setExplodeSprite(List<Bitmap> explodeSprite) {
         this.explodeSprite = explodeSprite;
@@ -128,7 +137,7 @@ public class Game {
             enemy.stop();
         }
 
-        for (DummyDaemon tower : towers) {
+        for (TowerDaemon tower : towers) {
             tower.stop();
         }
 
@@ -141,7 +150,7 @@ public class Game {
         //init spell (state)
         chain.addSpell(()->{
 
-            enemyGenerator = new DummyDaemon(gameConsumer, 1200).setClosure(ret->{
+            enemyGenerator = new DummyDaemon(gameConsumer, 10000).setClosure(ret->{
 
                 Log.d(DaemonUtils.tag(), "Enemy views queue size: " + enemyViews.size());
 
@@ -159,7 +168,7 @@ public class Game {
                         guiConsumer,
                         new Enemy(
                                 enemySprite,
-                                3,
+                                1,
                                 Pair.create((float)0, (float)0),
                                 Pair.create((float)firstField.getCenterX(), (float)firstField.getCenterY())
                         ).setView(enemyView)
@@ -243,70 +252,97 @@ public class Game {
             guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(image));
 
             if (b) {
-                DummyDaemon tower = new DummyDaemon(gameConsumer, 1200).setClosure(ret -> {
+//                DummyDaemon tower = new DummyDaemon(gameConsumer, 1200).setClosure(ret -> {
+//
+//                    for (EnemyDoubleDaemon enemy : activeEnemies) {
+//
+//                        Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
+//
+//                        if (Math.abs((float) field.getCenterX() - enemyCoord.first) < 200
+//                                && Math.abs((float) field.getCenterY() - enemyCoord.second) < 200) {
+//                            fireBullet(Pair.create((float) field.getCenterX(), (float) field.getCenterY()), enemy);
+//                            break;
+//                        }
+//                    }
+//
+//                });
+//
+//                tower.start();
+                //field.setTower(tower);
+                //towers.add(tower);
 
-                    for (EnemyDoubleDaemon enemy : activeEnemies) {
 
-                        Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
+                List<Bitmap> initTower = new ArrayList<>(1);
+                initTower.add(towerSprite.get(0));
 
-                        if (Math.abs((float) field.getCenterX() - enemyCoord.first) < 200
-                                && Math.abs((float) field.getCenterY() - enemyCoord.second) < 200) {
-                            fireBullet(Pair.create((float) field.getCenterX(), (float) field.getCenterY()), enemy);
-                            break;
-                        }
-                    }
+                TowerDaemon towerDaemon = new TowerDaemon(
+                        gameConsumer,
+                        guiConsumer,
+                        new Tower(
+                                initTower,
+                                towerSprite,
+                                Pair.create((float) field.getCenterX(), (float) field.getCenterY()),
+                                300
+                        )
+                ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
 
+                towerDaemon.setView(viewMatrix[field.getRow()][field.getColumn()]);
+
+                towers.add(towerDaemon);
+
+                towerDaemon.setAnimateSideQuest().setClosure(aReturn -> {//gui consumer //TODO make a separate closure class
+                    ImageMover.PositionedBitmap posBmp = aReturn.get();
+                    towerDaemon.getView().setX(posBmp.positionX);
+                    towerDaemon.getView().setY(posBmp.positionY);
+                    towerDaemon.getView().setImage(posBmp.image);
                 });
 
-                tower.start();
-                //field.setTower(tower);
-                towers.add(tower);
+                towerDaemon.start();
 
+                List<EnemyDoubleDaemon> activeEnemyList = new ArrayList<>();
 
-//                TowerDaemon towerDaemon = new TowerDaemon(
-//                        gameConsumer,
-//                        guiConsumer,
-//                        new Tower(
-//                                towerSprite,
-//                                Pair.create(x, y),
-//                                200
-//                        )
-//                ).setName("TowerX:" + x + "Y:" + y);
-//
-//                towers.add(towerDaemon);
-//
-//                towerDaemon.setAnimateSideQuest().setClosure(aReturn -> {//gui consumer //TODO make a separate closure class
-//                    ImageMover.PositionedBitmap posBmp = aReturn.get();
-//                    towerDaemon.getView().setX(posBmp.positionX);
-//                    towerDaemon.getView().setY(posBmp.positionY);
-//                    towerDaemon.getView().setImage(posBmp.image);
-//                });
-//
-//                towerDaemon.start();
-//
-//                List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
-//
-//                for(EnemyDoubleDaemon enemy : activeEnemies) {
-//                    activeEnemyList.add(enemy);
-//                }
-//
-//                towerDaemon.scan(activeEnemyList, new Closure<EnemyDoubleDaemon>() {
-//                    @Override
-//                    public void onReturn(Return<EnemyDoubleDaemon> aReturn) {
-//
-//                        fireBullet(towerDaemon.getPrototype().getLastCoordinates(), aReturn.get());
-//                        List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
-//                        for(EnemyDoubleDaemon enemy : activeEnemies) {
-//                            activeEnemyList.add(enemy);
-//                        }
-//                        towerDaemon.scan(activeEnemyList, this);
-//                    }
-//                });
+                for(EnemyDoubleDaemon enemy : activeEnemies) {
+                    activeEnemyList.add(enemy);
+                }
+
+                towerDaemon.scan(activeEnemyList, new TowerScanClosure(towerDaemon, 500));
             }
         });
 
         return this;
     }
+
+
+    private class TowerScanClosure implements Closure<Pair<Boolean, EnemyDoubleDaemon>> {
+
+        private TowerDaemon tower;
+        private int sleepInteraval;
+
+        public TowerScanClosure setSleepInteraval(int sleepInteraval) {
+            this.sleepInteraval = sleepInteraval;
+            return this;
+        }
+
+        public TowerScanClosure(TowerDaemon tower, int sleepInteraval) {
+            this.tower = tower;
+            this.sleepInteraval = sleepInteraval;
+        }
+
+        @Override
+        public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
+
+            List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
+            activeEnemyList.addAll(activeEnemies);
+
+            if (aReturn.get().first) {
+                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().second);
+                tower.sleep(sleepInteraval, aReturn1 -> tower.scan(activeEnemyList, this));
+            } else {
+                tower.scan(activeEnemyList, this);
+            }
+        }
+    }
+
 
     private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy) {
 

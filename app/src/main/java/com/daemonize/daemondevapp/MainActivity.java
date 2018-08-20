@@ -246,6 +246,47 @@ public class MainActivity extends AppCompatActivity {
             explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 80, 80, false));
 
 
+            List<Bitmap> towerSprite = new ArrayList<>(36);
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower0.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower10.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower20.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower30.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower40.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower50.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower60.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower70.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower80.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower90.png")), 80, 80, false));
+
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower100.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower110.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower120.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower130.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower140.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower150.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower160.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower170.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower180.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower190.png")), 80, 80, false));
+
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower200.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower210.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower220.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower230.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower240.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower250.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower260.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower270.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower280.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower290.png")), 80, 80, false));
+
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower300.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower310.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower320.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower330.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower340.png")), 80, 80, false));
+            towerSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower350.png")), 80, 80, false));
+
             //TODO unnecessary background
             backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false);
             background.setImageBitmap(backgroundImg);
@@ -271,6 +312,7 @@ public class MainActivity extends AppCompatActivity {
                     .setEnemySprite(sprite)
                     .setBulletSprite(bulletSprite)
                     .setExplodeSprite(explosionSprite)
+                    .setTowerSprite(towerSprite)
                     .setBorders(borderX, borderY);
 
         } catch (IOException ex) {

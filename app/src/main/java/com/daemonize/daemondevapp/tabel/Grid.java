@@ -50,8 +50,8 @@ public class Grid {
     }
 
     public Field getField(float x, float y) {
-        int row = (int) ((y /*- 40*/) / fieldWith);
-        int column = (int) ((x /*- 40*/) / fieldWith);
+        int row = (int) ((y - 40) / fieldWith);
+        int column = (int) ((x - 40) / fieldWith);
 
         return grid[row][column];
     }

@@ -1,15 +1,18 @@
 package com.daemonize.daemondevapp;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.CachedSpriteImageTranslationMover;
 import com.daemonize.daemondevapp.view.DaemonView;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,12 +37,12 @@ public class Tower extends CachedSpriteImageTranslationMover {
         this.view = view;
     }
 
-    public Tower(List<Bitmap> sprite,  Pair<Float, Float> startingPos, float range) {
-        super(sprite, 0, startingPos);
+    public Tower(List<Bitmap> initSprite, List<Bitmap> rotationSprite,  Pair<Float, Float> startingPos, float range) {
+        super(initSprite, 0, startingPos);
 
         //TODO validate sprite size (36)
         for (int i = 0; i < 360; ++i) {
-            angleToImageMap.put(i,  sprite.get(i / 10));
+            angleToImageMap.put(i,  rotationSprite.get(i / 10));
         }
 
         this.range = range;
@@ -51,26 +54,43 @@ public class Tower extends CachedSpriteImageTranslationMover {
     }
 
     @DedicatedThread
-    public EnemyDoubleDaemon scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
+    public boolean sleep(int millis) throws InterruptedException {
+        Thread.sleep(millis);
+        return true;
+    }
+
+    @DedicatedThread
+    public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
+
+
+
+        Log.d(DaemonUtils.tag(), "SCANNING.....");
+
         for (EnemyDoubleDaemon enemy : activeEnemies) {
             if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().first) < range
                     && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().second) < range) {
+
+                Log.i(DaemonUtils.tag(), "ENEMY FOUND: " + enemy.getName() + ", at coordinates: " + enemy.getPrototype().getLastCoordinates());
+
                 setDirectionForRotation(
                         enemy.getPrototype().getLastCoordinates().first,
                         enemy.getPrototype().getLastCoordinates().second
                 );
-                return enemy;
+                return Pair.create(true, enemy);
             }
         }
 
-        return null;
+        Log.e(DaemonUtils.tag(), "NO ENEMIES FOUND");
+
+        Thread.sleep(1000);
+        return Pair.create(false, null);
     }
 
     public void setDirectionForRotation(float x, float y) throws InterruptedException {
 
+        float dx = x - lastX;
+        float dy = y - lastY;
 
-        float dx = lastX - x;
-        float dy = lastY - y;
         double c = Math.sqrt(dx*dx + dy*dy);
 
         int alpha = (int) Math.asin(dx/c);
@@ -92,6 +112,8 @@ public class Tower extends CachedSpriteImageTranslationMover {
         boolean plus =true;// targetAngle >= currentAngle;//TODO cover when target - current <10
 
         int deltaAlpha = targetAngle -  currentAngle;
+
+        //Log.e(DaemonUtils.tag(), "DELTA ALPHA: " + deltaAlpha);
 
         if ( deltaAlpha < 10 ){
             currentAngle = targetAngle;
@@ -134,7 +156,11 @@ public class Tower extends CachedSpriteImageTranslationMover {
         }
 
         currentAngle = targetAngle;
+
         pushSprite(rotationSprite, velocity.intensity);
+        List<Bitmap> finalPositionSprite = new ArrayList<>(1);
+        finalPositionSprite.add(rotationSprite.get(rotationSprite.size() - 1));
+        sprite = finalPositionSprite;
     }
 
     @SideQuest(SLEEP = 25)
