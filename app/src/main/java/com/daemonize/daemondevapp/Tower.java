@@ -60,7 +60,6 @@ public class Tower extends CachedSpriteImageTranslationMover {
         return super.pushSprite(sprite, velocity);
     }
 
-    @DedicatedThread
     public boolean sleep(int millis) throws InterruptedException {
         Thread.sleep(millis);
         return true;
@@ -93,80 +92,118 @@ public class Tower extends CachedSpriteImageTranslationMover {
         return Pair.create(false, null);
     }
 
-    public void setDirectionForRotation(float x, float y) throws InterruptedException {
+    private static double getAngle(float x1, float y1, float x2, float y2) {
 
-        float dx = x - lastX;
-        float dy = y - lastY;
+        float dx = x2 - x1;
+        float dy = y2 - y1;
 
         double c = Math.sqrt(dx*dx + dy*dy);
+        double angle =  Math.toDegrees(Math.acos(Math.abs(dx)/c));
 
-        int alpha = (int) Math.asin(dx/c);
-
-        if (dx > 0 && dy > 0){
-            // II kvadrant
-            targetAngle = 90 + alpha;
-        } else if (dx < 0 && dy > 0){
-            // I KVADRANT
-            targetAngle = 90 - alpha;
-        } else if (dx > 0 && dy < 0){
-            // III KVADRANT
-            targetAngle = 180 + alpha;
-        }else if (dx < 0 && dy < 0){
-            // IV KVADRANT
-            targetAngle = 270 + alpha;
+        if (dx == 0 && dy == 0) {
+          return 0;
+        } else if(dx == 0) {
+            if(dy < 0) {
+                return 90;
+            } else {
+                return 270;
+            }
+        } else if (dy == 0){
+            if(dx < 0) {
+                return 180;
+            } else {
+                return 0;
+            }
+        } else if (dx > 0 && dy > 0) {
+            return 360 - angle;
+        } else if (dx < 0 && dy > 0) {
+            return 180 + angle;
+        } else if (dx < 0 && dy < 0) {
+            return 180 - angle;
+        } else if (dx > 0 && dy < 0) {
+            return angle;
+        } else {
+            return 0;
         }
+    }
 
-        boolean plus =true;// targetAngle >= currentAngle;//TODO cover when target - current <10
 
-        int deltaAlpha = targetAngle -  currentAngle;
+    public void setDirectionForRotation(float x, float y) throws InterruptedException {
+
+//        float dx = x - lastX;
+//        float dy = y - lastY;
+//
+//        double c = Math.sqrt(dx*dx + dy*dy);
+//
+//        int alpha = (int) Math.asin(dx/c);
+//
+//        if (dx > 0 && dy > 0){
+//            // II kvadrant
+//            targetAngle = 90 + alpha;
+//        } else if (dx < 0 && dy > 0){
+//            // I KVADRANT
+//            targetAngle = 90 - alpha;
+//        } else if (dx > 0 && dy < 0){
+//            // III KVADRANT
+//            targetAngle = 180 + alpha;
+//        }else if (dx < 0 && dy < 0){
+//            // IV KVADRANT
+//            targetAngle = 270 + alpha;
+//        }
+
+        int angle = (int) getAngle(lastX, lastY, x, y);
+
+        //boolean plus = true;// targetAngle >= currentAngle;//TODO cover when target - current <10
+
+        //int deltaAlpha = targetAngle -  currentAngle;
 
         //Log.e(DaemonUtils.tag(), "DELTA ALPHA: " + deltaAlpha);
 
-        if ( deltaAlpha < 10 ){
-            currentAngle = targetAngle;
-            return;
-        }
+//        if ( deltaAlpha < 10 ){
+//            currentAngle = targetAngle;
+//            return;
+//        }
 
-        if (Math.abs(deltaAlpha) > 180) {
-            if (deltaAlpha > 0){
-               plus = false;
-            } else {
-               plus = true;
-            }
-        } else {
-            if (deltaAlpha > 0){
-                plus = true;
-            } else {
-                plus = false;
-            }
-        }
+//        if (Math.abs(deltaAlpha) > 180) {
+//            if (deltaAlpha > 0){
+//               plus = false;
+//            } else {
+//               plus = true;
+//            }
+//        } else {
+//            if (deltaAlpha > 0){
+//                plus = true;
+//            } else {
+//                plus = false;
+//            }
+//        }
 
-        List<Bitmap> rotationSprite = new LinkedList<>();
-        int counterAngle = currentAngle;
-        while (!(Math.abs(counterAngle - targetAngle) < 10)) {
-            rotationSprite.add(angleToImageMap.get(counterAngle));
-            if (plus) {
-                if (counterAngle >= 350){
-                    counterAngle = 0;
-                }else {
-                    counterAngle += 10;
-                }
-            }
-            else{
-                if (counterAngle <= 10){
-                    counterAngle = 359;
-                }else {
-                    counterAngle -= 10;
-                }
-            }
+//        List<Bitmap> rotationSprite = new LinkedList<>();
+//        int counterAngle = currentAngle;
+//        while (!(Math.abs(counterAngle - targetAngle) < 10)) {
+//            rotationSprite.add(angleToImageMap.get(counterAngle));
+//            if (plus) {
+//                if (counterAngle >= 350){
+//                    counterAngle = 0;
+//                }else {
+//                    counterAngle += 10;
+//                }
+//            }
+//            else{
+//                if (counterAngle <= 10){
+//                    counterAngle = 359;
+//                }else {
+//                    counterAngle -= 10;
+//                }
+//            }
+//
+//        }
 
-        }
+        ///currentAngle = targetAngle;
 
-        currentAngle = targetAngle;
-
-        pushSprite(rotationSprite, velocity.intensity);
+        //pushSprite(rotationSprite, velocity.intensity);
         List<Bitmap> finalPositionSprite = new ArrayList<>(1);
-        finalPositionSprite.add(rotationSprite.get(rotationSprite.size() - 1));
+        finalPositionSprite.add(angleToImageMap.get(angle));
         sprite = finalPositionSprite;
     }
 
