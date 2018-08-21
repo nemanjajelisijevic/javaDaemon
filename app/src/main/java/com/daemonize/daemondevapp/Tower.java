@@ -6,7 +6,6 @@ import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.CachedSpriteImageTranslationMover;
 import com.daemonize.daemondevapp.view.DaemonView;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
@@ -25,10 +24,27 @@ public class Tower extends CachedSpriteImageTranslationMover {
     private DaemonView view;
     private volatile boolean pause = false;
 
-    private int scanInterval;
+    private Game.TowerScanClosure scanClosure;
+
+    @CallingThread
+    public void setScanClosure(Game.TowerScanClosure scanClosure) {
+        this.scanClosure = scanClosure;
+    }
+
+    @CallingThread
+    public Game.TowerScanClosure getScanClosure() {
+        return scanClosure;
+    }
+
+    private volatile int scanInterval;
 
     public void setScanInterval(int scanInterval) {
         this.scanInterval = scanInterval;
+    }
+
+    @CallingThread
+    public int getScanInterval() {
+        return scanInterval;
     }
 
     @CallingThread
@@ -119,7 +135,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
         int diff = targetAngle - currentAngle;
         List<Bitmap> rotationSprite = new LinkedList<>();
 
-        if (Math.abs(diff) < spriteBuffer.getStep()) {
+        if (Math.abs(diff) < 2 * spriteBuffer.getStep()) {
             rotationSprite.add(spriteBuffer.getByAngle(targetAngle));
             sprite = rotationSprite;
         } else {

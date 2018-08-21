@@ -57,6 +57,7 @@ public class Game {
     private Bitmap fieldImageTowerDen;
 
     private List<TowerDaemon> towers = new ArrayList<>();
+    private int towerShootInterval = 1000;
 
     private Queue<DaemonView> enemyViews;
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
@@ -172,7 +173,7 @@ public class Game {
         //init spell (state)
         chain.addSpell(()->{
 
-            enemyGenerator = new DummyDaemon(gameConsumer, 2000).setClosure(ret->{
+            enemyGenerator = new DummyDaemon(gameConsumer, 3000).setClosure(ret->{
 
                 Log.d(DaemonUtils.tag(), "Enemy views queue size: " + enemyViews.size());
 
@@ -187,12 +188,12 @@ public class Game {
 
 
                 //every 20 enemys increase the pain!!!!
-                if (enemyCounter % 20 == 0) {
-                    enemyVelocity += 0.3;
+                if (enemyCounter % 10 == 0) {
+                    enemyVelocity += 0.6;
                     enemyHp += 5;
                     if (enemyGenerateinterval > 1000)
-                        enemyGenerateinterval -= 200;
-                        enemyGenerator.setSleepInterval((int)enemyGenerateinterval);
+                        enemyGenerateinterval -= 500;
+                    enemyGenerator.setSleepInterval((int)enemyGenerateinterval);
                 }
 
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
@@ -241,8 +242,8 @@ public class Game {
                 }
             });
 
-            //try to garbage collect every 10sec to check fo mem leaks
-            new DummyDaemon(gameConsumer, 10000).setClosure(aReturn -> System.gc()).start();
+            //try to garbage collect
+            new DummyDaemon(gameConsumer, 5000).setClosure(aReturn -> System.gc()).start();
 
         });
 
@@ -260,7 +261,17 @@ public class Game {
 
             Field field = grid.getField(x, y);
 
-            guiConsumer.consume(()->viewMatrix[field.getRow()][field.getColumn()].setImage(fieldImageTower));
+            //upgrade existing tower
+            TowerDaemon tow = field.getTower();
+            if (tow != null) {
+
+                if(towerShootInterval > 500) {
+                    towerShootInterval -= 50;
+                }
+
+                tow.getScanClosure().setSleepInteraval(towerShootInterval);
+                return;
+            }
 
             boolean b = grid.setTower(field.getRow(), field.getColumn());
 
@@ -284,13 +295,14 @@ public class Game {
                                 towerSprite,
                                 Pair.create((float) field.getCenterX(), (float) field.getCenterY()),
                                 200,
-                                1000
+                                towerShootInterval
                         )
                 ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
 
                 towerDaemon.setView(viewMatrix[field.getRow()][field.getColumn()]);
 
                 towers.add(towerDaemon);
+                field.setTower(towerDaemon);
 
                 towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(viewMatrix[field.getRow()][field.getColumn()]));
 
@@ -301,7 +313,10 @@ public class Game {
                     activeEnemyList.add(enemy);
                 }
 
-                towerDaemon.scan(activeEnemyList, new TowerScanClosure(towerDaemon, 1000));
+
+                TowerScanClosure scanClosure = new TowerScanClosure(towerDaemon, towerShootInterval);
+                towerDaemon.setScanClosure(scanClosure);
+                towerDaemon.scan(activeEnemyList, scanClosure);
             }
         });
 
@@ -309,7 +324,7 @@ public class Game {
     }
 
 
-    private class TowerScanClosure implements Closure<Pair<Boolean, EnemyDoubleDaemon>> {
+    public class TowerScanClosure implements Closure<Pair<Boolean, EnemyDoubleDaemon>> {
 
         private TowerDaemon tower;
         private int sleepInteraval;

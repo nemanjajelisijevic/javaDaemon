@@ -58,7 +58,7 @@ public class Grid {
 
     public Field getField(float x, float y) {
         gridLock.lock();
-        int row = (int) ((y/* - 40*/) / fieldWith);//TODo this shit right here
+        int row = (int) ((y/* - 40*/) / fieldWith);//TODO this shit right here
         int column = (int) ((x /*- 40*/) / fieldWith);
         Field ret = grid[row][column];
         gridLock.unlock();

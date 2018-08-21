@@ -301,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
 
             Queue<DaemonView> bulletQueue = new LinkedList<>();
 
-            for (int cnt = 0; cnt < 100; ++cnt) {
+            for (int cnt = 0; cnt < 200; ++cnt) {
                 bulletQueue.add(new AndroidImageView(createImageView(bulletSize, bulletSize)));
             }
 

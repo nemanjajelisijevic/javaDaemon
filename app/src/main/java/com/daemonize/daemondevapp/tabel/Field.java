@@ -2,6 +2,7 @@ package com.daemonize.daemondevapp.tabel;
 
 import android.support.annotation.NonNull;
 
+import com.daemonize.daemondevapp.TowerDaemon;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
 
 public class Field implements  IHeapItem <Field> {
@@ -20,13 +21,13 @@ public class Field implements  IHeapItem <Field> {
     boolean walkable;
     int heapIndex;
 
-    private DummyDaemon tower;
+    private TowerDaemon tower;
 
-    public DummyDaemon getTower() {
+    public TowerDaemon getTower() {
         return tower;
     }
 
-    public Field setTower(DummyDaemon tower) {
+    public Field setTower(TowerDaemon tower) {
         this.tower = tower;
         return this;
     }
