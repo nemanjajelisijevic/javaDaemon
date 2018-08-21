@@ -64,6 +64,9 @@ public class Game {
 
     private DummyDaemon enemyGenerator;
     private long enemyCounter;
+    private float enemyVelocity = 1;
+    private int enemyHp = 10;
+    private long enemyGenerateinterval = 3000;
 
     private Queue<DaemonView> bulletQueue;
     private List<Bitmap> bulletSprite;
@@ -182,12 +185,23 @@ public class Game {
 
                 Field firstField = grid.getField(0, 0);
 
+
+                //every 20 enemys increase the pain!!!!
+                if (enemyCounter % 20 == 0) {
+                    enemyVelocity += 0.3;
+                    enemyHp += 5;
+                    if (enemyGenerateinterval > 1000)
+                        enemyGenerateinterval -= 200;
+                        enemyGenerator.setSleepInterval((int)enemyGenerateinterval);
+                }
+
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                         gameConsumer,
                         guiConsumer,
                         new Enemy(
                                 enemySprite,
-                                1,
+                                enemyVelocity,
+                                enemyHp,
                                 Pair.create((float)0, (float)0),
                                 Pair.create((float)firstField.getCenterX(), (float)firstField.getCenterY())
                         ).setView(enemyView)
@@ -201,16 +215,14 @@ public class Game {
 
                 activeEnemies.add(enemy);
 
-                enemy.goTo(firstField.getCenterX(), firstField.getCenterY(), 3,
+                enemy.goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
                         new Closure<Boolean>() {// gameConsumer
                             @Override
                             public void onReturn(Return<Boolean> aReturn) {
                                 Pair<Float, Float> currentCoord = enemy.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.first, currentCoord.second);
                                 Field next = grid.getMinWeightOfNeighbors(current);
-
-                                enemy.goTo(next.getCenterX(), next.getCenterY(), 3, this);
-
+                                enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
                             }
                         }
                 );
@@ -314,6 +326,7 @@ public class Game {
 
         @Override
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
+
             if (aReturn.get().first) {
                 fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().second);
                 tower.sleep(sleepInteraval, aReturn1 -> {

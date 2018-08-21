@@ -48,8 +48,9 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return this;
     }
 
-    public Enemy(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
+    public Enemy(List<Bitmap> sprite, float velocity, int hp, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
         super(sprite, velocity, startingPos, targetCoord);
+        this.hp = hp;
     }
 
     @Override
