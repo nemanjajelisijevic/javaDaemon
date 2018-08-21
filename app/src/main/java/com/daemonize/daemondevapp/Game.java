@@ -150,7 +150,7 @@ public class Game {
         //init spell (state)
         chain.addSpell(()->{
 
-            enemyGenerator = new DummyDaemon(gameConsumer, 5000).setClosure(ret->{
+            enemyGenerator = new DummyDaemon(gameConsumer, 2000).setClosure(ret->{
 
                 Log.d(DaemonUtils.tag(), "Enemy views queue size: " + enemyViews.size());
 

@@ -6,6 +6,8 @@ import com.daemonize.daemondevapp.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Grid {
 
@@ -13,6 +15,8 @@ public class Grid {
 
     Pair<Integer, Integer> startPoint;
     Pair<Integer, Integer> endPoint;
+
+    Lock gridLock  = new ReentrantLock();
 
     private Field[][] grid;
     int fieldWith = 80;
@@ -46,14 +50,19 @@ public class Grid {
     }
 
     public Field getField(int row, int column) {
-        return grid[row][column];
+        gridLock.lock();
+        Field ret = grid[row][column];
+        gridLock.unlock();
+        return ret;
     }
 
     public Field getField(float x, float y) {
+        gridLock.lock();
         int row = (int) ((y - 40) / fieldWith);
         int column = (int) ((x - 40) / fieldWith);
-
-        return grid[row][column];
+        Field ret = grid[row][column];
+        gridLock.unlock();
+        return ret;
     }
 
     public Field[][] getGrid() {
@@ -80,6 +89,7 @@ public class Grid {
 
     public boolean setTower(int row, int column) {
 
+        gridLock.lock();
         if (!grid[row][column].isWalkable()) return false;
 
         //copy of grid
@@ -95,11 +105,15 @@ public class Grid {
         grid[row][column].setWalkable(false);
 
         boolean acceptTower = pathFinding.recalculate(this);
+
+
         if (acceptTower) {
+            gridLock.unlock();
             return true;
         } else {
             grid = gridTemp;
             pathFinding.recalculate(this);
+            gridLock.unlock();
             return false;
         }
     }
@@ -129,6 +143,7 @@ public class Grid {
     }
 
     public Field getMinWeightOfNeighbors(int row, int column) {
+        gridLock.lock();
         List<Field> neighbors = new ArrayList<>();
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
@@ -157,6 +172,7 @@ public class Grid {
                 }
             }
         }
+        gridLock.unlock();
         return currentMinField;
     }
 
