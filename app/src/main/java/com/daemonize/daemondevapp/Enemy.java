@@ -17,7 +17,7 @@ import java.util.List;
 public class Enemy extends CoordinatedImageTranslationMover {
 
     private DaemonView view;
-    private volatile int hp = 50;
+    private volatile int hp = 30;
     private volatile boolean shootable = true;
 
     @CallingThread

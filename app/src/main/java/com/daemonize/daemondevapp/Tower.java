@@ -12,7 +12,6 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +23,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
     private int currentAngle;
     private AngleToBitmapArray spriteBuffer;
     private DaemonView view;
+    private volatile boolean pause = false;
 
     private int scanInterval;
 
@@ -63,7 +63,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
         for (EnemyDoubleDaemon enemy : activeEnemies) {
             if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().first) < range
                     && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().second) < range) {
-
+                pause = false;
                 rotateTowards(
                         enemy.getPrototype().getLastCoordinates().first,
                         enemy.getPrototype().getLastCoordinates().second
@@ -72,6 +72,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
             }
         }
 
+        pause = true;
         Thread.sleep(scanInterval);
         return Pair.create(false, null);
     }
@@ -115,13 +116,10 @@ public class Tower extends CachedSpriteImageTranslationMover {
     public void rotateTowards(float x, float y) throws InterruptedException {
 
         int targetAngle = (int) getAngle(lastX, lastY, x, y);
-
         int diff = targetAngle - currentAngle;
-
         List<Bitmap> rotationSprite = new LinkedList<>();
 
-
-        if (Math.abs(diff) < 2 * spriteBuffer.getStep()) {
+        if (Math.abs(diff) < spriteBuffer.getStep()) {
             rotationSprite.add(spriteBuffer.getByAngle(targetAngle));
             sprite = rotationSprite;
         } else {
@@ -133,7 +131,11 @@ public class Tower extends CachedSpriteImageTranslationMover {
 
                 if (diff > 0 && diff <= 180)
                     rotationSprite.add(spriteBuffer.getIncrementedByStep());
-                else
+                else if (diff > 180)
+                    rotationSprite.add(spriteBuffer.getDecrementedByStep());
+                else if (diff < -180)
+                    rotationSprite.add(spriteBuffer.getIncrementedByStep());
+                else if (diff < 0)
                     rotationSprite.add(spriteBuffer.getDecrementedByStep());
 
                 counterAngle = spriteBuffer.getCurrentAngle();
@@ -150,6 +152,10 @@ public class Tower extends CachedSpriteImageTranslationMover {
     @SideQuest(SLEEP = 25)
     @Override
     public PositionedBitmap animate() {
+
+        if (pause)
+            return null;
+
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
         ret.positionX = lastX;

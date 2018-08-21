@@ -198,11 +198,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             //bullet sprite
+            int bulletSize = 20;
             List<Bitmap> bulletSprite = new ArrayList<>();
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 40, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), 40, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), 40, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), 40, 40, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), bulletSize, bulletSize, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), bulletSize, bulletSize, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), bulletSize, bulletSize, false));
+            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), bulletSize, bulletSize, false));
 
 
             //explosion sprite
@@ -301,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
             Queue<DaemonView> bulletQueue = new LinkedList<>();
 
             for (int cnt = 0; cnt < 100; ++cnt) {
-                bulletQueue.add(new AndroidImageView(createImageView(40, 40)));
+                bulletQueue.add(new AndroidImageView(createImageView(bulletSize, bulletSize)));
             }
 
             game = new Game(rows, columns, fieldViews, enemyQueue, bulletQueue)

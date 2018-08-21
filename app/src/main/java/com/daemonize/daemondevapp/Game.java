@@ -1,7 +1,7 @@
 package com.daemonize.daemondevapp;
 
 import android.graphics.Bitmap;
-import android.renderscript.ScriptGroup;
+import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 
@@ -22,7 +22,6 @@ import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +69,23 @@ public class Game {
     private List<Bitmap> bulletSprite;
 
     private List<Bitmap> explodeSprite;
+
+    private class ImageAnimateClosure implements Closure<ImageMover.PositionedBitmap> {
+
+        private DaemonView view;
+
+        public ImageAnimateClosure(DaemonView view) {
+            this.view = view;
+        }
+
+        @Override
+        public void onReturn(Return<ImageMover.PositionedBitmap> aReturn) {
+            ImageMover.PositionedBitmap posBmp = aReturn.get();
+            view.setX(posBmp.positionX);
+            view.setY(posBmp.positionY);
+            view.setImage(posBmp.image);
+        }
+    }
 
     public Game setTowerSprite(List<Bitmap> towerSprite) {
         this.towerSprite = towerSprite;
@@ -146,6 +162,9 @@ public class Game {
         return this;
     }
 
+
+    private android.os.Handler handler = new android.os.Handler(Looper.getMainLooper());
+
     {
         //init spell (state)
         chain.addSpell(()->{
@@ -176,12 +195,7 @@ public class Game {
 
                 enemy.getPrototype().setBorders(borderX, borderY);
 
-                enemy.setAnimateSideQuest().setClosure(aReturn -> {//gui consumer
-                    ImageMover.PositionedBitmap posBmp = aReturn.get();
-                    enemy.getView().setX(posBmp.positionX);
-                    enemy.getView().setY(posBmp.positionY);
-                    enemy.getView().setImage(posBmp.image);
-                });
+                enemy.setAnimateSideQuest().setClosure(new ImageAnimateClosure(enemyView));//gui consumer
 
                 enemy.start();
 
@@ -222,6 +236,8 @@ public class Game {
 
     }
 
+
+
     public Game setTower(float x, float y) { //TODO to be called from Activity.onTouch()
 
         if (x >= 20 * 80 || y >= 11 * 80) {
@@ -231,14 +247,6 @@ public class Game {
         gameConsumer.consume(()-> {
 
             Field field = grid.getField(x, y);
-
-//            if (field.getTower() != null) {
-//                field.getTower().stop();
-//                field.setTower(null);
-//                guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage));
-//                grid.recalcGrid();
-//                return;
-//            }
 
             guiConsumer.consume(()->viewMatrix[field.getRow()][field.getColumn()].setImage(fieldImageTower));
 
@@ -252,37 +260,18 @@ public class Game {
             guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(image));
 
             if (b) {
-//                DummyDaemon tower = new DummyDaemon(gameConsumer, 1200).setClosure(ret -> {
-//
-//                    for (EnemyDoubleDaemon enemy : activeEnemies) {
-//
-//                        Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
-//
-//                        if (Math.abs((float) field.getCenterX() - enemyCoord.first) < 200
-//                                && Math.abs((float) field.getCenterY() - enemyCoord.second) < 200) {
-//                            fireBullet(Pair.create((float) field.getCenterX(), (float) field.getCenterY()), enemy);
-//                            break;
-//                        }
-//                    }
-//
-//                });
-//
-//                tower.start();
-                //field.setTower(tower);
-                //towers.add(tower);
 
-
-                List<Bitmap> initTower = new ArrayList<>(1);
-                initTower.add(towerSprite.get(0));
+                List<Bitmap> initTowerSprite = new ArrayList<>(1);
+                initTowerSprite.add(towerSprite.get(0));
 
                 TowerDaemon towerDaemon = new TowerDaemon(
                         gameConsumer,
                         guiConsumer,
                         new Tower(
-                                initTower,
+                                initTowerSprite,
                                 towerSprite,
                                 Pair.create((float) field.getCenterX(), (float) field.getCenterY()),
-                                300,
+                                200,
                                 1000
                         )
                 ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
@@ -291,22 +280,16 @@ public class Game {
 
                 towers.add(towerDaemon);
 
-                towerDaemon.setAnimateSideQuest().setClosure(aReturn -> {//gui consumer //TODO make a separate closure class
-                    ImageMover.PositionedBitmap posBmp = aReturn.get();
-                    towerDaemon.getView().setX(posBmp.positionX);
-                    towerDaemon.getView().setY(posBmp.positionY);
-                    towerDaemon.getView().setImage(posBmp.image);
-                });
+                towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(viewMatrix[field.getRow()][field.getColumn()]));
 
                 towerDaemon.start();
 
                 List<EnemyDoubleDaemon> activeEnemyList = new ArrayList<>();
-
                 for(EnemyDoubleDaemon enemy : activeEnemies) {
                     activeEnemyList.add(enemy);
                 }
 
-                towerDaemon.scan(activeEnemyList, new TowerScanClosure(towerDaemon, 500));
+                towerDaemon.scan(activeEnemyList, new TowerScanClosure(towerDaemon, 1000));
             }
         });
 
@@ -360,6 +343,11 @@ public class Game {
         Log.i(DaemonUtils.tag(), "Bullet view queue size: " + bulletQueue.size());
 
         DaemonView bulletView = bulletQueue.poll();
+
+        if (bulletView == null) {
+            throw new IllegalStateException("No more bullets!");
+        }
+
         guiConsumer.consume(()->bulletView.show());
 
         ImageMoverMDaemon bullet = new ImageMoverMDaemon(//TODO keep active bullets to destroy them
@@ -390,9 +378,12 @@ public class Game {
             //if hits enemy or goes out of the map borders destroy
             gameConsumer.consume(() -> {
 
-                if (posBmp.positionX >= 20 * 80 || posBmp.positionY >= 11 * 80) {
+                if (posBmp.positionX >= borderX || posBmp.positionY >= borderY) {
                     bullet.stop();
-                    bulletQueue.add(((Bullet) bullet.getPrototype()).getView());
+                    DaemonView bulletVju = ((Bullet) bullet.getPrototype()).getView();
+                    guiConsumer.consume(()->bulletVju.hide());
+                    if(!bulletQueue.contains(bulletVju))
+                        bulletQueue.add(bulletVju);
                 } else if (Math.abs(posBmp.positionX - enemyCoord.first) <= bulletSprite.get(0).getWidth()
                         && Math.abs(ret.get().positionY - enemyCoord.second) <= bulletSprite.get(0).getHeight()) {
 
