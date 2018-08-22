@@ -6,8 +6,8 @@ import com.daemonize.daemondevapp.TowerDaemon;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
 
 public class Field implements  IHeapItem <Field> {
-    int centerX;
-    int centerY;
+    float centerX;
+    float centerY;
 
     int row; //i - n
     int column;//j - m
@@ -32,7 +32,7 @@ public class Field implements  IHeapItem <Field> {
         return this;
     }
 
-    public Field(int centerX, int centerY, int row, int column, int weight, boolean walkable) {
+    public Field(float centerX, float centerY, int row, int column, int weight, boolean walkable) {
         this.centerX = centerX;
         this.centerY = centerY;
         this.row = row;
@@ -54,7 +54,7 @@ public class Field implements  IHeapItem <Field> {
 
     }
 
-    public int getCenterX() {
+    public float getCenterX() {
         return centerX;
     }
 
@@ -62,7 +62,7 @@ public class Field implements  IHeapItem <Field> {
         this.centerX = centerX;
     }
 
-    public int getCenterY() {
+    public float getCenterY() {
         return centerY;
     }
 

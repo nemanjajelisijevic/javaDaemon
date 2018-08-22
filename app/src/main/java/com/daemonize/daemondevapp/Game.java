@@ -6,9 +6,6 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
-import com.daemonize.daemondevapp.proba.Bullet;
-import com.daemonize.daemondevapp.proba.ImageMoverM;
-import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
 import com.daemonize.daemondevapp.view.DaemonView;
@@ -133,13 +130,13 @@ public class Game {
         return this;
     }
 
-    public Game(int rows, int columns, DaemonView[][] viewMatrix, Queue<DaemonView> enemyViews, Queue<DaemonView> bulletQueue) {
+    public Game(int rows, int columns, DaemonView[][] viewMatrix, Queue<DaemonView> enemyViews, Queue<DaemonView> bulletQueue,float x,float y) {
         this.rows = rows;
         this.columns = columns;
         this.viewMatrix = viewMatrix;
         //TODO validate enemyViews
         this.enemyViews = enemyViews;
-        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, 6 - 1));
+        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, 6 - 1), x, y);
         this.bulletQueue = bulletQueue;
     }
 
@@ -220,8 +217,10 @@ public class Game {
                         new Closure<Boolean>() {// gameConsumer
                             @Override
                             public void onReturn(Return<Boolean> aReturn) {
+                                aReturn.uncheckAndGet();
                                 Pair<Float, Float> currentCoord = enemy.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.first, currentCoord.second);
+                                if (current == null) return;
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
                             }
@@ -235,8 +234,8 @@ public class Game {
             guiConsumer.consume(()->{
                 for(int j = 0; j < rows; ++j ) {
                     for (int i = 0; i < columns; ++i) {
-                        viewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX() - (fieldImage.getWidth() / 2) + 40);
-                        viewMatrix[j][i].setY(grid.getGrid()[j][i].getCenterY() - (fieldImage.getHeight() / 2) + 40);
+                        viewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX() - (fieldImage.getWidth() / 2));
+                        viewMatrix[j][i].setY(grid.getGrid()[j][i].getCenterY() - (fieldImage.getHeight() / 2));
                         viewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower);
                     }
                 }
@@ -253,13 +252,10 @@ public class Game {
 
     public Game setTower(float x, float y) { //TODO to be called from Activity.onTouch()
 
-        if (x >= 20 * 80 || y >= 11 * 80) {
-            return this;
-        }
-
         gameConsumer.consume(()-> {
 
             Field field = grid.getField(x, y);
+            if (field == null) return;
 
             //upgrade existing tower
             TowerDaemon tow = field.getTower();
@@ -343,7 +339,7 @@ public class Game {
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
 
             if (aReturn.get().first) {
-                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().second);
+                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().second,5);
                 tower.sleep(sleepInteraval, aReturn1 -> {
 
                     List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
@@ -360,7 +356,7 @@ public class Game {
     }
 
 
-    private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy) {
+    private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity) {//velocity = 13
 
         if (!enemy.isShootable()) {
             return;
@@ -378,70 +374,46 @@ public class Game {
 
         guiConsumer.consume(()->bulletView.show());
 
-        ImageMoverMDaemon bullet = new ImageMoverMDaemon(//TODO keep active bullets to destroy them
+        BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
+                gameConsumer,
                 guiConsumer,
                 new Bullet(
                         bulletSprite,
-                        new ImageMoverM.Velocity(
-                                13,
-                                new ImageMoverM.Direction(enemyCoord.first, enemyCoord.second)
-                        ),
-                        1,
-                        Pair.create(
-                                sourceCoord.first + 40,
-                                sourceCoord.second + 40
-                        )
-                ).setBorders(borderX, borderY).setView(bulletView)
+                        velocity,
+                        sourceCoord,
+                        enemyCoord,
+                        2
+                ).setView(bulletView)
         ).setName("Bullet");
+        bulletDoubleDaemon.getPrototype().setBorders(borderX,borderY);
 
-        bullet.setMoveSideQuest().setClosure(ret->{ //gui thread
+        bulletDoubleDaemon.start();
 
-            ImageMoverM.PositionedBitmap posBmp = ret.get();
+        bulletDoubleDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(bulletView));
 
-            //draw the bullet
-            ((Bullet) bullet.getPrototype()).getView().setX(posBmp.positionX);
-            ((Bullet) bullet.getPrototype()).getView().setY(posBmp.positionY);
-            ((Bullet) bullet.getPrototype()).getView().setImage(posBmp.image);
+        bulletDoubleDaemon.goTo(enemyCoord.first, enemyCoord.second, velocity, aReturn-> {
+            boolean ret = aReturn.get();
 
-            //if hits enemy or goes out of the map borders destroy
-            gameConsumer.consume(() -> {
-
-                if (posBmp.positionX >= borderX || posBmp.positionY >= borderY) {
-                    bullet.stop();
-                    DaemonView bulletVju = ((Bullet) bullet.getPrototype()).getView();
-                    guiConsumer.consume(()->bulletVju.hide());
-                    if(!bulletQueue.contains(bulletVju))
-                        bulletQueue.add(bulletVju);
-                } else if (Math.abs(posBmp.positionX - enemyCoord.first) <= bulletSprite.get(0).getWidth()
-                        && Math.abs(ret.get().positionY - enemyCoord.second) <= bulletSprite.get(0).getHeight()) {
-
-                    int enemyHp = enemy.getHp();
-                    if (enemyHp > 0) {
-                        enemy.setHp(--enemyHp);
-                    } else {
-                        enemy.setShootable(false);
-                        enemy.pushSprite(explodeSprite, 0, aReturn -> {
-                            enemy.stop();
-                            guiConsumer.consume(()->enemy.getView().hide());
-                            activeEnemies.remove(enemy);
-                            if (!enemyViews.contains(enemy.getView()))
-                                enemyViews.add(enemy.getView());//TODO dead enemy should return a borrowed view
-                        });
-                    }
-                    bullet.stop();
-                    DaemonView view = ((Bullet) bullet.getPrototype()).getView();
-                    guiConsumer.consume(()->view.hide());
-                    if(!bulletQueue.contains(view))
-                        bulletQueue.add(view);
-
-                }
-
-            });
-
-
+            int enemyHp = enemy.getHp();
+            if (enemyHp > 0) {
+                enemy.setHp(enemyHp - bulletDoubleDaemon.getPrototype().getDamage());
+            } else {
+                enemy.setShootable(false);
+                enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
+                    enemy.stop();
+                    guiConsumer.consume(() -> enemy.getView().hide());
+                    activeEnemies.remove(enemy);
+                    if (!enemyViews.contains(enemy.getView()))
+                        enemyViews.add(enemy.getView());//TODO dead enemy should return a borrowed view
+                });
+            }
+            bulletDoubleDaemon.stop();
+            DaemonView view = ((Bullet) bulletDoubleDaemon.getPrototype()).getView();
+            guiConsumer.consume(()->view.hide());
+            if(!bulletQueue.contains(view))
+                bulletQueue.add(view);
         });
 
-        bullet.start();
     }
 
 
