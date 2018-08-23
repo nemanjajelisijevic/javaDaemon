@@ -252,6 +252,7 @@ public class Game {
 
     public Game setTower(float x, float y) { //TODO to be called from Activity.onTouch()
 
+        Log.i(DaemonUtils.tag(), "KLIK koordinate:  X: " + x+",  Y: "+y);
         gameConsumer.consume(()-> {
 
             Field field = grid.getField(x, y);
@@ -339,7 +340,7 @@ public class Game {
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
 
             if (aReturn.get().first) {
-                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().second,5);
+                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().second,15);
                 tower.sleep(sleepInteraval, aReturn1 -> {
 
                     List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();

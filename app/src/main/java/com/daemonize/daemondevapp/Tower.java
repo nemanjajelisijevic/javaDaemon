@@ -174,8 +174,8 @@ public class Tower extends CachedSpriteImageTranslationMover {
 
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
-        ret.positionX = lastX;
-        ret.positionY = lastY;
+        ret.positionX = lastX - ret.image.getWidth()/2;
+        ret.positionY = lastY - ret.image.getWidth()/2;
         return ret;
     }
 }

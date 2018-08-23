@@ -305,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
                 bulletQueue.add(new AndroidImageView(createImageView(bulletSize, bulletSize)));
             }
 
-            game = new Game(rows, columns, fieldViews, enemyQueue, bulletQueue,0,0)
+            game = new Game(rows, columns, fieldViews, enemyQueue, bulletQueue,50,50)
                     .setFieldImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false))
                     .setFieldImagePath(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false))
                     .setFieldImageTower(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 80, 80, false))
