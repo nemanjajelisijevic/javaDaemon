@@ -6,9 +6,9 @@ import com.daemonize.daemonengine.closure.ReturnRunnable;
 
 public class DummyQuest extends Quest<Void> {
 
-    private int sleepInterval;
+    private long sleepInterval;
 
-    public DummyQuest setSleepInterval(int milliseconds) {
+    public DummyQuest setSleepInterval(long milliseconds) {
         this.sleepInterval = milliseconds;
         return this;
     }
