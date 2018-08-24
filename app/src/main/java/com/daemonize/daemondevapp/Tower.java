@@ -23,6 +23,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
     private AngleToBitmapArray spriteBuffer;
     private DaemonView view;
     private volatile boolean pause = false;
+    private List<Bitmap> rotationSprite = new LinkedList<>();
 
     private Game.TowerScanClosure scanClosure;
 
@@ -73,24 +74,56 @@ public class Tower extends CachedSpriteImageTranslationMover {
         return true;
     }
 
+    private EnemyDoubleDaemon closestEnemy;
+
+    private boolean inRange(EnemyDoubleDaemon enemy) {
+        return Math.abs( lastX - enemy.getPrototype().getLastCoordinates().first) < range
+                && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().second) < range;
+    }
+
     @DedicatedThread
     public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
 
-        for (EnemyDoubleDaemon enemy : activeEnemies) {
-            if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().first) < range
-                    && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().second) < range) {
-                pause = false;
-                rotateTowards(
-                        enemy.getPrototype().getLastCoordinates().first,
-                        enemy.getPrototype().getLastCoordinates().second
-                );
-                return Pair.create(true, enemy);
-            }
-        }
+        if (closestEnemy != null && inRange(closestEnemy)) {
 
-        pause = true;
-        Thread.sleep(scanInterval);
-        return Pair.create(false, null);
+            pause = false;
+            rotateTowards(
+                    closestEnemy.getPrototype().getLastCoordinates().first,
+                    closestEnemy.getPrototype().getLastCoordinates().second
+            );
+
+            pause = true;
+            return Pair.create(true, closestEnemy);
+
+        } else if (closestEnemy != null && !inRange(closestEnemy)){
+
+            closestEnemy = null;
+            pause = true;
+            Thread.sleep(scanInterval);
+            return Pair.create(false, null);
+
+        } else if (closestEnemy == null) {
+
+            for (EnemyDoubleDaemon enemy : activeEnemies) {
+                if (inRange(enemy)) {
+                    closestEnemy = enemy;
+                    break;
+
+                }
+            }
+
+            pause = true;
+            Thread.sleep(scanInterval);
+            return Pair.create(false, null);
+
+        } else {
+
+
+            pause = true;
+            Thread.sleep(scanInterval);
+            return Pair.create(false, null);
+
+        }
     }
 
     private static double getAngle(float x1, float y1, float x2, float y2) {
@@ -133,7 +166,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
 
         int targetAngle = (int) getAngle(lastX, lastY, x, y);
         int diff = targetAngle - currentAngle;
-        List<Bitmap> rotationSprite = new LinkedList<>();
+        rotationSprite.clear();
 
         if (Math.abs(diff) < 2 * spriteBuffer.getStep()) {
             rotationSprite.add(spriteBuffer.getByAngle(targetAngle));

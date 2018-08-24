@@ -24,6 +24,11 @@ public class Bullet extends CoordinatedImageTranslationMover {
         this.damage = damage;
     }
 
+    public void setStartingCoords(Pair<Float, Float> startingCoords) {
+        lastX = startingCoords.first;
+        lastY = startingCoords.second;
+    }
+
     @CallingThread
     public int getDamage() {
         return damage;
