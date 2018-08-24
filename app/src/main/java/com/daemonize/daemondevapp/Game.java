@@ -58,10 +58,12 @@ public class Game {
     private Bitmap fieldImageTowerDen;
 
     private List<TowerDaemon> towers = new ArrayList<>();
-    private Queue<EnemyDoubleDaemon> enemyQueue = new ArrayBlockingQueue<>(50);
-    private int towerShootInterval = 1000;
+    private Queue<EnemyDoubleDaemon> enemyQueue = new LinkedList<>();
+    private int towerShootInterval = 1500;
+    private int range = 320;
 
     private Queue<DaemonView> enemyViews;
+    private Queue<DaemonView> enemyHpViews;
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private List<Bitmap> enemySprite;
 
@@ -71,8 +73,15 @@ public class Game {
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
 
+    private Bitmap healthBarImage;
+
+    public Game setHealthBarImage(Bitmap healthBarImage) {
+        this.healthBarImage = healthBarImage;
+        return this;
+    }
+
     private Queue<DaemonView> bulletViewQueue;
-    private Queue<BulletDoubleDaemon> bulletQueue = new ArrayBlockingQueue<>(200);
+    private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
     private List<Bitmap> bulletSprite;
 
     private List<Bitmap> explodeSprite;
@@ -93,6 +102,36 @@ public class Game {
             view.setImage(posBmp.image);
         }
     }
+
+
+    private class DoubleImageAnimateClosure implements Closure<ImageMover.PositionedBitmap> {
+
+        private DaemonView view;
+        private DaemonView childView;
+
+        public DoubleImageAnimateClosure(DaemonView view, DaemonView childView) {
+            this.view = view;
+            this.childView = childView;
+        }
+
+        @Override
+        public void onReturn(Return<ImageMover.PositionedBitmap> aReturn) {
+            ImageMover.PositionedBitmap posBmp = aReturn.get();
+            view.setX(posBmp.positionX);
+            view.setY(posBmp.positionY);
+            view.setImage(posBmp.image);
+
+            if (posBmp.children.get(0) != null) {
+                posBmp = posBmp.children.get(0);
+                childView.setX(posBmp.positionX);
+                childView.setY(posBmp.positionY);
+                childView.setImage(posBmp.image);
+            }
+
+        }
+    }
+
+
 
     public Game setTowerSprite(List<Bitmap> towerSprite) {
         this.towerSprite = towerSprite;
@@ -136,19 +175,19 @@ public class Game {
         return this;
     }
 
-    public Game(int rows, int columns, DaemonView[][] viewMatrix, Queue<DaemonView> enemyViews, Queue<DaemonView> bulletViewQueue, float x, float y) {
+    public Game(int rows, int columns, DaemonView[][] viewMatrix, Queue<DaemonView> enemyViews, Queue<DaemonView> enemyHpViewQueue, Queue<DaemonView> bulletViewQueue,float x,float y) {
         this.rows = rows;
         this.columns = columns;
         this.viewMatrix = viewMatrix;
         //TODO validate enemyViews
         this.enemyViews = enemyViews;
-        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, 6 - 1), x, y);
+        this.enemyHpViews = enemyHpViewQueue;
+        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, columns - 1), x, y);
         this.bulletViewQueue = bulletViewQueue;
     }
 
     public Game run() {
         gameConsumer.start();
-        //enemyDrawConsumer.start();
         chain.run();
         return this;
     }
@@ -157,7 +196,6 @@ public class Game {
 
         enemyGenerator.stop();
 
-
         for(EnemyDoubleDaemon enemy : activeEnemies) {
             enemy.stop();
         }
@@ -165,7 +203,7 @@ public class Game {
         for (TowerDaemon tower : towers) {
             tower.stop();
         }
-        //enemyDrawConsumer.stop();
+
         gameConsumer.stop();
 
         return this;
@@ -190,11 +228,12 @@ public class Game {
                                 Pair.create((float)0, (float)0),
                                 Pair.create(firstField.getCenterX(), firstField.getCenterY())
                         ).setView(enemyView)
+                        .setHealthBarImage(healthBarImage)
                 ).setName("Enemy");
 
                 enemy.getPrototype().setBorders(borderX, borderY);
 
-                enemy.setAnimateSideQuest().setClosure(new ImageAnimateClosure(enemyView));//gui consumer
+                enemy.setAnimateSideQuest().setClosure(new DoubleImageAnimateClosure(enemyView, enemyHpViews.poll()));//gui consumer
 
                 enemyQueue.add(enemy);
 
@@ -230,17 +269,6 @@ public class Game {
 
                 //every 20 enemys increase the pain!!!!
                 if (enemyCounter % 15 == 0) {
-
-
-                    System.gc();
-                    System.gc();
-                    System.gc();
-                    System.gc();
-                    System.gc();
-                    System.gc();
-                    System.gc();
-                    System.gc();
-
 
                     if(enemyVelocity < 6)
                         enemyVelocity += 1;
@@ -308,7 +336,7 @@ public class Game {
             });
 
             //try to garbage collect
-            new DummyDaemon(gameConsumer, 2000).setClosure(aReturn -> System.gc()).start();
+            new DummyDaemon(gameConsumer, 5000).setClosure(aReturn -> System.gc()).start();
 
         });
 
@@ -332,7 +360,7 @@ public class Game {
                     towerShootInterval -= 50;
                 }
 
-                tow.getScanClosure().setSleepInteraval(towerShootInterval);
+                towerScanClosure.setSleepInteraval(towerShootInterval);
                 return;
             }
 
@@ -341,7 +369,7 @@ public class Game {
             Bitmap image = grid.getField(
                     field.getRow(),
                     field.getColumn()
-            ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : fieldImageTower;
+            ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : towerSprite.get(0);
 
             guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(image));
 
@@ -357,7 +385,7 @@ public class Game {
                                 initTowerSprite,
                                 towerSprite,
                                 Pair.create(field.getCenterX(), field.getCenterY()),
-                                100,
+                                range,
                                 towerShootInterval
                         )
                 ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
@@ -376,9 +404,9 @@ public class Game {
                     activeEnemyList.add(enemy);
                 }
 
-                TowerScanClosure scanClosure = new TowerScanClosure(towerDaemon, towerShootInterval);
-                towerDaemon.setScanClosure(scanClosure);
-                towerDaemon.scan(activeEnemyList, scanClosure);
+                towerScanClosure = new TowerScanClosure(towerDaemon, towerShootInterval);
+                //towerDaemon.setScanClosure(scanClosure);
+                towerDaemon.scan(activeEnemyList, towerScanClosure);
             }
         });
 
@@ -421,6 +449,7 @@ public class Game {
         }
     }
 
+    private TowerScanClosure towerScanClosure;
 
     private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity) {//velocity = 13
 

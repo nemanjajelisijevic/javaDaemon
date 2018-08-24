@@ -10,6 +10,7 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -19,6 +20,12 @@ public class Enemy extends CoordinatedImageTranslationMover {
     private DaemonView view;
     private volatile int hp = 30;
     private volatile boolean shootable = true;
+    private Bitmap healthBarImage;//TODO should be sprite!!!!!!!!!!!!!!!!!!!!!!!
+
+    public Enemy setHealthBarImage(Bitmap healthBarImage) {
+        this.healthBarImage = healthBarImage;
+        return this;
+    }
 
     @CallingThread
     public boolean isShootable() {
@@ -64,9 +71,19 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return super.goTo(x, y, velocityInt);
     }
 
-    @SideQuest(SLEEP = 25)
+    @SideQuest(SLEEP = 30)
     @Override
     public PositionedBitmap animate() {
-        return super.animate();
+
+        PositionedBitmap hBar = new PositionedBitmap();
+        hBar.positionX = lastX;
+        hBar.positionY = lastY - 60;
+        hBar.image = healthBarImage;
+
+
+        PositionedBitmap ret = super.animate();
+        ret.children = new LinkedList<>();
+        ret.children.add(hBar);
+        return ret;
     }
 }

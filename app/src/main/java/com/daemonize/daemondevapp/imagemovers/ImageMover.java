@@ -30,6 +30,9 @@ public interface ImageMover {
     }
 
     class PositionedBitmap {
+
+        public List<PositionedBitmap> children;
+
         public Bitmap image;
         public float positionX;
         public float positionY;

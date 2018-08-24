@@ -299,13 +299,22 @@ public class MainActivity extends AppCompatActivity {
                 enemyQueue.add(new AndroidImageView(createImageView(80, 80)));
             }
 
+
+            Queue<DaemonView> enemyHpViewQueue = new LinkedList<>();
+
+            for (int cnt = 0; cnt < 50; ++cnt) {
+                enemyHpViewQueue.add(new AndroidImageView(createImageView(80, 80)));
+            }
+
             Queue<DaemonView> bulletQueue = new LinkedList<>();
 
             for (int cnt = 0; cnt < 200; ++cnt) {
                 bulletQueue.add(new AndroidImageView(createImageView(bulletSize, bulletSize)));
             }
 
-            game = new Game(rows, columns, fieldViews, enemyQueue, bulletQueue,50,50)
+            Bitmap healthBar = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("HealthBar.png")), 80, 80, false);
+
+            game = new Game(rows, columns, fieldViews, enemyQueue, enemyHpViewQueue, bulletQueue,50,50)
                     .setFieldImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false))
                     .setFieldImagePath(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false))
                     .setFieldImageTower(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 80, 80, false))
@@ -314,6 +323,7 @@ public class MainActivity extends AppCompatActivity {
                     .setBulletSprite(bulletSprite)
                     .setExplodeSprite(explosionSprite)
                     .setTowerSprite(towerSprite)
+                    .setHealthBarImage(healthBar)
                     .setBorders(borderX, borderY);
 
         } catch (IOException ex) {
