@@ -311,8 +311,21 @@ public class MainActivity extends AppCompatActivity {
             for (int cnt = 0; cnt < 200; ++cnt) {
                 bulletQueue.add(new AndroidImageView(createImageView(bulletSize, bulletSize)));
             }
+            int width = 60;
+            int height = 15;
 
-            Bitmap healthBar = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("HealthBar.png")), 80, 80, false);
+            List<Bitmap> listHealthBarImg = new ArrayList<>();
+           // listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_0.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_10.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_20.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_30.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_40.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_50.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_60.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_70.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_80.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_90.png")), width, height, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_100.png")), width, height, false));
 
             game = new Game(rows, columns, fieldViews, enemyQueue, enemyHpViewQueue, bulletQueue,50,50)
                     .setFieldImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), 80, 80, false))
@@ -323,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
                     .setBulletSprite(bulletSprite)
                     .setExplodeSprite(explosionSprite)
                     .setTowerSprite(towerSprite)
-                    .setHealthBarImage(healthBar)
+                    .setHealthBarImage(listHealthBarImg)
                     .setBorders(borderX, borderY);
 
         } catch (IOException ex) {

@@ -18,12 +18,13 @@ import java.util.List;
 public class Enemy extends CoordinatedImageTranslationMover {
 
     private DaemonView view;
+    private  int hpMax ;
     private volatile int hp = 30;
     private volatile boolean shootable = true;
-    private Bitmap healthBarImage;//TODO should be sprite!!!!!!!!!!!!!!!!!!!!!!!
+    private List<Bitmap> spriteHealthBarImage;//TODO should be sprite!!!!!!!!!!!!!!!!!!!!!!!
 
-    public Enemy setHealthBarImage(Bitmap healthBarImage) {
-        this.healthBarImage = healthBarImage;
+    public Enemy setHealthBarImage(List<Bitmap> healthBarImage) {
+        this.spriteHealthBarImage = healthBarImage;
         return this;
     }
 
@@ -58,6 +59,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
     public Enemy(List<Bitmap> sprite, float velocity, int hp, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
         super(sprite, velocity, startingPos, targetCoord);
         this.hp = hp;
+        this.hpMax = hp;
     }
 
     @Override
@@ -78,7 +80,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
         PositionedBitmap hBar = new PositionedBitmap();
         hBar.positionX = lastX;
         hBar.positionY = lastY - 60;
-        hBar.image = healthBarImage;
+        hBar.image = spriteHealthBarImage.get((hp * 100 / hpMax - 1) / spriteHealthBarImage.size());
 
 
         PositionedBitmap ret = super.animate();

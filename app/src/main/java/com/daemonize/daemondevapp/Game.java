@@ -70,9 +70,9 @@ public class Game {
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
 
-    private Bitmap healthBarImage;
+    private List<Bitmap> healthBarImage;
 
-    public Game setHealthBarImage(Bitmap healthBarImage) {
+    public Game setHealthBarImage(List<Bitmap> healthBarImage) {
         this.healthBarImage = healthBarImage;
         return this;
     }
@@ -471,8 +471,11 @@ public class Game {
             } else {
                 enemy.setShootable(false);
                 enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
+                    guiConsumer.consume(() -> {
+                                enemy.getView().hide();
+                                enemy.getView().hide();
+                    } );
                     enemy.stop();
-                    guiConsumer.consume(() -> enemy.getView().hide());
                     activeEnemies.remove(enemy);
                     if (!enemyQueue.contains(enemy))
                         enemyQueue.add(enemy);
