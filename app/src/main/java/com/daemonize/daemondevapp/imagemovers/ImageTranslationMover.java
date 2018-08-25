@@ -181,8 +181,8 @@ public class ImageTranslationMover implements ImageMover {
         lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
         lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
 
-        ret.positionX = lastX;
-        ret.positionY = lastY;
+        ret.positionX = lastX - ret.image.getWidth()/2;
+        ret.positionY = lastY - ret.image.getWidth()/2;
 
         return ret;
     }

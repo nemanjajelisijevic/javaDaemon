@@ -12,11 +12,8 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 
 @Daemonize(doubleDaemonize = true)
@@ -24,9 +21,34 @@ public class Tower extends CachedSpriteImageTranslationMover {
 
     private float range;
     private int currentAngle;
-    private int targetAngle;
-    private Map<Integer, Bitmap> angleToImageMap = new HashMap<>(360);
+    private AngleToBitmapArray spriteBuffer;
     private DaemonView view;
+    private volatile boolean pause = false;
+
+    private List<Bitmap> rotationSprite = new LinkedList<>();
+
+    private Game.TowerScanClosure scanClosure;
+
+    @CallingThread
+    public void setScanClosure(Game.TowerScanClosure scanClosure) {
+        this.scanClosure = scanClosure;
+    }
+
+    @CallingThread
+    public Game.TowerScanClosure getScanClosure() {
+        return scanClosure;
+    }
+
+    private volatile int scanInterval;
+
+    public void setScanInterval(int scanInterval) {
+        this.scanInterval = scanInterval;
+    }
+
+    @CallingThread
+    public int getScanInterval() {
+        return scanInterval;
+    }
 
     @CallingThread
     public DaemonView getView() {
@@ -37,15 +59,11 @@ public class Tower extends CachedSpriteImageTranslationMover {
         this.view = view;
     }
 
-    public Tower(List<Bitmap> init, List<Bitmap> sprite,  Pair<Float, Float> startingPos, float range) {
-        super(init, 0, startingPos);
-
-        //TODO validate sprite size (36)
-        for (int i = 0; i < 360; ++i) {
-            angleToImageMap.put(i,  sprite.get(i / 10));
-        }
-
+    public Tower(List<Bitmap> initSprite, List<Bitmap> rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
+        super(initSprite, 0, startingPos);
+        spriteBuffer = new AngleToBitmapArray(rotationSprite, 10);
         this.range = range;
+        this.scanInterval = scanIntervalInMillis;
     }
 
     @Override
@@ -53,99 +71,134 @@ public class Tower extends CachedSpriteImageTranslationMover {
         return super.pushSprite(sprite, velocity);
     }
 
+    public boolean sleep(int millis) throws InterruptedException {
+        Thread.sleep(millis);
+        return true;
+    }
+
     @DedicatedThread
-    public EnemyDoubleDaemon scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
-        Log.e(DaemonUtils.tag(), "INSIDE SCAN!!!!!!!!!!!!!!!!!!!!!!!");
+    public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
 
         for (EnemyDoubleDaemon enemy : activeEnemies) {
             if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().first) < range
                     && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().second) < range) {
-                setDirectionForRotation(
+                pause = false;
+                rotateTowards(
                         enemy.getPrototype().getLastCoordinates().first,
                         enemy.getPrototype().getLastCoordinates().second
                 );
-                return enemy;
+                return Pair.create(true, enemy);
             }
         }
 
-        return null;
+        pause = true;
+        Thread.sleep(scanInterval);
+        return Pair.create(false, null);
     }
 
-    public void setDirectionForRotation(float x, float y) throws InterruptedException {
+    private static double getAngle(float x1, float y1, float x2, float y2) {
 
-        //TODO math: calculate the currentAngle
-        float dx = lastX - x;
-        float dy = lastY - y;
-        float c = (float) Math.sqrt(dx * dx + dy * dy);
-        if (dx > 0 && dy > 0) {
-            // II kvadrant
-            int alfa = (int) Math.asin(dx / c);
-            targetAngle = 90 + alfa;
-        }else if (dx < 0 && dy > 0) {
-            // I kvadrant
-            int alfa = (int) Math.asin(dx / c);
-            targetAngle = 90 - alfa;
-        }else if (dx > 0 && dy < 0) {
-            // III kvadrant
-            int alfa = (int) Math.asin(dx / c);
-            targetAngle = 180 + alfa;
-        }else if (dx < 0 && dy < 0) {
-            // IV kvadrant
-            int alfa = (int) Math.asin(dx / c);
-            targetAngle = 270 + alfa;
-        }
+        float dx = x2 - x1;
+        float dy = y2 - y1;
 
-        boolean plus = true;//targetAngle >= currentAngle;//TODO cover when target - current <10
+        double c = Math.sqrt(dx*dx + dy*dy);
+        double angle =  Math.toDegrees(Math.acos(Math.abs(dx)/c));
 
-        double deltaAlfa = targetAngle - currentAngle;
-
-        if (Math.abs(deltaAlfa) > 180 ) {
-            if (deltaAlfa > 0) {
-                plus = false;
+        if (dx == 0 && dy == 0) {
+          return 0;
+        } else if(dx == 0) {
+            if(dy < 0) {
+                return 90;
             } else {
-                plus = true;
+                return 270;
             }
-        }
-
-        if(currentAngle == targetAngle){
-            sprite = new ArrayList<>();
-            sprite.add(angleToImageMap.get(targetAngle));
-            return;
-        }
-
-        List<Bitmap> rotationSprite = new LinkedList<>();
-        int counterAngle = currentAngle;
-        while (!(Math.abs(counterAngle - targetAngle) < 10)) {
-            Log.d(DaemonUtils.tag(), "COUNTER ANGLE: " + counterAngle + ", TARGET ANGLE: " + targetAngle);
-            Bitmap toAdd = angleToImageMap.get(counterAngle);
-            rotationSprite.add(toAdd);
-            if (plus) {
-                if ( counterAngle >= 350) {
-                    counterAngle = 0;
-                } else {
-                    counterAngle += 10;
-                }
-            }else {
-                if ( counterAngle <= 10) {
-                    counterAngle = 359;
-                } else {
-                    counterAngle -= 10;
-                }
+        } else if (dy == 0){
+            if(dx < 0) {
+                return 180;
+            } else {
+                return 0;
             }
-
+        } else if (dx > 0 && dy > 0) {
+            return 360 - angle;
+        } else if (dx < 0 && dy > 0) {
+            return 180 + angle;
+        } else if (dx < 0 && dy < 0) {
+            return 180 - angle;
+        } else if (dx > 0 && dy < 0) {
+            return angle;
+        } else {
+            return 0;
         }
-
-        currentAngle = targetAngle;
-        pushSprite(rotationSprite, velocity.intensity);
     }
 
-    @SideQuest(SLEEP = 25)
+
+    public void rotateTowards(float x, float y) throws InterruptedException {
+
+        int targetAngle = (int) getAngle(lastX, lastY, x, y);
+        rotationSprite.clear();
+
+        if (Math.abs(targetAngle - currentAngle) < 2 * spriteBuffer.getStep()) {
+            rotationSprite.add(spriteBuffer.getByAngle(targetAngle));
+            sprite = rotationSprite;
+        } else {
+
+            //rotate smoothly
+            int mirrorAngle;
+            boolean direction; //true for increasing angle
+
+            if (targetAngle < 180) {
+                mirrorAngle = targetAngle + 180;
+                direction = !(currentAngle < mirrorAngle && currentAngle > targetAngle);
+            } else {
+                mirrorAngle = targetAngle - 180;
+                direction = currentAngle < targetAngle && currentAngle > mirrorAngle;
+            }
+
+            int counterAngle = currentAngle;
+            int diff = targetAngle - counterAngle;
+
+            Log.e(DaemonUtils.tag(), "START Angle diff: " + diff);
+
+            while (!(Math.abs(targetAngle - counterAngle) < 10)) {
+
+                int diff2 = targetAngle - counterAngle;
+
+                Log.w(DaemonUtils.tag(), "****************************");
+                Log.w(DaemonUtils.tag(), "Target Angle: " + targetAngle);
+                Log.w(DaemonUtils.tag(), "Current Angle: " + counterAngle);
+                Log.w(DaemonUtils.tag(), "Angle diff: " + diff2);
+                Log.w(DaemonUtils.tag(), "****************************");
+
+                rotationSprite.add(
+                        direction ?
+                                spriteBuffer.getIncrementedByStep()
+                                : spriteBuffer.getDecrementedByStep()
+                );
+
+                counterAngle = spriteBuffer.getCurrentAngle();
+            }
+
+            Log.e(DaemonUtils.tag(), "END Angle diff: " + (targetAngle - counterAngle));
+
+            pushSprite(rotationSprite, velocity.intensity);
+            sprite.clear();
+            sprite.add(rotationSprite.get(rotationSprite.size() - 1));
+        }
+
+        currentAngle = targetAngle; //TODO check if this needs to go before pushSprite() call
+    }
+
+    @SideQuest(SLEEP = 30)
     @Override
     public PositionedBitmap animate() {
+
+        if (pause)
+            return null;
+
         PositionedBitmap ret = new PositionedBitmap();
         ret.image = iterateSprite();
-        ret.positionX = lastX;
-        ret.positionY = lastY;
+        ret.positionX = lastX - ret.image.getWidth()/2;
+        ret.positionY = lastY - ret.image.getWidth()/2;
         return ret;
     }
 }

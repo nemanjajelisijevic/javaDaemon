@@ -4,8 +4,11 @@ import android.util.Pair;
 
 import com.daemonize.daemondevapp.MainActivity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Grid {
 
@@ -14,28 +17,54 @@ public class Grid {
     Pair<Integer, Integer> startPoint;
     Pair<Integer, Integer> endPoint;
 
+    float xCoordinateInReal;
+    float yCoordinateInReal;
+
+    Lock gridLock  = new ReentrantLock();
+
     private Field[][] grid;
     int fieldWith = 80;
 
     private List<Field> path;
 
-    public Grid(int row, int column, Pair<Integer, Integer> startPoint, Pair<Integer, Integer> endPoint) {
+//    public Grid(float row, float column, Pair<Integer, Integer> startPoint, Pair<Integer, Integer> endPoint) {
+//        this.startPoint = startPoint;
+//        this.endPoint = endPoint;
+//        pathFinding = new Dijkstra();
+//        grid = createFieldGround(row, column);
+//        pathFinding.recalculate(this);//new Pair<>(0,0),new Pair<>(row - 1,column - 1)
+//
+//    }
+    public boolean isInsideOfGrid (float x, float y){
+        boolean in = false;
+        float x2 = xCoordinateInReal + grid[0].length * fieldWith;
+        float y2 = yCoordinateInReal + grid.length * fieldWith;
+        if ( x > xCoordinateInReal && x < x2 &&
+             y > yCoordinateInReal && y < y2 ){
+            in = true;
+        }
+        return in;
+    }
+
+    public Grid(int row, int column, Pair<Integer, Integer> startPoint, Pair<Integer, Integer> endPoint, float realCoordX, float realCoordY) {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
+        this.xCoordinateInReal = realCoordX;
+        this.yCoordinateInReal = realCoordY;
         pathFinding = new Dijkstra();
-        grid = createFieldGround(row, column);
+        grid = createFieldGround(row, column,realCoordX,realCoordY);
         pathFinding.recalculate(this);//new Pair<>(0,0),new Pair<>(row - 1,column - 1)
 
     }
 
-    Field[][] createFieldGround(int row, int column) {
+    Field[][] createFieldGround(int row, int column,float realCoordX, float realCoordY) {
         Field[][] gridtemp = new Field[row][column];
 
         for (int i = 0; i < row; i++) {
-            int y = fieldWith / 2 + i * fieldWith;
+            float y = realCoordY + fieldWith / 2 + i * fieldWith;
 
             for (int j = 0; j < column; j++) {
-                int x = fieldWith / 2 + j * fieldWith;
+                float x = realCoordX + fieldWith / 2 + j * fieldWith;
 
                 Field field = new Field(x, y, i, j, 0, true);
                 field.gCost = Integer.MAX_VALUE;
@@ -45,15 +74,27 @@ public class Grid {
         return gridtemp;
     }
 
-    public Field getField(int row, int column) {
-        return grid[row][column];
+    public synchronized Field getField(int row, int column) {
+//        gridLock.lock();
+        Field ret = grid[row][column];
+//        gridLock.unlock();
+        return ret;
     }
 
-    public Field getField(float x, float y) {
-        int row = (int) ((y /*- 40*/) / fieldWith);
-        int column = (int) ((x /*- 40*/) / fieldWith);
+    public synchronized Field getField(float x, float y) {
+//        gridLock.lock();
+        Field ret = null;
 
-        return grid[row][column];
+        if (isInsideOfGrid(x,y)) {
+            int row = (int) ((y - yCoordinateInReal) / fieldWith);//TODO this shit right here
+            int column = (int) ((x - xCoordinateInReal) / fieldWith);
+            ret = grid[row][column];
+            //        gridLock.unlock();
+
+        }
+
+        return ret;
+
     }
 
     public Field[][] getGrid() {
@@ -80,6 +121,7 @@ public class Grid {
 
     public boolean setTower(int row, int column) {
 
+//        gridLock.lock();
         if (!grid[row][column].isWalkable()) return false;
 
         //copy of grid
@@ -95,16 +137,20 @@ public class Grid {
         grid[row][column].setWalkable(false);
 
         boolean acceptTower = pathFinding.recalculate(this);
+
+
         if (acceptTower) {
+//            gridLock.unlock();
             return true;
         } else {
             grid = gridTemp;
             pathFinding.recalculate(this);
+//            gridLock.unlock();
             return false;
         }
     }
 
-    public List<Field> getNeighbors(int row, int column) {
+    protected List<Field> getNeighbors(int row, int column) {
         List<Field> neighbors = new ArrayList<>();
 
         for (int i = -1; i <= 1; i++) {
@@ -129,6 +175,7 @@ public class Grid {
     }
 
     public Field getMinWeightOfNeighbors(int row, int column) {
+//        gridLock.lock();
         List<Field> neighbors = new ArrayList<>();
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
@@ -157,6 +204,7 @@ public class Grid {
                 }
             }
         }
+//        gridLock.unlock();
         return currentMinField;
     }
 

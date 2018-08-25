@@ -9,10 +9,10 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class SideQuest<T> extends Quest<T> {
 
-  private int sleepInterval;
+  private long sleepInterval;
 
   @SuppressWarnings("unchecked")
-  public <K extends SideQuest> K setSleepInterval(int milliseconds) {
+  public <K extends SideQuest> K setSleepInterval(long milliseconds) {
     this.sleepInterval = milliseconds;
     return (K) this;
   }
