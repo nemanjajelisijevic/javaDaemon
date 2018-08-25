@@ -23,7 +23,7 @@ public class Grid {
     Lock gridLock  = new ReentrantLock();
 
     private Field[][] grid;
-    int fieldWith = 80;
+    int fieldWith ;
 
     private List<Field> path;
 
@@ -46,11 +46,12 @@ public class Grid {
         return in;
     }
 
-    public Grid(int row, int column, Pair<Integer, Integer> startPoint, Pair<Integer, Integer> endPoint, float realCoordX, float realCoordY) {
+    public Grid(int row, int column, Pair<Integer, Integer> startPoint, Pair<Integer, Integer> endPoint, float realCoordX, float realCoordY, int fieldWith) {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
         this.xCoordinateInReal = realCoordX;
         this.yCoordinateInReal = realCoordY;
+        this.fieldWith = fieldWith;
         pathFinding = new Dijkstra();
         grid = createFieldGround(row, column,realCoordX,realCoordY);
         pathFinding.recalculate(this);//new Pair<>(0,0),new Pair<>(row - 1,column - 1)

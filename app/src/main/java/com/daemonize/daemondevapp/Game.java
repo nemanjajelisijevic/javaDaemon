@@ -172,14 +172,23 @@ public class Game {
         return this;
     }
 
-    public Game(int rows, int columns, DaemonView[][] viewMatrix, Queue<DaemonView> enemyViews, Queue<DaemonView> enemyHpViewQueue, Queue<DaemonView> bulletViewQueue,float x,float y) {
+    public Game(
+            int rows,
+            int columns,
+            DaemonView[][] viewMatrix,
+            Queue<DaemonView> enemyViews,
+            Queue<DaemonView> enemyHpViewQueue,
+            Queue<DaemonView> bulletViewQueue,
+            float x,
+            float y,
+            int fieldWidth) {
         this.rows = rows;
         this.columns = columns;
         this.viewMatrix = viewMatrix;
         //TODO validate enemyViews
         this.enemyViews = enemyViews;
         this.enemyHpViews = enemyHpViewQueue;
-        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, columns - 1), x, y);
+        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, columns - 1), x, y, fieldWidth);
         this.bulletViewQueue = bulletViewQueue;
     }
 

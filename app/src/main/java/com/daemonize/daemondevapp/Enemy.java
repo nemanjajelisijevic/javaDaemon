@@ -77,15 +77,16 @@ public class Enemy extends CoordinatedImageTranslationMover {
     @Override
     public PositionedBitmap animate() {
 
-        PositionedBitmap hBar = new PositionedBitmap();
-        hBar.positionX = lastX;
-        hBar.positionY = lastY - 60;
-        hBar.image = spriteHealthBarImage.get((hp * 100 / hpMax - 1) / spriteHealthBarImage.size());
-
-
         PositionedBitmap ret = super.animate();
         ret.children = new LinkedList<>();
+
+        PositionedBitmap hBar = new PositionedBitmap();
+        hBar.image = spriteHealthBarImage.get((hp * 100 / hpMax - 1) / spriteHealthBarImage.size());
+        hBar.positionX = lastX - ret.image.getWidth()/2;
+        hBar.positionY = lastY - ret.image.getHeight()/2 - hBar.image.getHeight();
         ret.children.add(hBar);
+
+
         return ret;
     }
 }
