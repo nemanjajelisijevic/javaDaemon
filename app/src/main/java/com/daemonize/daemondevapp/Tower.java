@@ -135,52 +135,55 @@ public class Tower extends CachedSpriteImageTranslationMover {
     public void rotateTowards(float x, float y) throws InterruptedException {
 
         int targetAngle = (int) getAngle(lastX, lastY, x, y);
-        //int diff = targetAngle - currentAngle;
         rotationSprite.clear();
 
-        rotationSprite.add(spriteBuffer.getByAngle(targetAngle));
-        sprite = rotationSprite;
+        if (Math.abs(targetAngle - currentAngle) < 2 * spriteBuffer.getStep()) {
+            rotationSprite.add(spriteBuffer.getByAngle(targetAngle));
+            sprite = rotationSprite;
+        } else {
 
-//        if (Math.abs(targetAngle - currentAngle) < 2 * spriteBuffer.getStep()) {
-//            rotationSprite.add(spriteBuffer.getByAngle(targetAngle));
-//            sprite = rotationSprite;
-//        } else {
-//
-//            //rotate smoothly
-//            int counterAngle = currentAngle;
-//            int diff = targetAngle - counterAngle;
-//
-//            Log.e(DaemonUtils.tag(), "START Angle diff: " + diff);
-//
-//            while (!(Math.abs(targetAngle - counterAngle) < 10)) {
-//
-//                int diff2 = targetAngle - counterAngle;
-//
-//                Log.w(DaemonUtils.tag(), "****************************");
-//                Log.w(DaemonUtils.tag(), "Target Angle: " + targetAngle);
-//                Log.w(DaemonUtils.tag(), "Current Angle: " + counterAngle);
-//                Log.w(DaemonUtils.tag(), "Angle diff: " + diff2);
-//                Log.w(DaemonUtils.tag(), "****************************");
-//
-//                if (diff > 0 && diff < 180)
-//                    rotationSprite.add(spriteBuffer.getIncrementedByStep());
-//                else if (diff > 180)
-//                    rotationSprite.add(spriteBuffer.getDecrementedByStep());
-//                else if (diff < -180)
-//                    rotationSprite.add(spriteBuffer.getIncrementedByStep());
-//                else if (diff < 0)
-//                    rotationSprite.add(spriteBuffer.getDecrementedByStep());
-//
-//                counterAngle = spriteBuffer.getCurrentAngle();
-//            }
-//
-//
-//            Log.e(DaemonUtils.tag(), "END Angle diff: " + (targetAngle - counterAngle));
-//
-//            pushSprite(rotationSprite, velocity.intensity);
-//            sprite.clear();
-//            sprite.add(rotationSprite.get(rotationSprite.size() - 1));
-//        }
+            //rotate smoothly
+            int mirrorAngle;
+            boolean direction; //true for increasing angle
+
+            if (targetAngle < 180) {
+                mirrorAngle = targetAngle + 180;
+                direction = !(currentAngle < mirrorAngle && currentAngle > targetAngle);
+            } else {
+                mirrorAngle = targetAngle - 180;
+                direction = currentAngle < targetAngle && currentAngle > mirrorAngle;
+            }
+
+            int counterAngle = currentAngle;
+            int diff = targetAngle - counterAngle;
+
+            Log.e(DaemonUtils.tag(), "START Angle diff: " + diff);
+
+            while (!(Math.abs(targetAngle - counterAngle) < 10)) {
+
+                int diff2 = targetAngle - counterAngle;
+
+                Log.w(DaemonUtils.tag(), "****************************");
+                Log.w(DaemonUtils.tag(), "Target Angle: " + targetAngle);
+                Log.w(DaemonUtils.tag(), "Current Angle: " + counterAngle);
+                Log.w(DaemonUtils.tag(), "Angle diff: " + diff2);
+                Log.w(DaemonUtils.tag(), "****************************");
+
+                rotationSprite.add(
+                        direction ?
+                                spriteBuffer.getIncrementedByStep()
+                                : spriteBuffer.getDecrementedByStep()
+                );
+
+                counterAngle = spriteBuffer.getCurrentAngle();
+            }
+
+            Log.e(DaemonUtils.tag(), "END Angle diff: " + (targetAngle - counterAngle));
+
+            pushSprite(rotationSprite, velocity.intensity);
+            sprite.clear();
+            sprite.add(rotationSprite.get(rotationSprite.size() - 1));
+        }
 
         currentAngle = targetAngle; //TODO check if this needs to go before pushSprite() call
     }
