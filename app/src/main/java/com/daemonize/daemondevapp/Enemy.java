@@ -82,7 +82,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
         PositionedBitmap hBar = new PositionedBitmap();
         hBar.image = spriteHealthBarImage.get((hp * 100 / hpMax - 1) / spriteHealthBarImage.size());
-        hBar.positionX = lastX - ret.image.getWidth()/2;
+        hBar.positionX = lastX - ret.image.getWidth()/3;
         hBar.positionY = lastY - ret.image.getHeight()/2 - hBar.image.getHeight();
         ret.children.add(hBar);
 

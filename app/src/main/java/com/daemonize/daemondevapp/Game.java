@@ -482,7 +482,6 @@ public class Game {
                 enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                     guiConsumer.consume(() -> {
                                 enemy.getView().hide();
-                                enemy.getView().hide();
                     } );
                     enemy.stop();
                     activeEnemies.remove(enemy);
