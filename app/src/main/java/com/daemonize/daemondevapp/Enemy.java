@@ -10,7 +10,6 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -18,10 +17,11 @@ import java.util.List;
 public class Enemy extends CoordinatedImageTranslationMover {
 
     private DaemonView view;
-    private  int hpMax ;
+    private DaemonView hpView;
+    private  int hpMax;
     private volatile int hp = 30;
     private volatile boolean shootable = true;
-    private List<Bitmap> spriteHealthBarImage;//TODO should be sprite!!!!!!!!!!!!!!!!!!!!!!!
+    private List<Bitmap> spriteHealthBarImage;
 
     public Enemy setHealthBarImage(List<Bitmap> healthBarImage) {
         this.spriteHealthBarImage = healthBarImage;
@@ -46,6 +46,10 @@ public class Enemy extends CoordinatedImageTranslationMover {
         this.hp = hp;
     }
 
+    public void setMaxHp(int maxHp) {
+        this.hpMax = maxHp;
+    }
+
     @CallingThread
     public DaemonView getView() {
         return view;
@@ -53,6 +57,16 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
     public Enemy setView(DaemonView view) {
         this.view = view;
+        return this;
+    }
+
+    @CallingThread
+    public DaemonView getHpView() {
+        return hpView;
+    }
+
+    public Enemy setHpView(DaemonView hpView) {
+        this.hpView = hpView;
         return this;
     }
 
@@ -74,19 +88,14 @@ public class Enemy extends CoordinatedImageTranslationMover {
     }
 
     @SideQuest(SLEEP = 30)
-    @Override
-    public PositionedBitmap animate() {
-
-        PositionedBitmap ret = super.animate();
-        ret.children = new LinkedList<>();
-
+    public GenericNode<Pair<PositionedBitmap, DaemonView>> animateEnemy() {
+        PositionedBitmap enemyPosBmp = super.animate();
+        GenericNode<Pair<PositionedBitmap, DaemonView>> root = new GenericNode<>(Pair.create(enemyPosBmp, view));
         PositionedBitmap hBar = new PositionedBitmap();
         hBar.image = spriteHealthBarImage.get((hp * 100 / hpMax - 1) / spriteHealthBarImage.size());
-        hBar.positionX = lastX - ret.image.getWidth()/3;
-        hBar.positionY = lastY - ret.image.getHeight()/2 - hBar.image.getHeight();
-        ret.children.add(hBar);
-
-
-        return ret;
+        hBar.positionX = lastX - enemyPosBmp.image.getWidth() / 3;
+        hBar.positionY = lastY - enemyPosBmp.image.getHeight() / 2 - hBar.image.getHeight();
+        root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
+        return root;
     }
 }

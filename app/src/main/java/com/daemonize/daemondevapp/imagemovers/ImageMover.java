@@ -30,9 +30,6 @@ public interface ImageMover {
     }
 
     class PositionedBitmap {
-
-        public List<PositionedBitmap> children;
-
         public Bitmap image;
         public float positionX;
         public float positionY;
@@ -72,7 +69,5 @@ public interface ImageMover {
 
     @SideQuest(SLEEP = 25)
     PositionedBitmap animate();
-
-    PositionedBitmap explode(List<Bitmap> explodeSprite, Closure<PositionedBitmap> update) throws InterruptedException;
 
 }

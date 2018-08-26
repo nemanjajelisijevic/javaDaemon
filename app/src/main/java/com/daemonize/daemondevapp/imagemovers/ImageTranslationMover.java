@@ -126,7 +126,7 @@ public class ImageTranslationMover implements ImageMover {
 //        boolean signY = dY >= 0;
 //        boolean signX = dX >= 0;
         velocity.intensity = velocityInt;
-        velocity.direction = new ImageMover.Direction(dX, dY);
+        velocity.direction = new ImageMover.Direction(dX, dY); //TODO check this shit
 //
 //        if (Math.abs(dY) >= Math.abs(dX)) {
 //            a = Math.abs((100*dX)/dY);
@@ -193,25 +193,5 @@ public class ImageTranslationMover implements ImageMover {
         return exploading;
     }
 
-    @Override
-    public PositionedBitmap explode(List<Bitmap> explodeSprite, Closure<PositionedBitmap> update) throws InterruptedException {
-
-        Handler handler = new Handler(Looper.getMainLooper());
-        PositionedBitmap updatePB = new PositionedBitmap();
-        exploading = true;
-
-        for (Bitmap bmp : explodeSprite) {
-
-            updatePB.image = bmp;
-            updatePB.positionX = lastX;
-            updatePB.positionY = lastY;
-            handler.post(new ReturnRunnable<>(update).setResult(updatePB));
-            Thread.sleep(25);
-        }
-
-        Thread.sleep(3000);
-        updatePB.image = explodeSprite.get(explodeSprite.size() - 1);
-        return updatePB;
-    }
 }
 

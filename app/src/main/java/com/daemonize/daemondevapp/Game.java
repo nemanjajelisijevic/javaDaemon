@@ -1,7 +1,6 @@
 package com.daemonize.daemondevapp;
 
 import android.graphics.Bitmap;
-import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 
@@ -100,35 +99,17 @@ public class Game {
         }
     }
 
-
-    private class DoubleImageAnimateClosure implements Closure<ImageMover.PositionedBitmap> {
-
-        private DaemonView view;
-        private DaemonView childView;
-
-        public DoubleImageAnimateClosure(DaemonView view, DaemonView childView) {
-            this.view = view;
-            this.childView = childView;
-        }
-
+    private class EnemyAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedBitmap, DaemonView>>> {
         @Override
-        public void onReturn(Return<ImageMover.PositionedBitmap> aReturn) {
-            ImageMover.PositionedBitmap posBmp = aReturn.get();
-            view.setX(posBmp.positionX);
-            view.setY(posBmp.positionY);
-            view.setImage(posBmp.image);
-
-            if (posBmp.children.get(0) != null) {
-                posBmp = posBmp.children.get(0);
-                childView.setX(posBmp.positionX);
-                childView.setY(posBmp.positionY);
-                childView.setImage(posBmp.image);
-            }
-
+        public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedBitmap, DaemonView>>> aReturn) {
+            GenericNode.forEach(aReturn.uncheckAndGet(), actionret -> {
+                Pair<ImageMover.PositionedBitmap, DaemonView> imageAndView = actionret.get();
+                imageAndView.second.setX(imageAndView.first.positionX);
+                imageAndView.second.setY(imageAndView.first.positionY);
+                imageAndView.second.setImage(imageAndView.first.image);
+            });
         }
     }
-
-
 
     public Game setTowerSprite(List<Bitmap> towerSprite) {
         this.towerSprite = towerSprite;
@@ -220,7 +201,6 @@ public class Game {
         //init spell (state)
         chain.addSpell(()->{
 
-
             Field firstField = grid.getField(0, 0);
 
             for (DaemonView enemyView : enemyViews) {
@@ -233,13 +213,13 @@ public class Game {
                                 enemyHp,
                                 Pair.create((float)0, (float)0),
                                 Pair.create(firstField.getCenterX(), firstField.getCenterY())
-                        ).setView(enemyView)
+                        ).setView(enemyView).setHpView(enemyHpViews.poll())
                         .setHealthBarImage(healthBarImage)
                 ).setName("Enemy");
 
                 enemy.getPrototype().setBorders(borderX, borderY);
 
-                enemy.setAnimateSideQuest().setClosure(new DoubleImageAnimateClosure(enemyView, enemyHpViews.poll()));//gui consumer
+                enemy.setAnimateEnemySideQuest().setClosure(new EnemyAnimateClosure());//gui consumer
 
                 enemyQueue.add(enemy);
 
@@ -279,8 +259,8 @@ public class Game {
                     if(enemyVelocity < 6)
                         enemyVelocity += 1;
 
-                    if (enemyHp < 80)
-                        enemyHp += 5;
+//                    if (enemyHp < 80)
+////                        enemyHp += 5;//TODO pay attention to enemy max hp
 
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
@@ -312,9 +292,12 @@ public class Game {
                                 if (current == null) return;
                                 else if (current.getColumn() ==  6 - 1 && current.getRow() == rows - 1) {
                                     enemy.setShootable(false);
+                                    guiConsumer.consume(()-> enemy.getHpView().hide());
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                                         enemy.stop();
-                                        guiConsumer.consume(() -> enemy.getView().hide());
+                                        guiConsumer.consume(() -> {
+                                            enemy.getView().hide();
+                                        });
                                         activeEnemies.remove(enemy);
                                         if (!enemyQueue.contains(enemy))
                                             enemyQueue.add(enemy);
@@ -347,8 +330,6 @@ public class Game {
         });
 
     }
-
-
 
     public Game setTower(float x, float y) { //TODO to be called from Activity.onTouch()
 
@@ -479,10 +460,11 @@ public class Game {
                 enemy.setHp(enemyHp - bulletDoubleDaemon.getPrototype().getDamage());
             } else {
                 enemy.setShootable(false);
+                guiConsumer.consume(()->enemy.getHpView().hide());
                 enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                     guiConsumer.consume(() -> {
                                 enemy.getView().hide();
-                    } );
+                    });
                     enemy.stop();
                     activeEnemies.remove(enemy);
                     if (!enemyQueue.contains(enemy))
