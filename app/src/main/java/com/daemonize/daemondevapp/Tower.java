@@ -141,6 +141,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
         if (Math.abs(targetAngle - currentAngle) < 2 * spriteBuffer.getStep()) {
 
             rotationSprite.add(spriteBuffer.getByAngle(targetAngle));
+            spriteBuffer.setCurrentAngle(targetAngle);
             sprite = rotationSprite;
 
         } else {
@@ -162,13 +163,13 @@ public class Tower extends CachedSpriteImageTranslationMover {
 
             Log.e(DaemonUtils.tag(), "START Angle diff: " + diff);
 
-            while (!(Math.abs(targetAngle - counterAngle) < 10)) {
+            while (!(Math.abs(targetAngle - spriteBuffer.getCurrentAngle()) < 10)) {
 
-                int diff2 = targetAngle - counterAngle;
+                int diff2 = targetAngle - /*counterAngle*/spriteBuffer.getCurrentAngle();
 
                 Log.w(DaemonUtils.tag(), "****************************");
                 Log.w(DaemonUtils.tag(), "Target Angle: " + targetAngle);
-                Log.w(DaemonUtils.tag(), "Current Angle: " + counterAngle);
+                Log.w(DaemonUtils.tag(), "Current Angle: " + /*counterAngle*/spriteBuffer.getCurrentAngle());
                 Log.w(DaemonUtils.tag(), "Angle diff: " + diff2);
                 Log.w(DaemonUtils.tag(), "****************************");
 
@@ -188,7 +189,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
             sprite.add(rotationSprite.get(rotationSprite.size() - 1));
         }
 
-        currentAngle = targetAngle; //TODO check if this needs to go before pushSprite() call
+        currentAngle = spriteBuffer.getCurrentAngle(); //TODO check if this needs to go before pushSprite() call
     }
 
     @SideQuest(SLEEP = 30)

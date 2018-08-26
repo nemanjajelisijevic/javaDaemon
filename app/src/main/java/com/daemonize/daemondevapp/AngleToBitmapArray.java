@@ -8,7 +8,15 @@ public class AngleToBitmapArray {
 
     private Bitmap[] array = new Bitmap[360];
     private int step;
-    private int pointer;
+    private int pointer = 0;
+
+
+    public void setCurrentAngle(int degrees) {
+        if (degrees < 0 || degrees > 359) {
+            throw new IllegalArgumentException("Arg degrees must be > 0 && < 360");
+        }
+        pointer = degrees;
+    }
 
     public int getStep() {
         return step;
@@ -47,6 +55,8 @@ public class AngleToBitmapArray {
         int diff = pointer - step;
         if (diff < 0) {
             pointer = array.length + diff;
+        } else if (diff == 0){
+            pointer = 0;
         } else {
             pointer -= step;
         }
