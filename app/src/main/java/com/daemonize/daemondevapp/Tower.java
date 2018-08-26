@@ -12,6 +12,7 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
     private DaemonView view;
     private volatile boolean pause = false;
 
-    private List<Bitmap> rotationSprite = new LinkedList<>();
+    private List<Bitmap> rotationSprite;
 
     private Game.TowerScanClosure scanClosure;
 
@@ -62,6 +63,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
     public Tower(List<Bitmap> initSprite, List<Bitmap> rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
         super(initSprite, 0, startingPos);
         spriteBuffer = new AngleToBitmapArray(rotationSprite, 10);
+        this.rotationSprite = new ArrayList<>(19);
         this.range = range;
         this.scanInterval = scanIntervalInMillis;
     }
