@@ -13,7 +13,6 @@ import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 
@@ -62,7 +61,7 @@ public class Tower extends CachedSpriteImageTranslationMover {
 
     public Tower(List<Bitmap> initSprite, List<Bitmap> rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
         super(initSprite, 0, startingPos);
-        spriteBuffer = new AngleToBitmapArray(rotationSprite, 10);
+        this.spriteBuffer = new AngleToBitmapArray(rotationSprite, 10);
         this.rotationSprite = new ArrayList<>(19);
         this.range = range;
         this.scanInterval = scanIntervalInMillis;
@@ -140,8 +139,10 @@ public class Tower extends CachedSpriteImageTranslationMover {
         rotationSprite.clear();
 
         if (Math.abs(targetAngle - currentAngle) < 2 * spriteBuffer.getStep()) {
+
             rotationSprite.add(spriteBuffer.getByAngle(targetAngle));
             sprite = rotationSprite;
+
         } else {
 
             //rotate smoothly
