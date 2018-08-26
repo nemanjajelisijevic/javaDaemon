@@ -102,7 +102,7 @@ public class Game {
     private class EnemyAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedBitmap, DaemonView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedBitmap, DaemonView>>> aReturn) {
-            GenericNode.forEach(aReturn.uncheckAndGet(), actionret -> {
+            GenericNode.forEach(aReturn.get(), actionret -> {
                 Pair<ImageMover.PositionedBitmap, DaemonView> imageAndView = actionret.get();
                 imageAndView.second.setX(imageAndView.first.positionX);
                 imageAndView.second.setY(imageAndView.first.positionY);
@@ -325,7 +325,7 @@ public class Game {
             });
 
             //try to garbage collect
-            new DummyDaemon(gameConsumer, 5000).setClosure(aReturn -> System.gc()).start();
+            new DummyDaemon(gameConsumer, 3000).setClosure(aReturn -> System.gc()).start();
 
         });
 
