@@ -29,6 +29,7 @@ public class AndroidImageView implements DaemonView {
     @Override
     public AndroidImageView setImage(Bitmap image) {
         view.setImageBitmap(image);
+        view.invalidate();
         return this;
     }
 

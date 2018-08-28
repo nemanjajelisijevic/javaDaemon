@@ -62,22 +62,6 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap backgroundImg;
 
     private AndroidImageView[][] fieldViews;
-    private ArrayList<ImageView> bulletsViews;
-
-    public Grid grid;
-
-    private DummyDaemon dummyDaemon;
-
-    private List<ImageMoverDaemon> starMovers;
-    private List<ImageMoverMDaemon> enemyList;
-
-    private ImageMoverDaemon mainMover;
-    private ImageView mainView;
-    private ImageMoverDaemon[][] mainMover2;
-
-
-//    private MassiveImageMoverDaemon massiveDaemon;
-    private List<ImageView> massiveViews;
 
     private int borderX;
     private int borderY;
@@ -88,23 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
     public TextView hpView;
     private String hpText = "HP: ";
-
-    public static class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
-
-        protected ImageView view;
-
-        public ImageMoveClosure(ImageView view) {
-            this.view = view;
-        }
-
-        @Override
-        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
-            ImageMover.PositionedBitmap returnVal = ret.get();
-            view.setX(returnVal.positionX);
-            view.setY(returnVal.positionY);
-            view.setImageBitmap(returnVal.image);
-        }
-    }
 
 
     private static int getRandomInt(int min, int max) {
@@ -143,10 +110,6 @@ public class MainActivity extends AppCompatActivity {
         layout = findViewById(R.id.cl);
 
         background = findViewById(R.id.img_large);
-
-        //mainView = findViewById(R.id.imageViewMain);
-        starMovers = new ArrayList<>(60);
-        enemyList = new ArrayList<>(10);
 
         wastedCntView = findViewById(R.id.response);
         wastedCntView.setWidth(borderX / 3);
@@ -301,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
 
             Queue<DaemonView> enemyQueue = new LinkedList<>();
 
-            for (int cnt = 0; cnt < 50; ++cnt) {
+            for (int cnt = 0; cnt < 100; ++cnt) {
                 enemyQueue.add(new AndroidImageView(createImageView(width, height)));
             }
 
@@ -309,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
             int height_hp = 30;
             Queue<DaemonView> enemyHpViewQueue = new LinkedList<>();
 
-            for (int cnt = 0; cnt < 50; ++cnt) {
+            for (int cnt = 0; cnt < 100; ++cnt) {
                 enemyHpViewQueue.add(new AndroidImageView(createImageView(width_hp, height_hp)));
             }
 
@@ -321,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             List<Bitmap> listHealthBarImg = new ArrayList<>();
-           // listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_0.png")), width_hp, height_hp, false));
+            listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_0.png")), width_hp, height_hp, false));
             listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_10.png")), width_hp, height_hp, false));
             listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_20.png")), width_hp, height_hp, false));
             listHealthBarImg.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_30.png")), width_hp, height_hp, false));
@@ -349,21 +312,6 @@ public class MainActivity extends AppCompatActivity {
             Log.e(DaemonUtils.tag(), "Could not init game!", ex);
         }
 
-
-//        ExampleDaemon exampleDaemon = new ExampleDaemon(
-//                new AndroidLooperConsumer(),
-//                new Example()
-//        ).setName("Example recursion");
-//
-//        exampleDaemon.increment(new Closure<String>() {
-//            @Override
-//            public void onReturn(Return<String> aReturn) {
-//                Log.e(DaemonUtils.tag(), aReturn.get());
-//                exampleDaemon.increment(this);
-//            }
-//        });
-
-
     }
 
     @Override
@@ -383,15 +331,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         game.stop();
-
-//        mainMover.stop();
-//        for(ImageMoverDaemon mover : starMovers) {
-//            mover.stop();
-//        }
-//        dummyDaemon.stop();
-        //massiveDaemon.stop();
-        //exampleDaemon.stop();
-        //backgroundScrollerDaemon.stop();
     }
 
     @Override

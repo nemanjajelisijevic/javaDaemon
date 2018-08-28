@@ -57,6 +57,13 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @SideQuest(SLEEP = 30)
     @Override
     public PositionedBitmap animate() {
+
+        if (Math.abs(lastX) < velocity.intensity
+                || Math.abs(lastX - borderX) < velocity.intensity
+                || Math.abs(lastY) < velocity.intensity
+                || Math.abs(lastY - borderY) < velocity.intensity)
+            throw new IllegalStateException("Bullet out of borders!");
+
         return super.animate();
     }
 }

@@ -15,6 +15,7 @@ import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
+import com.daemonize.daemonengine.exceptions.DaemonException;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
@@ -92,6 +93,7 @@ public class Game {
 
         @Override
         public void onReturn(Return<ImageMover.PositionedBitmap> aReturn) {
+            Log.d(DaemonUtils.tag(), "TOWER CLOSURE!!!!");
             ImageMover.PositionedBitmap posBmp = aReturn.get();
             view.setX(posBmp.positionX);
             view.setY(posBmp.positionY);
@@ -102,6 +104,7 @@ public class Game {
     private class EnemyAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedBitmap, DaemonView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedBitmap, DaemonView>>> aReturn) {
+            Log.d(DaemonUtils.tag(), "ENEMY CLOSURE!!!!");
             GenericNode.forEach(aReturn.get(), actionret -> {
                 Pair<ImageMover.PositionedBitmap, DaemonView> imageAndView = actionret.get();
                 imageAndView.second.setX(imageAndView.first.positionX);
@@ -199,53 +202,72 @@ public class Game {
 
     {
         //init spell (state)
-        chain.addSpell(()->{
+        chain.addSpell(()-> {
+
+                    Field firstField = grid.getField(0, 0);
+
+                    for (DaemonView enemyView : enemyViews) {
+                        EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
+                                gameConsumer,
+                                guiConsumer,
+                                new Enemy(
+                                        enemySprite,
+                                        enemyVelocity,
+                                        enemyHp,
+                                        Pair.create((float) 0, (float) 0),
+                                        Pair.create(firstField.getCenterX(), firstField.getCenterY())
+                                ).setView(enemyView).setHpView(enemyHpViews.poll())
+                                        .setHealthBarImage(healthBarImage)
+                        ).setName("Enemy");
+
+                        enemy.getPrototype().setBorders(borderX, borderY);
+
+                        enemy.setAnimateEnemySideQuest().setClosure(new EnemyAnimateClosure());//gui consumer
+
+                        enemyQueue.add(enemy);
+
+                    }
+
+
+                    for (DaemonView bulletView : bulletViewQueue) {
+
+                        BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
+                                gameConsumer,
+                                guiConsumer,
+                                new Bullet(
+                                        bulletSprite,
+                                        0,
+                                        Pair.create((float) 0, (float) 0),
+                                        Pair.create((float) 0, (float) 0),
+                                        2
+                                ).setView(bulletView)
+                        ).setName("Bullet");
+
+                        bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
+                        bulletDoubleDaemon.setAnimateSideQuest().setClosure(aReturn -> {
+                            Log.d(DaemonUtils.tag(), "BULLET CLOSURE!!!!");
+                            try {
+                                ImageMover.PositionedBitmap posBmp = aReturn.checkAndGet();
+                                bulletDoubleDaemon.getView().setX(posBmp.positionX);
+                                bulletDoubleDaemon.getView().setY(posBmp.positionY);
+                                bulletDoubleDaemon.getView().setImage(posBmp.image);
+                            } catch (DaemonException ex) {
+                                guiConsumer.consume(()->bulletDoubleDaemon.getView().hide());
+                                bulletDoubleDaemon.stop();
+                                if(!bulletQueue.contains(bulletDoubleDaemon))
+                                    bulletQueue.add(bulletDoubleDaemon);
+                            }
+
+                        });
+
+                        bulletQueue.add(bulletDoubleDaemon);
+                    }
+
+                    chain.next();
+
+        }).addSpell(()->{//gameState
 
             Field firstField = grid.getField(0, 0);
-
-            for (DaemonView enemyView : enemyViews) {
-                EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
-                        gameConsumer,
-                        guiConsumer,
-                        new Enemy(
-                                enemySprite,
-                                enemyVelocity,
-                                enemyHp,
-                                Pair.create((float)0, (float)0),
-                                Pair.create(firstField.getCenterX(), firstField.getCenterY())
-                        ).setView(enemyView).setHpView(enemyHpViews.poll())
-                        .setHealthBarImage(healthBarImage)
-                ).setName("Enemy");
-
-                enemy.getPrototype().setBorders(borderX, borderY);
-
-                enemy.setAnimateEnemySideQuest().setClosure(new EnemyAnimateClosure());//gui consumer
-
-                enemyQueue.add(enemy);
-
-            }
-
-
-            for (DaemonView bulletView : bulletViewQueue) {
-
-                BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
-                        gameConsumer,
-                        guiConsumer,
-                        new Bullet(
-                                bulletSprite,
-                                0,
-                                Pair.create((float)0, (float)0),
-                                Pair.create((float)0, (float)0),
-                                2
-                        ).setView(bulletView)
-                ).setName("Bullet");
-
-                bulletDoubleDaemon.getPrototype().setBorders(borderX,borderY);
-                bulletDoubleDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(bulletView));
-
-                bulletQueue.add(bulletDoubleDaemon);
-            }
-
 
             enemyGenerator = new DummyDaemon(gameConsumer, (int) enemyGenerateinterval).setClosure(ret->{
 
@@ -259,8 +281,9 @@ public class Game {
                     if(enemyVelocity < 6)
                         enemyVelocity += 1;
 
-//                    if (enemyHp < 80)
-////                        enemyHp += 5;//TODO pay attention to enemy max hp
+                    if (enemyHp < 80) {
+                        enemyHp += 5;//TODO pay attention to enemy max hp
+                    }
 
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
@@ -271,6 +294,7 @@ public class Game {
 
                 EnemyDoubleDaemon enemy = enemyQueue.poll();
                 enemy.setName("Enemy no." + enemyCounter);
+                enemy.setMaxHp(enemyHp);
                 enemy.setHp(enemyHp);
                 enemy.getPrototype().setVelocity(enemyVelocity);
 
@@ -333,7 +357,6 @@ public class Game {
 
     public Game setTower(float x, float y) { //TODO to be called from Activity.onTouch()
 
-        Log.i(DaemonUtils.tag(), "KLIK koordinate:  X: " + x+",  Y: "+y);
         gameConsumer.consume(()-> {
 
             Field field = grid.getField(x, y);
@@ -380,20 +403,16 @@ public class Game {
                 towerDaemon.setView(viewMatrix[field.getRow()][field.getColumn()]);
 
                 towers.add(towerDaemon);
+
                 field.setTower(towerDaemon);
 
                 towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(viewMatrix[field.getRow()][field.getColumn()]));
 
                 towerDaemon.start();
 
-                List<EnemyDoubleDaemon> activeEnemyList = new ArrayList<>();
-                for(EnemyDoubleDaemon enemy : activeEnemies) {
-                    activeEnemyList.add(enemy);
-                }
-
                 towerScanClosure = new TowerScanClosure(towerDaemon, towerShootInterval);
                 //towerDaemon.setScanClosure(scanClosure);
-                towerDaemon.scan(activeEnemyList, towerScanClosure);
+                towerDaemon.scan(activeEnemies.toArray(new EnemyDoubleDaemon[activeEnemies.size()]), towerScanClosure);
             }
         });
 
@@ -421,17 +440,11 @@ public class Game {
 
             if (aReturn.get() != null && aReturn.get().first) {
                 fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().second,15);
-                tower.sleep(sleepInteraval, aReturn1 -> {
-
-                    List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
-                    activeEnemyList.addAll(activeEnemies);
-
-                    tower.scan(activeEnemyList, this);
-                });
+                tower.sleep(sleepInteraval, aReturn1 -> tower.scan(activeEnemies.toArray(new EnemyDoubleDaemon[activeEnemies.size()]), this));
             } else {
                 List<EnemyDoubleDaemon> activeEnemyList = new LinkedList<>();
                 activeEnemyList.addAll(activeEnemies);
-                tower.scan(activeEnemyList, this);
+                tower.scan(activeEnemies.toArray(new EnemyDoubleDaemon[activeEnemies.size()]), this);
             }
         }
     }
