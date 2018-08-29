@@ -26,9 +26,7 @@ import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
-import com.daemonize.daemonengine.daemonscript.DaemonSpell;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;

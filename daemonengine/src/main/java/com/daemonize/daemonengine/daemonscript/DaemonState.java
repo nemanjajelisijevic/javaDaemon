@@ -2,6 +2,6 @@ package com.daemonize.daemonengine.daemonscript;
 
 
 @FunctionalInterface
-public interface DaemonSpell {
-    void cast();
+public interface DaemonState {
+    void enter();
 }
