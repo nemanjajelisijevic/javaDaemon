@@ -1,8 +1,9 @@
 package com.daemonize.daemondevapp.imagemovers;
 
 
-import android.graphics.Bitmap;
 import android.util.Pair;
+
+import com.daemonize.daemondevapp.images.Image;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
     private float proximityDistance = 50;
 
     public BouncingImageTranslationMover(
-            List<Bitmap> sprite,
+            List<Image> sprite,
             float velocity,
             Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
@@ -39,10 +40,10 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
     }
 
     @Override
-    public PositionedBitmap animate() {
+    public PositionedImage animate() {
 
 
-        PositionedBitmap ret = new PositionedBitmap();
+        PositionedImage ret = new PositionedImage();
         ret.image = iterateSprite();
 
         //awaitForMovement();

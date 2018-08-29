@@ -1,63 +1,31 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Pair;
-import android.widget.ImageView;
 
-import com.daemonize.daemondevapp.proba.ImageMoverM;
-import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ReturnRunnable;
+import com.daemonize.daemondevapp.images.Image;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class ImageTranslationMover implements ImageMover {
 
-    protected List<Bitmap> sprite;
-    protected Iterator<Bitmap> spriteIterator;
+    private List<Image> sprite;
+    protected Iterator<Image> spriteIterator;
     protected float initVelocity = 20;
 
     protected volatile Velocity velocity;
 
-//    private Lock moveLock = new ReentrantLock();
-//    private Condition moveCondition = moveLock.newCondition();
-//
-//    protected void startMoving() {
-//        moveLock.lock();
-//        moveCondition.signalAll();
-//        moveLock.unlock();
-//    }
-//
-//    protected void awaitForMovement() throws InterruptedException {
-//        moveLock.lock();
-//        try {
-//            while (velocity.intensity <= 0) {
-//                moveCondition.await();
-//            }
-//        } finally {
-//            moveLock.unlock();
-//        }
-//    }
+    public List<Image> getSprite() {
+        return sprite;
+    }
 
+    public ImageTranslationMover setSprite(List<Image> sprite) {
+        this.sprite = sprite;
+        return this;
+    }
 
     protected volatile float lastX;
     protected volatile float lastY;
-
-//    private ImageView view;
-//
-//    public ImageView getView() {
-//        return view;
-//    }
-
-//    public ImageTranslationMover setView(ImageView view) {
-//        this.view = view;
-//        return this;
-//    }
 
     @Override
     public Pair<Float, Float> getLastCoordinates() {
@@ -70,11 +38,11 @@ public class ImageTranslationMover implements ImageMover {
     }
 
     @Override
-    public PositionedBitmap setLastCoordinates(float lastX, float lastY) {
+    public PositionedImage setLastCoordinates(float lastX, float lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
 
-        PositionedBitmap ret = new PositionedBitmap();
+        PositionedImage ret = new PositionedImage();
         ret.image = iterateSprite();
 
         ret.positionX = lastX;
@@ -86,7 +54,7 @@ public class ImageTranslationMover implements ImageMover {
     protected float borderX;
     protected float borderY;
 
-    public ImageTranslationMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
+    public ImageTranslationMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos) {
         this.sprite = sprite;
         this.initVelocity = velocity;
         this.velocity = new Velocity(velocity, new Direction(80, 20));
@@ -96,7 +64,7 @@ public class ImageTranslationMover implements ImageMover {
 
     }
 
-    protected Bitmap iterateSprite() {
+    protected Image iterateSprite() {
         if(!spriteIterator.hasNext()) {
             spriteIterator = sprite.iterator();
         }
@@ -160,9 +128,9 @@ public class ImageTranslationMover implements ImageMover {
     ) {}
 
     @Override
-    public PositionedBitmap animate() {
+    public PositionedImage animate() {
 
-        PositionedBitmap ret = new PositionedBitmap();
+        PositionedImage ret = new PositionedImage();
         ret.image = iterateSprite();
 
         //check borders and recalculate

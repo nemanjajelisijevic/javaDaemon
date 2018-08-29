@@ -1,8 +1,9 @@
 package com.daemonize.daemondevapp.imagemovers;
 
 
-import android.graphics.Bitmap;
 import android.util.Pair;
+
+import com.daemonize.daemondevapp.images.Image;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class GravityImageMover extends ImageTranslationMover {
     private boolean touched = false;
     private boolean falling = false;
 
-    public GravityImageMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
+    public GravityImageMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
     }
 
@@ -29,7 +30,7 @@ public class GravityImageMover extends ImageTranslationMover {
     }
 
     @Override
-    public PositionedBitmap animate() {
+    public PositionedImage animate() {
 
             if(velocity.intensity <= 0) {
                 falling = true;

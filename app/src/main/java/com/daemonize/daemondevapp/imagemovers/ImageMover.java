@@ -1,14 +1,12 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.graphics.Bitmap;
 import android.util.Pair;
 
-import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
-import java.util.List;
 
 @Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
@@ -29,8 +27,8 @@ public interface ImageMover {
         }
     }
 
-    class PositionedBitmap {
-        public Bitmap image;
+    class PositionedImage {
+        public Image image;
         public float positionX;
         public float positionY;
     }
@@ -52,7 +50,7 @@ public interface ImageMover {
     @CallingThread
     Velocity getVelocity();
 
-    PositionedBitmap setLastCoordinates(float lastX, float lastY);
+    PositionedImage setLastCoordinates(float lastX, float lastY);
 
     void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, Velocity velocity);
 
@@ -68,6 +66,6 @@ public interface ImageMover {
     <K extends ImageMover> K setBorders(float x, float y);
 
     @SideQuest(SLEEP = 25)
-    PositionedBitmap animate();
+    PositionedImage animate();
 
 }

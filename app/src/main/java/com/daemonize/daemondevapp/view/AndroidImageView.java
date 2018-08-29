@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.daemonize.daemondevapp.images.Image;
+
 public class AndroidImageView implements DaemonView {
 
     private ImageView view;
@@ -27,8 +29,8 @@ public class AndroidImageView implements DaemonView {
 
     @SuppressWarnings("unchecked")
     @Override
-    public AndroidImageView setImage(Bitmap image) {
-        view.setImageBitmap(image);
+    public AndroidImageView setImage(Image image) {
+        view.setImageBitmap((Bitmap)image.getImageImp());
         view.invalidate();
         return this;
     }

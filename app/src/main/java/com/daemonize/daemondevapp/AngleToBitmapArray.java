@@ -1,12 +1,12 @@
 package com.daemonize.daemondevapp;
 
-import android.graphics.Bitmap;
+import com.daemonize.daemondevapp.images.Image;
 
 import java.util.List;
 
 public class AngleToBitmapArray {
 
-    private Bitmap[] array = new Bitmap[360];
+    private Image[] array = new Image[360];
     private int step;
     private int pointer = 0;
 
@@ -22,7 +22,7 @@ public class AngleToBitmapArray {
         return step;
     }
 
-    public AngleToBitmapArray(List<Bitmap> sprite, int step) {
+    public AngleToBitmapArray(List<Image> sprite, int step) {
         this.step = step;
         for (int i = 0; i < array.length; ++i) {
             int it = i / step;
@@ -33,7 +33,7 @@ public class AngleToBitmapArray {
         }
     }
 
-    public Bitmap getCurrent() {
+    public Image getCurrent() {
         return array[pointer];
     }
 
@@ -41,7 +41,7 @@ public class AngleToBitmapArray {
         return pointer;
     }
 
-    public Bitmap getIncrementedByStep() {
+    public Image getIncrementedByStep() {
         int diff = pointer + step - array.length;
         if(diff >= 0) {
             pointer = diff;
@@ -51,7 +51,7 @@ public class AngleToBitmapArray {
         return array[pointer];
     }
 
-    public Bitmap getDecrementedByStep() {
+    public Image getDecrementedByStep() {
         int diff = pointer - step;
         if (diff < 0) {
             pointer = array.length + diff;
@@ -63,7 +63,7 @@ public class AngleToBitmapArray {
         return array[pointer];
     }
 
-    public Bitmap getByAngle(int degrees) {
+    public Image getByAngle(int degrees) {
         if (degrees < 0 || degrees > 359) {
             throw new IllegalArgumentException("Arg degrees must be > 0 && < 360");
         }

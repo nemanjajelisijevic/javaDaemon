@@ -12,6 +12,11 @@ public class ReturnRunnable<T> implements Runnable {
     this.ret = new Return<>();
   }
 
+  public ReturnRunnable(Closure<T> closure, T result) {
+    this.closure = closure;
+    this.ret = new Return<>(result);
+  }
+
   @SuppressWarnings("unchecked")
   public <K extends ReturnRunnable<T>> K setResult(T result) {
     ret.setResult(result);

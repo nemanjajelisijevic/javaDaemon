@@ -1,9 +1,9 @@
 package com.daemonize.daemondevapp;
 
-import android.graphics.Bitmap;
 import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
+import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.DaemonView;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
@@ -18,7 +18,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
     private DaemonView view;
     private volatile int damage = 2;
 
-    public Bullet(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos,
+    public Bullet(List<Image> sprite, float velocity, Pair<Float, Float> startingPos,
                   Pair<Float, Float> targetCoord, int damage) {
         super(sprite, velocity, startingPos, targetCoord);
         this.damage = damage;
@@ -56,13 +56,13 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     @SideQuest(SLEEP = 30)
     @Override
-    public PositionedBitmap animate() {
+    public PositionedImage animate() {
 
-        if (Math.abs(lastX) < velocity.intensity
-                || Math.abs(lastX - borderX) < velocity.intensity
-                || Math.abs(lastY) < velocity.intensity
-                || Math.abs(lastY - borderY) < velocity.intensity)
-            throw new IllegalStateException("Bullet out of borders!");
+//        if (Math.abs(lastX) < velocity.intensity
+//                || Math.abs(lastX - borderX) < velocity.intensity
+//                || Math.abs(lastY) < velocity.intensity
+//                || Math.abs(lastY - borderY) < velocity.intensity)
+//            throw new IllegalStateException("Bullet out of borders!");
 
         return super.animate();
     }

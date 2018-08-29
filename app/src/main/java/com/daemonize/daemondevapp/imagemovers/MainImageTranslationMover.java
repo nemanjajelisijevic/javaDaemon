@@ -1,12 +1,12 @@
 package com.daemonize.daemondevapp.imagemovers;
 
 
-import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 
+import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
@@ -48,7 +48,7 @@ public class MainImageTranslationMover extends CachedSpriteImageTranslationMover
     }
 
     public MainImageTranslationMover(
-            List<Bitmap> sprite,
+            List<Image> sprite,
             float velocity,
             Pair<Float, Float> startingPos,
             List<ImageMoverMDaemon> observers) {
@@ -63,7 +63,7 @@ public class MainImageTranslationMover extends CachedSpriteImageTranslationMover
     }
 
     @Override
-    public PositionedBitmap animate() {
+    public PositionedImage animate() {
 
 
 //        if(velocity.intensity > 0 ) {

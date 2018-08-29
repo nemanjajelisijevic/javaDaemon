@@ -168,7 +168,7 @@ public class Bullet implements ImageMoverM {
     @Override
     public PositionedBitmap explode(Closure<PositionedBitmap> update) throws InterruptedException {
 //        Handler handler = new Handler(Looper.getMainLooper());
-//        PositionedBitmap updatePB = new PositionedBitmap();
+//        PositionedImage updatePB = new PositionedImage();
 //        exploading = true;
 //
 //        for (Bitmap bmp : explodeSprite) {

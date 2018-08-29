@@ -25,6 +25,6 @@ public interface MassiveImageMover {
     List<ImageMover.Velocity> getVelocities();
 
     @SideQuest(SLEEP = 25)
-    List<ImageMover.PositionedBitmap> move();
+    List<ImageMover.PositionedImage> move();
 
 }

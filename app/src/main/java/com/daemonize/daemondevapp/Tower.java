@@ -1,13 +1,10 @@
 package com.daemonize.daemondevapp;
 
-import android.graphics.Bitmap;
-import android.util.Log;
 import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.CachedArraySpriteImageMover;
-import com.daemonize.daemondevapp.imagemovers.CachedSpriteImageTranslationMover;
+import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.DaemonView;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
@@ -26,7 +23,7 @@ public class Tower extends CachedArraySpriteImageMover {
     private DaemonView view;
     private volatile boolean pause = false;
 
-    private Bitmap[] rotationSprite;
+    private Image[] rotationSprite;
     private int size = 0;
 
     private Game.TowerScanClosure scanClosure;
@@ -61,16 +58,16 @@ public class Tower extends CachedArraySpriteImageMover {
         this.view = view;
     }
 
-    public Tower(List<Bitmap> initSprite, List<Bitmap> rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
+    public Tower(List<Image> initSprite, List<Image> rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
         super(initSprite, 0, startingPos);
         this.spriteBuffer = new AngleToBitmapArray(rotationSprite, 10);
-        this.rotationSprite = new Bitmap[19];
+        this.rotationSprite = new Image[19];
         this.range = range;
         this.scanInterval = scanIntervalInMillis;
     }
 
     @Override
-    public boolean pushSprite(Bitmap[] sprite, float velocity) throws InterruptedException {
+    public boolean pushSprite(Image[] sprite, float velocity) throws InterruptedException {
         return super.pushSprite(sprite, velocity);
     }
 
@@ -80,7 +77,7 @@ public class Tower extends CachedArraySpriteImageMover {
     }
 
     @DedicatedThread
-    public Pair<Boolean, EnemyDoubleDaemon> scan (EnemyDoubleDaemon[] activeEnemies) throws InterruptedException {
+    public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
 
         for (EnemyDoubleDaemon enemy : activeEnemies) {
             if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().first) < range
@@ -134,8 +131,8 @@ public class Tower extends CachedArraySpriteImageMover {
         }
     }
 
-    private  List<Bitmap> convertArrayInList(Bitmap [] array, int size) {
-        ArrayList<Bitmap> arrayList = new ArrayList<>(size);
+    private  List<Image> convertArrayInList(Image [] array, int size) {
+        ArrayList<Image> arrayList = new ArrayList<>(size);
         for (int i=0;i<size;i++){
             arrayList.add(array[i]);
         }
@@ -151,7 +148,7 @@ public class Tower extends CachedArraySpriteImageMover {
         if (Math.abs(targetAngle - currentAngle) <= 2 * spriteBuffer.getStep()) {
             rotationSprite[size++] = spriteBuffer.getByAngle(targetAngle);
             spriteBuffer.setCurrentAngle(targetAngle);
-            sprite = convertArrayInList(rotationSprite,size);
+            setSprite(convertArrayInList(rotationSprite,size));
 
         } else {
 
@@ -182,12 +179,12 @@ public class Tower extends CachedArraySpriteImageMover {
 
     @SideQuest(SLEEP = 30)
     @Override
-    public PositionedBitmap animate() {
+    public PositionedImage animate() {
 
         if (pause)
             return null;
 
-        PositionedBitmap ret = new PositionedBitmap();
+        PositionedImage ret = new PositionedImage();
         ret.image = iterateSprite();
         ret.positionX = lastX - ret.image.getWidth()/2;
         ret.positionY = lastY - ret.image.getWidth()/2;

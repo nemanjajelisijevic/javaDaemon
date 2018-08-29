@@ -1,7 +1,8 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.graphics.Bitmap;
 import android.util.Pair;
+
+import com.daemonize.daemondevapp.images.Image;
 
 import java.util.List;
 import java.util.concurrent.locks.Condition;
@@ -19,7 +20,7 @@ public class CoordinatedImageTranslationMover extends CachedSpriteImageTranslati
     private volatile float targetX;
     private volatile float targetY;
 
-    public CoordinatedImageTranslationMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
+    public CoordinatedImageTranslationMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
         super(sprite, velocity, startingPos);
         this.targetX = targetCoord.first;
         this.targetY = targetCoord.second;
@@ -46,7 +47,7 @@ public class CoordinatedImageTranslationMover extends CachedSpriteImageTranslati
     }
 
     @Override
-    public PositionedBitmap animate() {
+    public PositionedImage animate() {
 
         if (Math.abs(lastX - targetX)  < velocity.intensity
                 && Math.abs(lastY - targetY)  < velocity.intensity) {

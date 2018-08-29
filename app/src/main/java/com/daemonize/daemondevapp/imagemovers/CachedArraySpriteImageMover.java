@@ -1,33 +1,34 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.graphics.Bitmap;
 import android.util.Pair;
+
+import com.daemonize.daemondevapp.images.Image;
 
 import java.util.List;
 
 public class CachedArraySpriteImageMover extends ImageTranslationMover {
 
-    private AwaitedArraySprite<Bitmap> cache;
+    private AwaitedArraySprite<Image> cache;
 
-    public boolean pushSprite(Bitmap[] sprite, float velocity) throws InterruptedException {
+    public boolean pushSprite(Image[] sprite, float velocity) throws InterruptedException {
         this.velocity.intensity = velocity;
         cache = new AwaitedArraySprite<>(sprite);
-        this.sprite.clear();
-        this.sprite.add(sprite[sprite.length - 1]);
+        getSprite().clear();
+        getSprite().add(sprite[sprite.length - 1]);
         cache.await();
         cache = null;
         return true;
     }
 
     @Override
-    protected Bitmap iterateSprite() {
+    protected Image iterateSprite() {
         if (cache != null)
             return cache.getNext();
         else
             return super.iterateSprite();
     }
 
-    public CachedArraySpriteImageMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
+    public CachedArraySpriteImageMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
     }
 

@@ -4,11 +4,12 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Pair;
 
+import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class ImageArrayMover implements ImageMover {
 
-    private volatile Bitmap[] sprite;
+    private volatile Image[] sprite;
     private int cnt = 0;
     protected float initVelocity;
 
@@ -16,11 +17,11 @@ public class ImageArrayMover implements ImageMover {
     protected volatile float lastX;
     protected volatile float lastY;
 
-    public synchronized Bitmap[] getSprite() {
+    public synchronized Image[] getSprite() {
         return sprite;
     }
 
-    public synchronized ImageArrayMover setSprite(Bitmap[] sprite) {
+    public synchronized ImageArrayMover setSprite(Image[] sprite) {
         this.sprite = sprite;
         return this;
     }
@@ -36,11 +37,11 @@ public class ImageArrayMover implements ImageMover {
     }
 
     @Override
-    public PositionedBitmap setLastCoordinates(float lastX, float lastY) {
+    public PositionedImage setLastCoordinates(float lastX, float lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
 
-        PositionedBitmap ret = new PositionedBitmap();
+        PositionedImage ret = new PositionedImage();
         ret.image = iterateSprite();
 
         ret.positionX = lastX;
@@ -52,7 +53,7 @@ public class ImageArrayMover implements ImageMover {
     protected float borderX;
     protected float borderY;
 
-    public ImageArrayMover(Bitmap[] sprite, float velocity, Pair<Float, Float> startingPos) {
+    public ImageArrayMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos) {
         this.sprite = sprite;
         this.initVelocity = velocity;
         this.velocity = new Velocity(velocity, new Direction(80, 20));
@@ -61,9 +62,9 @@ public class ImageArrayMover implements ImageMover {
 
     }
 
-    protected synchronized Bitmap iterateSprite() {
+    protected synchronized Image iterateSprite() {
         Log.w(DaemonUtils.tag(), "CUUUUUUUNT: "+ cnt);
-        Bitmap ret = sprite[cnt];
+        Image ret = sprite[cnt];
         if (++cnt == sprite.length) {
             cnt = 0;
         }
@@ -108,9 +109,9 @@ public class ImageArrayMover implements ImageMover {
     ) {}
 
     @Override
-    public PositionedBitmap animate() {
+    public PositionedImage animate() {
 
-        PositionedBitmap ret = new PositionedBitmap();
+        PositionedImage ret = new PositionedImage();
         ret.image = iterateSprite();
 
         //check borders and recalculate
