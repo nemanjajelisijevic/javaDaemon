@@ -1,7 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -11,8 +9,8 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
-import com.daemonize.daemonengine.daemonscript.DaemonSpell;
 import com.daemonize.daemonengine.daemonscript.DaemonScript;
+import com.daemonize.daemonengine.daemonscript.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class RestClientTestScript implements DaemonScript {
@@ -25,7 +23,7 @@ public class RestClientTestScript implements DaemonScript {
     private Consumer mainConsumer = new AndroidLooperConsumer();
 
     {
-        chain.addSpell(() ->
+        chain.addState(() ->
             restClientDaemon.get(
                     "/api/users?delay=3",
                      DelayedGetResponse.class,
@@ -44,7 +42,7 @@ public class RestClientTestScript implements DaemonScript {
                             consumer.stop();
                         }
                     })  
-        ).addSpell(() ->
+        ).addState(() ->
             restClientDaemon.get(
                     "/api/users?delay=3",
                     DelayedGetResponse.class,
@@ -54,7 +52,7 @@ public class RestClientTestScript implements DaemonScript {
                         Log.d(DaemonUtils.tag(), "LINK 2");
                         next();
                     })
-        ).addSpell(() ->
+        ).addState(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
@@ -64,7 +62,7 @@ public class RestClientTestScript implements DaemonScript {
                             Log.d(DaemonUtils.tag(), "LINK 3");
                             next();
                         })
-        ).addSpell(() ->
+        ).addState(() ->
                 restClientDaemon.get(
                         "/api/users?delay=3",
                         DelayedGetResponse.class,
@@ -86,8 +84,8 @@ public class RestClientTestScript implements DaemonScript {
 
     @Override
     @SuppressWarnings("unchecked")
-    public RestClientTestScript addSpell(DaemonSpell spell) {
-        chain.addSpell(spell);
+    public RestClientTestScript addState(DaemonState state) {
+        chain.addState(state);
         return this;
     }
 

@@ -202,7 +202,7 @@ public class Game {
 
     {
         //init spell (state)
-        chain.addSpell(()-> {
+        chain.addState(()-> {
 
                     Field firstField = grid.getField(0, 0);
 
@@ -265,7 +265,7 @@ public class Game {
 
                     chain.next();
 
-        }).addSpell(()->{//gameState
+        }).addState(()->{//gameState
 
             Field firstField = grid.getField(0, 0);
 
