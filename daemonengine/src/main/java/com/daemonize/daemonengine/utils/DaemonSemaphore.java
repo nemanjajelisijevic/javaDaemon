@@ -11,6 +11,10 @@ public class DaemonSemaphore {
 
     public DaemonSemaphore() {}
 
+    public DaemonSemaphore(boolean skipFirstAwait) {
+        flag = skipFirstAwait;
+    }
+
     public void signal() {
         lock.lock();
         flag = true;
