@@ -2,14 +2,13 @@ package com.daemonize.daemondevapp.view;
 
 import android.graphics.Bitmap;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.daemonize.daemondevapp.images.Image;
 
-public class AndroidImageView implements DaemonView {
+public class AndroidImageView implements ImageView {
 
-    private ImageView view;
-    public AndroidImageView(ImageView view) {
+    private android.widget.ImageView view;
+    public AndroidImageView(android.widget.ImageView view) {
         this.view = view;
     }
 
@@ -47,5 +46,20 @@ public class AndroidImageView implements DaemonView {
     public AndroidImageView show() {
         view.setVisibility(View.VISIBLE);
         return this;
+    }
+
+    @Override
+    public <K extends ImageView> K setZindex(int zindex) {
+        throw new IllegalStateException("Stub");
+    }
+
+    @Override
+    public int getZindex() {
+        throw new IllegalStateException("Stub");
+    }
+
+    @Override
+    public boolean isShowing() {
+        return view.isShown();
     }
 }

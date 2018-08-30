@@ -11,7 +11,7 @@ public class ImageTranslationMover implements ImageMover {
 
     private List<Image> sprite;
     protected Iterator<Image> spriteIterator;
-    protected float initVelocity = 20;
+    protected float initVelocity;
 
     protected volatile Velocity velocity;
 
@@ -85,8 +85,6 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void setDirectionAndMove(float x, float y, float velocityInt) {
 
-        exploading = false;
-
         float dX = x - lastX;
         float dY = y - lastY;
 
@@ -146,20 +144,10 @@ public class ImageTranslationMover implements ImageMover {
             lastY = borderY;
         }
 
-        lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
-        lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
-
-        ret.positionX = lastX - ret.image.getWidth()/2;
-        ret.positionY = lastY - ret.image.getWidth()/2;
+        ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
+        ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
 
         return ret;
     }
-
-    private volatile boolean exploading;
-
-    public boolean isExploading() {
-        return exploading;
-    }
-
 }
 

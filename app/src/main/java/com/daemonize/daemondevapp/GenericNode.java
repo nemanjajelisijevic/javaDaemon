@@ -45,7 +45,6 @@ public class GenericNode<T> {
         return children.add(child);
     }
 
-
     public static <K> void forEach(GenericNode<K> root, Closure<K> action) {
         Return<K> actionReturn = new Return<>(root.getValue());
         forEach(actionReturn, root, action);

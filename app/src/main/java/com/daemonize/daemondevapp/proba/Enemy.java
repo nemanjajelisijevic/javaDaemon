@@ -3,15 +3,11 @@ package com.daemonize.daemondevapp.proba;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.util.Pair;
-import android.widget.ImageView;
 
-import com.daemonize.daemondevapp.imagemovers.ImageMover;
-import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
-import com.daemonize.daemondevapp.view.DaemonView;
+import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 
@@ -40,7 +36,7 @@ public class Enemy implements ImageMoverM {
 
     boolean reachDestiny = false;
 
-    private DaemonView view;
+    private ImageView view;
 
     public Enemy(int hp, List<Bitmap> sprite, List<Bitmap> explodeSprite, Velocity velocity,  Pair<Float, Float> startingPos,Grid grid) {
         this.hp = hp;
@@ -57,11 +53,11 @@ public class Enemy implements ImageMoverM {
         setDirectionAndMove(currentField.getCenterX(),currentField.getCenterY(),velocity.intensity);
     }
 
-    public DaemonView getView() {
+    public ImageView getView() {
         return view;
     }
 
-    public Enemy setView(DaemonView view) {
+    public Enemy setView(ImageView view) {
         this.view = view;
         return this;
     }

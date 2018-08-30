@@ -7,39 +7,18 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.Pair;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
-import com.daemonize.daemondevapp.imagemovers.ImageMover;
-import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
-import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemondevapp.images.AndroidBitmapImage;
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.proba.Bullet;
-import com.daemonize.daemondevapp.proba.Enemy;
-import com.daemonize.daemondevapp.proba.ImageMoverM;
-import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
-import com.daemonize.daemondevapp.tabel.Field;
-import com.daemonize.daemondevapp.tabel.Grid;
-import com.daemonize.daemondevapp.tabel.PathFinding;
 import com.daemonize.daemondevapp.view.AndroidImageView;
-import com.daemonize.daemondevapp.view.DaemonView;
-import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
-import com.daemonize.daemonengine.dummy.DummyDaemon;
+import com.daemonize.daemondevapp.view.AndroidSurfaceViewDispatcherEngine;
+import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
@@ -50,9 +29,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
-import io.github.controlwear.virtual.joystick.android.JoystickView;
-
-import static android.graphics.Color.RED;
 import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity {
@@ -60,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout layout;
     private Game game;
 
-    private ImageView background;
-    private Bitmap backgroundImg;
+    private android.widget.ImageView background;
+    //private Bitmap backgroundImg;
 
-    private AndroidImageView[][] fieldViews;
+    private ImageView[][] fieldViews;
 
     private int borderX;
     private int borderY;
@@ -81,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
         return r.nextInt((max - min) + 1) + min;
     }
 
-    public ImageView createImageView(int width, int height) {
-        ImageView view = new ImageView(getApplicationContext());
+    public android.widget.ImageView createImageView(int width, int height) {
+        android.widget.ImageView view = new android.widget.ImageView(getApplicationContext());
         ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT
@@ -123,9 +99,27 @@ public class MainActivity extends AppCompatActivity {
         hpView.setHeight(borderY / 10);
         hpView.setTextColor(WHITE);
 
+
+
         ///////////////////////////////////////////////////////////////////////////////////////////
         //                                GAME INITIALIZATION                                    //
         ///////////////////////////////////////////////////////////////////////////////////////////
+
+
+        //drawing engine and view dispatcher
+        AndroidSurfaceViewDispatcherEngine drawingEngine = new AndroidSurfaceViewDispatcherEngine(this);
+        drawingEngine.setWindowSize(borderX, borderY);
+        setContentView(drawingEngine);
+
+        //TODO unnecessary background
+        try {
+            Bitmap backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false);
+            //background.setImageBitmap(backgroundImg);
+            drawingEngine.setBackgroundImage(new AndroidBitmapImage(backgroundImg));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
 
         int rows = 6;
@@ -135,16 +129,17 @@ public class MainActivity extends AppCompatActivity {
         int height = 160;
 
         //init view matrix
-        fieldViews = new AndroidImageView[rows][columns];
+        fieldViews = new ImageView[rows][columns];
         for(int j = 0; j < rows; ++j ) {
             for (int i = 0; i < columns; ++i) {
-                fieldViews[j][i] = new AndroidImageView(createImageView(width, width)); //TODO unhardcode
+                //fieldViews[j][i] = new AndroidImageView(createImageView(width, width)); //TODO unhardcode
+                fieldViews[j][i] = drawingEngine.createImageView(0); //TODO unhardcode
             }
         }
 
 
         //init enemy view
-        ImageView enemyView = createImageView(80,80);
+        //android.widget.ImageView enemyView = createImageView(80,80);
 
         try {
 
@@ -259,29 +254,26 @@ public class MainActivity extends AppCompatActivity {
             towerSprite.add(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower340.png")),width, height, false)));
             towerSprite.add(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower350.png")),width, height, false)));
 
-            //TODO unnecessary background
-            backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false);
-            background.setImageBitmap(backgroundImg);
-
-
-            Queue<DaemonView> enemyQueue = new LinkedList<>();
+            Queue<ImageView> enemyQueue = new LinkedList<>();
 
             for (int cnt = 0; cnt < 100; ++cnt) {
-                enemyQueue.add(new AndroidImageView(createImageView(width, height)));
+                //enemyQueue.add(new AndroidImageView(createImageView(width, height)));
+                enemyQueue.add(drawingEngine.createImageView(1));
             }
 
             int width_hp = 120;
             int height_hp = 30;
-            Queue<DaemonView> enemyHpViewQueue = new LinkedList<>();
+            Queue<ImageView> enemyHpViewQueue = new LinkedList<>();
 
             for (int cnt = 0; cnt < 100; ++cnt) {
-                enemyHpViewQueue.add(new AndroidImageView(createImageView(width_hp, height_hp)));
+                //enemyHpViewQueue.add(new AndroidImageView(createImageView(width_hp, height_hp)));
+                enemyHpViewQueue.add(drawingEngine.createImageView(1));
             }
 
-            Queue<DaemonView> bulletQueue = new LinkedList<>();
+            Queue<ImageView> bulletQueue = new LinkedList<>();
 
             for (int cnt = 0; cnt < 200; ++cnt) {
-                bulletQueue.add(new AndroidImageView(createImageView(bulletSize, bulletSize)));
+                bulletQueue.add(drawingEngine.createImageView(2));
             }
 
 
@@ -298,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
             listHealthBarImg.add(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_90.png")), width_hp, height_hp, false)));
             listHealthBarImg.add(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_100.png")), width_hp, height_hp, false)));
 
-            game = new Game(rows, columns, fieldViews, enemyQueue, enemyHpViewQueue, bulletQueue,50,50, width)
+            game = new Game(drawingEngine, rows, columns, fieldViews, enemyQueue, enemyHpViewQueue, bulletQueue,50,50, width)
                     .setFieldImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
                     .setFieldImagePath(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
                     .setFieldImageTower(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), width, height, false)))

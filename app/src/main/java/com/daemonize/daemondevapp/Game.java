@@ -8,7 +8,8 @@ import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
-import com.daemonize.daemondevapp.view.DaemonView;
+import com.daemonize.daemondevapp.view.DrawingEngine;
+import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -46,7 +47,7 @@ public class Game {
 
     private int rows;
     private int columns;
-    private DaemonView[][] viewMatrix;
+    private ImageView[][] viewMatrix;
 
     private Grid grid;
 
@@ -60,8 +61,8 @@ public class Game {
     private int towerShootInterval = 1500;
     private int range = 320;
 
-    private Queue<DaemonView> enemyViews;
-    private Queue<DaemonView> enemyHpViews;
+    private Queue<ImageView> enemyViews;
+    private Queue<ImageView> enemyHpViews;
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private List<Image> enemySprite;
 
@@ -69,7 +70,7 @@ public class Game {
     private long enemyCounter;
     private float enemyVelocity = 1;
     private int enemyHp = 10;
-    private long enemyGenerateinterval = 50000;
+    private long enemyGenerateinterval = 5000;
 
     private List<Image> healthBarImage;
 
@@ -78,7 +79,7 @@ public class Game {
         return this;
     }
 
-    private Queue<DaemonView> bulletViewQueue;
+    private Queue<ImageView> bulletViewQueue;
     private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
     private List<Image> bulletSprite;
 
@@ -86,34 +87,30 @@ public class Game {
 
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
-        private DaemonView view;
+        private ImageView view;
 
-        public ImageAnimateClosure(DaemonView view) {
+        public ImageAnimateClosure(ImageView view) {
             this.view = view;
         }
 
         @Override
         public void onReturn(Return<ImageMover.PositionedImage> aReturn) {
-            long t0 = System.nanoTime();
-            ImageMover.PositionedImage posBmp = aReturn.get();
+            ImageMover.PositionedImage posBmp = aReturn.uncheckAndGet();
             view.setX(posBmp.positionX);
             view.setY(posBmp.positionY);
             view.setImage(posBmp.image);
-            Log.e(DaemonUtils.tag(), "TOWER CLOSURE LASTED: " + DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS));
         }
     }
 
-    private class EnemyAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, DaemonView>>> {
+    private class EnemyAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
         @Override
-        public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, DaemonView>>> aReturn) {
-            long t0 = System.nanoTime();
+        public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
             GenericNode.forEach(aReturn.get(), actionret -> {
-                Pair<ImageMover.PositionedImage, DaemonView> imageAndView = actionret.get();
+                Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.get();
                 imageAndView.second.setX(imageAndView.first.positionX);
                 imageAndView.second.setY(imageAndView.first.positionY);
                 imageAndView.second.setImage(imageAndView.first.image);
             });
-            Log.w(DaemonUtils.tag(), "ENEMY CLOSURE LASTED: " + DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS));
         }
     }
 
@@ -159,16 +156,20 @@ public class Game {
         return this;
     }
 
+    DrawingEngine drawingEngine;
+
     public Game(
+            DrawingEngine drawingEngine,
             int rows,
             int columns,
-            DaemonView[][] viewMatrix,
-            Queue<DaemonView> enemyViews,
-            Queue<DaemonView> enemyHpViewQueue,
-            Queue<DaemonView> bulletViewQueue,
+            ImageView[][] viewMatrix,
+            Queue<ImageView> enemyViews,
+            Queue<ImageView> enemyHpViewQueue,
+            Queue<ImageView> bulletViewQueue,
             float x,
             float y,
             int fieldWidth) {
+        this.drawingEngine = drawingEngine;
         this.rows = rows;
         this.columns = columns;
         this.viewMatrix = viewMatrix;
@@ -180,6 +181,7 @@ public class Game {
     }
 
     public Game run() {
+        drawingEngine.start();
         gameConsumer.start();
         chain.run();
         return this;
@@ -198,7 +200,7 @@ public class Game {
         }
 
         gameConsumer.stop();
-
+        drawingEngine.stop();
         return this;
     }
 
@@ -209,7 +211,7 @@ public class Game {
 
                     Field firstField = grid.getField(0, 0);
 
-                    for (DaemonView enemyView : enemyViews) {
+                    for (ImageView enemyView : enemyViews) {
                         EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                                 gameConsumer,
                                 guiConsumer,
@@ -232,7 +234,7 @@ public class Game {
                     }
 
 
-                    for (DaemonView bulletView : bulletViewQueue) {
+                    for (ImageView bulletView : bulletViewQueue) {
 
                         BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
                                 gameConsumer,
@@ -248,7 +250,6 @@ public class Game {
 
                         bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
                         bulletDoubleDaemon.setAnimateSideQuest().setClosure(aReturn -> {
-                            long t0 = System.nanoTime();
 
                             ImageMover.PositionedImage posBmp = aReturn.get();
 
@@ -267,7 +268,6 @@ public class Game {
                             bulletDoubleDaemon.getView().setY(posBmp.positionY);
                             bulletDoubleDaemon.getView().setImage(posBmp.image);
 
-                            Log.d(DaemonUtils.tag(), "BULLET CLOSURE LASTED: " + DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS));
                         });
 
                         bulletQueue.add(bulletDoubleDaemon);
@@ -276,6 +276,17 @@ public class Game {
                     chain.next();
 
         }).addState(()->{//gameState
+
+
+            guiConsumer.consume(()->{
+                for(int j = 0; j < rows; ++j ) {
+                    for (int i = 0; i < columns; ++i) {
+                        viewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX()/* - (fieldImage.getWidth() / 2)*/);
+                        viewMatrix[j][i].setY(grid.getGrid()[j][i].getCenterY() /*- (fieldImage.getHeight() / 2)*/);
+                        viewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).show();
+                    }
+                }
+            });
 
             Field firstField = grid.getField(0, 0);
 
@@ -310,6 +321,7 @@ public class Game {
 
 
                 guiConsumer.consume(()->enemy.getView().show());
+                guiConsumer.consume(()->enemy.getHpView().show());
                 activeEnemies.add(enemy);
                 enemy.setShootable(true);
                 enemy.start();
@@ -348,18 +360,8 @@ public class Game {
 
             enemyGenerator.start();
 
-            guiConsumer.consume(()->{
-                for(int j = 0; j < rows; ++j ) {
-                    for (int i = 0; i < columns; ++i) {
-                        viewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX() - (fieldImage.getWidth() / 2));
-                        viewMatrix[j][i].setY(grid.getGrid()[j][i].getCenterY() - (fieldImage.getHeight() / 2));
-                        viewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower);
-                    }
-                }
-            });
-
             //try to garbage collect
-            //new DummyDaemon(gameConsumer, 3000).setClosure(aReturn -> System.gc()).start();
+            new DummyDaemon(gameConsumer, 3000).setClosure(aReturn -> System.gc()).start();
 
         });
 
@@ -391,7 +393,7 @@ public class Game {
                     field.getColumn()
             ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : towerSprite.get(0);
 
-            guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(image));
+            guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
 
             if (b) {
 

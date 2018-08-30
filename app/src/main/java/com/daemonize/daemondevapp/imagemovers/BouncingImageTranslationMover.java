@@ -25,13 +25,7 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
     public void checkCollisionAndBounce(
             Pair<Float, Float> colliderCoordinates,
             Velocity velocity
-    ) {
-
-        if(!isExploading() && Math.abs(lastX - colliderCoordinates.first) < proximityDistance
-                && Math.abs(lastY - colliderCoordinates.second) < proximityDistance) {
-            setVelocity(new Velocity(velocity));
-        }
-    }
+    ) {}
 
     @Override
     public BouncingImageTranslationMover setBorders(float x, float y) {

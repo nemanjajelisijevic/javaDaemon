@@ -4,7 +4,7 @@ import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.view.DaemonView;
+import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
@@ -16,8 +16,8 @@ import java.util.List;
 @Daemonize(doubleDaemonize = true, className = "EnemyDoubleDaemon")
 public class Enemy extends CoordinatedImageTranslationMover {
 
-    private DaemonView view;
-    private DaemonView hpView;
+    private ImageView view;
+    private ImageView hpView;
     private  int hpMax;
     private volatile int hp = 30;
     private volatile boolean shootable = true;
@@ -51,21 +51,21 @@ public class Enemy extends CoordinatedImageTranslationMover {
     }
 
     @CallingThread
-    public DaemonView getView() {
+    public ImageView getView() {
         return view;
     }
 
-    public Enemy setView(DaemonView view) {
+    public Enemy setView(ImageView view) {
         this.view = view;
         return this;
     }
 
     @CallingThread
-    public DaemonView getHpView() {
+    public ImageView getHpView() {
         return hpView;
     }
 
-    public Enemy setHpView(DaemonView hpView) {
+    public Enemy setHpView(ImageView hpView) {
         this.hpView = hpView;
         return this;
     }
@@ -88,13 +88,13 @@ public class Enemy extends CoordinatedImageTranslationMover {
     }
 
     @SideQuest(SLEEP = 30)
-    public GenericNode<Pair<PositionedImage, DaemonView>> animateEnemy() {
+    public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() {
         PositionedImage enemyPosBmp = super.animate();
-        GenericNode<Pair<PositionedImage, DaemonView>> root = new GenericNode<>(Pair.create(enemyPosBmp, view));
+        GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(enemyPosBmp, view));
         PositionedImage hBar = new PositionedImage();
         hBar.image = spriteHealthBarImage.get((hp * 100 / hpMax - 1) / spriteHealthBarImage.size());
-        hBar.positionX = lastX - enemyPosBmp.image.getWidth() / 3;
-        hBar.positionY = lastY - enemyPosBmp.image.getHeight() / 2 - hBar.image.getHeight();
+        hBar.positionX = lastX;
+        hBar.positionY = lastY - 2 * hBar.image.getHeight();
         root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
         return root;
     }

@@ -13,8 +13,6 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
     public boolean pushSprite(Image[] sprite, float velocity) throws InterruptedException {
         this.velocity.intensity = velocity;
         cache = new AwaitedArraySprite<>(sprite);
-        getSprite().clear();
-        getSprite().add(sprite[sprite.length - 1]);
         cache.await();
         cache = null;
         return true;

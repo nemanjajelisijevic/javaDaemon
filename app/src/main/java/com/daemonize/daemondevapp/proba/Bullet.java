@@ -3,7 +3,7 @@ package com.daemonize.daemondevapp.proba;
 import android.graphics.Bitmap;
 import android.util.Pair;
 
-import com.daemonize.daemondevapp.view.DaemonView;
+import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.closure.Closure;
 
 import java.util.Iterator;
@@ -24,7 +24,7 @@ public class Bullet implements ImageMoverM {
     protected float borderX;
     protected float borderY;
 
-    private DaemonView view;
+    private ImageView view;
 
     public Bullet(List<Bitmap> sprite,
                   Velocity velocity,
@@ -40,11 +40,11 @@ public class Bullet implements ImageMoverM {
         setDirectionAndMove(velocity.direction.coeficientX, velocity.direction.coeficientY,velocity.intensity);
     }
 
-    public DaemonView getView() {
+    public ImageView getView() {
         return view;
     }
 
-    public Bullet setView(DaemonView view) {
+    public Bullet setView(ImageView view) {
         this.view = view;
         return this;
     }

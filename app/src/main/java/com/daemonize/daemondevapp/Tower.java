@@ -4,7 +4,7 @@ import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.CachedArraySpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.view.DaemonView;
+import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
@@ -20,7 +20,7 @@ public class Tower extends CachedArraySpriteImageMover {
     private float range;
     private int currentAngle;
     private AngleToBitmapArray spriteBuffer;
-    private DaemonView view;
+    private ImageView view;
     private volatile boolean pause = false;
 
     private Image[] rotationSprite;
@@ -50,11 +50,11 @@ public class Tower extends CachedArraySpriteImageMover {
     }
 
     @CallingThread
-    public DaemonView getView() {
+    public ImageView getView() {
         return view;
     }
 
-    public void setView(DaemonView view) {
+    public void setView(ImageView view) {
         this.view = view;
     }
 
@@ -148,7 +148,7 @@ public class Tower extends CachedArraySpriteImageMover {
         if (Math.abs(targetAngle - currentAngle) <= 2 * spriteBuffer.getStep()) {
             rotationSprite[size++] = spriteBuffer.getByAngle(targetAngle);
             spriteBuffer.setCurrentAngle(targetAngle);
-            setSprite(convertArrayInList(rotationSprite,size));
+            //setSprite(convertArrayInList(rotationSprite,size));
 
         } else {
 
@@ -168,8 +168,8 @@ public class Tower extends CachedArraySpriteImageMover {
                 rotationSprite[size++] = direction ? spriteBuffer.getIncrementedByStep() : spriteBuffer.getDecrementedByStep();
             }
 
-//            sprite.clear();
-//            sprite.add(rotationSprite[size - 1]);
+            //getSprite().clear();
+            //getSprite().add(rotationSprite[size - 1]);
             pushSprite(rotationSprite,velocity.intensity);
 
         }
@@ -186,8 +186,13 @@ public class Tower extends CachedArraySpriteImageMover {
 
         PositionedImage ret = new PositionedImage();
         ret.image = iterateSprite();
-        ret.positionX = lastX - ret.image.getWidth()/2;
-        ret.positionY = lastY - ret.image.getWidth()/2;
+
+        if (ret.image == null) {
+            return null;//TODO check this null
+        }
+
+        ret.positionX = lastX /*- ret.image.getWidth()/2*/;
+        ret.positionY = lastY /*- ret.image.getWidth()/2*/;
         return ret;
     }
 }
