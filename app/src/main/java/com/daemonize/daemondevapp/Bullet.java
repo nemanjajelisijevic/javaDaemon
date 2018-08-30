@@ -1,7 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.util.Pair;
-
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
@@ -25,8 +23,8 @@ public class Bullet extends CoordinatedImageTranslationMover {
     }
 
     public void setStartingCoords(Pair<Float, Float> startingCoords) {
-        lastX = startingCoords.first;
-        lastY = startingCoords.second;
+        lastX = startingCoords.getFirst();
+        lastY = startingCoords.getSecond();
     }
 
     @CallingThread

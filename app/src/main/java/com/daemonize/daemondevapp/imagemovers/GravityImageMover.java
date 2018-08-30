@@ -1,8 +1,7 @@
 package com.daemonize.daemondevapp.imagemovers;
 
 
-import android.util.Pair;
-
+import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
 import java.util.List;

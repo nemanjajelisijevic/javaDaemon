@@ -1,7 +1,7 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.util.Pair;
 
+import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;

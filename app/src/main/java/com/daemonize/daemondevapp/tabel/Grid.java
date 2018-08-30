@@ -1,10 +1,7 @@
 package com.daemonize.daemondevapp.tabel;
 
-import android.util.Pair;
+import com.daemonize.daemondevapp.Pair;
 
-import com.daemonize.daemondevapp.MainActivity;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -106,12 +103,12 @@ public class Grid {
         this.path = path;
     }
 
-    public Pair<Integer,Integer>  getFieldCoord(float x, float y) {
-        int row = (int) ((y) / fieldWith);
-        int column = (int) ((x) / fieldWith);
-
-        return new Pair<>(row,column);
-    }
+//    public Pair<Integer,Integer>  getFieldCoord(float x, float y) {
+//        int row = (int) ((y) / fieldWith);
+//        int column = (int) ((x) / fieldWith);
+//
+//        return new Pair<>(row,column);
+//    }
 
     public boolean setTower(float x, float y) {
         int row = (int) ((y) / fieldWith);

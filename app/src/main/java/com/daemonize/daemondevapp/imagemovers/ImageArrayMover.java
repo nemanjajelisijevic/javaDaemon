@@ -1,9 +1,8 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.graphics.Bitmap;
 import android.util.Log;
-import android.util.Pair;
 
+import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
@@ -57,8 +56,8 @@ public class ImageArrayMover implements ImageMover {
         this.sprite = sprite;
         this.initVelocity = velocity;
         this.velocity = new Velocity(velocity, new Direction(80, 20));
-        lastX = startingPos.first;
-        lastY = startingPos.second;
+        lastX = startingPos.getFirst();
+        lastY = startingPos.getSecond();
 
     }
 

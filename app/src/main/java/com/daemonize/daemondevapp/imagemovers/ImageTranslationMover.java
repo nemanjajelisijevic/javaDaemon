@@ -1,7 +1,6 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.util.Pair;
-
+import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
 import java.util.Iterator;
@@ -58,8 +57,8 @@ public class ImageTranslationMover implements ImageMover {
         this.sprite = sprite;
         this.initVelocity = velocity;
         this.velocity = new Velocity(velocity, new Direction(80, 20));
-        lastX = startingPos.first;
-        lastY = startingPos.second;
+        lastX = startingPos.getFirst();
+        lastY = startingPos.getSecond();
         spriteIterator = sprite.iterator();
 
     }

@@ -10,8 +10,8 @@ public class Dijkstra extends PathFinding {
 
     @Override
     public boolean recalculate(Grid grid) {
-        Field startNode =  grid.getGrid()[grid.endPoint.first][grid.endPoint.second];
-        Field endNode = grid.getGrid()[grid.startPoint.first][grid.startPoint.second];
+        Field startNode =  grid.getGrid()[grid.endPoint.getFirst()][grid.endPoint.getSecond()];
+        Field endNode = grid.getGrid()[grid.startPoint.getFirst()][grid.startPoint.getSecond()];
 
         Field [] heapArray = new Field[ grid.getGrid().length * grid.getGrid()[0].length];
         Heap<Field> openSet = new Heap<Field>(heapArray) ;
@@ -44,7 +44,7 @@ public class Dijkstra extends PathFinding {
             }
         }
 
-        grid.getGrid()[grid.endPoint.first][grid.endPoint.second].gCost = 0;
+        grid.getGrid()[grid.endPoint.getFirst()][grid.endPoint.getSecond()].gCost = 0;
 
         return false;
     }

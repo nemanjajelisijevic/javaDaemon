@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
@@ -20,8 +19,8 @@ public class BackgroundScroller {
     @SideQuest(SLEEP = 25)
     public Pair<Integer, Integer> scroll(){
         Pair<Integer, Integer> currentTargetCoord = Pair.create(
-                Math.round(target.getLastCoordinates().first + 100),
-                Math.round(target.getLastCoordinates().second + 100)
+                Math.round(target.getLastCoordinates().getFirst() + 100),
+                Math.round(target.getLastCoordinates().getSecond() + 100)
         );
 
         if (currentTargetCoord.equals(lastTargetCoord))

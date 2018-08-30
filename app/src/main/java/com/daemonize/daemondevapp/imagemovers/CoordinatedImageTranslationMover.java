@@ -1,7 +1,6 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.util.Pair;
-
+import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
 import java.util.List;
@@ -22,8 +21,8 @@ public class CoordinatedImageTranslationMover extends CachedSpriteImageTranslati
 
     public CoordinatedImageTranslationMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
         super(sprite, velocity, startingPos);
-        this.targetX = targetCoord.first;
-        this.targetY = targetCoord.second;
+        this.targetX = targetCoord.getFirst();
+        this.targetY = targetCoord.getSecond();
     }
 
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {

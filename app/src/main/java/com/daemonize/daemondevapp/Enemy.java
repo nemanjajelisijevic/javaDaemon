@@ -1,7 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.util.Pair;
-
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;

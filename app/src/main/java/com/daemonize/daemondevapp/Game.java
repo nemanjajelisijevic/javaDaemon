@@ -1,8 +1,6 @@
 package com.daemonize.daemondevapp;
 
-
 import android.util.Log;
-import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.images.Image;
@@ -107,9 +105,9 @@ public class Game {
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
             GenericNode.forEach(aReturn.get(), actionret -> {
                 Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.get();
-                imageAndView.second.setX(imageAndView.first.positionX);
-                imageAndView.second.setY(imageAndView.first.positionY);
-                imageAndView.second.setImage(imageAndView.first.image);
+                imageAndView.getSecond().setX(imageAndView.getFirst().positionX);
+                imageAndView.getSecond().setY(imageAndView.getFirst().positionY);
+                imageAndView.getSecond().setImage(imageAndView.getFirst().image);
             });
         }
     }
@@ -333,10 +331,10 @@ public class Game {
                             @Override
                             public void onReturn(Return<Boolean> aReturn) {
                                 Pair<Float, Float> currentCoord = enemy.getPrototype().getLastCoordinates();
-                                Field current = grid.getField(currentCoord.first, currentCoord.second);
+                                Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
                                 if (current == null) return;
-                                else if (current.getColumn() ==  6 - 1 && current.getRow() == rows - 1) {
+                                else if (current.getColumn() ==  columns - 1 && current.getRow() == rows - 1) {
                                     enemy.setShootable(false);
                                     guiConsumer.consume(()-> enemy.getHpView().hide());
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
@@ -452,8 +450,8 @@ public class Game {
         @Override
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
 
-            if (aReturn.get() != null && aReturn.get().first) {
-                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().second,15);
+            if (aReturn.get() != null && aReturn.get().getFirst()) {
+                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(),15);
                 tower.sleep(sleepInterval, aReturn1 -> {
                     List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
                     clone.addAll(activeEnemies);
@@ -484,7 +482,7 @@ public class Game {
         bulletDoubleDaemon.setStartingCoords(sourceCoord);
         bulletDoubleDaemon.start();
 
-        bulletDoubleDaemon.goTo(enemyCoord.first, enemyCoord.second, velocity, aReturn-> {
+        bulletDoubleDaemon.goTo(enemyCoord.getFirst(), enemyCoord.getSecond(), velocity, aReturn-> {
 
             int enemyHp = enemy.getHp();
             if (enemyHp > 0) {

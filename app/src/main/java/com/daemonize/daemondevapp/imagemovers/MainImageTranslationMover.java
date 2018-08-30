@@ -4,8 +4,8 @@ package com.daemonize.daemondevapp.imagemovers;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.util.Pair;
 
+import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
@@ -70,12 +70,12 @@ public class MainImageTranslationMover extends CachedSpriteImageTranslationMover
 
             if (observers != null)
                 for (ImageMoverDaemon observer : observers) {
-                float x = Math.abs( lastX - observer.getLastCoordinates().first );
-                float y = Math.abs( lastY - observer.getLastCoordinates().second);
+                float x = Math.abs( lastX - observer.getLastCoordinates().getFirst() );
+                float y = Math.abs( lastY - observer.getLastCoordinates().getSecond());
                 float c = (float) Math.sqrt(x*x + y*y);
                 if (c < 250.0f){
                    // Log.w("Puca","bum");
-                    Log.d(DaemonUtils.tag(), "Puca bum  x: "+observer.getLastCoordinates().first+" , y: "+observer.getLastCoordinates().second);
+                    Log.d(DaemonUtils.tag(), "Puca bum  x: "+observer.getLastCoordinates().getFirst()+" , y: "+observer.getLastCoordinates().getSecond());
                     fire = true;
                     guihandler.post(new ReturnRunnable<>(bulletFire).setResult(observer.getLastCoordinates()));
                     try {

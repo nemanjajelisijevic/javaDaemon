@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.util.Pair;
 
 import com.daemonize.daemondevapp.imagemovers.CachedArraySpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
@@ -80,12 +79,12 @@ public class Tower extends CachedArraySpriteImageMover {
     public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
 
         for (EnemyDoubleDaemon enemy : activeEnemies) {
-            if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().first) < range
-                    && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().second) < range) {
+            if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().getFirst()) < range
+                    && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().getSecond()) < range) {
                 pause = false;
                 rotateTowards(
-                        enemy.getPrototype().getLastCoordinates().first,
-                        enemy.getPrototype().getLastCoordinates().second
+                        enemy.getPrototype().getLastCoordinates().getFirst(),
+                        enemy.getPrototype().getLastCoordinates().getSecond()
                 );
                 return Pair.create(true, enemy);
             }

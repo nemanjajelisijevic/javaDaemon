@@ -10,8 +10,8 @@ public class AStar extends PathFinding {
 
     @Override
     public boolean recalculate(Grid grid) {
-        Field startNode =  grid.getGrid()[grid.startPoint.first][grid.startPoint.second];
-        Field endNode = grid.getGrid()[grid.endPoint.first][grid.endPoint.second];
+        Field startNode =  grid.getGrid()[grid.startPoint.getFirst()][grid.startPoint.getSecond()];
+        Field endNode = grid.getGrid()[grid.endPoint.getFirst()][grid.endPoint.getSecond()];
 
         Field [] heapArray = new Field[grid.getGrid().length * grid.getGrid()[0].length];
         //        List<Field> openSet = new ArrayList<>() ;
