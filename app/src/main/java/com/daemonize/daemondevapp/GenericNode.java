@@ -45,12 +45,17 @@ public class GenericNode<T> {
         return children.add(child);
     }
 
+
     public static <K> void forEach(GenericNode<K> root, Closure<K> action) {
         Return<K> actionReturn = new Return<>(root.getValue());
-        action.onReturn(actionReturn);
+        forEach(actionReturn, root, action);
+    }
+
+    private static <K> void forEach(Return<K> ret, GenericNode<K> root, Closure<K> action) {
+        action.onReturn(ret);
         if(root.getChildren() != null) {
             for (GenericNode<K> child : root.getChildren()) {
-                forEach(child, action);
+                forEach(ret, child, action);
             }
         }
     }
