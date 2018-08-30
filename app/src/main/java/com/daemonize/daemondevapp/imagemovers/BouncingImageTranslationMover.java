@@ -11,13 +11,13 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
     private float proximityDistance = 50;
 
     public BouncingImageTranslationMover(
-            List<Image> sprite,
+            Image [] sprite,
             float velocity,
             Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
-        if (sprite != null && !sprite.isEmpty()) {
-            proximityDistance = sprite.get(0).getHeight() > sprite.get(0).getWidth()
-                    ? sprite.get(0).getHeight() / 2 : sprite.get(0).getWidth() / 2;
+        if (sprite != null && sprite.length > 0) {
+            proximityDistance = sprite[0].getHeight() > sprite[0].getWidth()
+                    ? sprite[0].getHeight() / 2 : sprite[0].getWidth() / 2;
         }
     }
 

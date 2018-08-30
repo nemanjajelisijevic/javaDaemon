@@ -22,12 +22,12 @@ public class AngleToBitmapArray {
         return step;
     }
 
-    public AngleToBitmapArray(List<Image> sprite, int step) {
+    public AngleToBitmapArray(Image [] sprite, int step) {
         this.step = step;
         for (int i = 0; i < array.length; ++i) {
             int it = i / step;
-            if (it < sprite.size())
-                array[i] = sprite.get(it);
+            if (it < sprite.length)
+                array[i] = sprite[it];
             else
                 break;
         }

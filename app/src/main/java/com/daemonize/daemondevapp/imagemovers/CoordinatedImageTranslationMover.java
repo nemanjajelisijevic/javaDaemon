@@ -19,7 +19,7 @@ public class CoordinatedImageTranslationMover extends CachedSpriteImageTranslati
     private volatile float targetX;
     private volatile float targetY;
 
-    public CoordinatedImageTranslationMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
+    public CoordinatedImageTranslationMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
         super(sprite, velocity, startingPos);
         this.targetX = targetCoord.getFirst();
         this.targetY = targetCoord.getSecond();

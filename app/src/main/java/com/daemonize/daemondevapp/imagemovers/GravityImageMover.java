@@ -11,7 +11,7 @@ public class GravityImageMover extends ImageTranslationMover {
     private boolean touched = false;
     private boolean falling = false;
 
-    public GravityImageMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos) {
+    public GravityImageMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
     }
 

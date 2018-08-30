@@ -62,7 +62,7 @@ public class Game {
     private Queue<ImageView> enemyViews;
     private Queue<ImageView> enemyHpViews;
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
-    private List<Image> enemySprite;
+    private Image [] enemySprite;
 
     private DummyDaemon enemyGenerator;
     private long enemyCounter;
@@ -70,18 +70,18 @@ public class Game {
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
 
-    private List<Image> healthBarImage;
+    private Image [] healthBarImage;
 
-    public Game setHealthBarImage(List<Image> healthBarImage) {
+    public Game setHealthBarImage(Image [] healthBarImage) {
         this.healthBarImage = healthBarImage;
         return this;
     }
 
     private Queue<ImageView> bulletViewQueue;
     private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
-    private List<Image> bulletSprite;
+    private Image [] bulletSprite;
 
-    private List<Image> explodeSprite;
+    private Image [] explodeSprite;
 
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
@@ -112,24 +112,24 @@ public class Game {
         }
     }
 
-    public Game setTowerSprite(List<Image> towerSprite) {
+    public Game setTowerSprite(Image [] towerSprite) {
         this.towerSprite = towerSprite;
         return this;
     }
 
-    private List<Image> towerSprite;
+    private Image [] towerSprite;
 
-    public Game setExplodeSprite(List<Image> explodeSprite) {
+    public Game setExplodeSprite(Image [] explodeSprite) {
         this.explodeSprite = explodeSprite;
         return this;
     }
 
-    public Game setBulletSprite(List<Image> bulletSprite) {
+    public Game setBulletSprite(Image [] bulletSprite) {
         this.bulletSprite = bulletSprite;
         return this;
     }
 
-    public Game setEnemySprite(List<Image> enemySprite) {
+    public Game setEnemySprite(Image [] enemySprite) {
         this.enemySprite = enemySprite;
         return this;
     }
@@ -389,14 +389,14 @@ public class Game {
             Image image = grid.getField(
                     field.getRow(),
                     field.getColumn()
-            ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : towerSprite.get(0);
+            ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : towerSprite[0];
 
             guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
 
             if (b) {
 
-                List<Image> initTowerSprite = new ArrayList<>(1);
-                initTowerSprite.add(towerSprite.get(0));
+                Image [] initTowerSprite = new Image[1];
+                initTowerSprite[0] = towerSprite[0];
 
                 TowerDaemon towerDaemon = new TowerDaemon(
                         gameConsumer,

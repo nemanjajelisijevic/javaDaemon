@@ -47,7 +47,7 @@ public class MainImageTranslationMover extends CachedSpriteImageTranslationMover
     }
 
     public MainImageTranslationMover(
-            List<Image> sprite,
+            Image [] sprite,
             float velocity,
             Pair<Float, Float> startingPos,
             List<ImageMoverDaemon> observers) {

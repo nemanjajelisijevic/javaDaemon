@@ -10,7 +10,7 @@ public class CachedSpriteImageTranslationMover extends ImageTranslationMover {
 
     private AwaitedSprite<Image> cache;
 
-    public boolean pushSprite(List<Image> sprite, float velocity) throws InterruptedException {
+    public boolean pushSprite(Image [] sprite, float velocity) throws InterruptedException {
         this.velocity.intensity = velocity;
         cache = new AwaitedSprite<>(sprite);
         cache.await();
@@ -26,7 +26,7 @@ public class CachedSpriteImageTranslationMover extends ImageTranslationMover {
             return super.iterateSprite();
     }
 
-    public CachedSpriteImageTranslationMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos) {
+    public CachedSpriteImageTranslationMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
     }
 

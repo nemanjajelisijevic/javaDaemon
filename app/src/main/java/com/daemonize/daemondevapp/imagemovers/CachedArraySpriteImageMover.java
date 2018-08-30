@@ -26,7 +26,7 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
             return super.iterateSprite();
     }
 
-    public CachedArraySpriteImageMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos) {
+    public CachedArraySpriteImageMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
     }
 

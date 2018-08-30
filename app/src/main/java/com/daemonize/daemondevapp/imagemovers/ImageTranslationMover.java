@@ -8,18 +8,23 @@ import java.util.List;
 
 public class ImageTranslationMover implements ImageMover {
 
-    private List<Image> sprite;
-    protected Iterator<Image> spriteIterator;
+    private Image [] sprite;
+    private int spriteSize;
+    private int spriteIndex;
+    //protected Iterator<Image> spriteIterator;
     protected float initVelocity;
 
     protected volatile Velocity velocity;
 
-    public List<Image> getSprite() {
+    public Image [] getSprite() {
         return sprite;
     }
 
-    public ImageTranslationMover setSprite(List<Image> sprite) {
-        this.sprite = sprite;
+    public ImageTranslationMover setImage(Image image) { //TODO That's how it must be
+        this.sprite = new Image[1];
+        this.spriteIndex = 0;
+        this.spriteSize = 1;
+        this.sprite[0] = image;
         return this;
     }
 
@@ -53,21 +58,27 @@ public class ImageTranslationMover implements ImageMover {
     protected float borderX;
     protected float borderY;
 
-    public ImageTranslationMover(List<Image> sprite, float velocity, Pair<Float, Float> startingPos) {
+    public ImageTranslationMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos) {
         this.sprite = sprite;
         this.initVelocity = velocity;
         this.velocity = new Velocity(velocity, new Direction(80, 20));
         lastX = startingPos.getFirst();
         lastY = startingPos.getSecond();
-        spriteIterator = sprite.iterator();
+        spriteIndex = 0;
+        spriteSize = sprite.length;
+        //spriteIterator = sprite.iterator();
 
     }
 
     protected Image iterateSprite() {
-        if(!spriteIterator.hasNext()) {
-            spriteIterator = sprite.iterator();
+        if(spriteIndex >= spriteSize) {
+            spriteIndex = 0;
         }
-        return spriteIterator.next();
+        return sprite[spriteIndex++];
+//        if(!spriteIterator.hasNext()) {
+//            spriteIterator = sprite.iterator();
+//        }
+//        return spriteIterator.next();
     }
 
     @Override

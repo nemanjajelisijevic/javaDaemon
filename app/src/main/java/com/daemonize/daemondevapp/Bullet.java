@@ -16,7 +16,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
     private ImageView view;
     private volatile int damage = 2;
 
-    public Bullet(List<Image> sprite, float velocity, Pair<Float, Float> startingPos,
+    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos,
                   Pair<Float, Float> targetCoord, int damage) {
         super(sprite, velocity, startingPos, targetCoord);
         this.damage = damage;

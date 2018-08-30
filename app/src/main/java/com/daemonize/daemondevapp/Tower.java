@@ -57,7 +57,7 @@ public class Tower extends CachedArraySpriteImageMover {
         this.view = view;
     }
 
-    public Tower(List<Image> initSprite, List<Image> rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
+    public Tower(Image [] initSprite, Image [] rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
         super(initSprite, 0, startingPos);
         this.spriteBuffer = new AngleToBitmapArray(rotationSprite, 10);
         this.rotationSprite = new Image[19];
@@ -147,7 +147,7 @@ public class Tower extends CachedArraySpriteImageMover {
         if (Math.abs(targetAngle - currentAngle) <= 2 * spriteBuffer.getStep()) {
             rotationSprite[size++] = spriteBuffer.getByAngle(targetAngle);
             spriteBuffer.setCurrentAngle(targetAngle);
-            //setSprite(convertArrayInList(rotationSprite,size));
+            setImage(rotationSprite[size - 1]);
 
         } else {
 
@@ -170,6 +170,7 @@ public class Tower extends CachedArraySpriteImageMover {
             //getSprite().clear();
             //getSprite().add(rotationSprite[size - 1]);
             pushSprite(rotationSprite,velocity.intensity);
+            setImage(rotationSprite[size - 1]);
 
         }
 
