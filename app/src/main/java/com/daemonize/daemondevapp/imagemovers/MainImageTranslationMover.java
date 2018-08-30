@@ -7,7 +7,6 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.proba.ImageMoverMDaemon;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.utils.DaemonUtils;
@@ -16,7 +15,7 @@ import java.util.List;
 
 public class MainImageTranslationMover extends CachedSpriteImageTranslationMover {
 
-    private final List<ImageMoverMDaemon> observers;
+    private final List<ImageMoverDaemon> observers;
 
     private int hp = 1000;
     private Handler guihandler = new Handler(Looper.getMainLooper());
@@ -51,7 +50,7 @@ public class MainImageTranslationMover extends CachedSpriteImageTranslationMover
             List<Image> sprite,
             float velocity,
             Pair<Float, Float> startingPos,
-            List<ImageMoverMDaemon> observers) {
+            List<ImageMoverDaemon> observers) {
         super(sprite, velocity, startingPos);
         this.observers = observers;
     }
@@ -70,7 +69,7 @@ public class MainImageTranslationMover extends CachedSpriteImageTranslationMover
 
 
             if (observers != null)
-                for (ImageMoverMDaemon observer : observers) {
+                for (ImageMoverDaemon observer : observers) {
                 float x = Math.abs( lastX - observer.getLastCoordinates().first );
                 float y = Math.abs( lastY - observer.getLastCoordinates().second);
                 float c = (float) Math.sqrt(x*x + y*y);
