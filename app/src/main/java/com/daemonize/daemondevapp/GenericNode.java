@@ -52,6 +52,7 @@ public class GenericNode<T> {
     }
 
     private static <K> void forEach(Return<K> ret, GenericNode<K> root, Closure<K> action) {
+        ret.setResult(root.getValue());
         action.onReturn(ret);
         if(root.getChildren() != null) {
             for (GenericNode<K> child : root.getChildren()) {
