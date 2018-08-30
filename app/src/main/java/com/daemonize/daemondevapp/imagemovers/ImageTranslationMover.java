@@ -61,7 +61,7 @@ public class ImageTranslationMover implements ImageMover {
     public ImageTranslationMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos) {
         this.sprite = sprite;
         this.initVelocity = velocity;
-        this.velocity = new Velocity(velocity, new Direction(80, 20));
+        this.velocity = new Velocity(velocity, new Direction(0, 0));
         lastX = startingPos.getFirst();
         lastY = startingPos.getSecond();
         spriteIndex = 0;
