@@ -191,8 +191,8 @@ public class Tower extends CachedArraySpriteImageMover {
             return null;//TODO check this null
         }
 
-        ret.positionX = lastX /*- ret.image.getWidth()/2*/;
-        ret.positionY = lastY /*- ret.image.getWidth()/2*/;
+        ret.positionX = lastX;
+        ret.positionY = lastY;
         return ret;
     }
 }
