@@ -9,4 +9,5 @@ public interface Renderer {
     <K extends Renderer> K start();
     <K extends Renderer> K stop();
 
+    ImageView createImageView(int zIndex);
 }

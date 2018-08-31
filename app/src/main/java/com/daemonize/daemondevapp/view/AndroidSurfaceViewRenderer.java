@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidSurfaceViewRenderer extends SurfaceView implements ViewDispatcher, Renderer, Runnable, SurfaceHolder.Callback {
+public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer, Runnable, SurfaceHolder.Callback {
 
 
     private volatile int windowSizeX;
@@ -37,7 +37,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements ViewDispa
     public void surfaceCreated(SurfaceHolder holder) {}
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) { }
+    public void surfaceDestroyed(SurfaceHolder holder) {}
 
 
     public AndroidSurfaceViewRenderer(Context context) {

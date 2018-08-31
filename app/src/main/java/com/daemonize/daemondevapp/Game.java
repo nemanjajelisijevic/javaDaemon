@@ -335,7 +335,7 @@ public class Game {
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
                                 if (current == null) return;
-                                else if (current.getColumn() ==  columns - 1 && current.getRow() == rows - 1) {
+                                else if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     enemy.setShootable(false);
                                     guiConsumer.consume(()-> enemy.getHpView().hide());
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
