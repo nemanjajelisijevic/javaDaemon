@@ -102,12 +102,6 @@ public class ImageArrayMover implements ImageMover {
     }
 
     @Override
-    public void checkCollisionAndBounce(
-            Pair<Float, Float> colliderCoordinates,
-            Velocity velocity
-    ) {}
-
-    @Override
     public PositionedImage animate() {
 
         PositionedImage ret = new PositionedImage();

@@ -1,17 +1,17 @@
 package com.daemonize.daemondevapp.imagemovers;
 
+import android.util.Log;
+
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
-import java.util.Iterator;
-import java.util.List;
 
 public class ImageTranslationMover implements ImageMover {
 
     private Image [] sprite;
     private int spriteSize;
     private int spriteIndex;
-    //protected Iterator<Image> spriteIterator;
     protected float initVelocity;
 
     protected volatile Velocity velocity;
@@ -66,19 +66,14 @@ public class ImageTranslationMover implements ImageMover {
         lastY = startingPos.getSecond();
         spriteIndex = 0;
         spriteSize = sprite.length;
-        //spriteIterator = sprite.iterator();
 
     }
 
     protected Image iterateSprite() {
-        if(spriteIndex >= spriteSize) {
+        if(spriteIndex == spriteSize) {
             spriteIndex = 0;
         }
         return sprite[spriteIndex++];
-//        if(!spriteIterator.hasNext()) {
-//            spriteIterator = sprite.iterator();
-//        }
-//        return spriteIterator.next();
     }
 
     @Override
@@ -128,12 +123,6 @@ public class ImageTranslationMover implements ImageMover {
     public void setVelocity(float velocity) {
         this.velocity.intensity = velocity;
     }
-
-    @Override
-    public void checkCollisionAndBounce(
-            Pair<Float, Float> colliderCoordinates,
-            Velocity velocity
-    ) {}
 
     @Override
     public PositionedImage animate() {

@@ -33,9 +33,10 @@ public class DaemonLatch {
     public DaemonLatch unsubscribe() {
 
         daemonCounter--;
-        if (daemonCounter == 0)
+        if (daemonCounter == 0) {
+            if (latchCallback == null) throw new IllegalStateException("Callback is null!");
             consumer.consume(latchCallback); //TODO Handle null ptr exc
-
+        }
         return this;
     }
 

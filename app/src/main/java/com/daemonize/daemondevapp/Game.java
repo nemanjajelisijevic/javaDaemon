@@ -6,7 +6,7 @@ import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
-import com.daemonize.daemondevapp.view.DrawingEngine;
+import com.daemonize.daemondevapp.view.Renderer;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
@@ -16,7 +16,6 @@ import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
-import com.daemonize.daemonengine.utils.TimeUnits;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -154,10 +153,10 @@ public class Game {
         return this;
     }
 
-    DrawingEngine drawingEngine;
+    Renderer renderer;
 
     public Game(
-            DrawingEngine drawingEngine,
+            Renderer renderer,
             int rows,
             int columns,
             ImageView[][] viewMatrix,
@@ -167,7 +166,7 @@ public class Game {
             float x,
             float y,
             int fieldWidth) {
-        this.drawingEngine = drawingEngine;
+        this.renderer = renderer;
         this.rows = rows;
         this.columns = columns;
         this.viewMatrix = viewMatrix;
@@ -179,7 +178,7 @@ public class Game {
     }
 
     public Game run() {
-        drawingEngine.start();
+        renderer.start();
         gameConsumer.start();
         chain.run();
         return this;
@@ -198,7 +197,7 @@ public class Game {
         }
 
         gameConsumer.stop();
-        drawingEngine.stop();
+        renderer.stop();
         return this;
     }
 
@@ -251,16 +250,18 @@ public class Game {
 
                             ImageMover.PositionedImage posBmp = aReturn.get();
 
-                            if (Math.abs(posBmp.positionX) < 20
-                                    || Math.abs(posBmp.positionX - borderX) < 20
-                                    || Math.abs(posBmp.positionY) < 20
-                                    || Math.abs(posBmp.positionY - borderY) < 20) {
-                                bulletDoubleDaemon.stop();
-                                guiConsumer.consume(()->bulletDoubleDaemon.getView().hide());
-                                if(!bulletQueue.contains(bulletDoubleDaemon))
-                                    bulletQueue.add(bulletDoubleDaemon);
-                                return;
-                            }
+                            gameConsumer.consume(()-> {
+                                        if (Math.abs(posBmp.positionX) < 20
+                                                || Math.abs(posBmp.positionX - borderX) < 20
+                                                || Math.abs(posBmp.positionY) < 20
+                                                || Math.abs(posBmp.positionY - borderY) < 20) {
+                                            bulletDoubleDaemon.stop();
+                                            guiConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
+                                            if (!bulletQueue.contains(bulletDoubleDaemon))
+                                                bulletQueue.add(bulletDoubleDaemon);
+                                            return;
+                                        }
+                            });
 
                             bulletDoubleDaemon.getView().setX(posBmp.positionX);
                             bulletDoubleDaemon.getView().setY(posBmp.positionY);

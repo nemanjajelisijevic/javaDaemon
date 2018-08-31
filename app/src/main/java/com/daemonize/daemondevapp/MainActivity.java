@@ -16,16 +16,13 @@ import android.widget.TextView;
 
 import com.daemonize.daemondevapp.images.AndroidBitmapImage;
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.view.AndroidImageView;
-import com.daemonize.daemondevapp.view.AndroidSurfaceViewDispatcherEngine;
+import com.daemonize.daemondevapp.view.AndroidSurfaceViewRenderer;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
@@ -108,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //drawing engine and view dispatcher
-        AndroidSurfaceViewDispatcherEngine drawingEngine = new AndroidSurfaceViewDispatcherEngine(this);
+        AndroidSurfaceViewRenderer drawingEngine = new AndroidSurfaceViewRenderer(this);
         drawingEngine.setWindowSize(borderX, borderY);
         setContentView(drawingEngine);
 

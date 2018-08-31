@@ -21,11 +21,6 @@ public class BouncingImageTranslationMover extends ImageTranslationMover {
         }
     }
 
-    public void checkCollisionAndBounce(
-            Pair<Float, Float> colliderCoordinates,
-            Velocity velocity
-    ) {}
-
     @Override
     public BouncingImageTranslationMover setBorders(float x, float y) {
         super.setBorders(x, y);

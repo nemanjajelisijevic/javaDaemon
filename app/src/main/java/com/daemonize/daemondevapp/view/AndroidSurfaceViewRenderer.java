@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AndroidSurfaceViewDispatcherEngine extends SurfaceView implements ViewDispatcher, DrawingEngine, Runnable, SurfaceHolder.Callback {
+public class AndroidSurfaceViewRenderer extends SurfaceView implements ViewDispatcher, Renderer, Runnable, SurfaceHolder.Callback {
 
 
     private volatile int windowSizeX;
@@ -41,7 +41,7 @@ public class AndroidSurfaceViewDispatcherEngine extends SurfaceView implements V
     public void surfaceDestroyed(SurfaceHolder holder) { }
 
 
-    public AndroidSurfaceViewDispatcherEngine(Context context) {
+    public AndroidSurfaceViewRenderer(Context context) {
         super(context);
         this.views = new ArrayList<>();
         this.surfaceHolder = getHolder();
@@ -52,7 +52,7 @@ public class AndroidSurfaceViewDispatcherEngine extends SurfaceView implements V
 
     @SuppressWarnings("unchecked")
     @Override
-    public AndroidSurfaceViewDispatcherEngine setWindowSize(int x, int y) {
+    public AndroidSurfaceViewRenderer setWindowSize(int x, int y) {
         this.windowSizeX = x;
         this.windowSizeY = y;
         return this;
@@ -60,7 +60,7 @@ public class AndroidSurfaceViewDispatcherEngine extends SurfaceView implements V
 
     @SuppressWarnings("unchecked")
     @Override
-    public AndroidSurfaceViewDispatcherEngine setBackgroundImage(Image image) {
+    public AndroidSurfaceViewRenderer setBackgroundImage(Image image) {
 
         if (drawing)
             throw new IllegalStateException("Can not set background image while the engine is drawing!");
@@ -78,7 +78,7 @@ public class AndroidSurfaceViewDispatcherEngine extends SurfaceView implements V
 
     @SuppressWarnings("unchecked")
     @Override
-    public AndroidSurfaceViewDispatcherEngine start() {
+    public AndroidSurfaceViewRenderer start() {
 
         if(views.isEmpty())
             throw new IllegalStateException("No views to be drawn. Add some views!");
@@ -93,7 +93,7 @@ public class AndroidSurfaceViewDispatcherEngine extends SurfaceView implements V
 
     @SuppressWarnings("unchecked")
     @Override
-    public AndroidSurfaceViewDispatcherEngine stop() {
+    public AndroidSurfaceViewRenderer stop() {
         drawing = false;
         try {
             drawThread.join();

@@ -52,8 +52,6 @@ public interface ImageMover {
 
     PositionedImage setLastCoordinates(float lastX, float lastY);
 
-    void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, Velocity velocity);
-
     void setDirection(Direction direction);
 
     void setVelocity(Velocity velocity);
