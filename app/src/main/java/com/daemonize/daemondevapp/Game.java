@@ -222,13 +222,13 @@ public class Game {
 
             for(int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i) {
-                    viewMatrix[j][i] = renderer.createImageView(0); //TODO unhardcode
+                    viewMatrix[j][i] = renderer.createImageView(0);
                 }
             }
 
             Field firstField = grid.getField(0, 0);
 
-            for (int i = 0; i < 50; ++i) {
+            for (int i = 0; i < 200; ++i) {
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                         gameConsumer,
                         guiConsumer,
@@ -315,7 +315,7 @@ public class Game {
 
                 Log.d(DaemonUtils.tag(), "Enemy queue size: " + enemyQueue.size());
 
-                //every 15 enemys increase the pain!!!!
+                //every 15 enemies increase the pain!!!!
                 if (enemyCounter % 15 == 0) {
 
                     if(enemyVelocity < 6)
