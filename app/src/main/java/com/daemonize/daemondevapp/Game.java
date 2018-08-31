@@ -148,19 +148,19 @@ public class Game {
         return this;
     }
 
-    private Image [] towerSprite;
+    private Image[] towerSprite;
 
-    public Game setExplodeSprite(Image [] explodeSprite) {
+    public Game setExplodeSprite(Image[] explodeSprite) {
         this.explodeSprite = explodeSprite;
         return this;
     }
 
-    public Game setBulletSprite(Image [] bulletSprite) {
+    public Game setBulletSprite(Image[] bulletSprite) {
         this.bulletSprite = bulletSprite;
         return this;
     }
 
-    public Game setEnemySprite(Image [] enemySprite) {
+    public Game setEnemySprite(Image[] enemySprite) {
         this.enemySprite = enemySprite;
         return this;
     }
@@ -180,7 +180,7 @@ public class Game {
         return this;
     }
 
-    public Game setHealthBarSprite(Image [] healthBarSprite) {
+    public Game setHealthBarSprite(Image[] healthBarSprite) {
         this.healthBarSprite = healthBarSprite;
         return this;
     }
@@ -487,8 +487,5 @@ public class Game {
         });
 
     }
-
-
-
 
 }
