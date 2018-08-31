@@ -73,7 +73,6 @@ public class Game {
     private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
     private Image[] bulletSprite;
 
-
     //closures
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
@@ -242,7 +241,7 @@ public class Game {
                         ).setView(renderer.createImageView(2))
                                 .setHpView(renderer.createImageView(2))
                                 .setHealthBarImage(healthBarSprite)
-                ).setName("Enemy");
+                ).setName("Enemy no. " + i);
 
                 enemy.getPrototype().setBorders(borderX, borderY);
 
@@ -264,7 +263,7 @@ public class Game {
                                 2
                         )//.setView(bulletView)
                         .setView(renderer.createImageView(1))
-                ).setName("Bullet");
+                ).setName("Bullet no. " + i);
 
                 bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
                 bulletDoubleDaemon.setAnimateSideQuest().setClosure(aReturn -> {
@@ -280,7 +279,6 @@ public class Game {
                                     guiConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
                                     if (!bulletQueue.contains(bulletDoubleDaemon))
                                         bulletQueue.add(bulletDoubleDaemon);
-                                    return;
                                 }
                     });
 
@@ -394,7 +392,7 @@ public class Game {
             TowerDaemon tow = field.getTower();
             if (tow != null) {
 
-                if(towerShootInterval > 500)
+                if(towerShootInterval > 200)
                     towerShootInterval -= 50;
 
                 towerScanClosure.setSleepInterval(towerShootInterval);
@@ -412,7 +410,7 @@ public class Game {
 
             if (b) {
 
-                Image [] initTowerSprite = new Image[1];
+                Image[] initTowerSprite = new Image[1];
                 initTowerSprite[0] = towerSprite[0];
 
                 TowerDaemon towerDaemon = new TowerDaemon(
