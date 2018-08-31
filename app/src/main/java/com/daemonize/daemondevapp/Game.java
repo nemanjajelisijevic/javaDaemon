@@ -27,9 +27,13 @@ import java.util.Set;
 
 public class Game {
 
+    //game threads
+    private Renderer renderer;
     private DaemonConsumer gameConsumer = new DaemonConsumer("Game Consumer");
-    private DaemonChainScript chain = new DaemonChainScript();
     private Consumer guiConsumer = new AndroidLooperConsumer();
+
+    //state holder
+    private DaemonChainScript chain = new DaemonChainScript();
 
     //screen borders
     private int borderX;
@@ -41,23 +45,29 @@ public class Game {
         return this;
     }
 
+    //grid
+    private Grid grid;
     private int rows;
     private int columns;
     private ImageView[][] viewMatrix;
-
-    private Grid grid;
 
     private Image fieldImage;
     private Image fieldImageTower;
     private Image fieldImageTowerDen;
 
+    //towers
     private List<TowerDaemon> towers = new ArrayList<>();
     private Queue<EnemyDoubleDaemon> enemyQueue = new LinkedList<>();
     private int towerShootInterval = 1500;
     private int range = 320;
 
+    private TowerScanClosure towerScanClosure;
+
+    //enemies
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
-    private Image [] enemySprite;
+    private Image[] enemySprite;
+    private Image [] explodeSprite;
+    private Image [] healthBarSprite;
 
     private DummyDaemon enemyGenerator;
     private long enemyCounter;
@@ -65,17 +75,9 @@ public class Game {
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
 
-    private Image [] healthBarImage;
-
-    public Game setHealthBarImage(Image [] healthBarImage) {
-        this.healthBarImage = healthBarImage;
-        return this;
-    }
-
+    //bullets
     private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
-    private Image [] bulletSprite;
-
-    private Image [] explodeSprite;
+    private Image[] bulletSprite;
 
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
@@ -143,7 +145,10 @@ public class Game {
         return this;
     }
 
-    private Renderer renderer;
+    public Game setHealthBarSprite(Image [] healthBarSprite) {
+        this.healthBarSprite = healthBarSprite;
+        return this;
+    }
 
     public Game(Renderer renderer, int rows, int columns, float x, float y, int fieldWidth) {
         this.renderer = renderer;
@@ -188,99 +193,85 @@ public class Game {
         //init spell (state)
         chain.addState(()-> {
 
-                    Log.w(DaemonUtils.tag(), "INITIAL RENDERER VIEW SIZE: " + renderer.viwesSize());
+            viewMatrix = new ImageView[rows][columns];
 
-                    viewMatrix = new ImageView[rows][columns];
+            for(int j = 0; j < rows; ++j ) {
+                for (int i = 0; i < columns; ++i) {
+                    viewMatrix[j][i] = renderer.createImageView(0); //TODO unhardcode
+                }
+            }
 
-                    for(int j = 0; j < rows; ++j ) {
-                        for (int i = 0; i < columns; ++i) {
-                            viewMatrix[j][i] = renderer.createImageView(0); //TODO unhardcode
-                        }
-                    }
+            Field firstField = grid.getField(0, 0);
 
-                    Log.w(DaemonUtils.tag(), "AFTER GRID RENDERER VIEW SIZE: " + renderer.viwesSize());
+            for (int i = 0; i < 50; ++i) {
+                EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
+                        gameConsumer,
+                        guiConsumer,
+                        new Enemy(
+                                enemySprite,
+                                enemyVelocity,
+                                enemyHp,
+                                Pair.create((float) 0, (float) 0),
+                                Pair.create(firstField.getCenterX(), firstField.getCenterY())
+                        ).setView(renderer.createImageView(2))
+                                .setHpView(renderer.createImageView(2))
+                                .setHealthBarImage(healthBarSprite)
+                ).setName("Enemy");
 
-                    Field firstField = grid.getField(0, 0);
+                enemy.getPrototype().setBorders(borderX, borderY);
 
-                    for (int i = 0; i < 50; ++i) {
-                        EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
-                                gameConsumer,
-                                guiConsumer,
-                                new Enemy(
-                                        enemySprite,
-                                        enemyVelocity,
-                                        enemyHp,
-                                        Pair.create((float) 0, (float) 0),
-                                        Pair.create(firstField.getCenterX(), firstField.getCenterY())
-                                ).setView(renderer.createImageView(2))
-                                        .setHpView(renderer.createImageView(2))
-                                        .setHealthBarImage(healthBarImage)
-                        ).setName("Enemy");
+                enemy.setAnimateEnemySideQuest().setClosure(new EnemyAnimateClosure());//gui consumer
 
-                        enemy.getPrototype().setBorders(borderX, borderY);
+                enemyQueue.add(enemy);
 
-                        enemy.setAnimateEnemySideQuest().setClosure(new EnemyAnimateClosure());//gui consumer
+            }
 
-                        enemyQueue.add(enemy);
+            for (int i = 0; i < 200; ++i) {
+                BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
+                        gameConsumer,
+                        guiConsumer,
+                        new Bullet(
+                                bulletSprite,
+                                0,
+                                Pair.create((float) 0, (float) 0),
+                                Pair.create((float) 0, (float) 0),
+                                2
+                        )//.setView(bulletView)
+                        .setView(renderer.createImageView(1))
+                ).setName("Bullet");
 
-                    }
+                bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
+                bulletDoubleDaemon.setAnimateSideQuest().setClosure(aReturn -> {
 
-                    Log.w(DaemonUtils.tag(), "AFTER ENEMIES RENDERER VIEW SIZE: " + renderer.viwesSize());
+                    ImageMover.PositionedImage posBmp = aReturn.get();
 
-                    //for (ImageView bulletView : bulletViewQueue) {
-                    for (int i = 0; i < 200; ++i) {
-                        BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
-                                gameConsumer,
-                                guiConsumer,
-                                new Bullet(
-                                        bulletSprite,
-                                        0,
-                                        Pair.create((float) 0, (float) 0),
-                                        Pair.create((float) 0, (float) 0),
-                                        2
-                                )//.setView(bulletView)
-                                .setView(renderer.createImageView(1))
-                        ).setName("Bullet");
+                    gameConsumer.consume(()-> {
+                                if (Math.abs(posBmp.positionX) < 20
+                                        || Math.abs(posBmp.positionX - borderX) < 20
+                                        || Math.abs(posBmp.positionY) < 20
+                                        || Math.abs(posBmp.positionY - borderY) < 20) {
+                                    bulletDoubleDaemon.stop();
+                                    guiConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
+                                    if (!bulletQueue.contains(bulletDoubleDaemon))
+                                        bulletQueue.add(bulletDoubleDaemon);
+                                    return;
+                                }
+                    });
 
-                        bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
-                        bulletDoubleDaemon.setAnimateSideQuest().setClosure(aReturn -> {
+                    bulletDoubleDaemon.getView().setX(posBmp.positionX);
+                    bulletDoubleDaemon.getView().setY(posBmp.positionY);
+                    bulletDoubleDaemon.getView().setImage(posBmp.image);
 
-                            ImageMover.PositionedImage posBmp = aReturn.get();
+                });
 
-                            gameConsumer.consume(()-> {
-                                        if (Math.abs(posBmp.positionX) < 20
-                                                || Math.abs(posBmp.positionX - borderX) < 20
-                                                || Math.abs(posBmp.positionY) < 20
-                                                || Math.abs(posBmp.positionY - borderY) < 20) {
-                                            bulletDoubleDaemon.stop();
-                                            guiConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
-                                            if (!bulletQueue.contains(bulletDoubleDaemon))
-                                                bulletQueue.add(bulletDoubleDaemon);
-                                            return;
-                                        }
-                            });
+                bulletQueue.add(bulletDoubleDaemon);
+            }
 
-                            bulletDoubleDaemon.getView().setX(posBmp.positionX);
-                            bulletDoubleDaemon.getView().setY(posBmp.positionY);
-                            bulletDoubleDaemon.getView().setImage(posBmp.image);
+            renderer.start();
 
-                        });
-
-                        bulletQueue.add(bulletDoubleDaemon);
-                    }
-
-
-                    Log.w(DaemonUtils.tag(), "RENDERER VIEW SIZE: " + renderer.viwesSize());
-
-                    renderer.start();
-
-                    chain.next();
+            chain.next();
 
         }).addState(()->{//gameState
-
-            Log.w(DaemonUtils.tag(), "ENEMY QUEUE SIZE: " + enemyQueue.size());
-            Log.w(DaemonUtils.tag(), "BULLET QUEUE SIZE: " + bulletQueue.size());
-
 
             guiConsumer.consume(()->{
                 for(int j = 0; j < rows; ++j ) {
@@ -467,8 +458,6 @@ public class Game {
             }
         }
     }
-
-    private TowerScanClosure towerScanClosure;
 
     private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity) {//velocity = 13
 

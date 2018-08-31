@@ -22,8 +22,6 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Random;
 
 import static android.graphics.Color.WHITE;
@@ -255,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
                     .setBulletSprite(bulletSprite)
                     .setExplodeSprite(explosionSprite)
                     .setTowerSprite(towerSprite)
-                    .setHealthBarImage(listHealthBarImg)
+                    .setHealthBarSprite(listHealthBarImg)
                     .setBorders(borderX, borderY);
 
         } catch (IOException ex) {
