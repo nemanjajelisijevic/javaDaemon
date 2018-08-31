@@ -153,7 +153,7 @@ public class Game {
         return this;
     }
 
-    Renderer renderer;
+    private Renderer renderer;
 
     public Game(
             Renderer renderer,
@@ -340,9 +340,7 @@ public class Game {
                                     guiConsumer.consume(()-> enemy.getHpView().hide());
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                                         enemy.stop();
-                                        guiConsumer.consume(() -> {
-                                            enemy.getView().hide();
-                                        });
+                                        guiConsumer.consume(() -> enemy.getView().hide());
                                         activeEnemies.remove(enemy);
                                         if (!enemyQueue.contains(enemy))
                                             enemyQueue.add(enemy);
