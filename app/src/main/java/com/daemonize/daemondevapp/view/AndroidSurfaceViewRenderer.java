@@ -115,6 +115,11 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer,
     }
 
     @Override
+    public int viwesSize() {
+        return views.size();
+    }
+
+    @Override
     public void run() {
         Collections.sort(views);
         while (drawing){

@@ -104,21 +104,10 @@ public class MainActivity extends AppCompatActivity {
         ///////////////////////////////////////////////////////////////////////////////////////////
 
 
-        //drawing engine and view dispatcher
-        AndroidSurfaceViewRenderer drawingEngine = new AndroidSurfaceViewRenderer(this);
-        drawingEngine.setWindowSize(borderX, borderY);
-        setContentView(drawingEngine);
-
-        //TODO unnecessary background
-        try {
-            Bitmap backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false);
-            //background.setImageBitmap(backgroundImg);
-            drawingEngine.setBackgroundImage(new AndroidBitmapImage(backgroundImg));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
+        //renderer init
+        AndroidSurfaceViewRenderer renderer = new AndroidSurfaceViewRenderer(this);
+        renderer.setWindowSize(borderX, borderY);
+        setContentView(renderer);
 
         int rows = 6;
         int columns = 11;
@@ -126,20 +115,11 @@ public class MainActivity extends AppCompatActivity {
         int width = 160;
         int height = 160;
 
-        //init view matrix
-        fieldViews = new ImageView[rows][columns];
-        for(int j = 0; j < rows; ++j ) {
-            for (int i = 0; i < columns; ++i) {
-                //fieldViews[j][i] = new AndroidImageView(createImageView(width, width)); //TODO unhardcode
-                fieldViews[j][i] = drawingEngine.createImageView(0); //TODO unhardcode
-            }
-        }
-
-
-        //init enemy view
-        //android.widget.ImageView enemyView = createImageView(80,80);
-
         try {
+
+            //background
+            Bitmap backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false);
+            renderer.setBackgroundImage(new AndroidBitmapImage(backgroundImg));
 
             //init enemy sprite
             Image [] sprite = new Image[12];
@@ -252,28 +232,8 @@ public class MainActivity extends AppCompatActivity {
             towerSprite[34] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower340.png")),width, height, false));
             towerSprite[35] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower350.png")),width, height, false));
 
-            Queue<ImageView> enemyQueue = new LinkedList<>();
-
-            for (int cnt = 0; cnt < 100; ++cnt) {
-                //enemyQueue.add(new AndroidImageView(createImageView(width, height)));
-                enemyQueue.add(drawingEngine.createImageView(1));
-            }
-
             int width_hp = 120;
             int height_hp = 30;
-            Queue<ImageView> enemyHpViewQueue = new LinkedList<>();
-
-            for (int cnt = 0; cnt < 100; ++cnt) {
-                //enemyHpViewQueue.add(new AndroidImageView(createImageView(width_hp, height_hp)));
-                enemyHpViewQueue.add(drawingEngine.createImageView(1));
-            }
-
-            Queue<ImageView> bulletQueue = new LinkedList<>();
-
-            for (int cnt = 0; cnt < 200; ++cnt) {
-                bulletQueue.add(drawingEngine.createImageView(2));
-            }
-
 
             Image [] listHealthBarImg = new Image[10];
             listHealthBarImg[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_10.png")), width_hp, height_hp, false));
@@ -287,9 +247,8 @@ public class MainActivity extends AppCompatActivity {
             listHealthBarImg[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_90.png")), width_hp, height_hp, false));
             listHealthBarImg[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_100.png")), width_hp, height_hp, false));
 
-            game = new Game(drawingEngine, rows, columns, fieldViews, enemyQueue, enemyHpViewQueue, bulletQueue,50,50, width)
+            game = new Game(renderer, rows, columns,50,50, width)
                     .setFieldImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
-                    .setFieldImagePath(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
                     .setFieldImageTower(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), width, height, false)))
                     .setFieldImageTowerDen(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), width, height, false)))
                     .setEnemySprite(sprite)

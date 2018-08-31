@@ -30,7 +30,6 @@ public class Game {
     private DaemonConsumer gameConsumer = new DaemonConsumer("Game Consumer");
     private DaemonChainScript chain = new DaemonChainScript();
     private Consumer guiConsumer = new AndroidLooperConsumer();
-    //private DaemonHelperConsumer enemyDrawConsumer = new DaemonHelperConsumer("Enemy Draw Consumer", guiConsumer, 10);
 
     //screen borders
     private int borderX;
@@ -49,7 +48,6 @@ public class Game {
     private Grid grid;
 
     private Image fieldImage;
-    private Image fieldImagePath;
     private Image fieldImageTower;
     private Image fieldImageTowerDen;
 
@@ -58,8 +56,6 @@ public class Game {
     private int towerShootInterval = 1500;
     private int range = 320;
 
-    private Queue<ImageView> enemyViews;
-    private Queue<ImageView> enemyHpViews;
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private Image [] enemySprite;
 
@@ -76,7 +72,6 @@ public class Game {
         return this;
     }
 
-    private Queue<ImageView> bulletViewQueue;
     private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
     private Image [] bulletSprite;
 
@@ -138,11 +133,6 @@ public class Game {
         return this;
     }
 
-    public Game setFieldImagePath(Image fieldImagePath) {
-        this.fieldImagePath = fieldImagePath;
-        return this;
-    }
-
     public Game setFieldImageTower(Image fieldImageTower) {
         this.fieldImageTower = fieldImageTower;
         return this;
@@ -155,30 +145,22 @@ public class Game {
 
     private Renderer renderer;
 
-    public Game(
-            Renderer renderer,
-            int rows,
-            int columns,
-            ImageView[][] viewMatrix,
-            Queue<ImageView> enemyViews,
-            Queue<ImageView> enemyHpViewQueue,
-            Queue<ImageView> bulletViewQueue,
-            float x,
-            float y,
-            int fieldWidth) {
+    public Game(Renderer renderer, int rows, int columns, float x, float y, int fieldWidth) {
         this.renderer = renderer;
         this.rows = rows;
         this.columns = columns;
-        this.viewMatrix = viewMatrix;
-        //TODO validate enemyViews
-        this.enemyViews = enemyViews;
-        this.enemyHpViews = enemyHpViewQueue;
-        this.grid = new Grid(rows, columns, Pair.create(0, 0), Pair.create(rows - 1, columns - 1), x, y, fieldWidth);
-        this.bulletViewQueue = bulletViewQueue;
+        this.grid = new Grid(
+                rows,
+                columns,
+                Pair.create(0, 0),
+                Pair.create(rows - 1, columns - 1),
+                x,
+                y,
+                fieldWidth
+        );
     }
 
     public Game run() {
-        renderer.start();
         gameConsumer.start();
         chain.run();
         return this;
@@ -206,9 +188,21 @@ public class Game {
         //init spell (state)
         chain.addState(()-> {
 
+                    Log.w(DaemonUtils.tag(), "INITIAL RENDERER VIEW SIZE: " + renderer.viwesSize());
+
+                    viewMatrix = new ImageView[rows][columns];
+
+                    for(int j = 0; j < rows; ++j ) {
+                        for (int i = 0; i < columns; ++i) {
+                            viewMatrix[j][i] = renderer.createImageView(0); //TODO unhardcode
+                        }
+                    }
+
+                    Log.w(DaemonUtils.tag(), "AFTER GRID RENDERER VIEW SIZE: " + renderer.viwesSize());
+
                     Field firstField = grid.getField(0, 0);
 
-                    for (ImageView enemyView : enemyViews) {
+                    for (int i = 0; i < 50; ++i) {
                         EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                                 gameConsumer,
                                 guiConsumer,
@@ -218,7 +212,8 @@ public class Game {
                                         enemyHp,
                                         Pair.create((float) 0, (float) 0),
                                         Pair.create(firstField.getCenterX(), firstField.getCenterY())
-                                ).setView(enemyView).setHpView(enemyHpViews.poll())
+                                ).setView(renderer.createImageView(2))
+                                        .setHpView(renderer.createImageView(2))
                                         .setHealthBarImage(healthBarImage)
                         ).setName("Enemy");
 
@@ -230,9 +225,10 @@ public class Game {
 
                     }
 
+                    Log.w(DaemonUtils.tag(), "AFTER ENEMIES RENDERER VIEW SIZE: " + renderer.viwesSize());
 
-                    for (ImageView bulletView : bulletViewQueue) {
-
+                    //for (ImageView bulletView : bulletViewQueue) {
+                    for (int i = 0; i < 200; ++i) {
                         BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
                                 gameConsumer,
                                 guiConsumer,
@@ -242,7 +238,8 @@ public class Game {
                                         Pair.create((float) 0, (float) 0),
                                         Pair.create((float) 0, (float) 0),
                                         2
-                                ).setView(bulletView)
+                                )//.setView(bulletView)
+                                .setView(renderer.createImageView(1))
                         ).setName("Bullet");
 
                         bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
@@ -272,16 +269,24 @@ public class Game {
                         bulletQueue.add(bulletDoubleDaemon);
                     }
 
+
+                    Log.w(DaemonUtils.tag(), "RENDERER VIEW SIZE: " + renderer.viwesSize());
+
+                    renderer.start();
+
                     chain.next();
 
         }).addState(()->{//gameState
+
+            Log.w(DaemonUtils.tag(), "ENEMY QUEUE SIZE: " + enemyQueue.size());
+            Log.w(DaemonUtils.tag(), "BULLET QUEUE SIZE: " + bulletQueue.size());
 
 
             guiConsumer.consume(()->{
                 for(int j = 0; j < rows; ++j ) {
                     for (int i = 0; i < columns; ++i) {
-                        viewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX()/* - (fieldImage.getWidth() / 2)*/);
-                        viewMatrix[j][i].setY(grid.getGrid()[j][i].getCenterY() /*- (fieldImage.getHeight() / 2)*/);
+                        viewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX());
+                        viewMatrix[j][i].setY(grid.getGrid()[j][i].getCenterY());
                         viewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).show();
                     }
                 }
@@ -295,14 +300,14 @@ public class Game {
 
                 Log.d(DaemonUtils.tag(), "Enemy queue size: " + enemyQueue.size());
 
-                //every 20 enemys increase the pain!!!!
+                //every 15 enemys increase the pain!!!!
                 if (enemyCounter % 15 == 0) {
 
                     if(enemyVelocity < 6)
                         enemyVelocity += 1;
 
                     if (enemyHp < 80) {
-                        enemyHp += 5;//TODO pay attention to enemy max hp
+                        enemyHp += 5;
                     }
 
                     if (enemyGenerateinterval > 1000)
@@ -420,7 +425,6 @@ public class Game {
                 towerDaemon.start();
 
                 towerScanClosure = new TowerScanClosure(towerDaemon, towerShootInterval);
-                //towerDaemon.setScanClosure(scanClosure);
                 List<EnemyDoubleDaemon> clone = new ArrayList<EnemyDoubleDaemon>(activeEnemies.size());
                 clone.addAll(activeEnemies);
                 towerDaemon.scan(clone, towerScanClosure);
