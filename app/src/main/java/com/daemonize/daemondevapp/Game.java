@@ -79,6 +79,8 @@ public class Game {
     private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
     private Image[] bulletSprite;
 
+
+    //closures
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
         private ImageView view;
@@ -105,6 +107,39 @@ public class Game {
                 imageAndView.getSecond().setY(imageAndView.getFirst().positionY);
                 imageAndView.getSecond().setImage(imageAndView.getFirst().image);
             });
+        }
+    }
+
+    public class TowerScanClosure implements Closure<Pair<Boolean, EnemyDoubleDaemon>> {
+
+        private TowerDaemon tower;
+        private int sleepInterval;
+
+        public TowerScanClosure setSleepInterval(int sleepInterval) {
+            this.sleepInterval = sleepInterval;
+            return this;
+        }
+
+        public TowerScanClosure(TowerDaemon tower, int sleepInterval) {
+            this.tower = tower;
+            this.sleepInterval = sleepInterval;
+        }
+
+        @Override
+        public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
+
+            if (aReturn.get() != null && aReturn.get().getFirst()) {
+                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(),15);
+                tower.sleep(sleepInterval, aReturn1 -> {
+                    List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
+                    clone.addAll(activeEnemies);
+                    tower.scan(clone, this);
+                });
+            } else {
+                List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
+                clone.addAll(activeEnemies);
+                tower.scan(clone, this);
+            }
         }
     }
 
@@ -423,40 +458,6 @@ public class Game {
         });
 
         return this;
-    }
-
-
-    public class TowerScanClosure implements Closure<Pair<Boolean, EnemyDoubleDaemon>> {
-
-        private TowerDaemon tower;
-        private int sleepInterval;
-
-        public TowerScanClosure setSleepInterval(int sleepInterval) {
-            this.sleepInterval = sleepInterval;
-            return this;
-        }
-
-        public TowerScanClosure(TowerDaemon tower, int sleepInterval) {
-            this.tower = tower;
-            this.sleepInterval = sleepInterval;
-        }
-
-        @Override
-        public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
-
-            if (aReturn.get() != null && aReturn.get().getFirst()) {
-                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(),15);
-                tower.sleep(sleepInterval, aReturn1 -> {
-                    List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
-                    clone.addAll(activeEnemies);
-                    tower.scan(clone, this);
-                });
-            } else {
-                List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
-                clone.addAll(activeEnemies);
-                tower.scan(clone, this);
-            }
-        }
     }
 
     private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity) {//velocity = 13
