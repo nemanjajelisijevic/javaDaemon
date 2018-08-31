@@ -11,20 +11,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.WindowManager;
-import android.widget.TextView;
 
 
 import com.daemonize.daemondevapp.images.AndroidBitmapImage;
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.view.AndroidSurfaceViewRenderer;
-import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemondevapp.renderer.AndroidSurfaceViewRenderer;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
-import java.util.Random;
-
-import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity {
 

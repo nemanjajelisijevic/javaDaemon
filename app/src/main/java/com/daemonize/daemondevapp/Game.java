@@ -6,7 +6,7 @@ import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
-import com.daemonize.daemondevapp.view.Renderer;
+import com.daemonize.daemondevapp.renderer.Renderer;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;

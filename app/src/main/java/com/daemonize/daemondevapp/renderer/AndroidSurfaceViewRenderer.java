@@ -1,4 +1,4 @@
-package com.daemonize.daemondevapp.view;
+package com.daemonize.daemondevapp.renderer;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +9,8 @@ import android.view.SurfaceView;
 
 import com.daemonize.daemondevapp.images.AndroidBitmapImage;
 import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemondevapp.view.ImageViewImpl;
 
 import java.util.ArrayList;
 import java.util.Collections;

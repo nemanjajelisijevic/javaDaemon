@@ -1,6 +1,7 @@
-package com.daemonize.daemondevapp.view;
+package com.daemonize.daemondevapp.renderer;
 
 import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemondevapp.view.ImageView;
 
 public interface Renderer {
 
