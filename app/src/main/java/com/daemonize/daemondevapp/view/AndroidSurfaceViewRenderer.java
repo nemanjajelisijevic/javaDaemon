@@ -30,7 +30,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements ViewDispa
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
 
-
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
 
