@@ -222,7 +222,7 @@ public class Game {
 
             for(int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i) {
-                    viewMatrix[j][i] = renderer.createImageView(0);
+                    viewMatrix[j][i] = renderer.createImageView(1);
                 }
             }
 
@@ -261,8 +261,7 @@ public class Game {
                                 Pair.create((float) 0, (float) 0),
                                 Pair.create((float) 0, (float) 0),
                                 2
-                        )//.setView(bulletView)
-                        .setView(renderer.createImageView(1))
+                        ).setView(renderer.createImageView(0))
                 ).setName("Bullet no. " + i);
 
                 bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
