@@ -39,12 +39,6 @@ public class Game {
     private int borderX;
     private int borderY;
 
-    public Game setBorders(int x, int y) {
-        this.borderX = x;
-        this.borderY = y;
-        return this;
-    }
-
     //grid
     private Grid grid;
     private int rows;
@@ -143,6 +137,12 @@ public class Game {
         }
     }
 
+    public Game setBorders(int x, int y) {
+        this.borderX = x;
+        this.borderY = y;
+        return this;
+    }
+
     public Game setTowerSprite(Image [] towerSprite) {
         this.towerSprite = towerSprite;
         return this;
@@ -207,22 +207,13 @@ public class Game {
     }
 
     public Game stop(){
-
         enemyGenerator.stop();
-
-        for(EnemyDoubleDaemon enemy : activeEnemies) {
-            enemy.stop();
-        }
-
-        for (TowerDaemon tower : towers) {
-            tower.stop();
-        }
-
+        for(EnemyDoubleDaemon enemy : activeEnemies) enemy.stop();
+        for (TowerDaemon tower : towers) tower.stop();
         gameConsumer.stop();
         renderer.stop();
         return this;
     }
-
 
     {
         //init spell (state)
@@ -332,9 +323,8 @@ public class Game {
                     if(enemyVelocity < 6)
                         enemyVelocity += 1;
 
-                    if (enemyHp < 80) {
+                    if (enemyHp < 80)
                         enemyHp += 5;
-                    }
 
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
@@ -342,13 +332,11 @@ public class Game {
                     enemyGenerator.setSleepInterval((int)enemyGenerateinterval);
                 }
 
-
                 EnemyDoubleDaemon enemy = enemyQueue.poll();
                 enemy.setName("Enemy no." + enemyCounter);
                 enemy.setMaxHp(enemyHp);
                 enemy.setHp(enemyHp);
                 enemy.getPrototype().setVelocity(enemyVelocity);
-
 
                 guiConsumer.consume(()->enemy.getView().show());
                 guiConsumer.consume(()->enemy.getHpView().show());
@@ -406,9 +394,8 @@ public class Game {
             TowerDaemon tow = field.getTower();
             if (tow != null) {
 
-                if(towerShootInterval > 500) {
+                if(towerShootInterval > 500)
                     towerShootInterval -= 50;
-                }
 
                 towerScanClosure.setSleepInterval(towerShootInterval);
                 return;
@@ -462,9 +449,8 @@ public class Game {
 
     private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity) {//velocity = 13
 
-        if (!enemy.isShootable()) {
+        if (!enemy.isShootable())
             return;
-        }
 
         Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
 
