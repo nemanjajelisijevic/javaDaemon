@@ -31,27 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout layout;
     private Game game;
 
-    private android.widget.ImageView background;
-    //private Bitmap backgroundImg;
-
-    private ImageView[][] fieldViews;
-
-    private int borderX;
-    private int borderY;
-
-    private long wastedCounter;
-    private String wastedCntText = "EXPLOSIONS COUNTER: ";
-    private TextView wastedCntView;
-
-    public TextView hpView;
-    private String hpText = "HP: ";
-
-
-    private static int getRandomInt(int min, int max) {
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
-    }
-
     public android.widget.ImageView createImageView(int width, int height) {
         android.widget.ImageView view = new android.widget.ImageView(getApplicationContext());
         ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
@@ -70,37 +49,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        Log.w("onCreate","Start");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        borderX = getResources().getDisplayMetrics().widthPixels ;
-        borderY = getResources().getDisplayMetrics().heightPixels ;
+        int borderX = getResources().getDisplayMetrics().widthPixels;
+        int borderY = getResources().getDisplayMetrics().heightPixels;
 
         layout = findViewById(R.id.cl);
-
-        background = findViewById(R.id.img_large);
-
-        wastedCntView = findViewById(R.id.response);
-        wastedCntView.setWidth(borderX / 3);
-        wastedCntView.setHeight(borderY / 10);
-        wastedCntView.setTextColor(WHITE);
-
-        hpView = findViewById(R.id.hp);
-        hpView.setWidth(borderX / 3);
-        hpView.setHeight(borderY / 10);
-        hpView.setTextColor(WHITE);
-
-
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         //                                GAME INITIALIZATION                                    //
         ///////////////////////////////////////////////////////////////////////////////////////////
-
 
         //renderer init
         AndroidSurfaceViewRenderer renderer = new AndroidSurfaceViewRenderer(this);
@@ -123,21 +85,18 @@ public class MainActivity extends AppCompatActivity {
             Image [] sprite = new Image[12];
 
             int i = 0;
-            for (; i < 3; ++i) {
+            for (; i < 3; ++i)
                 sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), width, height, false));
-            }
 
-            for (; i < 6; ++i) {
+            for (; i < 6; ++i)
                 sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), width, height, false));
-            }
 
-            for (; i < 9; ++i) {
+
+            for (; i < 9; ++i)
                 sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), width, height, false));
-            }
 
-            for (; i < 12; ++i) {
+            for (; i < 12; ++i)
                 sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), width, height, false));
-            }
 
             //bullet sprite
             int bulletSize = 20;
