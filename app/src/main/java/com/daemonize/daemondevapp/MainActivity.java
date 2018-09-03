@@ -26,21 +26,6 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout layout;
     private Game game;
 
-    public android.widget.ImageView createImageView(int width, int height) {
-        android.widget.ImageView view = new android.widget.ImageView(getApplicationContext());
-        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-        );
-        view.setLayoutParams(lp);
-        view.getLayoutParams().height = height;
-        view.getLayoutParams().width = width;
-        layout.addView(view);
-        view.requestLayout();
-        return view;
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
