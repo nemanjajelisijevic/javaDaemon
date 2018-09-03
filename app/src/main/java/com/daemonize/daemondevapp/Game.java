@@ -10,9 +10,7 @@ import com.daemonize.daemondevapp.renderer.Renderer;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
-import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
@@ -30,7 +28,7 @@ public class Game {
     //game threads
     private Renderer renderer;
     private DaemonConsumer gameConsumer = new DaemonConsumer("Game Consumer");
-    private Consumer guiConsumer = new AndroidLooperConsumer();
+    private DaemonConsumer guiConsumer = new DaemonConsumer("Gui Consumer");
 
     //state holder
     private DaemonChainScript chain = new DaemonChainScript();
@@ -200,6 +198,7 @@ public class Game {
     }
 
     public Game run() {
+        guiConsumer.start();
         gameConsumer.start();
         chain.run();
         return this;
@@ -209,6 +208,7 @@ public class Game {
         enemyGenerator.stop();
         for(EnemyDoubleDaemon enemy : activeEnemies) enemy.stop();
         for (TowerDaemon tower : towers) tower.stop();
+        guiConsumer.stop();
         gameConsumer.stop();
         renderer.stop();
         return this;
