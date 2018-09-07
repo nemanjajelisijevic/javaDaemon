@@ -175,6 +175,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         MethodSpec sideQuestSetter = MethodSpec.methodBuilder("set" + Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1) + "SideQuest")
                 .addModifiers(Modifier.PUBLIC)
+                .addJavadoc("Prototype method {@link $N#$N}", sideQuestMethod.getFirst().getEnclosingElement().getSimpleName(), sideQuestMethod.getFirst().getSimpleName())
                 .returns(sideQuestOfRet)
                 .addStatement("$T sideQuest = new $N()", sideQuestOfRet, sideQuest)
                 .addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L))", sleep)
