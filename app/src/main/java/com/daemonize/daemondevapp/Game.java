@@ -308,7 +308,7 @@ public class Game {
 
             Field firstField = grid.getField(0, 0);
 
-            enemyGenerator = new DummyDaemon(gameConsumer, (int) enemyGenerateinterval).setClosure(ret->{
+            enemyGenerator = new DummyDaemon(gameConsumer, enemyGenerateinterval).setClosure(ret->{
 
                 enemyCounter++;
 

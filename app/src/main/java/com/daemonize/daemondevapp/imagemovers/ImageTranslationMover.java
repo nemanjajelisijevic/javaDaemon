@@ -1,10 +1,8 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.util.Log;
 
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 public class ImageTranslationMover implements ImageMover {
@@ -20,11 +18,13 @@ public class ImageTranslationMover implements ImageMover {
         return sprite;
     }
 
-    public ImageTranslationMover setImage(Image image) { //TODO That's how it must be
-        this.sprite = new Image[1];
-        this.spriteIndex = 0;
-        this.spriteSize = 1;
-        this.sprite[0] = image;
+    public ImageTranslationMover setSprite(Image[] sprite) { //TODO That's how it must be
+//        this.sprite = new Image[1];
+//        this.spriteIndex = 0;
+//        this.spriteSize = 1;
+        this.spriteSize = sprite.length;
+        this.sprite = sprite;
+
         return this;
     }
 

@@ -29,11 +29,23 @@ public class AwaitedArraySprite<T> {
     }
 
 
+    public void await(Runnable action) throws InterruptedException {
+        lock.lock();
+        try {
+            while(!flag) {
+                condition.await();
+            }
+        } finally {
+            flag = false;
+            if (action != null)
+                action.run();
+            lock.unlock();
+        }
+    }
+
     public T getNext() {
 
-        cnt++;
-        T ret = sprite[cnt];
-
+        T ret = sprite[++cnt];
         if (cnt == sprite.length -1) {
             lock.lock();
             flag = true;

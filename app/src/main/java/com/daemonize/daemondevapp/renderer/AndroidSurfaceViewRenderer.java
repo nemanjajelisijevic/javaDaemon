@@ -85,7 +85,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer,
             throw new IllegalStateException("No views to be drawn. Add some views!");
 
         drawThread = new Thread(this);
-        drawThread.setName("Android Surface View Renderer");
+        drawThread.setName("AndroidSurfaceViewRenderer");
         drawing = true;
         drawThread.start();
 
