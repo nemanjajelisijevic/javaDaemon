@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
@@ -19,7 +18,7 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
     }
 
     @Override
-    protected Image iterateSprite() {
+    public Image iterateSprite() {
         if (cache != null)
             return cache.getNext();
         else

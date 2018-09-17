@@ -1,30 +1,31 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-
 import com.daemonize.daemondevapp.Pair;
+import com.daemonize.daemondevapp.imagemovers.spriteiterators.BasicSpriteIterator;
+import com.daemonize.daemondevapp.imagemovers.spriteiterators.SpriteIterator;
 import com.daemonize.daemondevapp.images.Image;
 
 
-public class ImageTranslationMover implements ImageMover {
+public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
-    private Image [] sprite;
-    private int spriteSize;
-    private int spriteIndex;
+    private SpriteIterator spriteIterator;
     protected float initVelocity;
 
     protected volatile Velocity velocity;
 
     public Image [] getSprite() {
-        return sprite;
+        return spriteIterator.getSprite();
     }
 
-    public ImageTranslationMover setSprite(Image[] sprite) { //TODO That's how it must be
-//        this.sprite = new Image[1];
-//        this.spriteIndex = 0;
-//        this.spriteSize = 1;
-        this.spriteSize = sprite.length;
-        this.sprite = sprite;
+    @Override
+    public int getSize() {
+        return spriteIterator.getSize();
+    }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public ImageTranslationMover setSprite(Image[] sprite) { //TODO That's how it must be
+        spriteIterator.setSprite(sprite);
         return this;
     }
 
@@ -58,22 +59,16 @@ public class ImageTranslationMover implements ImageMover {
     protected float borderX;
     protected float borderY;
 
-    public ImageTranslationMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos) {
-        this.sprite = sprite;
+    public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos) {
+        this.spriteIterator = new BasicSpriteIterator(sprite);
         this.initVelocity = velocity;
         this.velocity = new Velocity(velocity, new Direction(0, 0));
         lastX = startingPos.getFirst();
         lastY = startingPos.getSecond();
-        spriteIndex = 0;
-        spriteSize = sprite.length;
-
     }
 
-    protected Image iterateSprite() {
-        if(spriteIndex == spriteSize) {
-            spriteIndex = 0;
-        }
-        return sprite[spriteIndex++];
+    public Image iterateSprite() {
+        return spriteIterator.iterateSprite();
     }
 
     @Override
@@ -84,7 +79,6 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void setVelocity(Velocity velocity) {
         this.velocity = velocity;
-        //startMoving();
     }
 
     @Override
