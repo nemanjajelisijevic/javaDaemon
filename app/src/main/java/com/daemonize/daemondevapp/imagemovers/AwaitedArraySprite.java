@@ -19,9 +19,8 @@ public class AwaitedArraySprite<T> {
     public void await() throws InterruptedException {
         lock.lock();
         try {
-            while(!flag) {
+            while(!flag)
                 condition.await();
-            }
         } finally {
             flag = false;
             lock.unlock();
@@ -32,9 +31,8 @@ public class AwaitedArraySprite<T> {
     public void await(Runnable action) throws InterruptedException {
         lock.lock();
         try {
-            while(!flag) {
+            while(!flag)
                 condition.await();
-            }
         } finally {
             flag = false;
             if (action != null)
@@ -46,7 +44,7 @@ public class AwaitedArraySprite<T> {
     public T getNext() {
 
         T ret = sprite[++cnt];
-        if (cnt == sprite.length -1) {
+        if (cnt == sprite.length - 1) {
             lock.lock();
             flag = true;
             condition.signal();
