@@ -29,8 +29,7 @@ public class DaemonConsumer implements Consumer, Daemon {
         boolean ret;
         closureLock.lock();
         ret = closureQueue.add(runnable);
-        if (ret)
-            closureAvailable.signal();
+        closureAvailable.signal();
         closureLock.unlock();
         return ret;
     }

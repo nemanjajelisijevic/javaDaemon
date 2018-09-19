@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -24,7 +25,8 @@ import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.daemonscript.DaemonSpell;
+import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
+import com.daemonize.daemonengine.dummy.DummyDaemon;
 
 
 import java.io.IOException;
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView background;
     private Bitmap backgroundImg;
 
+    private DummyDaemon dummyDaemon;
 
     private List<Bitmap> sprite;
     private List<Bitmap> spriteMain;
@@ -229,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
     private void fireBullet(Pair<Float, Float> sourceCoord, float angleInRadians) {
         ImageView bulletView = createImageView(40, 40);
         ImageMoverDaemon bullet = new ImageMoverDaemon(
+                new AndroidLooperConsumer(),
                 new ImageTranslationMover(
                         bulletSprite,
                         50,
@@ -481,6 +485,7 @@ public class MainActivity extends AppCompatActivity {
 
             ImageView view = createImageView(80, 80);
             ImageMoverDaemon starMover = new ImageMoverDaemon(
+                    new AndroidLooperConsumer(),
                     new BouncingImageTranslationMover(
                             sprite,
                             8,
@@ -499,6 +504,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mainMover = new ImageMoverDaemon(
+                new AndroidLooperConsumer(),
                 new MainImageTranslationMover(
                         spriteMain,
                         10f,
@@ -541,7 +547,7 @@ public class MainActivity extends AppCompatActivity {
         mainMover.setMoveSideQuest().setClosure(binder.bindViewToClosure(mainView));
         mainMover.start();
 
-        backgroundScrollerDaemon = new BackgroundScrollerDaemon(new BackgroundScroller(mainMover)).setName("Background scroller");
+        backgroundScrollerDaemon = new BackgroundScrollerDaemon(new AndroidLooperConsumer(), new BackgroundScroller(mainMover)).setName("Background scroller");
         backgroundScrollerDaemon.setScrollSideQuest().setClosure(ret -> {
             horizontalSv.scrollTo(ret.get().first, ret.get().second);
             verticalSv.scrollTo(ret.get().first, ret.get().second);
@@ -619,7 +625,34 @@ public class MainActivity extends AppCompatActivity {
 //                new RestClientDaemon(new RestClient("https://reqres.in"))
 //        ).run();
 
+
+//        dummyDaemon = new DummyDaemon(
+//                new AndroidLooperConsumer(),
+//                500
+//        ).setClosure(ret -> fireBullet(Pair.create((float)0 , (float)0), 340 * 0.0174533F));
+//
+//        dummyDaemon.start();
+
         Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
+
+
+//        DoubleExampleDaemon dd = new DoubleExampleDaemon(
+//                new AndroidLooperConsumer(),
+//                new AndroidLooperConsumer(),
+//                new DoubleExample()
+//        );
+//
+//        dd.setLogAndReturnSideQuest().setClosure(aReturn -> Log.e(DaemonUtils.tag(), "DoubleExampleDaemon::LogAndReturnSideQuest returned: " + Integer.toString(aReturn.get())));
+//
+//        dd.start();
+//
+//        dd.increment(new Closure<Boolean>() {
+//            @Override
+//            public void onReturn(Return<Boolean> aReturn) {
+//                dd.increment(this);
+//            }
+//        });
+
 
     }
 
@@ -631,6 +664,8 @@ public class MainActivity extends AppCompatActivity {
         for(ImageMoverDaemon mover : starMovers) {
             mover.stop();
         }
+
+        //dummyDaemon.stop();
         //massiveDaemon.stop();
         //exampleDaemon.stop();
         backgroundScrollerDaemon.stop();

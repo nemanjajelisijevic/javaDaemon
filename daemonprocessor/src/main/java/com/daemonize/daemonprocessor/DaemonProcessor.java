@@ -1,6 +1,7 @@
 package com.daemonize.daemonprocessor;
 
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -28,7 +29,8 @@ import javax.tools.Diagnostic;
         {
                 "com.daemonize.daemonprocessor.annotations.Daemonize",
                 "com.daemonize.daemonprocessor.annotations.SideQuest",
-                "com.daemonize.daemonprocessor.annotations.CallingThread"
+                "com.daemonize.daemonprocessor.annotations.CallingThread",
+                "com.daemonize.daemonprocessor.annotations.DedicatedThread"
         }
 )
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
@@ -60,6 +62,7 @@ public class DaemonProcessor extends AbstractProcessor {
         for (Element classElement : annotatedElements) {
 
             if (!(classElement.getKind().equals(ElementKind.CLASS) || classElement.getKind().equals(ElementKind.INTERFACE))) {
+
                 messager.printMessage(
                         Diagnostic.Kind.ERROR,
                         "Error processing element: "
@@ -67,7 +70,9 @@ public class DaemonProcessor extends AbstractProcessor {
                                 + " - @Daemonize can only be applied to a class or an interface."
                 );
                 return true;
+
             } else {
+
                 messager.printMessage(
                         Diagnostic.Kind.NOTE,
                         "Annotated type found: " + classElement.asType().toString()
@@ -86,9 +91,22 @@ public class DaemonProcessor extends AbstractProcessor {
                 } else {
 
                     if(publicPrototypeMethods.size() == sideQuestMethods.size()) {
+
                         generator = new SideQuestDaemonGenerator(((TypeElement) classElement));
+
                     } else if (publicPrototypeMethods.size() > sideQuestMethods.size()) {
-                        generator = new HybridDaemonGenerator(((TypeElement) classElement));
+
+                        // double threaded daemon
+                        if (classElement.getAnnotation(Daemonize.class).doubleDaemonize()) {
+
+                            generator = new DoubleDaemonGenerator(((TypeElement) classElement));
+
+                        } else {
+
+                            //single threaded daemon
+                            generator = new HybridDaemonGenerator(((TypeElement) classElement));
+                        }
+
                     } else {
                         throw new IllegalStateException(
                                 classElement.toString()

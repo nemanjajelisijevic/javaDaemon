@@ -20,16 +20,12 @@ import javax.lang.model.element.TypeElement;
 
 public class HybridDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
 
-    private MainQuestDaemonGenerator mainGenerator;
-    private SideQuestDaemonGenerator sideGenerator;
+    protected MainQuestDaemonGenerator mainGenerator;
+    protected SideQuestDaemonGenerator sideGenerator;
 
     {
         daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE + ".hybriddaemon";
         daemonEngineSimpleName = "HybridDaemonEngine";
-        daemonInterface = ClassName.get(
-                DAEMON_ENGINE_IMPL_PACKAGE + ".sidequestdaemon",
-                "SideQuestDaemon"
-        );
     }
 
     public HybridDaemonGenerator(TypeElement classElement) {
@@ -40,6 +36,9 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 classElement.getAnnotation(Daemonize.class).returnDaemonInstance()
         );
         this.sideGenerator = new SideQuestDaemonGenerator(classElement);
+
+        if(!mainGenerator.getDedicatedThreadEngines().isEmpty())
+            autoGenerateApiMethods = false;
     }
 
     @Override
@@ -63,24 +62,33 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 daemonEngineSimpleName
         );
 
-        ClassName consumer = ClassName.get(CONSUMER_PACKAGE + "." + platform.getImplementationPackage(), platform.getPlatformConsumer());
-
-        FieldSpec daemonEngine = FieldSpec.builder(
-                daemonEngineClass,
-                DAEMON_ENGINE_STRING
-        ).addModifiers(Modifier.PROTECTED).initializer(
-                "new $N(new $T()).setName(this.getClass().getSimpleName())",
-                daemonEngineSimpleName,
-                consumer
-        ).build();
+        //private fields for main daemon engine
+        FieldSpec daemonEngine = FieldSpec.builder(daemonEngineClass, daemonEngineString)
+                .addModifiers(Modifier.PROTECTED)
+                .build();
 
         daemonClassBuilder.addField(prototype);
         daemonClassBuilder.addField(daemonEngine);
 
         //daemon construct
-        MethodSpec daemonConstructor = MethodSpec.constructorBuilder()
+        MethodSpec.Builder daemonConstructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
+                .addParameter(consumer, "consumer")
                 .addParameter(ClassName.get(classElement.asType()), PROTOTYPE_STRING)
+                .addStatement("this.daemonEngine = new $N(consumer).setName(this.getClass().getSimpleName())", daemonEngineSimpleName);
+
+        //add dedicated daemon engines
+        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
+            daemonClassBuilder.addField(entry.getValue().getSecond());
+            daemonConstructorBuilder.addStatement(
+                    "this." + entry.getValue().getFirst() +
+                            " = new $N(consumer).setName(this.getClass().getSimpleName() + \" - "
+                            + entry.getValue().getFirst() + "\")",
+                    daemonEngineSimpleName
+            );
+        }
+
+        MethodSpec daemonConstructor = daemonConstructorBuilder
                 .addStatement("this.$N = $N", PROTOTYPE_STRING, PROTOTYPE_STRING)
                 .build();
 
@@ -109,10 +117,20 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 continue;
             }
 
-            mainQuestsAndApiMethods.put(
-                    mainGenerator.createMainQuest(method),
-                    mainGenerator.createApiMethod(method)
-            );
+            if (mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
+                mainQuestsAndApiMethods.put(
+                        mainGenerator.createMainQuest(method),
+                        mainGenerator.createApiMethod(
+                                method,
+                                mainGenerator.getDedicatedThreadEngines().get(method).getFirst()
+                        )
+                );
+            } else {
+                mainQuestsAndApiMethods.put(
+                        mainGenerator.createMainQuest(method),
+                        mainGenerator.createApiMethod(method, daemonEngineString)
+                );
+            }
         }
 
         //add side quests
@@ -126,9 +144,30 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         }
 
         //Add API METHODS
-        List<MethodSpec> apiMethods = sideGenerator.generateDaemonApiMethods();
+        List<MethodSpec> daemonApiMethods;
 
-        for(MethodSpec apiMethod : apiMethods) {
+        if (autoGenerateApiMethods) {
+            daemonApiMethods = sideGenerator.generateDaemonApiMethods();
+        } else {
+            daemonApiMethods = new ArrayList<>(9);
+
+            daemonApiMethods.add(generateGetPrototypeDaemonApiMethod());
+            daemonApiMethods.add(generateSetPrototypeDaemonApiMethod());
+            daemonApiMethods.add(generateStartDaemonApiMethod());
+
+
+            daemonApiMethods.add(mainGenerator.generateDedicatedEnginesStopDaemonApiMethod());
+            daemonApiMethods.add(mainGenerator.generateDedicatedEnginesQueueStopDaemonApiMethod());
+
+            daemonApiMethods.add(generateGetStateDaemonApiMethod());
+
+            daemonApiMethods.add(mainGenerator.generateDedicatedEnginesSetNameDaemonApiMethod());
+            daemonApiMethods.add(generateGetNameDaemonApiMethod());
+            daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
+
+        }
+
+        for (MethodSpec apiMethod : daemonApiMethods) {
             daemonClassBuilder.addMethod(apiMethod);
         }
 
