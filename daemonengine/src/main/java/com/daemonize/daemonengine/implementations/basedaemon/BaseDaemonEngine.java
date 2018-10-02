@@ -91,11 +91,13 @@ public abstract class BaseDaemonEngine implements Daemon {
 
   @Override
   public void stop() {
-    state = DaemonState.GONE_DAEMON;
-    if (daemonThread != null
-        && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stopDaemon from daemon thread
-        && daemonThread.isAlive()) {
-      daemonThread.interrupt();
+    if (state != DaemonState.STOPPED) {
+      state = DaemonState.GONE_DAEMON;
+      if (daemonThread != null
+              && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stopDaemon from daemon thread
+              && daemonThread.isAlive()) {
+        daemonThread.interrupt();
+      }
     }
   }
 
