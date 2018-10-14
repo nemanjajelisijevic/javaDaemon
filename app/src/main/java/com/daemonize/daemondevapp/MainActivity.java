@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(renderer);
 
         int rows = 6;
-        int columns = 11;
+        int columns = 9;
 
         int width = 160;
         int height = 160;
@@ -184,6 +184,10 @@ public class MainActivity extends AppCompatActivity {
             listHealthBarImg[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_90.png")), width_hp, height_hp, false));
             listHealthBarImg[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_100.png")), width_hp, height_hp, false));
 
+            Image dialog = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Atomic1.png")), 600, 500, false));
+            Image score = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("SmallBox.png")), 300, 150, false));
+
+
             game = new Game(renderer, rows, columns,50,50, width)
                     .setFieldImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
                     .setFieldImageTower(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), width, height, false)))
@@ -193,7 +197,9 @@ public class MainActivity extends AppCompatActivity {
                     .setExplodeSprite(explosionSprite)
                     .setTowerSprite(towerSprite)
                     .setHealthBarSprite(listHealthBarImg)
-                    .setBorders(borderX, borderY);
+                    .setBorders(borderX, borderY)
+                    .setDialogue(dialog)
+                    .setScoreImage(score);
 
         } catch (IOException ex) {
             Log.e(DaemonUtils.tag(), "Could not init game!", ex);
@@ -204,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN)
-            game.setTower(event.getX(), event.getY());
+            game.onTouch(event.getX(), event.getY());
         return super.onTouchEvent(event);
     }
 

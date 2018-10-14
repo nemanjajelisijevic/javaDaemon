@@ -12,5 +12,6 @@ public interface ImageView {
     <K extends ImageView> K setZindex(int zindex);
     int getZindex();
     boolean isShowing();
+    boolean checkCoordinates(float x, float y);
 
 }

@@ -4,6 +4,7 @@ package com.daemonize.daemondevapp;
 import com.daemonize.daemondevapp.imagemovers.CachedArraySpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
@@ -26,6 +27,8 @@ public class Tower extends CachedArraySpriteImageMover {
     private int size = 0;
 
     private Game.TowerScanClosure scanClosure;
+
+    private DaemonCountingSemaphore scanSemaphore = new DaemonCountingSemaphore();
 
     @CallingThread
     public void setScanClosure(Game.TowerScanClosure scanClosure) {
@@ -77,6 +80,9 @@ public class Tower extends CachedArraySpriteImageMover {
 
     @DedicatedThread
     public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
+
+
+        scanSemaphore.await();
 
         for (EnemyDoubleDaemon enemy : activeEnemies) {
             if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().getFirst()) < range
@@ -177,6 +183,20 @@ public class Tower extends CachedArraySpriteImageMover {
         }
 
         currentAngle = spriteBuffer.getCurrentAngle(); //TODO check if this needs to go before pushSprite() call
+    }
+
+    @CallingThread
+    @Override
+    public void pause() {
+        super.pause();
+        scanSemaphore.subscribe();
+    }
+
+    @CallingThread
+    @Override
+    public void cont() {
+        super.cont();
+        scanSemaphore.unsubscribe();
     }
 
     @SideQuest(SLEEP = 30)

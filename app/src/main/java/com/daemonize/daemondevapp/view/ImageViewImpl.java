@@ -14,6 +14,17 @@ public class ImageViewImpl implements ImageView, Comparable<ImageViewImpl> {
     private float xOffset;
     private float yOffset;
 
+    public ImageViewImpl() {}
+
+//    public ImageViewImpl(int zIndex, boolean showing, float x, float y, float xOffset, float yOffset) {
+//        this.zIndex = zIndex;
+//        this.showing = showing;
+//        this.x = x;
+//        this.y = y;
+//        this.xOffset = xOffset;
+//        this.yOffset = yOffset;
+//    }
+
     public float getxOffset() {
         return xOffset;
     }
@@ -86,6 +97,15 @@ public class ImageViewImpl implements ImageView, Comparable<ImageViewImpl> {
     @Override
     public boolean isShowing() {
         return showing;
+    }
+
+    @Override
+    public boolean checkCoordinates(float x, float y) {
+        if (x >= (getX() - getxOffset()) && x <= (getX() + getxOffset())) {
+            if (y >= (getY() - getyOffset()) && y <= (getY() + getyOffset()))
+                return true;
+        }
+        return false;
     }
 
     @Override

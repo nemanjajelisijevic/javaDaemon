@@ -42,10 +42,16 @@ public class Game {
     private int rows;
     private int columns;
     private ImageView[][] viewMatrix;
+    private GenericNode<ImageView> dialogue;
+    //private ImageView score;
 
     private Image fieldImage;
     private Image fieldImageTower;
     private Image fieldImageTowerDen;
+    private Image dialogueImage;
+    private Image scoreImage;
+
+    private boolean pause;
 
     //towers
     private List<TowerDaemon> towers = new ArrayList<>();
@@ -62,10 +68,12 @@ public class Game {
     private Image [] healthBarSprite;
 
     private DummyDaemon enemyGenerator;
-    private long enemyCounter;
+    private DummyDaemon levelGenerator;
+    private long enemyCounter = 0;
     private float enemyVelocity = 1;
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
+    private long levelGenerateinterval = 5000;
 
     //bullets
     private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
@@ -182,6 +190,16 @@ public class Game {
         return this;
     }
 
+    public Game setDialogue(Image dialogueImage) {
+        this.dialogueImage = dialogueImage;
+        return this;
+    }
+
+    public Game setScoreImage(Image scoreImage) {
+        this.scoreImage = scoreImage;
+        return this;
+    }
+
     public Game(Renderer renderer, int rows, int columns, float x, float y, int fieldWidth) {
         this.renderer = renderer;
         this.rows = rows;
@@ -195,6 +213,28 @@ public class Game {
                 y,
                 fieldWidth
         );
+    }
+
+    private void pauseAll() {
+        pause = true;
+        enemyGenerator.stop();
+        for (EnemyDoubleDaemon enemy : activeEnemies) {
+            enemy.pause();
+        }
+        for (TowerDaemon tower : towers) {
+            tower.pause();
+        }
+    }
+
+    private void contAll() {
+        pause = false;
+        enemyGenerator.start();
+        for (EnemyDoubleDaemon enemy : activeEnemies) {
+            enemy.cont();
+        }
+        for (TowerDaemon tower : towers) {
+            tower.cont();
+        }
     }
 
     public Game run() {
@@ -214,9 +254,29 @@ public class Game {
         return this;
     }
 
+    public Game onTouch(float x, float y) {
+        gameConsumer.consume(()->{
+            if (dialogue.getValue().isShowing()) {
+                if (dialogue.getChildren().get(0).getValue().checkCoordinates(x,y)) {
+                    dialogue.getValue().hide();
+                    dialogue.getChildren().get(0).getValue().hide();
+                    contAll();
+                }
+            } else {
+                setTower(x, y);
+            }
+        });
+        return this;
+    }
+
     {
         //init spell (state)
         chain.addState(()-> {
+
+            dialogue = new GenericNode<>(renderer.createImageView(3), "TEST DIALOGUE");
+            dialogue.addChild(new GenericNode<>(renderer.createImageView(4), "KILL DIALOGUE BUTTON"));
+
+            //score = renderer.createImageView(4);
 
             viewMatrix = new ImageView[rows][columns];
 
@@ -265,11 +325,11 @@ public class Game {
                 ).setName("Bullet no. " + i);
 
                 bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
-                bulletDoubleDaemon.setAnimateSideQuest().setClosure(aReturn -> {
+                bulletDoubleDaemon.setAnimateSideQuest().setClosure(aReturn -> { //by default working on gui consumer,because of that we use  ** some part of code which we want to be executed in game  consumer, not in gui
 
                     ImageMover.PositionedImage posBmp = aReturn.get();
 
-                    gameConsumer.consume(()-> {
+                    gameConsumer.consume(()-> { //**
                                 if (Math.abs(posBmp.positionX) < 20
                                         || Math.abs(posBmp.positionX - borderX) < 20
                                         || Math.abs(posBmp.positionY) < 20
@@ -304,6 +364,10 @@ public class Game {
                         viewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).show();
                     }
                 }
+//                score.setX(borderX - scoreImage.getWidth())
+//                     .setY(100)
+//                     .setImage(scoreImage)
+//                .show();
             });
 
             Field firstField = grid.getField(0, 0);
@@ -315,7 +379,7 @@ public class Game {
                 Log.d(DaemonUtils.tag(), "Enemy queue size: " + enemyQueue.size());
 
                 //every 15 enemies increase the pain!!!!
-                if (enemyCounter % 15 == 0) {
+                if (enemyCounter % 3 == 0) {
 
                     if(enemyVelocity < 6)
                         enemyVelocity += 1;
@@ -326,6 +390,8 @@ public class Game {
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
 
+                    enemyGenerator.setSleepInterval(20000);
+                } else {
                     enemyGenerator.setSleepInterval((int)enemyGenerateinterval);
                 }
 
@@ -391,10 +457,33 @@ public class Game {
             TowerDaemon tow = field.getTower();
             if (tow != null) {
 
+                if (!dialogue.getValue().isShowing()) {
+                    pauseAll();
+                    guiConsumer.consume(() -> {
+                        dialogue.getValue().setImage(dialogueImage)
+                                .setX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() / 2)//TODO fix grid.getGridHeight/Width!!!!!!!!!!!!
+                                .setY(grid.getStartingY() + dialogueImage.getHeight() / 2)
+                                .show();
+                        dialogue.getChildren().get(0).getValue()
+                                .setImage(fieldImageTowerDen)
+                                .setX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() * 7/8)
+                                .setY(grid.getStartingY())
+                                .show();
+
+                    });
+                } else {
+                    contAll();
+                    guiConsumer.consume(() -> GenericNode.forEach(dialogue, ret->{
+                        ret.get().hide();
+                    }));
+                }
+
                 if(towerShootInterval > 200)
                     towerShootInterval -= 50;
 
                 towerScanClosure.setSleepInterval(towerShootInterval);
+                return;
+            } else if (pause) {
                 return;
             }
 

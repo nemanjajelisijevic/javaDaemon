@@ -14,8 +14,16 @@ public class Grid {
     Pair<Integer, Integer> startPoint;
     Pair<Integer, Integer> endPoint;
 
-    float xCoordinateInReal;
-    float yCoordinateInReal;
+    private float xCoordinateInReal;
+    private float yCoordinateInReal;
+
+    public float getStartingX() {
+        return xCoordinateInReal;
+    }
+
+    public float getStartingY() {
+        return yCoordinateInReal;
+    }
 
     Lock gridLock  = new ReentrantLock();
 

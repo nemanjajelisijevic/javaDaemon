@@ -4,6 +4,8 @@ import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.daemondevapp.imagemovers.spriteiterators.SpriteIterator;
 import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 
 
 public class ImageTranslationMover implements ImageMover, SpriteIterator {
@@ -12,6 +14,9 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     protected float initVelocity;
 
     protected volatile Velocity velocity;
+
+    protected static DaemonCountingSemaphore semaphore = new DaemonCountingSemaphore();
+
 
     public Image [] getSprite() {
         return spriteIterator.getSprite();
@@ -118,29 +123,48 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         this.velocity.intensity = velocity;
     }
 
+
+    public void pause(){
+        semaphore.subscribe();
+    }
+
+    public void cont(){
+        semaphore.unsubscribe();
+    }
+
     @Override
     public PositionedImage animate() {
 
-        PositionedImage ret = new PositionedImage();
-        ret.image = iterateSprite();
+        try {
 
-        //check borders and recalculate
-        if (lastX <= 0) {
-            lastX = 0;
-        } else if (lastX >= borderX) {
-            lastX = borderX;
+            semaphore.await();
+
+
+            PositionedImage ret = new PositionedImage();
+            ret.image = iterateSprite();
+
+            //check borders and recalculate
+            if (lastX <= 0) {
+                lastX = 0;
+            } else if (lastX >= borderX) {
+                lastX = borderX;
+            }
+
+            if(lastY <= 0) {
+                lastY = 0;
+            } else if( lastY >= borderY) {
+                lastY = borderY;
+            }
+
+            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
+            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
+
+            return ret;
+
+        } catch (InterruptedException e) {
+                return null;
         }
 
-        if(lastY <= 0) {
-            lastY = 0;
-        } else if( lastY >= borderY) {
-            lastY = borderY;
-        }
-
-        ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
-        ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
-
-        return ret;
     }
 }
 
