@@ -26,6 +26,35 @@ public class AndroidImageView implements ImageView {
         return this;
     }
 
+    @Override
+    public Image getImage() { throw new IllegalStateException("Can not get android Bitmap from ImageView");}
+
+    @Override
+    public float getX() {
+        return view.getX();
+    }
+
+    @Override
+    public float getY() {
+        return view.getY();
+    }
+
+    @Override
+    public float getxOffset() {
+        return 0;
+    }
+
+    @Override
+    public float getyOffset() {
+        return 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AndroidImageView setImageWithoutOffset(Image image) {
+        return setImage(image);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public AndroidImageView setImage(Image image) {
@@ -61,5 +90,10 @@ public class AndroidImageView implements ImageView {
     @Override
     public boolean isShowing() {
         return view.isShown();
+    }
+
+    @Override
+    public int compareTo(ImageView o) {
+        return 0;
     }
 }

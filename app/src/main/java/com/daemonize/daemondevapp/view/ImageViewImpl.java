@@ -2,7 +2,7 @@ package com.daemonize.daemondevapp.view;
 
 import com.daemonize.daemondevapp.images.Image;
 
-public class ImageViewImpl implements ImageView, Comparable<ImageViewImpl> {
+public class ImageViewImpl implements ImageView {
 
     private volatile int zIndex;
     private volatile boolean showing;
@@ -50,21 +50,30 @@ public class ImageViewImpl implements ImageView, Comparable<ImageViewImpl> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public ImageViewImpl setImage(Image image) {
+    public ImageViewImpl setImageWithoutOffset(Image image) {
         this.image = image;
-        this.xOffset = image.getWidth() / 2;
-        this.yOffset = image.getHeight() / 2;
         return this;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public ImageViewImpl setImage(Image image) {
+        this.xOffset = image.getWidth() / 2;
+        this.yOffset = image.getHeight() / 2;
+        return setImageWithoutOffset(image);
+    }
+
+    @Override
     public Image getImage() {
         return image;
     }
 
+    @Override
     public float getX() {
         return x;
     }
 
+    @Override
     public float getY() {
         return y;
     }
@@ -89,7 +98,10 @@ public class ImageViewImpl implements ImageView, Comparable<ImageViewImpl> {
     }
 
     @Override
-    public int compareTo(ImageViewImpl o) {
-        return Integer.compare(this.zIndex, o.zIndex);
+    public int compareTo(ImageView o) {
+        if (o instanceof ImageViewImpl)
+            return Integer.compare(this.zIndex, ((ImageViewImpl) o).zIndex);
+        else
+            return 0;
     }
 }

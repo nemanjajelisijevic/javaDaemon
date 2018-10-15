@@ -40,6 +40,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return hp;
     }
 
+    @CallingThread
     public void setHp(int hp) {
         this.hp = hp;
     }
@@ -85,7 +86,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return super.goTo(x, y, velocityInt);
     }
 
-    @SideQuest(SLEEP = 30)
+    @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() {
         PositionedImage enemyPosBmp = super.animate();
         GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(enemyPosBmp, view));

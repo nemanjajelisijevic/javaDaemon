@@ -179,7 +179,7 @@ public class Tower extends CachedArraySpriteImageMover {
         currentAngle = spriteBuffer.getCurrentAngle(); //TODO check if this needs to go before pushSprite() call
     }
 
-    @SideQuest(SLEEP = 30)
+    @SideQuest(SLEEP = 25)
     @Override
     public PositionedImage animate() {
 
