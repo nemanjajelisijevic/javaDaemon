@@ -312,16 +312,23 @@ public class Game {
             dialogue = new GenericNode<>(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(3)), "TEST DIALOGUE");
             dialogue.addChild(new GenericNode<>(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(4)), "KILL DIALOGUE BUTTON"));
 
-            scoreBackGrView = new ImageViewImpl().hide().setX(0).setY(0).setZindex(3);
+            scoreBackGrView = new ImageViewImpl().setX(0).setY(0).setZindex(3).show();
 
-            scoreTitleView = new ImageViewImpl().hide().setX(0).setY(0).setZindex(4);
+            scoreTitleView = new ImageViewImpl().setX(0).setY(0).setZindex(4).show();
 
             viewsNum = new ImageView[5];
-            viewsNum[0] = new ImageViewImpl().hide().setX(0).setY(0).setZindex(5);
-            viewsNum[1] = new ImageViewImpl().hide().setX(0).setY(0).setZindex(5);
-            viewsNum[2] = new ImageViewImpl().hide().setX(0).setY(0).setZindex(5);
-            viewsNum[3] = new ImageViewImpl().hide().setX(0).setY(0).setZindex(5);
-            viewsNum[4] = new ImageViewImpl().hide().setX(0).setY(0).setZindex(5);
+            viewsNum[0] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
+            viewsNum[1] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
+            viewsNum[2] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
+            viewsNum[3] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
+            viewsNum[4] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
+
+            scene.addImageView(scoreBackGrView);
+            scene.addImageView(scoreTitleView);
+
+            for (ImageView view : viewsNum) {
+                scene.addImageView(view);
+            }
 
 
 

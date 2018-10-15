@@ -16,14 +16,14 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
 
     public ImageViewImpl() {}
 
-//    public ImageViewImpl(int zIndex, boolean showing, float x, float y, float xOffset, float yOffset) {
-//        this.zIndex = zIndex;
-//        this.showing = showing;
-//        this.x = x;
-//        this.y = y;
-//        this.xOffset = xOffset;
-//        this.yOffset = yOffset;
-//    }
+    public ImageViewImpl(int zIndex, boolean showing, float x, float y, float xOffset, float yOffset) {
+        this.zIndex = zIndex;
+        this.showing = showing;
+        this.x = x;
+        this.y = y;
+        this.xOffset = xOffset;
+        this.yOffset = yOffset;
+    }
 
     public float getxOffset() {
         return xOffset;
