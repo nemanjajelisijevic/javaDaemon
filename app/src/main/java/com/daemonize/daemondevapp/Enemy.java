@@ -40,6 +40,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return hp;
     }
 
+    @CallingThread
     public void setHp(int hp) {
         this.hp = hp;
     }
@@ -85,6 +86,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return super.goTo(x, y, velocityInt);
     }
 
+    @SideQuest(SLEEP = 25)
     @CallingThread
     @Override
     public void pause() {

@@ -52,6 +52,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return super.goTo(x, y, velocityInt);
     }
 
+    @SideQuest(SLEEP = 25)
     @CallingThread
     @Override
     public void pause() {

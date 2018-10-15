@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class JavaFXRenderer {//implements Renderer, Runnable {
+public class JavaFXRenderer {//implements Renderer2D, Runnable {
 
 //    private volatile int windowSizeX;
 //    private volatile int windowSizeY;
@@ -108,7 +108,7 @@ public class JavaFXRenderer {//implements Renderer, Runnable {
 //    }
 //
 //    @Override
-//    public ImageView createImageView(int zIndex) {
+//    public ImageView addImageView(int zIndex) {
 //        if (drawing)
 //            throw new IllegalStateException("Can not create views while the engine is drawing!");
 //

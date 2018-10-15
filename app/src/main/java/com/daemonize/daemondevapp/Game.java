@@ -4,10 +4,12 @@ import android.util.Log;
 
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemondevapp.renderer.Renderer2D;
+import com.daemonize.daemondevapp.scene.Scene2D;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
-import com.daemonize.daemondevapp.renderer.Renderer;
 import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemondevapp.view.ImageViewImpl;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
@@ -26,12 +28,19 @@ import java.util.Set;
 public class Game {
 
     //game threads
-    private Renderer renderer;
+    private Renderer2D renderer;
     private DaemonConsumer gameConsumer = new DaemonConsumer("Game Consumer");
     private DaemonConsumer guiConsumer = new DaemonConsumer("Gui Consumer");
 
     //state holder
     private DaemonChainScript chain = new DaemonChainScript();
+
+    //Scene
+    private Scene2D scene;
+
+    //BackgroundImage
+    private Image backgroundImage;
+    private ImageView backgroundView;
 
     //screen borders
     private int borderX;
@@ -41,7 +50,7 @@ public class Game {
     private Grid grid;
     private int rows;
     private int columns;
-    private ImageView[][] viewMatrix;
+    private ImageView[][] gridViewMatrix;
     private GenericNode<ImageView> dialogue;
 
     private int score = 0;
@@ -157,6 +166,11 @@ public class Game {
         return this;
     }
 
+    public Game setBackgroundImage(Image backgroundImage) {
+        this.backgroundImage = backgroundImage;
+        return this;
+    }
+
     public Game setTowerSprite(Image [] towerSprite) {
         this.towerSprite = towerSprite;
         return this;
@@ -219,8 +233,9 @@ public class Game {
         return this;
     }
 
-    public Game(Renderer renderer, int rows, int columns, float x, float y, int fieldWidth) {
+    public Game(Renderer2D renderer, int rows, int columns, float x, float y, int fieldWidth) {
         this.renderer = renderer;
+        this.scene = new Scene2D();
         this.rows = rows;
         this.columns = columns;
         this.grid = new Grid(
@@ -312,7 +327,7 @@ public class Game {
 
             for(int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i) {
-                    viewMatrix[j][i] = renderer.createImageView(1);
+                    gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(1));
                 }
             }
 
@@ -328,8 +343,8 @@ public class Game {
                                 enemyHp,
                                 Pair.create((float) 0, (float) 0),
                                 Pair.create(firstField.getCenterX(), firstField.getCenterY())
-                        ).setView(renderer.createImageView(2))
-                                .setHpView(renderer.createImageView(2))
+                        ).setView(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(2)))
+                                .setHpView(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(2)))
                                 .setHealthBarImage(healthBarSprite)
                 ).setName("Enemy no. " + i);
 
@@ -351,7 +366,7 @@ public class Game {
                                 Pair.create((float) 0, (float) 0),
                                 Pair.create((float) 0, (float) 0),
                                 2
-                        ).setView(renderer.createImageView(0))
+                        ).setView(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(0)))
                 ).setName("Bullet no. " + i);
 
                 bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
@@ -380,7 +395,8 @@ public class Game {
                 bulletQueue.add(bulletDoubleDaemon);
             }
 
-            renderer.start();
+            scene.lockViews();
+            renderer.setScene(scene).start();
 
             chain.next();
 
@@ -389,9 +405,9 @@ public class Game {
             guiConsumer.consume(()->{
                 for(int j = 0; j < rows; ++j ) {
                     for (int i = 0; i < columns; ++i) {
-                        viewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX());
-                        viewMatrix[j][i].setY(grid.getGrid()[j][i].getCenterY());
-                        viewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).show();
+                        gridViewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX());
+                        gridViewMatrix[j][i].setY(grid.getGrid()[j][i].getCenterY());
+                        gridViewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).show();
                     }
                 }
 
@@ -526,7 +542,7 @@ public class Game {
                     field.getColumn()
             ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : towerSprite[0];
 
-            guiConsumer.consume(()-> viewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
+            guiConsumer.consume(()-> gridViewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
 
             if (b) {
 
@@ -545,13 +561,13 @@ public class Game {
                         )
                 ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
 
-                towerDaemon.setView(viewMatrix[field.getRow()][field.getColumn()]);
+                towerDaemon.setView(gridViewMatrix[field.getRow()][field.getColumn()]);
 
                 towers.add(towerDaemon);
 
                 field.setTower(towerDaemon);
 
-                towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(viewMatrix[field.getRow()][field.getColumn()]));
+                towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(gridViewMatrix[field.getRow()][field.getColumn()]));
 
                 towerDaemon.start();
 

@@ -199,7 +199,7 @@ public class Tower extends CachedArraySpriteImageMover {
         scanSemaphore.unsubscribe();
     }
 
-    @SideQuest(SLEEP = 30)
+    @SideQuest(SLEEP = 25)
     @Override
     public PositionedImage animate() {
 

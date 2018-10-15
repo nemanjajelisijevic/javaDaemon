@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         //renderer init
         AndroidSurfaceViewRenderer renderer = new AndroidSurfaceViewRenderer(this);
-        renderer.setWindowSize(borderX, borderY);
+        //renderer.setWindowSize(borderX, borderY);
         setContentView(renderer);
 
         int rows = 6;
@@ -56,10 +56,6 @@ public class MainActivity extends AppCompatActivity {
         int height = 160;
 
         try {
-
-            //background
-            Bitmap backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false);
-            renderer.setBackgroundImage(new AndroidBitmapImage(backgroundImg));
 
             //init enemy sprite
             Image [] sprite = new Image[12];
@@ -206,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             game = new Game(renderer, rows, columns,50,50, width)
+                    .setBackgroundImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false)))
                     .setFieldImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
                     .setFieldImageTower(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), width, height, false)))
                     .setFieldImageTowerDen(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), width, height, false)))
