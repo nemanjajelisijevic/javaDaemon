@@ -16,7 +16,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
     private ImageView view;
     private ImageView hpView;
-    private  int hpMax;
+    private int hpMax;
     private volatile int hp = 30;
     private volatile boolean shootable = true;
     private Image[] spriteHealthBarImage;
@@ -87,7 +87,6 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return super.goTo(x, y, velocityInt);
     }
 
-    @SideQuest(SLEEP = 25)
     @CallingThread
     @Override
     public void pause() {
