@@ -43,13 +43,22 @@ public class Game {
     private int columns;
     private ImageView[][] viewMatrix;
     private GenericNode<ImageView> dialogue;
-    //private ImageView score;
+
+    private int score = 0;
+
+    private ImageView scoreBackGrView;
+    private ImageView scoreTitleView;
+
+    ImageView [] viewsNum;
+    private InfoTable infoScore;
 
     private Image fieldImage;
     private Image fieldImageTower;
     private Image fieldImageTowerDen;
     private Image dialogueImage;
-    private Image scoreImage;
+    private Image scoreBackGrImage;
+    private Image scoreTitle;
+    private Image [] scorenumbersImages;
 
     private boolean pause;
 
@@ -195,8 +204,18 @@ public class Game {
         return this;
     }
 
-    public Game setScoreImage(Image scoreImage) {
-        this.scoreImage = scoreImage;
+    public Game setScoreBackGrImage(Image scoreBackGrImage) {
+        this.scoreBackGrImage = scoreBackGrImage;
+        return this;
+    }
+
+    public Game setScoreTitle(Image scoreTitle) {
+        this.scoreTitle = scoreTitle;
+        return this;
+    }
+
+    public Game setScorenumbersImages(Image[] scorenumbersImages) {
+        this.scorenumbersImages = scorenumbersImages;
         return this;
     }
 
@@ -276,7 +295,18 @@ public class Game {
             dialogue = new GenericNode<>(renderer.createImageView(3), "TEST DIALOGUE");
             dialogue.addChild(new GenericNode<>(renderer.createImageView(4), "KILL DIALOGUE BUTTON"));
 
-            //score = renderer.createImageView(4);
+            scoreBackGrView = renderer.createImageView(3);
+
+            scoreTitleView = renderer.createImageView(4);
+
+            viewsNum = new ImageView[5];
+            viewsNum[0] = renderer.createImageView(5);
+            viewsNum[1] = renderer.createImageView(5);
+            viewsNum[2] = renderer.createImageView(5);
+            viewsNum[3] = renderer.createImageView(5);
+            viewsNum[4] = renderer.createImageView(5);
+
+
 
             viewMatrix = new ImageView[rows][columns];
 
@@ -364,10 +394,11 @@ public class Game {
                         viewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).show();
                     }
                 }
-//                score.setX(borderX - scoreImage.getWidth())
-//                     .setY(100)
-//                     .setImage(scoreImage)
-//                .show();
+
+                scoreTitleView.setImage(scoreTitle);
+                scoreBackGrView.setImage(scoreBackGrImage);
+                infoScore = new InfoTable(borderX - scoreBackGrImage.getWidth(),150,scoreBackGrView,scoreTitleView,viewsNum,scorenumbersImages).setNumbers(97513);
+
             });
 
             Field firstField = grid.getField(0, 0);
@@ -420,6 +451,7 @@ public class Game {
                                 else if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     enemy.setShootable(false);
                                     guiConsumer.consume(()-> enemy.getHpView().hide());
+                                    guiConsumer.consume(()-> infoScore.setNumbers(++score));
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                                         enemy.stop();
                                         guiConsumer.consume(() -> enemy.getView().hide());
