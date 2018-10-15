@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(renderer);
 
         int rows = 6;
-        int columns = 9;
+        int columns = 8;
 
         int width = 160;
         int height = 160;

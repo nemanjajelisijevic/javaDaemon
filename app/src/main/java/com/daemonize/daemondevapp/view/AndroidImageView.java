@@ -96,4 +96,9 @@ public class AndroidImageView implements ImageView {
     public int compareTo(ImageView o) {
         return 0;
     }
+
+    @Override
+    public boolean checkCoordinates(float x, float y) {
+        return false;
+    }
 }

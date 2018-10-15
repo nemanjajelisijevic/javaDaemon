@@ -2,7 +2,7 @@ package com.daemonize.daemondevapp.view;
 
 import com.daemonize.daemondevapp.images.Image;
 
-public class ImageViewImpl implements ImageView, Comparable<ImageViewImpl> {
+public class ImageViewImpl implements ImageView, Comparable<ImageView> {
 
     private volatile int zIndex;
     private volatile boolean showing;
