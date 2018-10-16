@@ -26,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout layout;
     private Game game;
 
+    private int getPercentageValue(int percent, int hundredPercentValue) {
+        return (hundredPercentValue * percent) / 100;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 

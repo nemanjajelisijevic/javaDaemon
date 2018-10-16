@@ -30,7 +30,7 @@ public class Game {
     //game threads
     private Renderer2D renderer;
     private DaemonConsumer gameConsumer = new DaemonConsumer("Game Consumer");
-    private DaemonConsumer guiConsumer = new DaemonConsumer("Gui Consumer");
+    private DaemonConsumer drawConsumer = new DaemonConsumer("Draw Consumer");
 
     //state holder
     private DaemonChainScript chain = new DaemonChainScript();
@@ -118,7 +118,7 @@ public class Game {
     private class EnemyAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
-            GenericNode.forEach(aReturn.get(), actionret -> {
+            GenericNode.forEach(aReturn.uncheckAndGet(), actionret -> {
                 Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.get();
                 imageAndView.getSecond().setX(imageAndView.getFirst().positionX);
                 imageAndView.getSecond().setY(imageAndView.getFirst().positionY);
@@ -272,7 +272,7 @@ public class Game {
     }
 
     public Game run() {
-        guiConsumer.start();
+        drawConsumer.start();
         gameConsumer.start();
         chain.run();
         return this;
@@ -282,7 +282,7 @@ public class Game {
         enemyGenerator.stop();
         for(EnemyDoubleDaemon enemy : activeEnemies) enemy.stop();
         for (TowerDaemon tower : towers) tower.stop();
-        guiConsumer.stop();
+        drawConsumer.stop();
         gameConsumer.stop();
         renderer.stop();
         return this;
@@ -345,7 +345,7 @@ public class Game {
             for (int i = 0; i < 200; ++i) {
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                         gameConsumer,
-                        guiConsumer,
+                        drawConsumer,
                         new Enemy(
                                 enemySprite,
                                 enemyVelocity,
@@ -368,7 +368,7 @@ public class Game {
             for (int i = 0; i < 200; ++i) {
                 BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
                         gameConsumer,
-                        guiConsumer,
+                        drawConsumer,
                         new Bullet(
                                 bulletSprite,
                                 0,
@@ -389,7 +389,7 @@ public class Game {
                                         || Math.abs(posBmp.positionY) < 20
                                         || Math.abs(posBmp.positionY - borderY) < 20) {
                                     bulletDoubleDaemon.stop();
-                                    guiConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
+                                    drawConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
                                     if (!bulletQueue.contains(bulletDoubleDaemon))
                                         bulletQueue.add(bulletDoubleDaemon);
                                 }
@@ -411,7 +411,7 @@ public class Game {
 
         }).addState(()->{//gameState
 
-            guiConsumer.consume(()->{
+            drawConsumer.consume(()->{
                 for(int j = 0; j < rows; ++j ) {
                     for (int i = 0; i < columns; ++i) {
                         gridViewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX());
@@ -422,7 +422,7 @@ public class Game {
 
                 scoreTitleView.setImage(scoreTitle);
                 scoreBackGrView.setImage(scoreBackGrImage);
-                infoScore = new InfoTable(borderX - scoreBackGrImage.getWidth(),150,scoreBackGrView,scoreTitleView,viewsNum,scorenumbersImages).setNumbers(97513);
+                infoScore = new InfoTable(borderX - scoreBackGrImage.getWidth(), 150,scoreBackGrView,scoreTitleView,viewsNum,scorenumbersImages).setNumbers(97513);
 
             });
 
@@ -457,8 +457,8 @@ public class Game {
                 enemy.setHp(enemyHp);
                 enemy.getPrototype().setVelocity(enemyVelocity);
 
-                guiConsumer.consume(()->enemy.getView().show());
-                guiConsumer.consume(()->enemy.getHpView().show());
+                drawConsumer.consume(()->enemy.getView().show());
+                drawConsumer.consume(()->enemy.getHpView().show());
                 activeEnemies.add(enemy);
                 enemy.setShootable(true);
                 enemy.start();
@@ -475,11 +475,11 @@ public class Game {
                                 if (current == null) return;
                                 else if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     enemy.setShootable(false);
-                                    guiConsumer.consume(()-> enemy.getHpView().hide());
-                                    guiConsumer.consume(()-> infoScore.setNumbers(++score));
+                                    drawConsumer.consume(()-> enemy.getHpView().hide());
+                                    drawConsumer.consume(()-> infoScore.setNumbers(++score));
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                                         enemy.stop();
-                                        guiConsumer.consume(() -> enemy.getView().hide());
+                                        drawConsumer.consume(() -> enemy.getView().hide());
                                         activeEnemies.remove(enemy);
                                         if (!enemyQueue.contains(enemy))
                                             enemyQueue.add(enemy);
@@ -516,23 +516,21 @@ public class Game {
 
                 if (!dialogue.getValue().isShowing()) {
                     pauseAll();
-                    guiConsumer.consume(() -> {
+                    drawConsumer.consume(() -> {
                         dialogue.getValue().setImage(dialogueImage)
                                 .setX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() / 2)//TODO fix grid.getGridHeight/Width!!!!!!!!!!!!
-                                .setY(grid.getStartingY() + dialogueImage.getHeight() / 2)
+                                .setY(grid.getStartingY() + scoreBackGrImage.getHeight()  + dialogueImage.getHeight() / 2)
                                 .show();
                         dialogue.getChildren().get(0).getValue()
                                 .setImage(fieldImageTowerDen)
                                 .setX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() * 7/8)
-                                .setY(grid.getStartingY())
+                                .setY(grid.getStartingY() + scoreBackGrImage.getHeight())
                                 .show();
 
                     });
                 } else {
                     contAll();
-                    guiConsumer.consume(() -> GenericNode.forEach(dialogue, ret->{
-                        ret.get().hide();
-                    }));
+                    drawConsumer.consume(() -> GenericNode.forEach(dialogue, ret->ret.get().hide()));
                 }
 
                 if(towerShootInterval > 200)
@@ -551,7 +549,7 @@ public class Game {
                     field.getColumn()
             ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : towerSprite[0];
 
-            guiConsumer.consume(()-> gridViewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
+            drawConsumer.consume(()-> gridViewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
 
             if (b) {
 
@@ -560,7 +558,7 @@ public class Game {
 
                 TowerDaemon towerDaemon = new TowerDaemon(
                         gameConsumer,
-                        guiConsumer,
+                        drawConsumer,
                         new Tower(
                                 initTowerSprite,
                                 towerSprite,
@@ -600,7 +598,7 @@ public class Game {
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
-        guiConsumer.consume(()->bulletDoubleDaemon.getView().show());
+        drawConsumer.consume(()->bulletDoubleDaemon.getView().show());
         bulletDoubleDaemon.setStartingCoords(sourceCoord);
         bulletDoubleDaemon.start();
 
@@ -611,9 +609,9 @@ public class Game {
                 enemy.setHp(enemyHp - bulletDoubleDaemon.getPrototype().getDamage());
             } else {
                 enemy.setShootable(false);
-                guiConsumer.consume(()->enemy.getHpView().hide());
+                drawConsumer.consume(()->enemy.getHpView().hide());
                 enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
-                    guiConsumer.consume(() -> enemy.getView().hide());
+                    drawConsumer.consume(() -> enemy.getView().hide());
                     enemy.stop();
                     activeEnemies.remove(enemy);
                     if (!enemyQueue.contains(enemy))
@@ -622,7 +620,7 @@ public class Game {
             }
 
             bulletDoubleDaemon.stop();
-            guiConsumer.consume(()->bulletDoubleDaemon.getView().hide());
+            drawConsumer.consume(()->bulletDoubleDaemon.getView().hide());
 
             if(!bulletQueue.contains(bulletDoubleDaemon))
                 bulletQueue.add(bulletDoubleDaemon);
