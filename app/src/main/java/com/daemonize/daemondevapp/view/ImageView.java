@@ -1,14 +1,15 @@
 package com.daemonize.daemondevapp.view;
 
+import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
 public interface ImageView extends Comparable<ImageView> {
 
-    <K extends ImageView> K setX(float x);
-    <K extends ImageView> K setY(float y);
+    <K extends ImageView> K setAbsoluteX(float absoluteX);
+    <K extends ImageView> K setAbsoluteY(float absoluteY);
 
-    float getX();
-    float getY();
+    float getAbsoluteX();
+    float getAbsoluteY();
 
     float getxOffset();
     float getyOffset();
@@ -28,4 +29,7 @@ public interface ImageView extends Comparable<ImageView> {
 
     @Override
     int compareTo(ImageView o);
+
+    void addChild(ImageView child);
+    void addChild(ImageView child, Pair<Integer, Integer> coordinates);
 }

@@ -3,6 +3,7 @@ package com.daemonize.daemondevapp.scene;
 import com.daemonize.daemondevapp.view.ImageView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Scene2D {
@@ -11,6 +12,7 @@ public class Scene2D {
     private volatile boolean locked = false;
 
     public Scene2D lockViews() {
+        Collections.sort(views);
         this.locked = true;
         return this;
     }

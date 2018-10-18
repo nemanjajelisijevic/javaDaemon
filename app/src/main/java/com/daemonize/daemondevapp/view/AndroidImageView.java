@@ -3,6 +3,7 @@ package com.daemonize.daemondevapp.view;
 import android.graphics.Bitmap;
 import android.view.View;
 
+import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
 public class AndroidImageView implements ImageView {
@@ -14,15 +15,15 @@ public class AndroidImageView implements ImageView {
 
     @SuppressWarnings("unchecked")
     @Override
-    public AndroidImageView setX(float x) {
-        view.setX(x);
+    public AndroidImageView setAbsoluteX(float absoluteX) {
+        view.setX(absoluteX);
         return this;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public AndroidImageView setY(float y) {
-        view.setY(y);
+    public AndroidImageView setAbsoluteY(float absoluteY) {
+        view.setY(absoluteY);
         return this;
     }
 
@@ -30,12 +31,12 @@ public class AndroidImageView implements ImageView {
     public Image getImage() { throw new IllegalStateException("Can not get android Bitmap from ImageView");}
 
     @Override
-    public float getX() {
+    public float getAbsoluteX() {
         return view.getX();
     }
 
     @Override
-    public float getY() {
+    public float getAbsoluteY() {
         return view.getY();
     }
 
@@ -100,5 +101,15 @@ public class AndroidImageView implements ImageView {
     @Override
     public boolean checkCoordinates(float x, float y) {
         return false;
+    }
+
+    @Override
+    public void addChild(ImageView child) {
+        throw new IllegalStateException("Cannot add child to this type of ImageView");
+    }
+
+    @Override
+    public void addChild(ImageView child, Pair<Integer, Integer> coordinates) {
+        throw new IllegalStateException("Cannot add child to this type of ImageView");
     }
 }

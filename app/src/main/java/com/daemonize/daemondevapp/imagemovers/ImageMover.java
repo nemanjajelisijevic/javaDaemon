@@ -3,12 +3,12 @@ package com.daemonize.daemondevapp.imagemovers;
 
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.SideQuest;
+//import com.daemonize.daemonprocessor.annotations.CallingThread;
+//import com.daemonize.daemonprocessor.annotations.Daemonize;
+//import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 
-@Daemonize(returnDaemonInstance = true)
+//@Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
 
     class Velocity {
@@ -44,10 +44,10 @@ public interface ImageMover {
         }
     }
 
-    @CallingThread
+    //@CallingThread
     Pair<Float, Float> getLastCoordinates();
 
-    @CallingThread
+    //@CallingThread
     Velocity getVelocity();
 
     PositionedImage setLastCoordinates(float lastX, float lastY);
@@ -60,10 +60,10 @@ public interface ImageMover {
 
     void setVelocity(float velocity);
 
-    @CallingThread
+    //@CallingThread
     <K extends ImageMover> K setBorders(float x, float y);
 
-    @SideQuest(SLEEP = 25)
+    //@SideQuest(SLEEP = 25)
     PositionedImage animate();
 
 }

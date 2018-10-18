@@ -1,5 +1,6 @@
 package com.daemonize.daemondevapp.view;
 
+import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
 public class ImageViewImpl implements ImageView, Comparable<ImageView> {
@@ -8,19 +9,26 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     private volatile boolean showing;
 
     private volatile Image image;
-    private volatile float x;
-    private volatile float y;
+    private volatile float absoluteX;
+    private volatile float absoluteY;
 
     private float xOffset;
     private float yOffset;
 
     public ImageViewImpl() {}
 
-    public ImageViewImpl(int zIndex, boolean showing, float x, float y, float xOffset, float yOffset) {
+    public ImageViewImpl(
+            int zIndex,
+            boolean showing,
+            float absoluteX,
+            float absoluteY,
+            float xOffset,
+            float yOffset
+    ) {
         this.zIndex = zIndex;
         this.showing = showing;
-        this.x = x;
-        this.y = y;
+        this.absoluteX = absoluteX;
+        this.absoluteY = absoluteY;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
     }
@@ -47,15 +55,15 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public ImageViewImpl setX(float x) {
-        this.x = x;
+    public ImageViewImpl setAbsoluteX(float absoluteX) {
+        this.absoluteX = absoluteX;
         return this;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public ImageViewImpl setY(float y) {
-        this.y = y;
+    public ImageViewImpl setAbsoluteY(float absoluteY) {
+        this.absoluteY = absoluteY;
         return this;
     }
 
@@ -80,13 +88,13 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     }
 
     @Override
-    public float getX() {
-        return x;
+    public float getAbsoluteX() {
+        return absoluteX;
     }
 
     @Override
-    public float getY() {
-        return y;
+    public float getAbsoluteY() {
+        return absoluteY;
     }
 
     @SuppressWarnings("unchecked")
@@ -110,8 +118,8 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
 
     @Override
     public boolean checkCoordinates(float x, float y) {
-        if (x >= (getX() - getxOffset()) && x <= (getX() + getxOffset())) {
-            if (y >= (getY() - getyOffset()) && y <= (getY() + getyOffset()))
+        if (x >= (getAbsoluteX() - getxOffset()) && x <= (getAbsoluteX() + getxOffset())) {
+            if (y >= (getAbsoluteY() - getyOffset()) && y <= (getAbsoluteY() + getyOffset()))
                 return true;
         }
         return false;
@@ -123,5 +131,15 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
             return Integer.compare(this.zIndex, ((ImageViewImpl) o).zIndex);
         else
             return 0;
+    }
+
+    @Override
+    public void addChild(ImageView child) {
+        throw new IllegalStateException("Cannot add child to this type of ImageView");
+    }
+
+    @Override
+    public void addChild(ImageView child, Pair<Integer, Integer> coordinates) {//
+        throw new IllegalStateException("Cannot add child to this type of ImageView");
     }
 }

@@ -2,13 +2,13 @@ package com.daemonize.daemondevapp.imagemovers;
 
 
 import com.daemonize.daemondevapp.Pair;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.SideQuest;
+//import com.daemonize.daemonprocessor.annotations.CallingThread;
+//import com.daemonize.daemonprocessor.annotations.Daemonize;
+//import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.List;
 
-@Daemonize(returnDaemonInstance = true)
+//@Daemonize(returnDaemonInstance = true)
 public interface MassiveImageMover {
 
 
@@ -18,13 +18,13 @@ public interface MassiveImageMover {
 
     void breakFormation(float velocityInt);
 
-    @CallingThread
+    //@CallingThread
     List<Pair<Float, Float>> getLastCoordinates();
 
-    @CallingThread
+    //@CallingThread
     List<ImageMover.Velocity> getVelocities();
 
-    @SideQuest(SLEEP = 25)
+    //@SideQuest(SLEEP = 25)
     List<ImageMover.PositionedImage> move();
 
 }

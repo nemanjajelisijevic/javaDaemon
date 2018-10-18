@@ -10,8 +10,6 @@ import android.view.SurfaceView;
 import com.daemonize.daemondevapp.scene.Scene2D;
 import com.daemonize.daemondevapp.view.ImageView;
 
-import java.util.Collections;
-
 public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D, Runnable, SurfaceHolder.Callback {
 
     private Scene2D scene;
@@ -89,7 +87,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
 
     @Override
     public void run() {
-        Collections.sort(scene.getViews());
+        //Collections.sort(scene.getViews());
         while (drawing){
 //            long t0 = System.nanoTime();
             drawViews();
@@ -117,8 +115,8 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
                 if (view.isShowing() && view.getImage() != null)//TODO this should never be null
                     canvas.drawBitmap(
                             ((Bitmap) view.getImage().getImageImp()),
-                            view.getX() - view.getxOffset(),
-                            view.getY() - view.getyOffset(),
+                            view.getAbsoluteX() - view.getxOffset(),
+                            view.getAbsoluteY() - view.getyOffset(),
                             paint);
             }
 

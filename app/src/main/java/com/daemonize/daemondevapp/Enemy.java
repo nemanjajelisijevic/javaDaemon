@@ -8,8 +8,6 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
-import java.util.List;
-
 
 @Daemonize(doubleDaemonize = true, className = "EnemyDoubleDaemon")
 public class Enemy extends CoordinatedImageTranslationMover {

@@ -112,7 +112,7 @@ public class JavaFXRenderer {//implements Renderer2D, Runnable {
 //        if (drawing)
 //            throw new IllegalStateException("Can not create views while the engine is drawing!");
 //
-//        ImageViewImpl view = new ImageViewImpl().hide().setX(0).setY(0).setZindex(zIndex);
+//        ImageViewImpl view = new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(zIndex);
 //        views.add(view);
 //
 //        return view;
@@ -152,8 +152,8 @@ public class JavaFXRenderer {//implements Renderer2D, Runnable {
 //            //Drawing the player
 //            if (view.isShowing() && view.getImage() != null)//TODO this should never be null
 //                gc.drawImage((javafx.scene.image.Image) view.getImage().getImageImp(),
-//                        view.getX() - view.getxOffset(),
-//                        view.getY() - view.getyOffset());
+//                        view.getAbsoluteX() - view.getxOffset(),
+//                        view.getAbsoluteY() - view.getyOffset());
 //        }
 //
 //    }

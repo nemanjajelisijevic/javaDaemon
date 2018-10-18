@@ -5,12 +5,12 @@ import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 
 public class InfoTable {
-    int x,y;
+    private int x,y;
 
-    ImageView backGroundImage;
-    ImageView title;
-    ImageView [] numbersView;
-    Image [] numberImages;
+    private ImageView backGroundImage;
+    private ImageView title;
+    private ImageView [] numbersView;
+    private Image [] numberImages;
 
     public InfoTable(int x, int y, ImageView backGroundImage, ImageView title, ImageView[] numbers, Image[] images) {
         this.x = x;
@@ -20,11 +20,11 @@ public class InfoTable {
         this.numbersView = numbers;
         this.numberImages = images;
 
-        backGroundImage.setX(x).setY(y).show();
-        title.setX(x).setY(y/2).show();
+        backGroundImage.setAbsoluteX(x).setAbsoluteY(y).show();
+        title.setAbsoluteX(x).setAbsoluteY(y/2).show();
 
         for (int i=0;i<numbersView.length;i++){
-            numbersView[i].setY(y).setX(x+((-2+i)*images[0].getWidth())).setImage(images[i]).show();
+            numbersView[i].setAbsoluteY(y).setAbsoluteX(x+((-2+i)*images[0].getWidth())).setImage(images[i]).show();
         }
     }
 

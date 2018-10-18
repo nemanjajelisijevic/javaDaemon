@@ -109,8 +109,8 @@ public class Game {
         @Override
         public void onReturn(Return<ImageMover.PositionedImage> aReturn) {
             ImageMover.PositionedImage posBmp = aReturn.uncheckAndGet();
-            view.setX(posBmp.positionX);
-            view.setY(posBmp.positionY);
+            view.setAbsoluteX(posBmp.positionX);
+            view.setAbsoluteY(posBmp.positionY);
             view.setImage(posBmp.image);
         }
     }
@@ -120,8 +120,8 @@ public class Game {
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
             GenericNode.forEach(aReturn.uncheckAndGet(), actionret -> {
                 Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.get();
-                imageAndView.getSecond().setX(imageAndView.getFirst().positionX);
-                imageAndView.getSecond().setY(imageAndView.getFirst().positionY);
+                imageAndView.getSecond().setAbsoluteX(imageAndView.getFirst().positionX);
+                imageAndView.getSecond().setAbsoluteY(imageAndView.getFirst().positionY);
                 imageAndView.getSecond().setImage(imageAndView.getFirst().image);
             });
         }
@@ -307,21 +307,21 @@ public class Game {
         //init spell (state)
         chain.addState(()-> {
 
-            scene.addImageView(new ImageViewImpl().setImageWithoutOffset(backgroundImage).setX(0).setY(0).setZindex(0).show());
+            scene.addImageView(new ImageViewImpl().setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
 
-            dialogue = new GenericNode<>(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(3)), "TEST DIALOGUE");
-            dialogue.addChild(new GenericNode<>(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(4)), "KILL DIALOGUE BUTTON"));
+            dialogue = new GenericNode<>(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)), "TEST DIALOGUE");
+            dialogue.addChild(new GenericNode<>(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(4)), "KILL DIALOGUE BUTTON"));
 
-            scoreBackGrView = new ImageViewImpl().setX(0).setY(0).setZindex(3).show();
+            scoreBackGrView = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(3).show();
 
-            scoreTitleView = new ImageViewImpl().setX(0).setY(0).setZindex(4).show();
+            scoreTitleView = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(4).show();
 
             viewsNum = new ImageView[5];
-            viewsNum[0] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
-            viewsNum[1] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
-            viewsNum[2] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
-            viewsNum[3] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
-            viewsNum[4] = new ImageViewImpl().setX(0).setY(0).setZindex(5).show();
+            viewsNum[0] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[1] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[2] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[3] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
             scene.addImageView(scoreBackGrView);
             scene.addImageView(scoreTitleView);
@@ -336,7 +336,7 @@ public class Game {
 
             for(int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i) {
-                    gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(1));
+                    gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1));
                 }
             }
 
@@ -352,8 +352,8 @@ public class Game {
                                 enemyHp,
                                 Pair.create((float) 0, (float) 0),
                                 Pair.create(firstField.getCenterX(), firstField.getCenterY())
-                        ).setView(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(2)))
-                                .setHpView(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(2)))
+                        ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(2)))
+                                .setHpView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(2)))
                                 .setHealthBarImage(healthBarSprite)
                 ).setName("Enemy no. " + i);
 
@@ -375,7 +375,7 @@ public class Game {
                                 Pair.create((float) 0, (float) 0),
                                 Pair.create((float) 0, (float) 0),
                                 2
-                        ).setView(scene.addImageView(new ImageViewImpl().hide().setX(0).setY(0).setZindex(0)))
+                        ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                 ).setName("Bullet no. " + i);
 
                 bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
@@ -395,8 +395,8 @@ public class Game {
                                 }
                     });
 
-                    bulletDoubleDaemon.getView().setX(posBmp.positionX);
-                    bulletDoubleDaemon.getView().setY(posBmp.positionY);
+                    bulletDoubleDaemon.getView().setAbsoluteX(posBmp.positionX);
+                    bulletDoubleDaemon.getView().setAbsoluteY(posBmp.positionY);
                     bulletDoubleDaemon.getView().setImage(posBmp.image);
 
                 });
@@ -414,8 +414,8 @@ public class Game {
             drawConsumer.consume(()->{
                 for(int j = 0; j < rows; ++j ) {
                     for (int i = 0; i < columns; ++i) {
-                        gridViewMatrix[j][i].setX(grid.getGrid()[j][i].getCenterX());
-                        gridViewMatrix[j][i].setY(grid.getGrid()[j][i].getCenterY());
+                        gridViewMatrix[j][i].setAbsoluteX(grid.getGrid()[j][i].getCenterX());
+                        gridViewMatrix[j][i].setAbsoluteY(grid.getGrid()[j][i].getCenterY());
                         gridViewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).show();
                     }
                 }
@@ -518,13 +518,13 @@ public class Game {
                     pauseAll();
                     drawConsumer.consume(() -> {
                         dialogue.getValue().setImage(dialogueImage)
-                                .setX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() / 2)//TODO fix grid.getGridHeight/Width!!!!!!!!!!!!
-                                .setY(grid.getStartingY() + scoreBackGrImage.getHeight()  + dialogueImage.getHeight() / 2)
+                                .setAbsoluteX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() / 2)//TODO fix grid.getGridHeight/Width!!!!!!!!!!!!
+                                .setAbsoluteY(grid.getStartingY() + scoreBackGrImage.getHeight()  + dialogueImage.getHeight() / 2)
                                 .show();
                         dialogue.getChildren().get(0).getValue()
                                 .setImage(fieldImageTowerDen)
-                                .setX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() * 7/8)
-                                .setY(grid.getStartingY() + scoreBackGrImage.getHeight())
+                                .setAbsoluteX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() * 7/8)
+                                .setAbsoluteY(grid.getStartingY() + scoreBackGrImage.getHeight())
                                 .show();
 
                     });
