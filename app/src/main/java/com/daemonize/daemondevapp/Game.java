@@ -284,6 +284,7 @@ public class Game {
         for (TowerDaemon tower : towers) tower.stop();
         drawConsumer.stop();
         gameConsumer.stop();
+        scene.unlockViews();
         renderer.stop();
         return this;
     }
