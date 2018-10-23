@@ -9,6 +9,10 @@ import android.view.SurfaceView;
 
 import com.daemonize.daemondevapp.scene.Scene2D;
 import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonengine.utils.TimeUnits;
+
+import java.util.Collections;
 
 public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D, Runnable, SurfaceHolder.Callback {
 
@@ -87,19 +91,17 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
 
     @Override
     public void run() {
-        //Collections.sort(scene.getViews());
         while (drawing){
-//            long t0 = System.nanoTime();
+            long t0 = System.nanoTime();
             drawViews();
-//            double duration = DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS);
-//            System.out.println("DRAW LASTED: " + Double.toString(duration));
-//            if (duration < 15) {
-//                try {
-//                    Thread.sleep(16 - (long) duration);
-//                } catch (InterruptedException e) {
-//                    //
-//                }
-//            }
+            double duration = DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS);
+            if (duration < 15) {
+                try {
+                    Thread.sleep(16 - (long) duration);
+                } catch (InterruptedException e) {
+                    //
+                }
+            }
         }
     }
 
