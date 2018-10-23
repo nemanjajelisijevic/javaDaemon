@@ -8,6 +8,7 @@ import com.daemonize.daemondevapp.renderer.Renderer2D;
 import com.daemonize.daemondevapp.scene.Scene2D;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
+import com.daemonize.daemondevapp.view.CompositeImageViewImpl;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemondevapp.view.ImageViewImpl;
 import com.daemonize.daemonengine.closure.Closure;
@@ -54,6 +55,8 @@ public class Game {
     private GenericNode<ImageView> dialogue;
 
     private int score = 0;
+
+    private ImageView dijalog;
 
     private ImageView scoreBackGrView;
     private ImageView scoreTitleView;
@@ -323,6 +326,10 @@ public class Game {
             viewsNum[3] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
             viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
+            dijalog = new CompositeImageViewImpl(250,250,3, dialogueImage);
+            dijalog.addChild(fieldImageTowerDen,Pair.create(50,50));
+
+            scene.addImageView(dijalog.getAllViews());
             scene.addImageView(scoreBackGrView);
             scene.addImageView(scoreTitleView);
 
@@ -526,6 +533,7 @@ public class Game {
                                 .setAbsoluteX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() * 7/8)
                                 .setAbsoluteY(grid.getStartingY() + scoreBackGrImage.getHeight())
                                 .show();
+                        dijalog.show();
 
                     });
                 } else {

@@ -3,6 +3,8 @@ package com.daemonize.daemondevapp.view;
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
+import java.util.List;
+
 public interface ImageView extends Comparable<ImageView> {
 
     <K extends ImageView> K setAbsoluteX(float absoluteX);
@@ -30,6 +32,7 @@ public interface ImageView extends Comparable<ImageView> {
     @Override
     int compareTo(ImageView o);
 
+    List<ImageView> getAllViews ();
     void addChild(ImageView child);
-    void addChild(ImageView child, Pair<Integer, Integer> coordinates);
+    void addChild(Image image, Pair<Integer, Integer> coordinates);
 }

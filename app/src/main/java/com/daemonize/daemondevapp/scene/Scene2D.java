@@ -27,6 +27,13 @@ public class Scene2D {
         views.add(view);
         return view;
     }
+    public void addImageView(List<ImageView> listOfView) {
+        if (locked)
+            throw new IllegalStateException("Scene locked. Can not add view!");
+        for (ImageView imageView : listOfView){
+            views.add(imageView);
+        }
+    }
 
     public List<ImageView> getViews() {
         return views;

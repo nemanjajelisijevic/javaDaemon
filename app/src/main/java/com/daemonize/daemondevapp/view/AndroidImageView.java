@@ -6,6 +6,8 @@ import android.view.View;
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
+import java.util.List;
+
 public class AndroidImageView implements ImageView {
 
     private android.widget.ImageView view;
@@ -99,6 +101,11 @@ public class AndroidImageView implements ImageView {
     }
 
     @Override
+    public List<ImageView> getAllViews() {
+        return null;
+    }
+
+    @Override
     public boolean checkCoordinates(float x, float y) {
         return false;
     }
@@ -109,7 +116,7 @@ public class AndroidImageView implements ImageView {
     }
 
     @Override
-    public void addChild(ImageView child, Pair<Integer, Integer> coordinates) {
-        throw new IllegalStateException("Cannot add child to this type of ImageView");
+    public void addChild(Image image, Pair<Integer, Integer> coordinates) {
+
     }
 }

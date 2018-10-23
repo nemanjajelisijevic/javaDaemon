@@ -3,6 +3,9 @@ package com.daemonize.daemondevapp.view;
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ImageViewImpl implements ImageView, Comparable<ImageView> {
 
     private volatile int zIndex;
@@ -139,7 +142,11 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     }
 
     @Override
-    public void addChild(ImageView child, Pair<Integer, Integer> coordinates) {//
+    public void addChild(Image image, Pair<Integer, Integer> coordinates) {//
+        throw new IllegalStateException("Cannot add child to this type of ImageView");
+    }
+
+    public List<ImageView> getAllViews () {
         throw new IllegalStateException("Cannot add child to this type of ImageView");
     }
 }
