@@ -263,7 +263,7 @@ public class Game {
         }
     }
 
-    private void contAll() {
+    private void contAll() { //continueAll
         pause = false;
         enemyGenerator.start();
         for (EnemyDoubleDaemon enemy : activeEnemies) {
@@ -293,15 +293,22 @@ public class Game {
 
     public Game onTouch(float x, float y) {
         gameConsumer.consume(()->{
-            if (dialogue.getValue().isShowing()) {
-                if (dialogue.getChildren().get(0).getValue().checkCoordinates(x,y)) {
-                    dialogue.getValue().hide();
-                    dialogue.getChildren().get(0).getValue().hide();
-                    contAll();
+//            if (dialogue.getValue().isShowing()) {
+//                if (dialogue.getChildren().get(0).getValue().checkCoordinates(x,y)) {
+//                    dialogue.getValue().hide();
+//                    dialogue.getChildren().get(0).getValue().hide();
+//                    contAll();
+//                }
+//            } else {
+                if(dijalog.isShowing()){
+                    if( dijalog.checkCoordinates(x,y)){
+                        dijalog.hide();
+                        contAll();
+                    }
+                }else {
+                    setTower(x, y);
                 }
-            } else {
-                setTower(x, y);
-            }
+            //}
         });
         return this;
     }
@@ -326,8 +333,8 @@ public class Game {
             viewsNum[3] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
             viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
-            dijalog = new CompositeImageViewImpl(250,250,3, dialogueImage);
-            dijalog.addChild(fieldImageTowerDen,Pair.create(50,50));
+            dijalog = new CompositeImageViewImpl(500,500,3, dialogueImage);
+            dijalog.addChild(fieldImageTowerDen,Pair.create(0,0));
 
             scene.addImageView(dijalog.getAllViews());
             scene.addImageView(scoreBackGrView);
@@ -521,24 +528,28 @@ public class Game {
             TowerDaemon tow = field.getTower();
             if (tow != null) {
 
-                if (!dialogue.getValue().isShowing()) {
+                if (!dijalog.
+                        isShowing()) {
                     pauseAll();
                     drawConsumer.consume(() -> {
-                        dialogue.getValue().setImage(dialogueImage)
-                                .setAbsoluteX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() / 2)//TODO fix grid.getGridHeight/Width!!!!!!!!!!!!
-                                .setAbsoluteY(grid.getStartingY() + scoreBackGrImage.getHeight()  + dialogueImage.getHeight() / 2)
-                                .show();
-                        dialogue.getChildren().get(0).getValue()
-                                .setImage(fieldImageTowerDen)
-                                .setAbsoluteX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() * 7/8)
-                                .setAbsoluteY(grid.getStartingY() + scoreBackGrImage.getHeight())
-                                .show();
+//                        dialogue.getValue().setImage(dialogueImage)
+//                                .setAbsoluteX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() / 2)//TODO fix grid.getGridHeight/Width!!!!!!!!!!!!
+//                                .setAbsoluteY(grid.getStartingY() + scoreBackGrImage.getHeight()  + dialogueImage.getHeight() / 2)
+//                                .show();
+//                        dialogue.getChildren().get(0).getValue()
+//                                .setImage(fieldImageTowerDen)
+//                                .setAbsoluteX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() * 7/8)
+//                                .setAbsoluteY(grid.getStartingY() + scoreBackGrImage.getHeight())
+//                                .show();
                         dijalog.show();
 
                     });
                 } else {
                     contAll();
-                    drawConsumer.consume(() -> GenericNode.forEach(dialogue, ret->ret.get().hide()));
+                    drawConsumer.consume(() ->{
+                        GenericNode.forEach(dialogue, ret->ret.get().hide());
+                        dijalog.hide();
+                    });
                 }
 
                 if(towerShootInterval > 200)

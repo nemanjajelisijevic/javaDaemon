@@ -1,8 +1,11 @@
 package com.daemonize.daemondevapp.view;
 
+import android.util.Log;
+
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
+import java.security.interfaces.RSAMultiPrimePrivateCrtKey;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,8 +40,8 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         }
 
         CompositeImageViewImpl child = new CompositeImageViewImpl(
-                                    (int) (this.getAbsoluteX() + coordinates.getFirst()),
-                                    (int) (this.getAbsoluteY() + coordinates.getSecond()),
+                                    (int) (this.getAbsoluteX() - this.getxOffset() + coordinates.getFirst() + image.getWidth()/2),
+                                    (int) (this.getAbsoluteY() - this.getyOffset() + coordinates.getSecond() + image.getHeight() / 2),
                                     this.getZindex() + 1,
                                     image);
 
@@ -97,11 +100,24 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         return this;
     }
 
-    public CompositeImageViewImpl showAllViews(CompositeImageViewImpl compositeImageView) {
+    @Override
+    public ImageViewImpl hide() {
+        super.hide();
+        Log.w("hide","desio se hajd compositimagea");
+        hideAllViews(this);
+        return this;
+    }
 
+    private CompositeImageViewImpl showAllViews(CompositeImageViewImpl compositeImageView) {
         for (CompositeImageViewImpl child : compositeImageView.getChildrenViews()) {
             child.show();
+        }
+        return compositeImageView;
+    }
 
+    private CompositeImageViewImpl hideAllViews(CompositeImageViewImpl compositeImageView) {
+        for (CompositeImageViewImpl child : compositeImageView.getChildrenViews()) {
+            child.hide();
         }
         return compositeImageView;
     }
