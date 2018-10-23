@@ -12,8 +12,9 @@ import java.util.List;
 
 public class CompositeImageViewImpl extends ImageViewImpl {
 
-    private List<CompositeImageViewImpl> childrenViews;
+    protected List<CompositeImageViewImpl> childrenViews;
 
+    public CompositeImageViewImpl() {}
 
     public CompositeImageViewImpl(int x, int y, int z, Image image) {
         //CompositeImageViewImpl rootView = new CompositeImageViewImpl().setAbsoluteX(x).setAbsoluteY(y).setZindex(z).setImage(image); //.show();
@@ -31,7 +32,21 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         return childrenViews;
     }
 
+    @Override
+    public boolean checkCoordinates(float x, float y) {
+        for (CompositeImageViewImpl child : getChildrenViews()){
+            return child.checkCoordinates(x, y);
+        }
+        return false;
+    }
 
+    @Override
+    public void addChild(CompositeImageViewImpl child) {
+        child.setAbsoluteX((int) (this.getAbsoluteX() - this.getxOffset() + child.getAbsoluteX() + child.getxOffset()));
+        child.setAbsoluteY((int) (this.getAbsoluteY() - this.getyOffset() + child.getAbsoluteY() + child.getyOffset()));
+        child.setZindex(this.getZindex() + 1);
+        addCh(this,child);
+    }
 
     @Override
     public void addChild(Image image, Pair<Integer, Integer> coordinates) {
@@ -52,11 +67,11 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     private boolean isViewBInsideViewA (ImageView viewA, ImageView viewB){
         int x1 = (int) (viewA.getAbsoluteX() - viewA.getxOffset());
         int x2 = (int) (viewA.getAbsoluteX() + viewA.getxOffset());
-        int y1 = (int) (viewA.getAbsoluteY() - viewA.getxOffset());
-        int y2 = (int) (viewA.getAbsoluteY() - viewA.getxOffset());
+        int y1 = (int) (viewA.getAbsoluteY() - viewA.getyOffset());
+        int y2 = (int) (viewA.getAbsoluteY() + viewA.getyOffset());
 
         int xB1 = (int) (viewB.getAbsoluteX() - viewB.getxOffset());
-        int yB1 = (int) (viewB.getAbsoluteY() - viewB.getxOffset());
+        int yB1 = (int) (viewB.getAbsoluteY() - viewB.getyOffset());
 
         if (xB1 >= x1 && xB1 <= x2 && yB1 >= y1 && yB1 <= y2){
             return true;
@@ -66,7 +81,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     private void addCh(CompositeImageViewImpl compositeImageView, CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : compositeImageView.getChildrenViews()){
-            if (isViewBInsideViewA(child,newChild)){
+            if (/*isViewBInsideViewA(child,newChild)*/child.checkCoordinates(newChild.getAbsoluteX() - newChild.getxOffset(), newChild.getAbsoluteY() - newChild.getyOffset())){
                 //ponovi sve za dete
                 newChild.setZindex(child.getZindex() + 1); // povecamo z index mozda treba i kordinate prevezati
                 addCh(child,newChild);

@@ -8,6 +8,7 @@ import com.daemonize.daemondevapp.renderer.Renderer2D;
 import com.daemonize.daemondevapp.scene.Scene2D;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
+import com.daemonize.daemondevapp.view.Button;
 import com.daemonize.daemondevapp.view.CompositeImageViewImpl;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemondevapp.view.ImageViewImpl;
@@ -301,13 +302,17 @@ public class Game {
 //                }
 //            } else {
                 if(dijalog.isShowing()){
-                    if( dijalog.checkCoordinates(x,y)){
-                        dijalog.hide();
-                        contAll();
-                    }
-                }else {
+                    dijalog.checkCoordinates(x, y);
+//                    if( dijalog.checkCoordinates(x,y)){
+//                        dijalog.hide();
+//                        contAll();
+//                    }
+                } else {
                     setTower(x, y);
                 }
+
+
+
             //}
         });
         return this;
@@ -334,7 +339,14 @@ public class Game {
             viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
             dijalog = new CompositeImageViewImpl(500,500,3, dialogueImage);
-            dijalog.addChild(fieldImageTowerDen,Pair.create(0,0));
+            dijalog.addChild(new Button(50, 50, dijalog.getZindex(), fieldImageTowerDen).onClick(()->{
+                if(dijalog.isShowing()) {
+                    dijalog.hide();
+                    contAll();
+                }
+            }));
+
+            //dijalog.addChild(fieldImageTowerDen,Pair.create(0,0));
 
             scene.addImageView(dijalog.getAllViews());
             scene.addImageView(scoreBackGrView);

@@ -111,7 +111,7 @@ public class AndroidImageView implements ImageView {
     }
 
     @Override
-    public void addChild(ImageView child) {
+    public void addChild(CompositeImageViewImpl child) {
         throw new IllegalStateException("Cannot add child to this type of ImageView");
     }
 

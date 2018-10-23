@@ -12,6 +12,8 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     private volatile boolean showing;
 
     private volatile Image image;
+
+    //center coords
     private volatile float absoluteX;
     private volatile float absoluteY;
 
@@ -137,7 +139,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     }
 
     @Override
-    public void addChild(ImageView child) {
+    public void addChild(CompositeImageViewImpl child) {
         throw new IllegalStateException("Cannot add child to this type of ImageView");
     }
 
