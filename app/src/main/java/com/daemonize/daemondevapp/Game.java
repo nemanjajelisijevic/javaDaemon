@@ -331,8 +331,6 @@ public class Game {
                 scene.addImageView(view);
             }
 
-
-
             gridViewMatrix = new ImageView[rows][columns];
 
             for(int j = 0; j < rows; ++j ) {
