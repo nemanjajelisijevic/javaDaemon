@@ -1,11 +1,8 @@
 package com.daemonize.daemondevapp.view;
 
-import android.util.Log;
-
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
-import java.security.interfaces.RSAMultiPrimePrivateCrtKey;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +21,6 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         this.setAbsoluteY(y);
         this.setZindex(z);
         this.setImage(image);
-
 
     }
 
@@ -64,24 +60,24 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     }
 
-    private boolean isViewBInsideViewA (ImageView viewA, ImageView viewB){
-        int x1 = (int) (viewA.getAbsoluteX() - viewA.getxOffset());
-        int x2 = (int) (viewA.getAbsoluteX() + viewA.getxOffset());
-        int y1 = (int) (viewA.getAbsoluteY() - viewA.getyOffset());
-        int y2 = (int) (viewA.getAbsoluteY() + viewA.getyOffset());
-
-        int xB1 = (int) (viewB.getAbsoluteX() - viewB.getxOffset());
-        int yB1 = (int) (viewB.getAbsoluteY() - viewB.getyOffset());
-
-        if (xB1 >= x1 && xB1 <= x2 && yB1 >= y1 && yB1 <= y2){
-            return true;
-        }
-        return false;
-    }
+//    private boolean isViewBInsideViewA (ImageView viewA, ImageView viewB){
+//        int x1 = (int) (viewA.getAbsoluteX() - viewA.getxOffset());
+//        int x2 = (int) (viewA.getAbsoluteX() + viewA.getxOffset());
+//        int y1 = (int) (viewA.getAbsoluteY() - viewA.getyOffset());
+//        int y2 = (int) (viewA.getAbsoluteY() + viewA.getyOffset());
+//
+//        int xB1 = (int) (viewB.getAbsoluteX() - viewB.getxOffset());
+//        int yB1 = (int) (viewB.getAbsoluteY() - viewB.getyOffset());
+//
+//        if (xB1 >= x1 && xB1 <= x2 && yB1 >= y1 && yB1 <= y2){
+//            return true;
+//        }
+//        return false;
+//    }
 
     private void addCh(CompositeImageViewImpl compositeImageView, CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : compositeImageView.getChildrenViews()){
-            if (/*isViewBInsideViewA(child,newChild)*/child.checkCoordinates(newChild.getAbsoluteX() - newChild.getxOffset(), newChild.getAbsoluteY() - newChild.getyOffset())){
+            if (child.checkCoordinates(newChild.getAbsoluteX() - newChild.getxOffset(), newChild.getAbsoluteY() - newChild.getyOffset())){
                 //ponovi sve za dete
                 newChild.setZindex(child.getZindex() + 1); // povecamo z index mozda treba i kordinate prevezati
                 addCh(child,newChild);
@@ -118,7 +114,6 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     @Override
     public ImageViewImpl hide() {
         super.hide();
-        Log.w("hide","desio se hajd compositimagea");
         hideAllViews(this);
         return this;
     }
