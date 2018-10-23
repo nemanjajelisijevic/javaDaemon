@@ -292,28 +292,13 @@ public class Game {
         return this;
     }
 
-    public Game onTouch(float x, float y) {
+    public Game onTouch(float x, float y) {//TODO use root dialogs only!!!!
         gameConsumer.consume(()->{
-//            if (dialogue.getValue().isShowing()) {
-//                if (dialogue.getChildren().get(0).getValue().checkCoordinates(x,y)) {
-//                    dialogue.getValue().hide();
-//                    dialogue.getChildren().get(0).getValue().hide();
-//                    contAll();
-//                }
-//            } else {
-                if(dijalog.isShowing()){
-                    dijalog.checkCoordinates(x, y);
-//                    if( dijalog.checkCoordinates(x,y)){
-//                        dijalog.hide();
-//                        contAll();
-//                    }
-                } else {
-                    setTower(x, y);
-                }
-
-
-
-            //}
+            if(dijalog.isShowing()){
+                dijalog.checkCoordinates(x, y);
+            } else {
+                setTower(x, y);
+            }
         });
         return this;
     }
