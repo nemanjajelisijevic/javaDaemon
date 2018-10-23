@@ -325,10 +325,8 @@ public class Game {
 
             dijalog = new CompositeImageViewImpl(500,500,3, dialogueImage);
             dijalog.addChild(new Button(50, 50, dijalog.getZindex(), fieldImageTowerDen).onClick(()->{
-                if(dijalog.isShowing()) {
-                    dijalog.hide();
-                    contAll();
-                }
+                dijalog.hide();
+                contAll();
             }));
 
             //dijalog.addChild(fieldImageTowerDen,Pair.create(0,0));
