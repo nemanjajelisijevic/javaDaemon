@@ -64,29 +64,29 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     @Override
     public boolean checkCoordinates(float x, float y) {
-        for (CompositeImageViewImpl child : getChildrenViews()){
-            return child.checkCoordinates(x, y);
+        if (super.checkCoordinates(x,y)) {
+            for (CompositeImageViewImpl child : getChildrenViews()) {
+                return child.checkCoordinates(x, y);
+            }
         }
         return false;
     }
 
-    @Override
     public void addChild(CompositeImageViewImpl child) {
-        child.setAbsoluteX((int) (this.getAbsoluteX() - this.getxOffset() + child.getRelativeX() - child.getxOffset()));
-        child.setAbsoluteY((int) (this.getAbsoluteY() - this.getyOffset() + child.getRelativeY() - child.getyOffset()));
+        child.setAbsoluteX((int) (getStartXCoordinates() + child.getRelativeX() - child.getxOffset()));
+        child.setAbsoluteY((int) (getStartYCoordinates() + child.getRelativeY() - child.getyOffset()));
         child.setZindex(this.getZindex() + 1);
         addCh(this,child);
     }
 
-    @Override
     public void addChild(Image image, Pair<Integer, Integer> coordinates) {
         if (childrenViews == null) {
             childrenViews = new LinkedList<>();
         }
 
         CompositeImageViewImpl child = new CompositeImageViewImpl(
-                                    (int) (this.getAbsoluteX() - this.getxOffset() + coordinates.getFirst() + image.getWidth()/2),
-                                    (int) (this.getAbsoluteY() - this.getyOffset() + coordinates.getSecond() + image.getHeight() / 2),
+                                    (int) (getStartXCoordinates() + coordinates.getFirst() + image.getWidth()/2),
+                                    (int) (getStartYCoordinates() + coordinates.getSecond() + image.getHeight() / 2),
                                     this.getZindex() + 1,
                                     image);
 

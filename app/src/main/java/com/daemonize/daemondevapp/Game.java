@@ -57,7 +57,7 @@ public class Game {
 
     private int score = 0;
 
-    private ImageView dijalog;
+    private CompositeImageViewImpl dijalog;
 
     private ImageView scoreBackGrView;
     private ImageView scoreTitleView;

@@ -34,7 +34,4 @@ public interface ImageView extends Comparable<ImageView> {
 
     List<ImageView> getAllViews ();
 
-    void addChild(CompositeImageViewImpl child);
-
-    void addChild(Image image, Pair<Integer, Integer> coordinates);
 }

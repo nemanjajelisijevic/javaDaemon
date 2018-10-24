@@ -46,6 +46,22 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
         return yOffset;
     }
 
+    public float getStartXCoordinates() {
+        return absoluteX - xOffset;
+    }
+
+    public float getStartYCoordinates() {
+        return absoluteY - yOffset;
+    }
+
+    public float getEndXCoordinates() {
+        return absoluteX + xOffset;
+    }
+
+    public float getEndYCoordinates() {
+        return absoluteY + yOffset;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl setZindex(int zindex) {
@@ -123,8 +139,8 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
 
     @Override
     public boolean checkCoordinates(float x, float y) {
-        if (x >= (getAbsoluteX() - getxOffset()) && x <= (getAbsoluteX() + getxOffset())) {
-            if (y >= (getAbsoluteY() - getyOffset()) && y <= (getAbsoluteY() + getyOffset()))
+        if (x >= getStartXCoordinates() && x <= getEndXCoordinates()) {
+            if (y >= getStartYCoordinates() && y <= getEndYCoordinates())
                 return true;
         }
         return false;
@@ -136,16 +152,6 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
             return Integer.compare(this.zIndex, ((ImageViewImpl) o).zIndex);
         else
             return 0;
-    }
-
-    @Override
-    public void addChild(CompositeImageViewImpl child) {
-        throw new IllegalStateException("Cannot add child to this type of ImageView");
-    }
-
-    @Override
-    public void addChild(Image image, Pair<Integer, Integer> coordinates) {//
-        throw new IllegalStateException("Cannot add child to this type of ImageView");
     }
 
     public List<ImageView> getAllViews () {

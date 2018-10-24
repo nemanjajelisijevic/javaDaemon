@@ -110,13 +110,4 @@ public class AndroidImageView implements ImageView {
         return false;
     }
 
-    @Override
-    public void addChild(CompositeImageViewImpl child) {
-        throw new IllegalStateException("Cannot add child to this type of ImageView");
-    }
-
-    @Override
-    public void addChild(Image image, Pair<Integer, Integer> coordinates) {
-
-    }
 }
