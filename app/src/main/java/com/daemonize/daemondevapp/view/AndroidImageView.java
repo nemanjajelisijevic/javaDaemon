@@ -1,3 +1,4 @@
+/*
 package com.daemonize.daemondevapp.view;
 
 import android.graphics.Bitmap;
@@ -111,3 +112,4 @@ public class AndroidImageView implements ImageView {
     }
 
 }
+*/

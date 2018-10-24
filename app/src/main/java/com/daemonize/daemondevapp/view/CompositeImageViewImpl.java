@@ -43,8 +43,9 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     @Override
     public CompositeImageViewImpl setAbsoluteX(float absoluteX) {
         this.absoluteX = absoluteX;
+        this.startingX = absoluteX - this.xOffset;
         for(CompositeImageViewImpl child : childrenViews) {
-            child.setAbsoluteX(this.getAbsoluteX() + child.getRelativeX());
+            child.setAbsoluteX(this.getStartingX() + child.getRelativeX());
         }
         return this;
     }
@@ -52,8 +53,9 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     @Override
     public ImageViewImpl setAbsoluteY(float absoluteY) {
         this.absoluteY = absoluteY;
+        this.startingY = absoluteY - this.yOffset;
         for(CompositeImageViewImpl child : childrenViews) {
-            child.setAbsoluteY(this.getAbsoluteY() + child.getRelativeY());
+            child.setAbsoluteY(this.getStartingY() + child.getRelativeY());
         }
         return this;
     }
@@ -64,29 +66,34 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     @Override
     public boolean checkCoordinates(float x, float y) {
-        if (super.checkCoordinates(x,y)) {
-            for (CompositeImageViewImpl child : getChildrenViews()) {
-                return child.checkCoordinates(x, y);
+//        if (super.checkCoordinates(x,y)) {
+//            for (CompositeImageViewImpl child : getChildrenViews()) {
+//                return child.checkCoordinates(x, y);
+//            }
+//        }
+
+        for (CompositeImageViewImpl child : getChildrenViews()){
+            if (child.checkCoordinates(x, y)) {
+                return true;
             }
         }
         return false;
     }
 
+    //@Override
     public void addChild(CompositeImageViewImpl child) {
-        child.setAbsoluteX((int) (getStartXCoordinates() + child.getRelativeX() - child.getxOffset()));
-        child.setAbsoluteY((int) (getStartYCoordinates() + child.getRelativeY() - child.getyOffset()));
-        child.setZindex(this.getZindex() + 1);
-        addCh(this,child);
-    }
+        addCh(this, child);
+    }//TODO check for multi nested call
 
+    //@Override
     public void addChild(Image image, Pair<Integer, Integer> coordinates) {
         if (childrenViews == null) {
             childrenViews = new LinkedList<>();
         }
 
         CompositeImageViewImpl child = new CompositeImageViewImpl(
-                                    (int) (getStartXCoordinates() + coordinates.getFirst() + image.getWidth()/2),
-                                    (int) (getStartYCoordinates() + coordinates.getSecond() + image.getHeight() / 2),
+                                    (int) (getStartingX() + coordinates.getFirst() + image.getWidth()/2),
+                                    (int) (getStartingY() + coordinates.getSecond() + image.getHeight() / 2),
                                     this.getZindex() + 1,
                                     image);
 
@@ -111,14 +118,20 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     private void addCh(CompositeImageViewImpl compositeImageView, CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : compositeImageView.getChildrenViews()){
-            if (child.checkCoordinates(newChild.getAbsoluteX() - newChild.getxOffset(), newChild.getAbsoluteY() - newChild.getyOffset())){
+            if (child.checkCoordinates(newChild.getStartingX(), newChild.getStartingY())){
                 //ponovi sve za dete
                 newChild.setZindex(child.getZindex() + 1); // povecamo z index mozda treba i kordinate prevezati
                 addCh(child,newChild);
                 return;
             }
         }
+
+        newChild.setAbsoluteX((this.startingX + newChild.getRelativeX() /*+ child.getxOffset()*/));//TODO check this
+        newChild.setAbsoluteY((this.startingY + newChild.getRelativeY() /*+ child.getyOffset()*/));//TODO check this
+        newChild.setZindex(this.getZindex() + 1);
+
         compositeImageView.getChildrenViews().add(newChild);
+
     }
 
     @Override
@@ -131,7 +144,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         for (CompositeImageViewImpl child : compositeImageViewImpl.getChildrenViews()){
             lst.add(child);
             if (child.getChildrenViews()!= null && !child.getChildrenViews().isEmpty()){
-                lst.add((ImageView) getAllViews(child));
+                lst.addAll(getAllViews(child));
             }
         }
         lst.add(compositeImageViewImpl);

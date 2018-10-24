@@ -205,6 +205,9 @@ public class MainActivity extends AppCompatActivity {
             listNumberImg[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("9.png")), numWidth, numHeight, false));
 
 
+            Bitmap green = Bitmap.createBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")));
+            Bitmap red = Bitmap.createBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")));
+
             game = new Game(renderer, rows, columns,50,50, width)
                     .setBackgroundImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false)))
                     .setFieldImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
@@ -216,7 +219,9 @@ public class MainActivity extends AppCompatActivity {
                     .setTowerSprite(towerSprite)
                     .setHealthBarSprite(listHealthBarImg)
                     .setBorders(borderX, borderY)
-                    .setDialogue(dialog)
+                    .setDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, dialog.getWidth(), dialog.getHeight(), false))/*dialog*/)
+                    .setRedNestedDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, dialog.getWidth() / 2, dialog.getHeight() / 2, false))/*dialog*/)
+                    .setGreenDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, dialog.getWidth(), dialog.getHeight(), false))/*dialog*/)
                     .setScoreBackGrImage(score)
                     .setScorenumbersImages(listNumberImg)
                     .setScoreTitle(titleScore);

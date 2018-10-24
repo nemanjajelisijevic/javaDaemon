@@ -13,6 +13,12 @@ public interface ImageView extends Comparable<ImageView> {
     float getAbsoluteX();
     float getAbsoluteY();
 
+    float getStartingX();
+    float getStartingY();
+
+    float getEndX();
+    float getEndY();
+
     float getxOffset();
     float getyOffset();
 

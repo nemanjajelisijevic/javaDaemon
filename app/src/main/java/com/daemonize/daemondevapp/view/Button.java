@@ -29,8 +29,8 @@ public class Button extends CompositeImageViewImpl implements ClickableImageView
 
     @Override
     public boolean checkCoordinates(float x, float y) {
-        if (x >= getStartXCoordinates() && x <= getEndXCoordinates()) {
-            if (y >= getStartYCoordinates() && y <= getEndYCoordinates()) {
+        if (x >= getStartingX() && x <= getEndX()) {
+            if (y >= getStartingY() && y <= getEndY()) {
                 onClickCallback.run();//TODO should this be here?????
                 return true;
             }

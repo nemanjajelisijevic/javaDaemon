@@ -109,20 +109,18 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
 
         if (surfaceHolder.getSurface().isValid()) {
 
-            //locking the canvas
             canvas = surfaceHolder.lockCanvas();
 
             for (ImageView view : scene.getViews()) {
-                //Drawing the player
+
                 if (view.isShowing() && view.getImage() != null)//TODO this should never be null
                     canvas.drawBitmap(
                             ((Bitmap) view.getImage().getImageImp()),
-                            view.getAbsoluteX() - view.getxOffset(),
-                            view.getAbsoluteY() - view.getyOffset(),
+                            view.getStartingX(),
+                            view.getStartingY(),
                             paint);
             }
 
-            //Unlocking the canvas
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
 

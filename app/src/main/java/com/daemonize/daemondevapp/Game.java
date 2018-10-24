@@ -69,6 +69,8 @@ public class Game {
     private Image fieldImageTower;
     private Image fieldImageTowerDen;
     private Image dialogueImage;
+    private Image nestedRedDialogueImage;
+    private Image greenDialogueImage;
     private Image scoreBackGrImage;
     private Image scoreTitle;
     private Image [] scorenumbersImages;
@@ -222,6 +224,16 @@ public class Game {
         return this;
     }
 
+    public Game setRedNestedDialogue(Image nestedRedDialogueImage) {
+        this.nestedRedDialogueImage = nestedRedDialogueImage;
+        return this;
+    }
+
+    public Game setGreenDialogue(Image nestedDialogueImage) {
+        this.greenDialogueImage = nestedDialogueImage;
+        return this;
+    }
+
     public Game setScoreBackGrImage(Image scoreBackGrImage) {
         this.scoreBackGrImage = scoreBackGrImage;
         return this;
@@ -305,6 +317,7 @@ public class Game {
     }
 
     private Pair<Integer, Integer> dijalogCoords = Pair.create(500, 500);
+    private boolean dijalogActive;
     private DummyDaemon dijalogAnimator;
 
     {
@@ -327,12 +340,30 @@ public class Game {
             viewsNum[3] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
             viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
-            dijalog = new CompositeImageViewImpl(dijalogCoords.getFirst(),dijalogCoords.getSecond(),3, dialogueImage);
-            dijalog.addChild(new Button(50, 50, fieldImageTowerDen).onClick(()->{
-                dijalogAnimator.stop();
-                dijalog.hide();
-                contAll();
-            }));
+            dijalog = new CompositeImageViewImpl(dijalogCoords.getFirst(),dijalogCoords.getSecond(),5, dialogueImage);
+            CompositeImageViewImpl nested = new CompositeImageViewImpl(dialogueImage.getWidth() / 2, dialogueImage.getHeight() / 2, nestedRedDialogueImage);
+            dijalog.addChild(nested);
+            nested.addChild(
+                    new Button(nested.getImage().getWidth() - (fieldImageTowerDen.getWidth() / 2), (fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
+                        dijalogAnimator.stop();
+                        dijalogActive = false;
+                        drawConsumer.consume(()->dijalog.hide());
+                        contAll();
+                    })
+            );
+
+            nested.addChild(
+                    new Button((fieldImageTowerDen.getWidth() / 2), (fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
+                        drawConsumer.consume(()->dijalog.setImage(dijalogActive ? greenDialogueImage : dialogueImage).show());
+                        dijalogActive = !dijalogActive;
+                    })
+            );
+
+//            dijalog.addChild(new Button(dialogueImage.getWidth() - (fieldImageTowerDen.getWidth() / 2), (fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
+//                dijalogAnimator.stop();
+//                dijalog.hide();
+//                contAll();
+//            }));
 
             dijalogAnimator = new DummyDaemon(drawConsumer, 25).setClosure(ret->{
                 if (dijalog.getAbsoluteX() < borderX - dijalog.getxOffset()){
@@ -536,16 +567,13 @@ public class Game {
 
                 if (!dijalog.isShowing()) {
                     pauseAll();
-                    dijalog.setAbsoluteX(dijalogCoords.getFirst());
-                    dijalog.setAbsoluteY(dijalogCoords.getSecond());
-                    drawConsumer.consume(() -> dijalog.show());
-                    dijalogAnimator.start();
-                } else {
-                    contAll();
-                    drawConsumer.consume(() ->{
-                        GenericNode.forEach(dialogue, ret->ret.get().hide());
-                        dijalog.hide();
+                    drawConsumer.consume(()->{
+                        dijalog.setAbsoluteX(dijalogCoords.getFirst());
+                        dijalog.setAbsoluteY(dijalogCoords.getSecond());
+                        dijalog.setImage(dialogueImage);
+                        dijalog.show();
                     });
+                    dijalogAnimator.start();
                 }
 
                 if(towerShootInterval > 200)
