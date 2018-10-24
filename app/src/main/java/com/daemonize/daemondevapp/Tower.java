@@ -10,7 +10,7 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -24,7 +24,6 @@ public class Tower extends CachedArraySpriteImageMover {
     private volatile boolean pause = false;
 
     private Image[] rotationSprite;
-    private int size = 0;
 
     private Game.TowerScanClosure scanClosure;
 
@@ -136,28 +135,20 @@ public class Tower extends CachedArraySpriteImageMover {
         }
     }
 
-    private  List<Image> convertArrayInList(Image [] array, int size) {
-        ArrayList<Image> arrayList = new ArrayList<>(size);
-        for (int i=0;i<size;i++){
-            arrayList.add(array[i]);
-        }
-        return arrayList;
-    }
-
     public void rotateTowards(float x, float y) throws InterruptedException {
 
         int targetAngle = (int) getAngle(lastX, lastY, x, y);
-        size = 0;
+
 
         if (Math.abs(targetAngle - currentAngle) <= 2 * spriteBuffer.getStep()) {
-            rotationSprite[size++] = spriteBuffer.getByAngle(targetAngle);
             spriteBuffer.setCurrentAngle(targetAngle);
-
             Image[] last = new Image[1];
-            last[0] = rotationSprite[rotationSprite.length - 1];
+            last[0] = spriteBuffer.getCurrent();
             setSprite(last);
 
         } else {
+
+            int size = 0;
 
             //rotate smoothly
             int mirrorAngle;
@@ -175,14 +166,11 @@ public class Tower extends CachedArraySpriteImageMover {
                 rotationSprite[size++] = direction ? spriteBuffer.getIncrementedByStep() : spriteBuffer.getDecrementedByStep();
             }
 
-            //getSprite().clear();
-            //getSprite().add(rotationSprite[size - 1]);
-            pushSprite(rotationSprite,velocity.intensity);
-            //setSprite(rotationSprite[size - 1]);
-
+            pushSprite(Arrays.copyOf(rotationSprite, size),velocity.intensity);
         }
 
-        currentAngle = spriteBuffer.getCurrentAngle(); //TODO check if this needs to go before pushSprite() call
+        currentAngle = spriteBuffer.getCurrentAngle();
+
     }
 
     @CallingThread

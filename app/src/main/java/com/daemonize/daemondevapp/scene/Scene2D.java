@@ -17,6 +17,11 @@ public class Scene2D {
         return this;
     }
 
+    public Scene2D unlockViews() {
+        this.locked = false;
+        return this;
+    }
+
     public boolean isLocked() {
         return locked;
     }

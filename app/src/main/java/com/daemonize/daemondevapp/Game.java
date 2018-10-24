@@ -288,6 +288,7 @@ public class Game {
         for (TowerDaemon tower : towers) tower.stop();
         drawConsumer.stop();
         gameConsumer.stop();
+        scene.unlockViews();
         renderer.stop();
         return this;
     }
@@ -338,8 +339,6 @@ public class Game {
             for (ImageView view : viewsNum) {
                 scene.addImageView(view);
             }
-
-
 
             gridViewMatrix = new ImageView[rows][columns];
 

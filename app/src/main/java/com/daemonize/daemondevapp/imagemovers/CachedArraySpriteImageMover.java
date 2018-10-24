@@ -12,7 +12,9 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
         cache = new AwaitedArraySprite<>(sprite);
         Image[] last = new Image[1];
         last[0] = sprite[sprite.length - 1];
-        cache.await(()->setSprite(last));
+        setSprite(last);
+        cache.await();
+        //cache.await(()->setSprite(last));
         cache = null;
         return true;
     }
