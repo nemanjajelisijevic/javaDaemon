@@ -14,11 +14,11 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     private volatile Image image;
 
     //center coords
-    private volatile float absoluteX;
-    private volatile float absoluteY;
+    protected volatile float absoluteX;
+    protected volatile float absoluteY;
 
-    private float xOffset;
-    private float yOffset;
+    protected float xOffset;
+    protected float yOffset;
 
     public ImageViewImpl() {}
 

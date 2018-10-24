@@ -7,8 +7,12 @@ public class Button extends CompositeImageViewImpl implements ClickableImageView
 
     private Runnable onClickCallback;
 
-    public Button(int x, int y, int z, Image image) {
-        super(x, y, z, image);
+    public Button(int relX, int relY, Image image) {
+        super(relX, relY, image);
+    }
+
+    public Button(float absX, float absY, int z, Image image) {
+        super(absX, absY, z, image);
     }
 
     @Override

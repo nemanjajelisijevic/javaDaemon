@@ -304,6 +304,9 @@ public class Game {
         return this;
     }
 
+    private Pair<Integer, Integer> dijalogCoords = Pair.create(500, 500);
+    private DummyDaemon dijalogAnimator;
+
     {
         //init spell (state)
         chain.addState(()-> {
@@ -324,11 +327,20 @@ public class Game {
             viewsNum[3] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
             viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
-            dijalog = new CompositeImageViewImpl(500,500,3, dialogueImage);
-            dijalog.addChild(new Button(50, 50, dijalog.getZindex(), fieldImageTowerDen).onClick(()->{
+            dijalog = new CompositeImageViewImpl(dijalogCoords.getFirst(),dijalogCoords.getSecond(),3, dialogueImage);
+            dijalog.addChild(new Button(50, 50, fieldImageTowerDen).onClick(()->{
+                dijalogAnimator.stop();
                 dijalog.hide();
                 contAll();
             }));
+
+            dijalogAnimator = new DummyDaemon(drawConsumer, 25).setClosure(ret->{
+                if (dijalog.getAbsoluteX() < borderX - dijalog.getxOffset()){
+                    dijalog.setAbsoluteX(dijalog.getAbsoluteX() + 3);
+                } else {
+                    gameConsumer.consume(()->dijalogAnimator.stop());
+                }
+            }).setName("Dijalog Animator");
 
             //dijalog.addChild(fieldImageTowerDen,Pair.create(0,0));
 
@@ -522,22 +534,12 @@ public class Game {
             TowerDaemon tow = field.getTower();
             if (tow != null) {
 
-                if (!dijalog.
-                        isShowing()) {
+                if (!dijalog.isShowing()) {
                     pauseAll();
-                    drawConsumer.consume(() -> {
-//                        dialogue.getValue().setImage(dialogueImage)
-//                                .setAbsoluteX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() / 2)//TODO fix grid.getGridHeight/Width!!!!!!!!!!!!
-//                                .setAbsoluteY(grid.getStartingY() + scoreBackGrImage.getHeight()  + dialogueImage.getHeight() / 2)
-//                                .show();
-//                        dialogue.getChildren().get(0).getValue()
-//                                .setImage(fieldImageTowerDen)
-//                                .setAbsoluteX(grid.getStartingX() + grid.getGridHeight() + dialogueImage.getWidth() * 7/8)
-//                                .setAbsoluteY(grid.getStartingY() + scoreBackGrImage.getHeight())
-//                                .show();
-                        dijalog.show();
-
-                    });
+                    dijalog.setAbsoluteX(dijalogCoords.getFirst());
+                    dijalog.setAbsoluteY(dijalogCoords.getSecond());
+                    drawConsumer.consume(() -> dijalog.show());
+                    dijalogAnimator.start();
                 } else {
                     contAll();
                     drawConsumer.consume(() ->{

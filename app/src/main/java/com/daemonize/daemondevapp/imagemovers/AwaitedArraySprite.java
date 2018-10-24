@@ -43,7 +43,12 @@ public class AwaitedArraySprite<T> {
 
     public T getNext() {
 
+        if (cnt >= sprite.length) {
+            cnt = -1;
+        }
+
         T ret = sprite[++cnt];
+
         if (cnt == sprite.length - 1) {
             lock.lock();
             flag = true;

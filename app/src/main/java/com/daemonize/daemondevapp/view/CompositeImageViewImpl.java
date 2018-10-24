@@ -11,17 +11,51 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     protected List<CompositeImageViewImpl> childrenViews;
 
-    public CompositeImageViewImpl() {}
+    private float relativeX;
+    private float relativeY;
 
-    public CompositeImageViewImpl(int x, int y, int z, Image image) {
-        //CompositeImageViewImpl rootView = new CompositeImageViewImpl().setAbsoluteX(x).setAbsoluteY(y).setZindex(z).setImage(image); //.show();
+    public float getRelativeX() {
+        return relativeX;
+    }
+
+    public float getRelativeY() {
+        return relativeY;
+    }
+
+    public CompositeImageViewImpl(float relX, float relY, Image image) {
         super();
         childrenViews = new LinkedList<>();
-        this.setAbsoluteX(x);
-        this.setAbsoluteY(y);
+        this.relativeX = relX;
+        this.relativeY = relY;
+        this.setImage(image);
+    }
+
+    //for root only!
+    public CompositeImageViewImpl(float absX, float absY, int z, Image image) {
+        super();
+        childrenViews = new LinkedList<>();
+        this.setAbsoluteX(absX);
+        this.setAbsoluteY(absY);
         this.setZindex(z);
         this.setImage(image);
+    }
 
+    @Override
+    public CompositeImageViewImpl setAbsoluteX(float absoluteX) {
+        this.absoluteX = absoluteX;
+        for(CompositeImageViewImpl child : childrenViews) {
+            child.setAbsoluteX(this.getAbsoluteX() + child.getRelativeX());
+        }
+        return this;
+    }
+
+    @Override
+    public ImageViewImpl setAbsoluteY(float absoluteY) {
+        this.absoluteY = absoluteY;
+        for(CompositeImageViewImpl child : childrenViews) {
+            child.setAbsoluteY(this.getAbsoluteY() + child.getRelativeY());
+        }
+        return this;
     }
 
     public List<CompositeImageViewImpl> getChildrenViews() {
@@ -38,8 +72,8 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     @Override
     public void addChild(CompositeImageViewImpl child) {
-        child.setAbsoluteX((int) (this.getAbsoluteX() - this.getxOffset() + child.getAbsoluteX() + child.getxOffset()));
-        child.setAbsoluteY((int) (this.getAbsoluteY() - this.getyOffset() + child.getAbsoluteY() + child.getyOffset()));
+        child.setAbsoluteX((int) (this.getAbsoluteX() - this.getxOffset() + child.getRelativeX() - child.getxOffset()));
+        child.setAbsoluteY((int) (this.getAbsoluteY() - this.getyOffset() + child.getRelativeY() - child.getyOffset()));
         child.setZindex(this.getZindex() + 1);
         addCh(this,child);
     }
@@ -96,7 +130,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         List<ImageView> lst = new ArrayList<>();
         for (CompositeImageViewImpl child : compositeImageViewImpl.getChildrenViews()){
             lst.add(child);
-            if (child.getChildrenViews()!= null && child.getChildrenViews().size()!=0){
+            if (child.getChildrenViews()!= null && !child.getChildrenViews().isEmpty()){
                 lst.add((ImageView) getAllViews(child));
             }
         }
