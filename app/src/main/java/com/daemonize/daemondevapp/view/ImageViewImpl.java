@@ -20,8 +20,8 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     protected volatile float startingX;
     protected volatile float startingY;
 
-    protected volatile float xOffset;
-    protected volatile float yOffset;
+    protected volatile float xOffset;//TODO check if this is really neccessary
+    protected volatile float yOffset;//TODO check if this is really neccessary
 
     public ImageViewImpl() {}
 
@@ -87,7 +87,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteX(float absoluteX) {
         this.absoluteX = absoluteX;
-        this.startingX = this.absoluteX - xOffset;
+        //this.startingX = this.absoluteX - xOffset;//TODO check if this is really neccessary
         return this;
     }
 
@@ -95,7 +95,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteY(float absoluteY) {
         this.absoluteY = absoluteY;
-        this.startingY = absoluteY - yOffset;
+        //this.startingY = absoluteY - yOffset;//TODO check if this is really neccessary
         return this;
     }
 
@@ -109,8 +109,8 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl setImage(Image image) {
-        this.xOffset = image.getWidth() / 2;
-        this.yOffset = image.getHeight() / 2;
+        this.xOffset = image.getWidth() / 2;//TODO check if this is really neccessary
+        this.yOffset = image.getHeight() / 2;//TODO check if this is really neccessary
         this.startingX = this.absoluteX - this.xOffset;
         this.startingY = this.absoluteY - this.yOffset;
         return setImageWithoutOffset(image);
@@ -152,11 +152,6 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
 
     @Override
     public boolean checkCoordinates(float x, float y) {
-//        if ((x >= (getAbsoluteX() - getxOffset()) && x <= (getAbsoluteX() + getxOffset()))
-//            && (y >= (getAbsoluteY() - getyOffset()) && y <= (getAbsoluteY() + getyOffset()))) {
-//                return true;
-//        }
-
         if (x >= getStartingX() && x <= getEndX()) {
             if (y >= getStartingY() && y <= getEndY())
                 return true;

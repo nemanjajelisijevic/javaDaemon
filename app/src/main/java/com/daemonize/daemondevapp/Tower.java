@@ -21,7 +21,7 @@ public class Tower extends CachedArraySpriteImageMover {
     private int currentAngle;
     private AngleToBitmapArray spriteBuffer;
     private ImageView view;
-    private volatile boolean pause = false;
+    //private volatile boolean pause = false;
 
     private Image[] rotationSprite;
 
@@ -86,7 +86,7 @@ public class Tower extends CachedArraySpriteImageMover {
         for (EnemyDoubleDaemon enemy : activeEnemies) {
             if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().getFirst()) < range
                     && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().getSecond()) < range) {
-                pause = false;
+                //pause = false;
                 rotateTowards(
                         enemy.getPrototype().getLastCoordinates().getFirst(),
                         enemy.getPrototype().getLastCoordinates().getSecond()
@@ -95,7 +95,7 @@ public class Tower extends CachedArraySpriteImageMover {
             }
         }
 
-        pause = true;
+        //pause = true;
         Thread.sleep(scanInterval);
         return Pair.create(false, null);
     }
@@ -191,18 +191,29 @@ public class Tower extends CachedArraySpriteImageMover {
     @Override
     public PositionedImage animate() {
 
-        if (pause)
+//        if (pause)
+//            return null;
+
+        try {
+
+            semaphore.await();
+
+            PositionedImage ret = new PositionedImage();
+            ret.image = iterateSprite();
+
+//        if (ret.image == null) {
+//            return null;//TODO check this null
+//        }
+
+            ret.positionX = lastX;
+            ret.positionY = lastY;
+
+            return ret;
+
+        } catch (InterruptedException ex) {
             return null;
-
-        PositionedImage ret = new PositionedImage();
-        ret.image = iterateSprite();
-
-        if (ret.image == null) {
-            return null;//TODO check this null
         }
 
-        ret.positionX = lastX;
-        ret.positionY = lastY;
-        return ret;
+
     }
 }

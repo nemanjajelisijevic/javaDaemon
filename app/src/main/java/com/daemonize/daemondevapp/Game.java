@@ -125,7 +125,7 @@ public class Game {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
             GenericNode.forEach(aReturn.uncheckAndGet(), actionret -> {
-                Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.get();
+                Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.uncheckAndGet();
                 imageAndView.getSecond().setAbsoluteX(imageAndView.getFirst().positionX);
                 imageAndView.getSecond().setAbsoluteY(imageAndView.getFirst().positionY);
                 imageAndView.getSecond().setImage(imageAndView.getFirst().image);
@@ -290,7 +290,7 @@ public class Game {
     public Game run() {
         drawConsumer.start();
         gameConsumer.start();
-        chain.run();
+        gameConsumer.consume(()->chain.run());
         return this;
     }
 
@@ -343,6 +343,7 @@ public class Game {
             dijalog = new CompositeImageViewImpl(dijalogCoords.getFirst(),dijalogCoords.getSecond(),5, dialogueImage);
             CompositeImageViewImpl nested = new CompositeImageViewImpl(dialogueImage.getWidth() / 2, dialogueImage.getHeight() / 2, nestedRedDialogueImage);
             dijalog.addChild(nested);
+
             nested.addChild(
                     new Button(nested.getImage().getWidth() - (fieldImageTowerDen.getWidth() / 2), (fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
                         dijalogAnimator.stop();
@@ -353,7 +354,7 @@ public class Game {
             );
 
             nested.addChild(
-                    new Button((fieldImageTowerDen.getWidth() / 2), (fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
+                    new Button((dialogueImage.getWidth() / 2 + fieldImageTowerDen.getWidth() / 2), (dialogueImage.getHeight() / 2 + fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
                         drawConsumer.consume(()->dijalog.setImage(dijalogActive ? greenDialogueImage : dialogueImage).show());
                         dijalogActive = !dijalogActive;
                     })
@@ -462,6 +463,9 @@ public class Game {
 
         }).addState(()->{//gameState
 
+
+            Log.e(DaemonUtils.tag(), "ENTERED GAME STATE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
             drawConsumer.consume(()->{
                 for(int j = 0; j < rows; ++j ) {
                     for (int i = 0; i < columns; ++i) {
@@ -554,84 +558,86 @@ public class Game {
 
     }
 
-    public Game setTower(float x, float y) { //TODO to be called from Activity.onTouch()
+    public void setTower(float x, float y) {
 
-        gameConsumer.consume(()-> {
+        Log.e(DaemonUtils.tag(), "SETTING TOWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
-            Field field = grid.getField(x, y);
-            if (field == null) return;
+        Field field = grid.getField(x, y);
+        if (field == null) return;
 
-            //upgrade existing tower
-            TowerDaemon tow = field.getTower();
-            if (tow != null) {
+        //upgrade existing tower
+        TowerDaemon tow = field.getTower();
+        if (tow != null) {
 
-                if (!dijalog.isShowing()) {
-                    pauseAll();
-                    drawConsumer.consume(()->{
-                        dijalog.setAbsoluteX(dijalogCoords.getFirst());
-                        dijalog.setAbsoluteY(dijalogCoords.getSecond());
-                        dijalog.setImage(dialogueImage);
-                        dijalog.show();
-                    });
-                    dijalogAnimator.start();
-                }
-
-                if(towerShootInterval > 200)
-                    towerShootInterval -= 50;
-
-                towerScanClosure.setSleepInterval(towerShootInterval);
-                return;
-            } else if (pause) {
-                return;
+            if (!dijalog.isShowing()) {
+                pauseAll();
+                drawConsumer.consume(()->{
+                    dijalog.setAbsoluteX(dijalogCoords.getFirst());
+                    dijalog.setAbsoluteY(dijalogCoords.getSecond());
+                    dijalog.setImage(dialogueImage);
+                    dijalog.show();
+                });
+                dijalogAnimator.start();
             }
 
-            boolean b = grid.setTower(field.getRow(), field.getColumn());
+            if(towerShootInterval > 200)
+                towerShootInterval -= 100;
 
-            Image image = grid.getField(
-                    field.getRow(),
-                    field.getColumn()
-            ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : towerSprite[0];
+            tow.setScanInterval(towerShootInterval);
+            towerScanClosure.setSleepInterval(towerShootInterval);
 
-            drawConsumer.consume(()-> gridViewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
+            return;
 
-            if (b) {
+        } else if (pause) {
+            return;
+        }
 
-                Image[] initTowerSprite = new Image[1];
-                initTowerSprite[0] = towerSprite[0];
+        boolean b = grid.setTower(field.getRow(), field.getColumn());
 
-                TowerDaemon towerDaemon = new TowerDaemon(
-                        gameConsumer,
-                        drawConsumer,
-                        new Tower(
-                                initTowerSprite,
-                                towerSprite,
-                                Pair.create(field.getCenterX(), field.getCenterY()),
-                                range,
-                                towerShootInterval
-                        )
-                ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
+        Image image = grid.getField(
+                field.getRow(),
+                field.getColumn()
+        ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : towerSprite[0];
 
-                towerDaemon.setView(gridViewMatrix[field.getRow()][field.getColumn()]);
+        drawConsumer.consume(()-> gridViewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
 
-                towers.add(towerDaemon);
+        if (b) {
 
-                field.setTower(towerDaemon);
+            Image[] initTowerSprite = new Image[1];
+            initTowerSprite[0] = towerSprite[0];
 
-                towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(gridViewMatrix[field.getRow()][field.getColumn()]));
+            TowerDaemon towerDaemon = new TowerDaemon(
+                    gameConsumer,
+                    drawConsumer,
+                    new Tower(
+                            initTowerSprite,
+                            towerSprite,
+                            Pair.create(field.getCenterX(), field.getCenterY()),
+                            range,
+                            towerShootInterval
+                    )
+            ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
 
-                towerDaemon.start();
+            towerDaemon.setView(gridViewMatrix[field.getRow()][field.getColumn()]);
 
-                towerScanClosure = new TowerScanClosure(towerDaemon, towerShootInterval);
-                List<EnemyDoubleDaemon> clone = new ArrayList<EnemyDoubleDaemon>(activeEnemies.size());
-                clone.addAll(activeEnemies);
-                towerDaemon.scan(clone, towerScanClosure);
-            }
-        });
+            towers.add(towerDaemon);
 
-        return this;
+            field.setTower(towerDaemon);
+
+            towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(gridViewMatrix[field.getRow()][field.getColumn()]));
+
+            towerDaemon.start();
+
+            towerScanClosure = new TowerScanClosure(towerDaemon, towerShootInterval);
+            List<EnemyDoubleDaemon> clone = new ArrayList<EnemyDoubleDaemon>(activeEnemies.size());
+            clone.addAll(activeEnemies);
+            towerDaemon.scan(clone, towerScanClosure);
+        }
     }
 
     private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity) {//velocity = 13
+
+        Log.e(DaemonUtils.tag(), "FIRING BULLET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         if (!enemy.isShootable())
             return;

@@ -66,15 +66,13 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     @Override
     public boolean checkCoordinates(float x, float y) {
-//        if (super.checkCoordinates(x,y)) {
-//            for (CompositeImageViewImpl child : getChildrenViews()) {
-//                return child.checkCoordinates(x, y);
-//            }
-//        }
+        if (super.checkCoordinates(x,y)) {
+            for (CompositeImageViewImpl child : getChildrenViews()) {
+                if (child.checkCoordinates(x, y)) {
+                    return true;
+                }
 
-        for (CompositeImageViewImpl child : getChildrenViews()){
-            if (child.checkCoordinates(x, y)) {
-                return true;
+                //return child.checkCoordinates(x, y);
             }
         }
         return false;
@@ -83,7 +81,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     //@Override
     public void addChild(CompositeImageViewImpl child) {
         addCh(this, child);
-    }//TODO check for multi nested call
+    }
 
     //@Override
     public void addChild(Image image, Pair<Integer, Integer> coordinates) {
@@ -100,21 +98,6 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         addCh(this,child);
 
     }
-
-//    private boolean isViewBInsideViewA (ImageView viewA, ImageView viewB){
-//        int x1 = (int) (viewA.getAbsoluteX() - viewA.getxOffset());
-//        int x2 = (int) (viewA.getAbsoluteX() + viewA.getxOffset());
-//        int y1 = (int) (viewA.getAbsoluteY() - viewA.getyOffset());
-//        int y2 = (int) (viewA.getAbsoluteY() + viewA.getyOffset());
-//
-//        int xB1 = (int) (viewB.getAbsoluteX() - viewB.getxOffset());
-//        int yB1 = (int) (viewB.getAbsoluteY() - viewB.getyOffset());
-//
-//        if (xB1 >= x1 && xB1 <= x2 && yB1 >= y1 && yB1 <= y2){
-//            return true;
-//        }
-//        return false;
-//    }
 
     private void addCh(CompositeImageViewImpl compositeImageView, CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : compositeImageView.getChildrenViews()){

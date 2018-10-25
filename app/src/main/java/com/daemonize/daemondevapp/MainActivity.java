@@ -242,6 +242,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
+
+        Log.w(DaemonUtils.tag(), "ACTIVITY ON RESUME----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
         game.run();
     }
 
