@@ -10,16 +10,21 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 
-public class CoordinatedImageTranslationMover extends CachedSpriteImageTranslationMover {
+public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMover {
 
-    private Lock coordinateLock = new ReentrantLock();
+    private Lock coordinateLock = new ReentrantLock();//TODO do dis with a semaphore
     private Condition coordinateReachedCondition = coordinateLock.newCondition();
     private volatile boolean coordinatesReached = false;
 
     private volatile float targetX;
     private volatile float targetY;
 
-    public CoordinatedImageTranslationMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
+    public CoordinatedImageTranslationMover(
+            Image [] sprite,
+            float velocity,
+            Pair<Float, Float> startingPos,
+            Pair<Float, Float> targetCoord
+    ) {
         super(sprite, velocity, startingPos);
         this.targetX = targetCoord.getFirst();
         this.targetY = targetCoord.getSecond();

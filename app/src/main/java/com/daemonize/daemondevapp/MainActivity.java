@@ -62,21 +62,26 @@ public class MainActivity extends AppCompatActivity {
         try {
 
             //init enemy sprite
-            Image [] sprite = new Image[12];
+            Image [] sprite = new Image[36];
 
-            int i = 0;
-            for (; i < 3; ++i)
-                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), width, height, false));
+            for(int i = 0; i < 36; i++) {
+                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("plane" + Integer.toString(i) + "0.png")), width, height, false));
+            }
 
-            for (; i < 6; ++i)
-                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), width, height, false));
-
-
-            for (; i < 9; ++i)
-                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), width, height, false));
-
-            for (; i < 12; ++i)
-                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), width, height, false));
+//
+//            int i = 0;
+//            for (; i < 3; ++i)
+//                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), width, height, false));
+//
+//            for (; i < 6; ++i)
+//                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), width, height, false));
+//
+//
+//            for (; i < 9; ++i)
+//                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), width, height, false));
+//
+//            for (; i < 12; ++i)
+//                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), width, height, false));
 
             //bullet sprite
             int bulletSize = 20;
@@ -232,6 +237,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        game.run();
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN)
@@ -242,15 +254,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-
         Log.w(DaemonUtils.tag(), "ACTIVITY ON RESUME----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
-        game.run();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        game.stop();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        game.run();
     }
 
     @Override

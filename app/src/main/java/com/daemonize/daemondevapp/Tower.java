@@ -2,6 +2,7 @@ package com.daemonize.daemondevapp;
 
 
 import com.daemonize.daemondevapp.imagemovers.CachedArraySpriteImageMover;
+import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
@@ -15,17 +16,13 @@ import java.util.List;
 
 
 @Daemonize(doubleDaemonize = true)
-public class Tower extends CachedArraySpriteImageMover {
+public class Tower extends RotatingSpriteImageMover {
+
+    private ImageView view;
+    private Game.TowerScanClosure scanClosure; //TODO check dis
 
     private float range;
-    private int currentAngle;
-    private AngleToBitmapArray spriteBuffer;
-    private ImageView view;
-    //private volatile boolean pause = false;
-
-    private Image[] rotationSprite;
-
-    private Game.TowerScanClosure scanClosure;
+    private volatile int scanInterval;
 
     private DaemonCountingSemaphore scanSemaphore = new DaemonCountingSemaphore();
 
@@ -39,8 +36,7 @@ public class Tower extends CachedArraySpriteImageMover {
         return scanClosure;
     }
 
-    private volatile int scanInterval;
-
+    @CallingThread
     public void setScanInterval(int scanInterval) {
         this.scanInterval = scanInterval;
     }
@@ -55,21 +51,15 @@ public class Tower extends CachedArraySpriteImageMover {
         return view;
     }
 
+    @CallingThread
     public void setView(ImageView view) {
         this.view = view;
     }
 
-    public Tower(Image[] initSprite, Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
-        super(initSprite, 0, startingPos);
-        this.spriteBuffer = new AngleToBitmapArray(rotationSprite, 10);
-        this.rotationSprite = new Image[19];
+    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
+        super(rotationSprite, 0, startingPos);
         this.range = range;
         this.scanInterval = scanIntervalInMillis;
-    }
-
-    @Override
-    public boolean pushSprite(Image[] sprite, float velocity) throws InterruptedException {
-        return super.pushSprite(sprite, velocity);
     }
 
     public boolean sleep(int millis) throws InterruptedException {
@@ -80,13 +70,11 @@ public class Tower extends CachedArraySpriteImageMover {
     @DedicatedThread
     public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
 
-
         scanSemaphore.await();
 
         for (EnemyDoubleDaemon enemy : activeEnemies) {
             if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().getFirst()) < range
                     && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().getSecond()) < range) {
-                //pause = false;
                 rotateTowards(
                         enemy.getPrototype().getLastCoordinates().getFirst(),
                         enemy.getPrototype().getLastCoordinates().getSecond()
@@ -95,82 +83,8 @@ public class Tower extends CachedArraySpriteImageMover {
             }
         }
 
-        //pause = true;
-        Thread.sleep(scanInterval);
+        Thread.sleep(scanInterval);//TODO check dis
         return Pair.create(false, null);
-    }
-
-    private static double getAngle(float x1, float y1, float x2, float y2) {
-
-        float dx = x2 - x1;
-        float dy = y2 - y1;
-
-        double c = Math.sqrt(dx*dx + dy*dy);
-        double angle =  Math.toDegrees(Math.acos(Math.abs(dx)/c));
-
-        if (dx == 0 && dy == 0) {
-          return 0;
-        } else if(dx == 0) {
-            if(dy < 0) {
-                return 90;
-            } else {
-                return 270;
-            }
-        } else if (dy == 0){
-            if(dx < 0) {
-                return 180;
-            } else {
-                return 0;
-            }
-        } else if (dx > 0 && dy > 0) {
-            return 360 - angle;
-        } else if (dx < 0 && dy > 0) {
-            return 180 + angle;
-        } else if (dx < 0 && dy < 0) {
-            return 180 - angle;
-        } else if (dx > 0 && dy < 0) {
-            return angle;
-        } else {
-            return 0;
-        }
-    }
-
-    public void rotateTowards(float x, float y) throws InterruptedException {
-
-        int targetAngle = (int) getAngle(lastX, lastY, x, y);
-
-
-        if (Math.abs(targetAngle - currentAngle) <= 2 * spriteBuffer.getStep()) {
-            spriteBuffer.setCurrentAngle(targetAngle);
-            Image[] last = new Image[1];
-            last[0] = spriteBuffer.getCurrent();
-            setSprite(last);
-
-        } else {
-
-            int size = 0;
-
-            //rotate smoothly
-            int mirrorAngle;
-            boolean direction; //true for increasing angle
-
-            if (targetAngle < 180) {
-                mirrorAngle = targetAngle + 180;
-                direction = !(currentAngle < mirrorAngle && currentAngle > targetAngle);
-            } else {
-                mirrorAngle = targetAngle - 180;
-                direction = currentAngle < targetAngle && currentAngle > mirrorAngle;
-            }
-
-            while (!(Math.abs(targetAngle - spriteBuffer.getCurrentAngle()) < 10)) {
-                rotationSprite[size++] = direction ? spriteBuffer.getIncrementedByStep() : spriteBuffer.getDecrementedByStep();
-            }
-
-            pushSprite(Arrays.copyOf(rotationSprite, size),velocity.intensity);
-        }
-
-        currentAngle = spriteBuffer.getCurrentAngle();
-
     }
 
     @CallingThread
@@ -190,30 +104,15 @@ public class Tower extends CachedArraySpriteImageMover {
     @SideQuest(SLEEP = 25)
     @Override
     public PositionedImage animate() {
-
-//        if (pause)
-//            return null;
-
         try {
-
             semaphore.await();
-
             PositionedImage ret = new PositionedImage();
             ret.image = iterateSprite();
-
-//        if (ret.image == null) {
-//            return null;//TODO check this null
-//        }
-
             ret.positionX = lastX;
             ret.positionY = lastY;
-
             return ret;
-
         } catch (InterruptedException ex) {
             return null;
         }
-
-
     }
 }

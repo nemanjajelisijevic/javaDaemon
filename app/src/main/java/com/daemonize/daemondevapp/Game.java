@@ -354,7 +354,7 @@ public class Game {
             );
 
             nested.addChild(
-                    new Button((dialogueImage.getWidth() / 2 + fieldImageTowerDen.getWidth() / 2), (dialogueImage.getHeight() / 2 + fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
+                    new Button((fieldImageTowerDen.getWidth() / 2), (fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
                         drawConsumer.consume(()->dijalog.setImage(dijalogActive ? greenDialogueImage : dialogueImage).show());
                         dijalogActive = !dijalogActive;
                     })
@@ -542,6 +542,9 @@ public class Game {
                                 }
 
                                 Field next = grid.getMinWeightOfNeighbors(current);
+
+                                enemy.rotateTowards(next.getCenterX(), next.getCenterY(), ret->{});
+
                                 enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
                             }
                         }
@@ -603,14 +606,10 @@ public class Game {
 
         if (b) {
 
-            Image[] initTowerSprite = new Image[1];
-            initTowerSprite[0] = towerSprite[0];
-
             TowerDaemon towerDaemon = new TowerDaemon(
                     gameConsumer,
                     drawConsumer,
                     new Tower(
-                            initTowerSprite,
                             towerSprite,
                             Pair.create(field.getCenterX(), field.getCenterY()),
                             range,

@@ -1,12 +1,15 @@
 package com.daemonize.daemondevapp;
 
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
+import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
+
+import java.util.Arrays;
 
 
 @Daemonize(doubleDaemonize = true, className = "EnemyDoubleDaemon")
@@ -18,6 +21,8 @@ public class Enemy extends CoordinatedImageTranslationMover {
     private volatile int hp = 30;
     private volatile boolean shootable = true;
     private Image[] spriteHealthBarImage;
+
+    private RotatingSpriteImageMover rotationMover;
 
     public Enemy setHealthBarImage(Image[] healthBarImage) {
         this.spriteHealthBarImage = healthBarImage;
@@ -69,20 +74,26 @@ public class Enemy extends CoordinatedImageTranslationMover {
     }
 
     public Enemy(Image [] sprite, float velocity, int hp, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
-        super(sprite, velocity, startingPos, targetCoord);
+        super(Arrays.copyOf(sprite, 1), velocity, startingPos, targetCoord);
         this.hp = hp;
         this.hpMax = hp;
+        this.rotationMover = new RotatingSpriteImageMover(sprite, velocity, startingPos);
     }
 
     @Override
     public boolean pushSprite(Image [] sprite, float velocity) throws InterruptedException {
-        return super.pushSprite(sprite, velocity);
+        return rotationMover.pushSprite(sprite, velocity);
     }
 
-    @DedicatedThread
+    //@DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
+    }
+
+    public boolean rotateTowards(float x, float y) throws InterruptedException {
+        rotationMover.rotateTowards(x, y);
+        return true;
     }
 
     @CallingThread
@@ -95,6 +106,11 @@ public class Enemy extends CoordinatedImageTranslationMover {
     @Override
     public void cont() {
         super.cont();
+    }
+
+    @Override
+    public Image iterateSprite() {
+        return rotationMover.iterateSprite();
     }
 
     @SideQuest(SLEEP = 25)
