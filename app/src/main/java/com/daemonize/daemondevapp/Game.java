@@ -657,6 +657,7 @@ public class Game {
             if (enemyHp > 0) {
                 enemy.setHp(enemyHp - bulletDoubleDaemon.getPrototype().getDamage());
             } else {
+                drawConsumer.consume(()-> infoScore.setNumbers(++score));
                 enemy.setShootable(false);
                 drawConsumer.consume(()->enemy.getHpView().hide());
                 enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
