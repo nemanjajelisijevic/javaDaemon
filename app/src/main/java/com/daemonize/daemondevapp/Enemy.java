@@ -73,6 +73,12 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return this;
     }
 
+    @CallingThread
+    @Override
+    public Pair<Float, Float> getLastCoordinates() {
+        return super.getLastCoordinates();
+    }
+
     public Enemy(Image [] sprite, float velocity, int hp, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
         super(Arrays.copyOf(sprite, 1), velocity, startingPos, targetCoord);
         this.hp = hp;
@@ -85,14 +91,13 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return rotationMover.pushSprite(sprite, velocity);
     }
 
-    //@DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
     }
 
-    public boolean rotateTowards(float x, float y) throws InterruptedException {
-        rotationMover.rotateTowards(x, y);
+    public boolean rotate(int angle) throws InterruptedException {
+        rotationMover.rotate(angle);
         return true;
     }
 

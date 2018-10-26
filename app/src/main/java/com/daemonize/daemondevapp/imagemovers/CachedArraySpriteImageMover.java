@@ -30,6 +30,4 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
     public CachedArraySpriteImageMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos) {
         super(sprite, velocity, startingPos);
     }
-
-
 }

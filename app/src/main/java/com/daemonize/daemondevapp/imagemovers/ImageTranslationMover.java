@@ -96,7 +96,8 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 //        boolean signY = dY >= 0;
 //        boolean signX = dX >= 0;
         velocity.intensity = velocityInt;
-        velocity.direction = new ImageMover.Direction(dX, dY); //TODO check this shit
+        setDirection(new ImageMover.Direction(dX, dY));
+        //velocity.direction = new ImageMover.Direction(dX, dY); //TODO check this shit
 //
 //        if (Math.abs(dY) >= Math.abs(dX)) {
 //            a = Math.abs((100*dX)/dY);

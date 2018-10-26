@@ -3,6 +3,7 @@ package com.daemonize.daemondevapp;
 import android.util.Log;
 
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
+import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.renderer.Renderer2D;
 import com.daemonize.daemondevapp.scene.Scene2D;
@@ -463,9 +464,6 @@ public class Game {
 
         }).addState(()->{//gameState
 
-
-            Log.e(DaemonUtils.tag(), "ENTERED GAME STATE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
             drawConsumer.consume(()->{
                 for(int j = 0; j < rows; ++j ) {
                     for (int i = 0; i < columns; ++i) {
@@ -520,6 +518,12 @@ public class Game {
 
                 activeEnemies.add(enemy);
 
+
+                int angle = (int) RotatingSpriteImageMover.getAngle(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond(), firstField.getCenterX(), firstField.getCenterY());
+                enemy.rotate(angle, ret1->{});
+
+                //enemy.rotateTowards(firstField.getCenterX(), firstField.getCenterY(), ret1->{});
+
                 enemy.goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
                         new Closure<Boolean>() {// gameConsumer
                             @Override
@@ -542,10 +546,10 @@ public class Game {
                                 }
 
                                 Field next = grid.getMinWeightOfNeighbors(current);
+                                int angle = (int) RotatingSpriteImageMover.getAngle(current.getCenterX(), current.getCenterY(), next.getCenterX(), next.getCenterY());
+                                enemy.rotate(angle, ret->enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this));
 
-                                enemy.rotateTowards(next.getCenterX(), next.getCenterY(), ret->{});
-
-                                enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
+                                //enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
                             }
                         }
                 );
@@ -562,8 +566,6 @@ public class Game {
     }
 
     public void setTower(float x, float y) {
-
-        Log.e(DaemonUtils.tag(), "SETTING TOWER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         Field field = grid.getField(x, y);
         if (field == null) return;
@@ -635,8 +637,6 @@ public class Game {
     }
 
     private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity) {//velocity = 13
-
-        Log.e(DaemonUtils.tag(), "FIRING BULLET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
         if (!enemy.isShootable())
             return;
