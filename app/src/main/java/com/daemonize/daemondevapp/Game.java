@@ -547,7 +547,7 @@ public class Game {
 
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 int angle = (int) RotatingSpriteImageMover.getAngle(current.getCenterX(), current.getCenterY(), next.getCenterX(), next.getCenterY());
-                                enemy.setVelocity(new ImageMover.Velocity(0, enemy.getVelocity().direction));
+                                enemy.setVelocity(new ImageMover.Velocity(1, enemy.getVelocity().direction));
                                 enemy.rotate(angle, ret-> enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this));
 
                                 //enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
