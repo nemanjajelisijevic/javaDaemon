@@ -113,6 +113,18 @@ public class Enemy extends CoordinatedImageTranslationMover {
         super.cont();
     }
 
+    @CallingThread
+    @Override
+    public Velocity getVelocity() {
+        return super.getVelocity();
+    }
+
+    @CallingThread
+    @Override
+    public void setVelocity(Velocity velocity) {
+        super.setVelocity(velocity);
+    }
+
     @Override
     public Image iterateSprite() {
         return rotationMover.iterateSprite();
