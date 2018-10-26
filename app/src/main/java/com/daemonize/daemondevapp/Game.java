@@ -1,6 +1,6 @@
 package com.daemonize.daemondevapp;
 
-import android.util.Log;
+//import android.util.Log;
 
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
@@ -485,7 +485,7 @@ public class Game {
 
                 enemyCounter++;
 
-                Log.d(DaemonUtils.tag(), "Enemy queue size: " + enemyQueue.size());
+                //Log.d(DaemonUtils.tag(), "Enemy queue size: " + enemyQueue.size());
 
                 //every 15 enemies increase the pain!!!!
                 if (enemyCounter % 3 == 0) {
@@ -644,7 +644,7 @@ public class Game {
 
         Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
 
-        Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
+        //Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
         drawConsumer.consume(()->bulletDoubleDaemon.getView().show());
