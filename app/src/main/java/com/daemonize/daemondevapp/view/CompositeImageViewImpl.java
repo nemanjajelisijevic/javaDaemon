@@ -22,6 +22,14 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         return relativeY;
     }
 
+    public void setRelativeX(float relativeX) {
+        this.relativeX = relativeX;
+    }
+
+    public void setRelativeY(float relativeY) {
+        this.relativeY = relativeY;
+    }
+
     public CompositeImageViewImpl(float relX, float relY, Image image) {
         super();
         childrenViews = new LinkedList<>();
@@ -71,7 +79,6 @@ public class CompositeImageViewImpl extends ImageViewImpl {
                 if (child.checkCoordinates(x, y)) {
                     return true;
                 }
-
                 //return child.checkCoordinates(x, y);
             }
         }
@@ -80,7 +87,10 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     //@Override
     public void addChild(CompositeImageViewImpl child) {
-        addCh(this, child);
+        child.setAbsoluteX((this.startingX + child.getRelativeX() ));//TODO check this -- need this because of root child
+        child.setAbsoluteY((this.startingY + child.getRelativeY() ));//TODO check this
+        child.setZindex(this.getZindex() + 1);
+        this.addCh(child);
     }
 
     //@Override
@@ -90,31 +100,38 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         }
 
         CompositeImageViewImpl child = new CompositeImageViewImpl(
-                                    (int) (getStartingX() + coordinates.getFirst() + image.getWidth()/2),
-                                    (int) (getStartingY() + coordinates.getSecond() + image.getHeight() / 2),
-                                    this.getZindex() + 1,
+                                    (int) (coordinates.getFirst()),
+                                    (int) (coordinates.getSecond()),
                                     image);
 
-        addCh(this,child);
+        addChild(child);
 
     }
 
-    private void addCh(CompositeImageViewImpl compositeImageView, CompositeImageViewImpl newChild) {
-        for (CompositeImageViewImpl child : compositeImageView.getChildrenViews()){
-            if (child.checkCoordinates(newChild.getStartingX(), newChild.getStartingY())){
+    private void addCh(CompositeImageViewImpl newChild) {
+        for (CompositeImageViewImpl child : this.childrenViews){
+            if (child.checkRootCoordinates(newChild.getStartingX(), newChild.getStartingY())){
                 //ponovi sve za dete
+                newChild.setRelativeX(newChild.getRelativeX() - (child.startingX - this.startingX));
+                newChild.setRelativeY(newChild.getRelativeY() - (child.startingY - this.startingY));
+                newChild.setAbsoluteX((child.startingX + newChild.getRelativeX()));//TODO check this reson to stay duble check
+                newChild.setAbsoluteY((child.startingY + newChild.getRelativeY()));//TODO check this
                 newChild.setZindex(child.getZindex() + 1); // povecamo z index mozda treba i kordinate prevezati
-                addCh(child,newChild);
+                child.addCh(newChild);
                 return;
             }
         }
 
-        newChild.setAbsoluteX((this.startingX + newChild.getRelativeX() /*+ child.getxOffset()*/));//TODO check this
-        newChild.setAbsoluteY((this.startingY + newChild.getRelativeY() /*+ child.getyOffset()*/));//TODO check this
-        newChild.setZindex(this.getZindex() + 1);
+        this.childrenViews.add(newChild);
 
-        compositeImageView.getChildrenViews().add(newChild);
+    }
 
+    private boolean checkRootCoordinates(float x, float y) {
+        if (x >= getStartingX() && x <= getEndX()) {
+            if (y >= getStartingY() && y <= getEndY())
+                return true;
+        }
+        return false;
     }
 
     @Override

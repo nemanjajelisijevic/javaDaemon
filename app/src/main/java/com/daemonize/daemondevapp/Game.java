@@ -345,8 +345,8 @@ public class Game {
             CompositeImageViewImpl nested = new CompositeImageViewImpl(dialogueImage.getWidth() / 2, dialogueImage.getHeight() / 2, nestedRedDialogueImage);
             dijalog.addChild(nested);
 
-            nested.addChild(
-                    new Button(nested.getImage().getWidth() - (fieldImageTowerDen.getWidth() / 2), (fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
+            dijalog.addChild(
+                    new Button( dialogueImage.getWidth() / 2 + nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
                         dijalogAnimator.stop();
                         dijalogActive = false;
                         drawConsumer.consume(()->dijalog.hide());
@@ -354,18 +354,12 @@ public class Game {
                     })
             );
 
-            nested.addChild(
-                    new Button((fieldImageTowerDen.getWidth() / 2), (fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
+            dijalog.addChild(
+                    new Button( dialogueImage.getWidth() / 2 - nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
                         drawConsumer.consume(()->dijalog.setImage(dijalogActive ? greenDialogueImage : dialogueImage).show());
                         dijalogActive = !dijalogActive;
                     })
             );
-
-//            dijalog.addChild(new Button(dialogueImage.getWidth() - (fieldImageTowerDen.getWidth() / 2), (fieldImageTowerDen.getHeight() / 2), fieldImageTowerDen).onClick(()->{
-//                dijalogAnimator.stop();
-//                dijalog.hide();
-//                contAll();
-//            }));
 
             dijalogAnimator = new DummyDaemon(drawConsumer, 25).setClosure(ret->{
                 if (dijalog.getAbsoluteX() < borderX - dijalog.getxOffset()){
