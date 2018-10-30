@@ -34,6 +34,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return shootable;
     }
 
+    @CallingThread
     public void setShootable(boolean shootable) {
         this.shootable = shootable;
     }

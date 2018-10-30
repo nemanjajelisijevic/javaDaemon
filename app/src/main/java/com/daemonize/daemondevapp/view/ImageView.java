@@ -22,6 +22,9 @@ public interface ImageView extends Comparable<ImageView> {
     float getxOffset();
     float getyOffset();
 
+    float getWidth();
+    float getHeight();
+
     <K extends ImageView> K setImageWithoutOffset(Image image);
     <K extends ImageView> K setImage(Image image);
     Image getImage();

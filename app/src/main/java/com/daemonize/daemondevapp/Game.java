@@ -2,6 +2,8 @@ package com.daemonize.daemondevapp;
 
 //import android.util.Log;
 
+import android.util.Log;
+
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
@@ -529,7 +531,10 @@ public class Game {
                                 else if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     enemy.setShootable(false);
                                     drawConsumer.consume(()-> enemy.getHpView().hide());
-                                    drawConsumer.consume(()-> infoScore.setNumbers(++score));
+
+                                    if (score > 0)
+                                        drawConsumer.consume(()-> infoScore.setNumbers(--score));
+
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                                         enemy.stop();
                                         drawConsumer.consume(() -> enemy.getView().hide());
@@ -541,7 +546,7 @@ public class Game {
 
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 int angle = (int) RotatingSpriteImageMover.getAngle(current.getCenterX(), current.getCenterY(), next.getCenterX(), next.getCenterY());
-                                enemy.setVelocity(new ImageMover.Velocity(1, enemy.getVelocity().direction));
+                                enemy.setVelocity(new ImageMover.Velocity(3, enemy.getVelocity().direction));
                                 enemy.rotate(angle, ret-> enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this));
 
                                 //enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
@@ -647,12 +652,16 @@ public class Game {
 
         bulletDoubleDaemon.goTo(enemyCoord.getFirst(), enemyCoord.getSecond(), velocity, aReturn-> {
 
+            if (!enemy.isShootable())
+                return;
+
             int enemyHp = enemy.getHp();
-            if (enemyHp > 0) {
+
+            if (enemyHp > 0)
                 enemy.setHp(enemyHp - bulletDoubleDaemon.getPrototype().getDamage());
-            } else {
-                drawConsumer.consume(()-> infoScore.setNumbers(++score));
+            else {
                 enemy.setShootable(false);
+                drawConsumer.consume(()-> infoScore.setNumbers(++score));
                 drawConsumer.consume(()->enemy.getHpView().hide());
                 enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                     drawConsumer.consume(() -> enemy.getView().hide());

@@ -169,6 +169,16 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     }
 
     public List<ImageView> getAllViews () {
-        throw new IllegalStateException("Cannot add child to this type of ImageView");
+        throw new IllegalStateException("ImageViewImpl has no children.");
+    }
+
+    @Override
+    public float getWidth() {
+        return getEndX() - getStartingX();
+    }
+
+    @Override
+    public float getHeight() {
+        return getEndY() - getStartingY();
     }
 }
