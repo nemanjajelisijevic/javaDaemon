@@ -12,8 +12,24 @@ public class AwaitedArraySprite<T> {
     private Condition condition = lock.newCondition();
     private volatile boolean flag = false;
 
+    public AwaitedArraySprite(){}
+
     public AwaitedArraySprite(T[] sprite) {
         this.sprite = sprite;
+    }
+
+    public AwaitedArraySprite<T> setSprite(T[] sprite) {
+        this.sprite = sprite;
+        return this;
+    }
+
+    public AwaitedArraySprite<T> clearCache() {
+        sprite = null;
+        return this;
+    }
+
+    public boolean isValid() {
+        return sprite != null;
     }
 
     public void await() throws InterruptedException {

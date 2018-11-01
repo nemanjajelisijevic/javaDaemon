@@ -16,6 +16,8 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 @Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon")
 public class Bullet extends CoordinatedImageTranslationMover {
 
+    private int bulletNo;
+
     private ImageView view;
     private volatile int damage = 2;
 
@@ -23,6 +25,16 @@ public class Bullet extends CoordinatedImageTranslationMover {
                   Pair<Float, Float> targetCoord, int damage) {
         super(sprite, velocity, startingPos, targetCoord);
         this.damage = damage;
+    }
+
+    @CallingThread
+    public void setNo(int no) {
+        this.bulletNo = no;
+    }
+
+    @CallingThread
+    public int getBulletNo() {
+        return bulletNo;
     }
 
     @CallingThread
@@ -51,6 +63,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return this;
     }
 
+    @DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
@@ -91,13 +104,12 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     @SideQuest(SLEEP = 25)
     public PositionedImage animateBullet() {
-//        if (lastX <= borderX1 ||
-//                lastX >= borderX2 ||
-//                lastY <= borderY1 ||
-//                lastY >= borderY2) {
-//            Log.w(DaemonUtils.tag(), "BULLET OUT OF BORDERS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//            consumer.consume(outOfBordersClosure);
-//        }
+        if (lastX <= borderX1 ||
+                lastX >= borderX2 ||
+                lastY <= borderY1 ||
+                lastY >= borderY2) {
+            consumer.consume(outOfBordersClosure);
+        }
         return super.animate();
     }
 }

@@ -91,8 +91,12 @@ public class Game {
     //enemies
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private Image[] enemySprite;
-    private Image [] explodeSprite;
     private Image [] healthBarSprite;
+
+
+    //explosions
+    private Image [] explodeSprite;
+    private Image [] miniExplodeSprite;
 
     private DummyDaemon enemyGenerator;
     private DummyDaemon levelGenerator;
@@ -105,6 +109,7 @@ public class Game {
     //bullets
     private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
     private Image[] bulletSprite;
+    private int bulletNo;
 
     //closures
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
@@ -189,6 +194,11 @@ public class Game {
 
     public Game setExplodeSprite(Image[] explodeSprite) {
         this.explodeSprite = explodeSprite;
+        return this;
+    }
+
+    public Game setMiniExplodeSprite(Image[] miniExplodeSprite) {
+        this.miniExplodeSprite = miniExplodeSprite;
         return this;
     }
 
@@ -571,7 +581,7 @@ public class Game {
             enemyGenerator.start();
 
             //try to garbage collect
-            new DummyDaemon(gameConsumer, 3000).setClosure(aReturn -> System.gc()).start();
+            //new DummyDaemon(gameConsumer, 3000).setClosure(aReturn -> System.gc()).start();
 
         });
 
@@ -658,21 +668,17 @@ public class Game {
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
+        bulletDoubleDaemon.setNo(bulletNo++);
         drawConsumer.consume(()->bulletDoubleDaemon.getView().show());
+
         bulletDoubleDaemon.setStartingCoords(sourceCoord);
         bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
-
-            Log.e(DaemonUtils.tag(), bulletDoubleDaemon.getName() + " OUT OF BORDERS!!!");
-            Log.e(DaemonUtils.tag(), bulletDoubleDaemon.getName() + " OUT OF BORDERS SHOULD HAVE EXPLOADED!!!");
             bulletDoubleDaemon.stop();
             drawConsumer.consume(()->bulletDoubleDaemon.getView().hide());
 
             if(!bulletQueue.contains(bulletDoubleDaemon)) {
-                boolean added = bulletQueue.add(bulletDoubleDaemon);
-                Log.e(DaemonUtils.tag(), bulletDoubleDaemon.getName() + " OUT OF BORDERS SHOULD HAVE EXPLOADED AND RETURNED: " + added);
+                bulletQueue.add(bulletDoubleDaemon);
             }
-
-
         });
 
         bulletDoubleDaemon.start();
@@ -699,13 +705,23 @@ public class Game {
                 });
             }
 
-            bulletDoubleDaemon.pushSprite(explodeSprite, 0, ret->{
-                bulletDoubleDaemon.stop();
-                drawConsumer.consume(()->bulletDoubleDaemon.getView().hide());
 
-                if(!bulletQueue.contains(bulletDoubleDaemon))
+
+//            if (bulletDoubleDaemon.getBulletNo() % 10 == 0) {
+//                bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
+//                    bulletDoubleDaemon.stop();
+//                    drawConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
+//
+//                    if (!bulletQueue.contains(bulletDoubleDaemon))
+//                        bulletQueue.add(bulletDoubleDaemon);
+//                });
+//            } else {
+                bulletDoubleDaemon.stop();
+                drawConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
+
+                if (!bulletQueue.contains(bulletDoubleDaemon))
                     bulletQueue.add(bulletDoubleDaemon);
-            });
+          //}
 
 
         });
