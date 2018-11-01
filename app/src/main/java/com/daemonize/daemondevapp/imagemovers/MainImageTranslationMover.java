@@ -62,7 +62,7 @@
 //    }
 //
 //    @Override
-//    public PositionedImage animate() {
+//    public PositionedImage animateBullet() {
 //
 //
 ////        if(velocity.intensity > 0 ) {
@@ -99,7 +99,7 @@
 //                }
 //
 //           velocity.intensity -= 0.1;
-//            return super.animate();
+//            return super.animateBullet();
 //        //}
 //
 //      // return null;

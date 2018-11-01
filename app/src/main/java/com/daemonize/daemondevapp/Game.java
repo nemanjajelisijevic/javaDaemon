@@ -406,7 +406,14 @@ public class Game {
                                 .setHealthBarImage(healthBarSprite)
                 ).setName("Enemy no. " + i);
 
-                enemy.getPrototype().setBorders(borderX, borderY);
+                //enemy.getPrototype().setBorders(borderX, borderY);
+                enemy.getPrototype().setBorders(
+                        grid.getStartingX(),
+                        (grid.getStartingX() + grid.getGridWidth()),
+                        grid.getStartingY(),
+                        (grid.getStartingY() + grid.getGridHeight())
+                );
+
 
                 enemy.setAnimateEnemySideQuest().setClosure(new EnemyAnimateClosure());//gui consumer
 
@@ -427,8 +434,13 @@ public class Game {
                         ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                 ).setName("Bullet no. " + i);
 
-                bulletDoubleDaemon.getPrototype().setBorders(borderX, borderY);
-                bulletDoubleDaemon.setAnimateSideQuest().setClosure(aReturn -> { //by default working on gui consumer,because of that we use  ** some part of code which we want to be executed in game  consumer, not in gui
+                bulletDoubleDaemon.getPrototype().setBorders(
+                        grid.getStartingX(),
+                        (grid.getStartingX() + grid.getGridWidth()),
+                        grid.getStartingY(),
+                        (grid.getStartingY() + grid.getGridHeight())
+                );
+                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(aReturn -> { //by default working on gui consumer,because of that we use  ** some part of code which we want to be executed in game  consumer, not in gui
 
                     ImageMover.PositionedImage posBmp = aReturn.get();
 
@@ -643,11 +655,26 @@ public class Game {
 
         Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
 
-        //Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
+        Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
         drawConsumer.consume(()->bulletDoubleDaemon.getView().show());
         bulletDoubleDaemon.setStartingCoords(sourceCoord);
+        bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
+
+            Log.e(DaemonUtils.tag(), bulletDoubleDaemon.getName() + " OUT OF BORDERS!!!");
+            Log.e(DaemonUtils.tag(), bulletDoubleDaemon.getName() + " OUT OF BORDERS SHOULD HAVE EXPLOADED!!!");
+            bulletDoubleDaemon.stop();
+            drawConsumer.consume(()->bulletDoubleDaemon.getView().hide());
+
+            if(!bulletQueue.contains(bulletDoubleDaemon)) {
+                boolean added = bulletQueue.add(bulletDoubleDaemon);
+                Log.e(DaemonUtils.tag(), bulletDoubleDaemon.getName() + " OUT OF BORDERS SHOULD HAVE EXPLOADED AND RETURNED: " + added);
+            }
+
+
+        });
+
         bulletDoubleDaemon.start();
 
         bulletDoubleDaemon.goTo(enemyCoord.getFirst(), enemyCoord.getSecond(), velocity, aReturn-> {
@@ -662,7 +689,7 @@ public class Game {
             else {
                 enemy.setShootable(false);
                 drawConsumer.consume(()-> infoScore.setNumbers(++score));
-                drawConsumer.consume(()->enemy.getHpView().hide());
+                drawConsumer.consume(()-> enemy.getHpView().hide());
                 enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                     drawConsumer.consume(() -> enemy.getView().hide());
                     enemy.stop();
@@ -672,11 +699,14 @@ public class Game {
                 });
             }
 
-            bulletDoubleDaemon.stop();
-            drawConsumer.consume(()->bulletDoubleDaemon.getView().hide());
+            bulletDoubleDaemon.pushSprite(explodeSprite, 0, ret->{
+                bulletDoubleDaemon.stop();
+                drawConsumer.consume(()->bulletDoubleDaemon.getView().hide());
 
-            if(!bulletQueue.contains(bulletDoubleDaemon))
-                bulletQueue.add(bulletDoubleDaemon);
+                if(!bulletQueue.contains(bulletDoubleDaemon))
+                    bulletQueue.add(bulletDoubleDaemon);
+            });
+
 
         });
 

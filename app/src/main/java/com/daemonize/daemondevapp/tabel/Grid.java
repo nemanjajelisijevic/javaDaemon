@@ -232,11 +232,11 @@ public class Grid {
     }
 
     public int getGridWidth() {
-        return grid.length * fieldWith;
+        return grid[0].length * fieldWith;
     }
 
     public int getGridHeight() {
-        return grid[0].length * fieldWith;
+        return grid.length * fieldWith;
     }
 
 }

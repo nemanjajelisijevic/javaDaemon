@@ -61,8 +61,11 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return ret;
     }
 
-    protected float borderX;
-    protected float borderY;
+    protected float borderX1;
+    protected float borderX2;
+
+    protected float borderY1;
+    protected float borderY2;
 
     public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos) {
         this.spriteIterator = new BasicSpriteIterator(sprite);
@@ -112,10 +115,11 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public ImageTranslationMover setBorders(float x, float y) {
-        this.borderX = x;
-        this.borderY = y;
+    public ImageTranslationMover setBorders(float x1, float x2, float y1, float y2) {
+        this.borderX1 = x1;
+        this.borderX2 = x2;
+        this.borderY1 = y1;
+        this.borderY2 = y2;
         return this;
     }
 
@@ -145,16 +149,16 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
             ret.image = iterateSprite();
 
             //check borders and recalculate
-            if (lastX <= 0) {
-                lastX = 0;
-            } else if (lastX >= borderX) {
-                lastX = borderX;
+            if (lastX <= borderX1) {
+                lastX = borderX1;
+            } else if (lastX >= borderX2) {
+                lastX = borderX2;
             }
 
-            if(lastY <= 0) {
-                lastY = 0;
-            } else if( lastY >= borderY) {
-                lastY = borderY;
+            if(lastY <= borderY1) {
+                lastY = borderY1;
+            } else if( lastY >= borderY2) {
+                lastY = borderY2;
             }
 
             ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);

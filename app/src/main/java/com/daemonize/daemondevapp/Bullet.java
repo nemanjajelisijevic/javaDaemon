@@ -1,8 +1,12 @@
 package com.daemonize.daemondevapp;
 
+import android.util.Log;
+
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
@@ -21,6 +25,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         this.damage = damage;
     }
 
+    @CallingThread
     public void setStartingCoords(Pair<Float, Float> startingCoords) {
         lastX = startingCoords.getFirst();
         lastY = startingCoords.getSecond();
@@ -31,6 +36,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return damage;
     }
 
+    @CallingThread
     public void setDamage(int damage) {
         this.damage = damage;
     }
@@ -45,10 +51,14 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return this;
     }
 
-    @DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
+    }
+
+    @Override
+    public boolean pushSprite(Image[] sprite, float velocity) throws InterruptedException {
+        return super.pushSprite(sprite, velocity);
     }
 
     @CallingThread
@@ -63,9 +73,31 @@ public class Bullet extends CoordinatedImageTranslationMover {
         super.cont();
     }
 
+
+    private Consumer consumer;
+    private Runnable outOfBordersClosure;
+
+    @CallingThread
+    public Bullet setOutOfBordersConsumer(Consumer consumer) {
+        this.consumer = consumer;
+        return this;
+    }
+
+    @CallingThread
+    public Bullet setOutOfBordersClosure(Runnable outOfBordersClosure) {
+        this.outOfBordersClosure = outOfBordersClosure;
+        return this;
+    }
+
     @SideQuest(SLEEP = 25)
-    @Override
-    public PositionedImage animate() {
+    public PositionedImage animateBullet() {
+//        if (lastX <= borderX1 ||
+//                lastX >= borderX2 ||
+//                lastY <= borderY1 ||
+//                lastY >= borderY2) {
+//            Log.w(DaemonUtils.tag(), "BULLET OUT OF BORDERS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+//            consumer.consume(outOfBordersClosure);
+//        }
         return super.animate();
     }
 }
