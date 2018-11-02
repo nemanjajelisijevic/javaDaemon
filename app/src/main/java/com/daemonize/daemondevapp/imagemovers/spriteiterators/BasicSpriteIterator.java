@@ -1,28 +1,34 @@
 package com.daemonize.daemondevapp.imagemovers.spriteiterators;
 
 import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+
+import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class BasicSpriteIterator implements SpriteIterator {
 
-    private Image[] sprite;
-    private int spriteSize;
+    private volatile Image[] sprite;
     private int spriteIndex;
+    private Lock spriteLock = new ReentrantLock();
 
     public BasicSpriteIterator(Image[] sprite){
         this.sprite = sprite;
-        this.spriteSize = sprite.length;
     }
 
     @Override
     public int getSize() {
-        return spriteSize;
+        return sprite.length;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public BasicSpriteIterator setSprite(Image[] sprite) {
-        this.spriteSize = sprite.length;
+        spriteLock.lock();
         this.sprite = sprite;
+        this.spriteIndex = 0;
+        spriteLock.unlock();
         return this;
     }
 
@@ -33,9 +39,12 @@ public class BasicSpriteIterator implements SpriteIterator {
 
     @Override
     public Image iterateSprite() {
-        if(spriteIndex == spriteSize) {
+        spriteLock.lock();
+        if(spriteIndex == sprite.length) {
             spriteIndex = 0;
         }
-        return sprite[spriteIndex++];
+        Image ret = sprite[spriteIndex++];
+        spriteLock.unlock();
+        return ret;
     }
 }

@@ -175,10 +175,6 @@ public class MainActivity extends AppCompatActivity {
             miniExplosionSprite[31] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")),miniWidth, miniHeight, false));
             miniExplosionSprite[32] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")),miniWidth, miniHeight, false));
 
-
-
-
-
             Image [] towerSprite =new Image[36];
             towerSprite[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower0.png")), width, height,false));
             towerSprite[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower10.png")), width, height, false));
@@ -282,12 +278,14 @@ public class MainActivity extends AppCompatActivity {
             Log.e(DaemonUtils.tag(), "Could not init game!", ex);
         }
 
+        Log.e(DaemonUtils.tag(), "ACTIVITY ON CREATE----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
+        Log.e(DaemonUtils.tag(), "ACTIVITY ON START----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
         game.run();
     }
 
@@ -295,7 +293,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN)
             game.onTouch(event.getX(), event.getY());
-        return super.onTouchEvent(event);
+        return true;
+        //return super.onTouchEvent(event);
     }
 
     @Override
@@ -307,17 +306,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        Log.w(DaemonUtils.tag(), "ACTIVITY ON ON PAUSE----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        game.run();
+        Log.e(DaemonUtils.tag(), "ACTIVITY ON STOP----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+        game.stop();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.e(DaemonUtils.tag(), "ACTIVITY ON DESTROY----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
     }
 
     @Override

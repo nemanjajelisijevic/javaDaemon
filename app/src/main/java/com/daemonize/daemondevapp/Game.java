@@ -109,7 +109,7 @@ public class Game {
     //bullets
     private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
     private Image[] bulletSprite;
-    private int bulletNo;
+    private int bulletDamage = 2;
 
     //closures
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
@@ -440,7 +440,7 @@ public class Game {
                                 0,
                                 Pair.create((float) 0, (float) 0),
                                 Pair.create((float) 0, (float) 0),
-                                2
+                                bulletDamage
                         ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                 ).setName("Bullet no. " + i);
 
@@ -452,19 +452,19 @@ public class Game {
                 );
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(aReturn -> { //by default working on gui consumer,because of that we use  ** some part of code which we want to be executed in game  consumer, not in gui
 
-                    ImageMover.PositionedImage posBmp = aReturn.get();
-
-                    gameConsumer.consume(()-> { //**
-                                if (Math.abs(posBmp.positionX) < 20
-                                        || Math.abs(posBmp.positionX - borderX) < 20
-                                        || Math.abs(posBmp.positionY) < 20
-                                        || Math.abs(posBmp.positionY - borderY) < 20) {
-                                    bulletDoubleDaemon.stop();
-                                    drawConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
-                                    if (!bulletQueue.contains(bulletDoubleDaemon))
-                                        bulletQueue.add(bulletDoubleDaemon);
-                                }
-                    });
+                    ImageMover.PositionedImage posBmp = aReturn.uncheckAndGet();
+//
+//                    gameConsumer.consume(()-> { //**
+//                                if (Math.abs(posBmp.positionX) < 20
+//                                        || Math.abs(posBmp.positionX - borderX) < 20
+//                                        || Math.abs(posBmp.positionY) < 20
+//                                        || Math.abs(posBmp.positionY - borderY) < 20) {
+//                                    bulletDoubleDaemon.stop();
+//                                    drawConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
+//                                    if (!bulletQueue.contains(bulletDoubleDaemon))
+//                                        bulletQueue.add(bulletDoubleDaemon);
+//                                }
+//                    });
 
                     bulletDoubleDaemon.getView().setAbsoluteX(posBmp.positionX);
                     bulletDoubleDaemon.getView().setAbsoluteY(posBmp.positionY);
@@ -520,6 +520,11 @@ public class Game {
                     enemyGenerator.setSleepInterval(20000);
                 } else {
                     enemyGenerator.setSleepInterval((int)enemyGenerateinterval);
+                }
+
+                if (enemyCounter % 20 == 0) {
+                    if (bulletDamage < 10)
+                        bulletDamage += 1;
                 }
 
                 EnemyDoubleDaemon enemy = enemyQueue.poll();
@@ -581,7 +586,7 @@ public class Game {
             enemyGenerator.start();
 
             //try to garbage collect
-            //new DummyDaemon(gameConsumer, 3000).setClosure(aReturn -> System.gc()).start();
+            new DummyDaemon(gameConsumer, 3000).setClosure(aReturn -> System.gc()).start();
 
         });
 
@@ -668,7 +673,8 @@ public class Game {
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
-        bulletDoubleDaemon.setNo(bulletNo++);
+        bulletDoubleDaemon.setDamage(bulletDamage);
+        bulletDoubleDaemon.setSprite(bulletSprite);
         drawConsumer.consume(()->bulletDoubleDaemon.getView().show());
 
         bulletDoubleDaemon.setStartingCoords(sourceCoord);
@@ -688,11 +694,11 @@ public class Game {
             if (!enemy.isShootable())
                 return;
 
-            int enemyHp = enemy.getHp();
+            int newHp = enemy.getHp() - bulletDoubleDaemon.getPrototype().getDamage();
 
-            if (enemyHp > 0)
-                enemy.setHp(enemyHp - bulletDoubleDaemon.getPrototype().getDamage());
-            else {
+            if (newHp > 0) {
+                enemy.setHp(newHp);
+            } else {
                 enemy.setShootable(false);
                 drawConsumer.consume(()-> infoScore.setNumbers(++score));
                 drawConsumer.consume(()-> enemy.getHpView().hide());
@@ -705,24 +711,14 @@ public class Game {
                 });
             }
 
-
-
-//            if (bulletDoubleDaemon.getBulletNo() % 10 == 0) {
-//                bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
-//                    bulletDoubleDaemon.stop();
-//                    drawConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
-//
-//                    if (!bulletQueue.contains(bulletDoubleDaemon))
-//                        bulletQueue.add(bulletDoubleDaemon);
-//                });
-//            } else {
+            bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
                 bulletDoubleDaemon.stop();
                 drawConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
 
                 if (!bulletQueue.contains(bulletDoubleDaemon))
                     bulletQueue.add(bulletDoubleDaemon);
-          //}
 
+            });
 
         });
 

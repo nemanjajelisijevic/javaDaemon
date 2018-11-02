@@ -3,6 +3,7 @@ package com.daemonize.daemondevapp;
 import android.util.Log;
 
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
+import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -16,8 +17,6 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 @Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon")
 public class Bullet extends CoordinatedImageTranslationMover {
 
-    private int bulletNo;
-
     private ImageView view;
     private volatile int damage = 2;
 
@@ -28,13 +27,9 @@ public class Bullet extends CoordinatedImageTranslationMover {
     }
 
     @CallingThread
-    public void setNo(int no) {
-        this.bulletNo = no;
-    }
-
-    @CallingThread
-    public int getBulletNo() {
-        return bulletNo;
+    @Override
+    public ImageTranslationMover setSprite(Image[] sprite) {
+        return super.setSprite(sprite);
     }
 
     @CallingThread
