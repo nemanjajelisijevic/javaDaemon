@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp.view;
 
-import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
 import java.util.List;

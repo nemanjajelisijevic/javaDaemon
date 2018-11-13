@@ -61,6 +61,9 @@ public class Game {
     private int score = 0;
 
     private CompositeImageViewImpl dijalog;
+//    private CompositeImageViewImpl towerUpgrade;
+
+    private TowerUpgradeDialog towerUpgradeDialog;
 
     private ImageView scoreBackGrView;
     private ImageView scoreTitleView;
@@ -72,6 +75,9 @@ public class Game {
     private Image fieldImageTower;
     private Image fieldImageTowerDen;
     private Image dialogueImage;
+    private Image [] dialogueImageTowerUpgradeLevel;
+    private Image upgradeButton;
+    private Image closeButton;
     private Image nestedRedDialogueImage;
     private Image greenDialogueImage;
     private Image scoreBackGrImage;
@@ -237,6 +243,21 @@ public class Game {
         return this;
     }
 
+    public Game setDialogueImageTowerUpgradeLevel(Image[] dialogueImageTowerUpgradeLevel) {
+        this.dialogueImageTowerUpgradeLevel = dialogueImageTowerUpgradeLevel;
+        return this;
+    }
+
+    public Game setUpgradeButton(Image upgradeButton) {
+        this.upgradeButton = upgradeButton;
+        return this;
+    }
+
+    public Game setCloseButton(Image closeButton) {
+        this.closeButton = closeButton;
+        return this;
+    }
+
     public Game setRedNestedDialogue(Image nestedRedDialogueImage) {
         this.nestedRedDialogueImage = nestedRedDialogueImage;
         return this;
@@ -320,8 +341,8 @@ public class Game {
 
     public Game onTouch(float x, float y) {//TODO use root dialogs only!!!!
         gameConsumer.consume(()->{
-            if(dijalog.isShowing()){
-                dijalog.checkCoordinates(x, y);
+            if (towerUpgradeDialog.getTowerUpgrade().isShowing()){
+                towerUpgradeDialog.getTowerUpgrade().checkCoordinates(x, y);
             } else {
                 setTower(x, y);
             }
@@ -353,41 +374,44 @@ public class Game {
             viewsNum[3] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
             viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
-            dijalog = new CompositeImageViewImpl(dijalogCoords.getFirst(),dijalogCoords.getSecond(),5, dialogueImage);
-            CompositeImageViewImpl nested = new CompositeImageViewImpl(dialogueImage.getWidth() / 2, dialogueImage.getHeight() / 2, nestedRedDialogueImage);
-            dijalog.addChild(nested);
+            towerUpgradeDialog =  new TowerUpgradeDialog(700,500,
+                    dialogueImageTowerUpgradeLevel, upgradeButton, closeButton, greenDialogueImage );
 
-            //nested.addChild(
-            dijalog.addChild(
-                    //new Button( nestedRedDialogueImage.getWidth() / 2 + fieldImageTowerDen.getWidth() / 2, nestedRedDialogueImage.getHeight() / 2 - fieldImageTowerDen.getHeight() / 2, fieldImageTowerDen).onClick(()->{
-                    new Button( dialogueImage.getWidth() / 2 + nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
-                        dijalogAnimator.stop();
-                        dijalogActive = false;
-                        drawConsumer.consume(()->dijalog.hide());
-                        contAll();
-                    })
-            );
+//            dijalog = new CompositeImageViewImpl(dijalogCoords.getFirst(),dijalogCoords.getSecond(),5, dialogueImage);
+//            CompositeImageViewImpl nested = new CompositeImageViewImpl(dialogueImage.getWidth() / 2, dialogueImage.getHeight() / 2, nestedRedDialogueImage);
+//            dijalog.addChild(nested);
+//
+//            //nested.addChild(
+//            dijalog.addChild(
+//                    //new Button( nestedRedDialogueImage.getWidth() / 2 + fieldImageTowerDen.getWidth() / 2, nestedRedDialogueImage.getHeight() / 2 - fieldImageTowerDen.getHeight() / 2, fieldImageTowerDen).onClick(()->{
+//                    new Button( dialogueImage.getWidth() / 2 + nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
+//                        dijalogAnimator.stop();
+//                        dijalogActive = false;
+//                        drawConsumer.consume(()->dijalog.hide());
+//                        contAll();
+//                    })
+//            );
+//
+//            //nested.addChild(
+//            dijalog.addChild(
+//                    //new Button( nestedRedDialogueImage.getWidth() / 2 - fieldImageTowerDen.getWidth() / 2, nestedRedDialogueImage.getHeight() / 2 - fieldImageTowerDen.getHeight() / 2, fieldImageTowerDen).onClick(()->{
+//                    new Button( dialogueImage.getWidth() / 2 - nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
+//                        drawConsumer.consume(()->dijalog.setImage(dijalogActive ? greenDialogueImage : dialogueImage).show());
+//                        dijalogActive = !dijalogActive;
+//                    })
+//            );
 
-            //nested.addChild(
-            dijalog.addChild(
-                    //new Button( nestedRedDialogueImage.getWidth() / 2 - fieldImageTowerDen.getWidth() / 2, nestedRedDialogueImage.getHeight() / 2 - fieldImageTowerDen.getHeight() / 2, fieldImageTowerDen).onClick(()->{
-                    new Button( dialogueImage.getWidth() / 2 - nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
-                        drawConsumer.consume(()->dijalog.setImage(dijalogActive ? greenDialogueImage : dialogueImage).show());
-                        dijalogActive = !dijalogActive;
-                    })
-            );
-
-            dijalogAnimator = new DummyDaemon(drawConsumer, 25).setClosure(ret->{
-                if (dijalog.getAbsoluteX() < borderX - dijalog.getxOffset()){
-                    dijalog.setAbsoluteX(dijalog.getAbsoluteX() + 3);
-                } else {
-                    gameConsumer.consume(()->dijalogAnimator.stop());
-                }
-            }).setName("Dijalog Animator");
+//            dijalogAnimator = new DummyDaemon(drawConsumer, 25).setClosure(ret->{
+//                if (dijalog.getAbsoluteX() < borderX - dijalog.getxOffset()){
+//                    dijalog.setAbsoluteX(dijalog.getAbsoluteX() + 3);
+//                } else {
+//                    gameConsumer.consume(()->dijalogAnimator.stop());
+//                }
+//            }).setName("Dijalog Animator");
 
             //dijalog.addChild(fieldImageTowerDen,Pair.create(0,0));
 
-            scene.addImageView(dijalog.getAllViews());
+            scene.addImageView(towerUpgradeDialog.getTowerUpgrade().getAllViews());
             scene.addImageView(scoreBackGrView);
             scene.addImageView(scoreTitleView);
 
@@ -497,10 +521,10 @@ public class Game {
 
                 scoreTitleView.setImage(scoreTitle);
                 scoreBackGrView.setImage(scoreBackGrImage);
-                infoScore = new InfoTable(borderX - scoreBackGrImage.getWidth(), 150,scoreBackGrView,scoreTitleView,viewsNum,scorenumbersImages).setNumbers(97513);
+                infoScore = new InfoTable(borderX - scoreBackGrImage.getWidth(), 250,scoreBackGrView,scoreTitleView,viewsNum,scorenumbersImages).setNumbers(97513);
 
             });
-
+            //scoreBackGrView.setAbsoluteX(borderX - scoreBackGrImage.getWidth());
             Field firstField = grid.getField(0, 0);
 
             enemyGenerator = new DummyDaemon(gameConsumer, enemyGenerateinterval).setClosure(ret->{
@@ -605,15 +629,15 @@ public class Game {
         TowerDaemon tow = field.getTower();
         if (tow != null) {
 
-            if (!dijalog.isShowing()) {
+            if (!towerUpgradeDialog.getTowerUpgrade().isShowing()) {
                 pauseAll();
                 drawConsumer.consume(()->{
-                    dijalog.setAbsoluteX(dijalogCoords.getFirst());
-                    dijalog.setAbsoluteY(dijalogCoords.getSecond());
-                    dijalog.setImage(dialogueImage);
-                    dijalog.show();
+                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(dijalogCoords.getFirst());
+                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(dijalogCoords.getSecond());
+                  //  towerUpgradeDialog.getTowerUpgrade().setImage(greenDialogueImage);
+                    towerUpgradeDialog.getTowerUpgrade().show();
                 });
-                dijalogAnimator.start();
+                //dijalogAnimator.start();
             }
 
             if(towerShootInterval > 200)
@@ -646,7 +670,7 @@ public class Game {
                             towerSprite,
                             Pair.create(field.getCenterX(), field.getCenterY()),
                             range,
-                            towerShootInterval
+                            towerShootInterval,0
                     )
             ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
 

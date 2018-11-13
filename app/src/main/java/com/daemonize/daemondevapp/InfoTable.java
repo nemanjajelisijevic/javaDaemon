@@ -7,20 +7,20 @@ import com.daemonize.daemondevapp.view.ImageView;
 public class InfoTable {
     private int x,y;
 
-    private ImageView backGroundImage;
-    private ImageView title;
+   // private ImageView backGroundImage;
+    //private ImageView title;
     private ImageView [] numbersView;
     private Image [] numberImages;
 
     public InfoTable(int x, int y, ImageView backGroundImage, ImageView title, ImageView[] numbers, Image[] images) {
         this.x = x;
         this.y = y;
-        this.backGroundImage = backGroundImage;
-        this.title = title;
+        //this.backGroundImage = backGroundImage;
+       // this.title = title;
         this.numbersView = numbers;
         this.numberImages = images;
 
-        backGroundImage.setAbsoluteX(x).setAbsoluteY(y).show();
+        backGroundImage.setAbsoluteY(y).setAbsoluteX(x).show();
         title.setAbsoluteX(x).setAbsoluteY(y/2).show();
 
         for (int i=0;i<numbersView.length;i++){

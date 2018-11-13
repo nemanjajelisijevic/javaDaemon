@@ -23,6 +23,17 @@ public class Tower extends RotatingSpriteImageMover {
 
     private float range;
     private volatile int scanInterval;
+    private int level; //volatile ????????????
+
+    @CallingThread
+    public int getLevel() {
+        return level;
+    }
+
+    @CallingThread
+    public void setLevel(int level) {
+        this.level = level;
+    }
 
     private DaemonCountingSemaphore scanSemaphore = new DaemonCountingSemaphore();
 
@@ -56,9 +67,10 @@ public class Tower extends RotatingSpriteImageMover {
         this.view = view;
     }
 
-    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis) {
+    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis, int level) {
         super(rotationSprite, 0, startingPos);
         this.range = range;
+        this.level = level;
         this.scanInterval = scanIntervalInMillis;
     }
 

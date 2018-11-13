@@ -251,6 +251,12 @@ public class MainActivity extends AppCompatActivity {
             listNumberImg[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("8.png")), numWidth, numHeight, false));
             listNumberImg[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("9.png")), numWidth, numHeight, false));
 
+            Image [] dialogUpgradeTower1 = new Image[2];
+            dialogUpgradeTower1[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Atomic1.png")), 650, 390, false));
+            dialogUpgradeTower1[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("upgradeDialog.png")), 650, 390, false));
+//            dialogUpgradeTower1[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("2.png")), 650, 390, false));
+//            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("upgradeDialog.png")),650,390,false))
+
 
             Bitmap green = Bitmap.createBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")));
             Bitmap red = Bitmap.createBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")));
@@ -267,12 +273,17 @@ public class MainActivity extends AppCompatActivity {
                     .setTowerSprite(towerSprite)
                     .setHealthBarSprite(listHealthBarImg)
                     .setBorders(borderX, borderY)
+                    .setDialogueImageTowerUpgradeLevel(dialogUpgradeTower1)
+                    .setUpgradeButton(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("UPGRADE.png")),250,90,false)))
+                    .setCloseButton(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("CLOSE.png")),250,90,false)))
                     .setDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, dialog.getWidth(), dialog.getHeight(), false))/*dialog*/)
                     .setRedNestedDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, dialog.getWidth() / 2, dialog.getHeight() / 2, false))/*dialog*/)
-                    .setGreenDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, dialog.getWidth(), dialog.getHeight(), false))/*dialog*/)
+//                    .setGreenDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, dialog.getWidth(), dialog.getHeight(), false))/*dialog*/)
+                    .setGreenDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, 660, 490, false))/*dialog*/)
                     .setScoreBackGrImage(score)
                     .setScorenumbersImages(listNumberImg)
                     .setScoreTitle(titleScore);
+
 
         } catch (IOException ex) {
             Log.e(DaemonUtils.tag(), "Could not init game!", ex);
