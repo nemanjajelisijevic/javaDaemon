@@ -7,18 +7,18 @@ public class Button extends CompositeImageViewImpl implements ClickableImageView
 
     private Runnable onClickCallback;
 
-    public Button(int relX, int relY, Image image) {
-        super(relX, relY, image);
+    public Button(String name, int relX, int relY, Image image) {
+        super(name, relX, relY, image);
     }
 
-    public Button(float absX, float absY, int z, Image image) {
-        super(absX, absY, z, image);
+    public Button(String name, float absX, float absY, int z, Image image) {
+        super(name, absX, absY, z, image);
     }
 
-    @Override
-    public void addChild(Image image, Pair<Integer, Integer> coordinates) {
-        throw new IllegalStateException("Button can not have nested views!");
-    }
+//    @Override
+//    public void addChild(Image image, Pair<Integer, Integer> coordinates) {
+//        throw new IllegalStateException("Button can not have nested views!");
+//    }
 
     @SuppressWarnings("unchecked")
     @Override

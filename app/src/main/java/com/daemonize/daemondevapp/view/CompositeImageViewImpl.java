@@ -9,6 +9,7 @@ import java.util.List;
 
 public class CompositeImageViewImpl extends ImageViewImpl {
 
+    private String viewName;
     protected List<CompositeImageViewImpl> childrenViews;
 
     private float relativeX;
@@ -22,16 +23,19 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         return relativeY;
     }
 
-    public void setRelativeX(float relativeX) {
+    public CompositeImageViewImpl setRelativeX(float relativeX) {
         this.relativeX = relativeX;
+        return this;
     }
 
-    public void setRelativeY(float relativeY) {
+    public CompositeImageViewImpl setRelativeY(float relativeY) {
         this.relativeY = relativeY;
+        return this;
     }
 
-    public CompositeImageViewImpl(float relX, float relY, Image image) {
+    public CompositeImageViewImpl(String name, float relX, float relY, Image image) {
         super();
+        this.viewName = name;
         childrenViews = new LinkedList<>();
         this.relativeX = relX;
         this.relativeY = relY;
@@ -39,8 +43,9 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     }
 
     //for root only!
-    public CompositeImageViewImpl(float absX, float absY, int z, Image image) {
+    public CompositeImageViewImpl(String name, float absX, float absY, int z, Image image) {
         super();
+        this.viewName = name;
         childrenViews = new LinkedList<>();
         this.setAbsoluteX(absX);
         this.setAbsoluteY(absY);
@@ -72,6 +77,19 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         return childrenViews;
     }
 
+    public CompositeImageViewImpl getViewByName(String name) {
+        if (this.viewName.equals(name))
+            return this;
+        else {
+            for (CompositeImageViewImpl child : childrenViews) {
+                CompositeImageViewImpl ret = child.getViewByName(name);
+                if (ret != null)
+                    return ret;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean checkCoordinates(float x, float y) {
         if (super.checkCoordinates(x,y)) {
@@ -94,15 +112,15 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     }
 
     //@Override
-    public void addChild(Image image, Pair<Integer, Integer> coordinates) {
-        CompositeImageViewImpl child = new CompositeImageViewImpl(
-                coordinates.getFirst(),
-                coordinates.getSecond(),
-                image
-        );
-
-        addChild(child);
-    }
+//    public void addChild(Image image, Pair<Integer, Integer> coordinates) {
+//        CompositeImageViewImpl child = new CompositeImageViewImpl(
+//                coordinates.getFirst(),
+//                coordinates.getSecond(),
+//                image
+//        );
+//
+//        addChild(child);
+//    }
 
     private void addCh(CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : this.childrenViews){
@@ -122,8 +140,8 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     }
 
     private boolean checkRootCoordinates(float x, float y) {
-        if (x >= getStartingX() && x <= getEndX()) {
-            if (y >= getStartingY() && y <= getEndY())
+        if (x > getStartingX() && x < getEndX()) {
+            if (y > getStartingY() && y < getEndY())
                 return true;
         }
         return false;

@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Game {
@@ -76,8 +77,8 @@ public class Game {
     private Image fieldImageTowerDen;
     private Image dialogueImage;
     private Image [] dialogueImageTowerUpgradeLevel;
-    private Image upgradeButton;
-    private Image closeButton;
+    private Image upgradeButtonImage;
+    private Image closeButtonImage;
     private Image nestedRedDialogueImage;
     private Image greenDialogueImage;
     private Image scoreBackGrImage;
@@ -166,7 +167,22 @@ public class Game {
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
 
             if (aReturn.get() != null && aReturn.get().getFirst()) {
-                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(),15);
+
+                AtomicInteger bulletsFired = new AtomicInteger(0);
+
+                DummyDaemon rafal = new DummyDaemon(gameConsumer, 500);//TODO BUDZEVINA!!!!
+                rafal.setClosure(ret->{
+                    if (bulletsFired.get() == tower.getLevel()) {
+                        rafal.stop();
+                    }
+
+                    //tower.rotateTowards(enemyCoord.getFirst(), enemyCoord.getSecond());
+                    fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(), 15);
+                    bulletsFired.addAndGet(1);
+                }).start();
+
+
+
                 tower.sleep(sleepInterval, aReturn1 -> {
                     List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
                     clone.addAll(activeEnemies);
@@ -248,13 +264,13 @@ public class Game {
         return this;
     }
 
-    public Game setUpgradeButton(Image upgradeButton) {
-        this.upgradeButton = upgradeButton;
+    public Game setUpgradeButtonImage(Image upgradeButtonImage) {
+        this.upgradeButtonImage = upgradeButtonImage;
         return this;
     }
 
-    public Game setCloseButton(Image closeButton) {
-        this.closeButton = closeButton;
+    public Game setCloseButtonImage(Image closeButtonImage) {
+        this.closeButtonImage = closeButtonImage;
         return this;
     }
 
@@ -374,8 +390,38 @@ public class Game {
             viewsNum[3] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
             viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
+            //        towerUpgrade.addChild(new Button(closeButtonImage.getWidth() / 2, dialogueImageTowerUpgrade.getHeight() + closeButtonImage.getHeight() / 2, closeButtonImage).onClick(() -> {
+//            //                        dijalogAnimator.stop();
+//            //                        dijalogActive = false;
+//            //drawConsumer.consume(() -> towerUpgrade.hide());
+//            //                        contAll();
+//        }));
+
+            Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
+
+                Tower tow = towerUpgradeDialog.getTower();
+
+                int currentLevel = tow.getLevel();
+                tow.setLevel(++currentLevel);
+
+                CompositeImageViewImpl towerView = towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView");
+
+                if (towerView == null)
+                    throw new IllegalStateException("towerView == null");
+
+                drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgradeLevel[1]));
+
+            });
+
+            Button closeButton = new Button("Close", 0, 0, closeButtonImage).onClick(()->{
+                contAll();
+                drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().hide());
+            });
+
             towerUpgradeDialog =  new TowerUpgradeDialog(700,500,
                     dialogueImageTowerUpgradeLevel, upgradeButton, closeButton, greenDialogueImage );
+
+
 
 //            dijalog = new CompositeImageViewImpl(dijalogCoords.getFirst(),dijalogCoords.getSecond(),5, dialogueImage);
 //            CompositeImageViewImpl nested = new CompositeImageViewImpl(dialogueImage.getWidth() / 2, dialogueImage.getHeight() / 2, nestedRedDialogueImage);
@@ -631,6 +677,7 @@ public class Game {
 
             if (!towerUpgradeDialog.getTowerUpgrade().isShowing()) {
                 pauseAll();
+                towerUpgradeDialog.setTower(tow.getPrototype());
                 drawConsumer.consume(()->{
                     towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(dijalogCoords.getFirst());
                     towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(dijalogCoords.getSecond());

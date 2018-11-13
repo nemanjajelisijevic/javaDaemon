@@ -23,7 +23,7 @@ public class Tower extends RotatingSpriteImageMover {
 
     private float range;
     private volatile int scanInterval;
-    private int level; //volatile ????????????
+    private int level = 1; //volatile ???????????? //TODO test only!!!!!!!!!!!!!!!!!!!!!!!!!! REVERT!!!!!!!!!!!!!!!!1
 
     @CallingThread
     public int getLevel() {
@@ -77,6 +77,11 @@ public class Tower extends RotatingSpriteImageMover {
     public boolean sleep(int millis) throws InterruptedException {
         Thread.sleep(millis);
         return true;
+    }
+
+    @Override
+    public void rotateTowards(float x, float y) throws InterruptedException {
+        super.rotateTowards(x, y);
     }
 
     @DedicatedThread
