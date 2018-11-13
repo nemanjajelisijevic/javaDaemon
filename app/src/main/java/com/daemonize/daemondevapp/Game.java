@@ -357,7 +357,9 @@ public class Game {
             CompositeImageViewImpl nested = new CompositeImageViewImpl(dialogueImage.getWidth() / 2, dialogueImage.getHeight() / 2, nestedRedDialogueImage);
             dijalog.addChild(nested);
 
+            //nested.addChild(
             dijalog.addChild(
+                    //new Button( nestedRedDialogueImage.getWidth() / 2 + fieldImageTowerDen.getWidth() / 2, nestedRedDialogueImage.getHeight() / 2 - fieldImageTowerDen.getHeight() / 2, fieldImageTowerDen).onClick(()->{
                     new Button( dialogueImage.getWidth() / 2 + nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
                         dijalogAnimator.stop();
                         dijalogActive = false;
@@ -366,7 +368,9 @@ public class Game {
                     })
             );
 
+            //nested.addChild(
             dijalog.addChild(
+                    //new Button( nestedRedDialogueImage.getWidth() / 2 - fieldImageTowerDen.getWidth() / 2, nestedRedDialogueImage.getHeight() / 2 - fieldImageTowerDen.getHeight() / 2, fieldImageTowerDen).onClick(()->{
                     new Button( dialogueImage.getWidth() / 2 - nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
                         drawConsumer.consume(()->dijalog.setImage(dijalogActive ? greenDialogueImage : dialogueImage).show());
                         dijalogActive = !dijalogActive;
