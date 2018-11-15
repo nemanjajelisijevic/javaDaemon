@@ -383,7 +383,7 @@ public class Game {
                 drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgradeLevel[1]));
                 drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide());
                 score -= 4;
-                infoScore.setNumbers(score);
+                drawConsumer.consume(()->infoScore.setNumbers(score));
 
             });
 
