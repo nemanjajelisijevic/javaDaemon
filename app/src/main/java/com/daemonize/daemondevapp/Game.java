@@ -58,17 +58,11 @@ public class Game {
     private ImageView[][] gridViewMatrix;
     private GenericNode<ImageView> dialogue;
 
+    //score
     private int score = 0;
-
-    private CompositeImageViewImpl dijalog;
-//    private CompositeImageViewImpl towerUpgrade;
-
-    private TowerUpgradeDialog towerUpgradeDialog;
-
     private ImageView scoreBackGrView;
     private ImageView scoreTitleView;
-
-    ImageView [] viewsNum;
+    private ImageView[] viewsNum;
     private InfoTable infoScore;
 
     private Image fieldImage;
@@ -91,8 +85,11 @@ public class Game {
     private Queue<EnemyDoubleDaemon> enemyQueue = new LinkedList<>();
     private int towerShootInterval = 1500;
     private int range = 320;
+    private Image[] towerSprite;
+    private Image[] towerSpriteEx;
 
     private TowerScanClosure towerScanClosure;
+    private TowerUpgradeDialog towerUpgradeDialog;
 
     //enemies
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
@@ -150,48 +147,23 @@ public class Game {
     public class TowerScanClosure implements Closure<Pair<Boolean, EnemyDoubleDaemon>> {
 
         private TowerDaemon tower;
-        private int reloadInterval;
 
-        public TowerScanClosure setReloadInteval(int reloadInteval) {
-            this.reloadInterval = reloadInteval;
-            return this;
-        }
-
-        public TowerScanClosure(TowerDaemon tower, int reloadInteval) {
+        public TowerScanClosure(TowerDaemon tower) {
             this.tower = tower;
-            this.reloadInterval = reloadInteval;
         }
 
         @Override
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
 
-            if (aReturn.get() != null && aReturn.get().getFirst()) {
-//
-//                AtomicInteger bulletsFired = new AtomicInteger(0);
-//
-//                DummyDaemon rafal = new DummyDaemon(gameConsumer, 500);//TODO BUDZEVINA!!!!
-//                rafal.setClosure(ret->{
-//                    if (bulletsFired.get() == tower.getLevel()) {
-//                        rafal.stop();
-//                    }
-//
-//                    //tower.rotateTowards(enemyCoord.getFirst(), enemyCoord.getSecond());
-//                    fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(), 15);
-//                    bulletsFired.addAndGet(1);
-//                }).start();
+            if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst()) {
+                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15,tower.getTowerLevel().bulletDamage);
+            }
 
-                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(),15);
-
-                tower.sleep(reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
-                    List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
-                    clone.addAll(activeEnemies);
-                    tower.scan(clone, this);
-                });
-            } else {
+            tower.sleep(tower.getTowerLevel().reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
                 List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
                 clone.addAll(activeEnemies);
                 tower.scan(clone, this);
-            }
+            });
         }
     }
 
@@ -211,7 +183,10 @@ public class Game {
         return this;
     }
 
-    private Image[] towerSprite;
+    public Game setTowerSpriteEx(Image [] towerSpriteEx) {
+        this.towerSpriteEx = towerSpriteEx;
+        return this;
+    }
 
     public Game setExplodeSprite(Image[] explodeSprite) {
         this.explodeSprite = explodeSprite;
@@ -389,21 +364,16 @@ public class Game {
             viewsNum[3] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
             viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
-            //        towerUpgrade.addChild(new Button(closeButtonImage.getWidth() / 2, dialogueImageTowerUpgrade.getHeight() + closeButtonImage.getHeight() / 2, closeButtonImage).onClick(() -> {
-//            //                        dijalogAnimator.stop();
-//            //                        dijalogActive = false;
-//            //drawConsumer.consume(() -> towerUpgrade.hide());
-//            //                        contAll();
-//        }));
-
             Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
 
                 Tower tow = towerUpgradeDialog.getTower();
-                towerShootInterval -= 100;
-                towerScanClosure.setReloadInteval(towerShootInterval);
+                Tower.TowerLevel currentLevel = tow.getTowerLevel();
+                currentLevel.currentLevel++;
+                currentLevel.bulletDamage += 3;
+                currentLevel.reloadInterval -=500;
 
-                int currentLevel = tow.getLevel();
-                tow.setLevel(++currentLevel);
+                tow.setTowerLevel(currentLevel);
+                tow.setRotationSprite(towerSpriteEx);
 
                 CompositeImageViewImpl towerView = towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView");
 
@@ -411,6 +381,9 @@ public class Game {
                     throw new IllegalStateException("towerView == null");
 
                 drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgradeLevel[1]));
+                drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide());
+                score -= 4;
+                infoScore.setNumbers(score);
 
             });
 
@@ -420,59 +393,9 @@ public class Game {
             });
 
             towerUpgradeDialog =  new TowerUpgradeDialog(700,500,
-                   dialogueImageTowerUpgradeLevel, upgradeButton, closeButton, greenDialogueImage );//.setOnUpgrade(()->{
-//                Tower tow = towerUpgradeDialog.getTower();
-//                towerShootInterval -= 100;
-//                towerScanClosure.setReloadInteval(towerShootInterval);
-//
-//                int currentLevel = tow.getLevel();
-//                tow.setLevel(++currentLevel);
-//
-//                CompositeImageViewImpl towerView = towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView");
-//
-//                if (towerView == null)
-//                    throw new IllegalStateException("towerView == null");
-//
-//                drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgradeLevel[1]));
-//            });
+                   dialogueImageTowerUpgradeLevel[0], upgradeButton, closeButton, greenDialogueImage );//.setOnUpgrade(()->{
 
-
-
-//            dijalog = new CompositeImageViewImpl(dijalogCoords.getFirst(),dijalogCoords.getSecond(),5, dialogueImage);
-//            CompositeImageViewImpl nested = new CompositeImageViewImpl(dialogueImage.getWidth() / 2, dialogueImage.getHeight() / 2, nestedRedDialogueImage);
-//            dijalog.addChild(nested);
-//
-//            //nested.addChild(
-//            dijalog.addChild(
-//                    //new Button( nestedRedDialogueImage.getWidth() / 2 + fieldImageTowerDen.getWidth() / 2, nestedRedDialogueImage.getHeight() / 2 - fieldImageTowerDen.getHeight() / 2, fieldImageTowerDen).onClick(()->{
-//                    new Button( dialogueImage.getWidth() / 2 + nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
-//                        dijalogAnimator.stop();
-//                        dijalogActive = false;
-//                        drawConsumer.consume(()->dijalog.hide());
-//                        contAll();
-//                    })
-//            );
-//
-//            //nested.addChild(
-//            dijalog.addChild(
-//                    //new Button( nestedRedDialogueImage.getWidth() / 2 - fieldImageTowerDen.getWidth() / 2, nestedRedDialogueImage.getHeight() / 2 - fieldImageTowerDen.getHeight() / 2, fieldImageTowerDen).onClick(()->{
-//                    new Button( dialogueImage.getWidth() / 2 - nestedRedDialogueImage.getWidth() / 4, dialogueImage.getHeight() / 2 - nestedRedDialogueImage.getHeight() / 5, fieldImageTowerDen).onClick(()->{
-//                        drawConsumer.consume(()->dijalog.setImage(dijalogActive ? greenDialogueImage : dialogueImage).show());
-//                        dijalogActive = !dijalogActive;
-//                    })
-//            );
-
-//            dijalogAnimator = new DummyDaemon(drawConsumer, 25).setClosure(ret->{
-//                if (dijalog.getAbsoluteX() < borderX - dijalog.getxOffset()){
-//                    dijalog.setAbsoluteX(dijalog.getAbsoluteX() + 3);
-//                } else {
-//                    gameConsumer.consume(()->dijalogAnimator.stop());
-//                }
-//            }).setName("Dijalog Animator");
-
-            //dijalog.addChild(fieldImageTowerDen,Pair.create(0,0));
-
-            scene.addImageView(towerUpgradeDialog.getTowerUpgrade().getAllViews());
+            scene.addImageViews(towerUpgradeDialog.getTowerUpgrade().getAllViews());
             scene.addImageView(scoreBackGrView);
             scene.addImageView(scoreTitleView);
 
@@ -539,22 +462,10 @@ public class Game {
                         grid.getStartingY(),
                         (grid.getStartingY() + grid.getGridHeight())
                 );
+
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(aReturn -> { //by default working on gui consumer,because of that we use  ** some part of code which we want to be executed in game  consumer, not in gui
 
                     ImageMover.PositionedImage posBmp = aReturn.uncheckAndGet();
-//
-//                    gameConsumer.consume(()-> { //**
-//                                if (Math.abs(posBmp.positionX) < 20
-//                                        || Math.abs(posBmp.positionX - borderX) < 20
-//                                        || Math.abs(posBmp.positionY) < 20
-//                                        || Math.abs(posBmp.positionY - borderY) < 20) {
-//                                    bulletDoubleDaemon.stop();
-//                                    drawConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
-//                                    if (!bulletQueue.contains(bulletDoubleDaemon))
-//                                        bulletQueue.add(bulletDoubleDaemon);
-//                                }
-//                    });
-
                     bulletDoubleDaemon.getView().setAbsoluteX(posBmp.positionX);
                     bulletDoubleDaemon.getView().setAbsoluteY(posBmp.positionY);
                     bulletDoubleDaemon.getView().setImage(posBmp.image);
@@ -691,22 +602,23 @@ public class Game {
         if (tow != null) {
 
             if (!towerUpgradeDialog.getTowerUpgrade().isShowing()) {
+
                 pauseAll();
+                Tower.TowerLevel currLvl = tow.getTowerLevel();
                 towerUpgradeDialog.setTower(tow.getPrototype());
+                boolean hasSkillsToPayTheBills = score > 3;
+
                 drawConsumer.consume(()->{
                     towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(dijalogCoords.getFirst());
                     towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(dijalogCoords.getSecond());
-                  //  towerUpgradeDialog.getTowerUpgrade().setImage(greenDialogueImage);
+                    towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView").setImage(dialogueImageTowerUpgradeLevel[currLvl.currentLevel - 1]);
                     towerUpgradeDialog.getTowerUpgrade().show();
+                    if (hasSkillsToPayTheBills)
+                        towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").show();
+                    else
+                        towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide();
                 });
-                //dijalogAnimator.start();
             }
-
-//            if(towerShootInterval > 1000)
-//                towerShootInterval -= 100;
-
-            //tow.setScanInterval(towerShootInterval);
-            towerScanClosure.setReloadInteval(towerShootInterval);
 
             return;
 
@@ -731,8 +643,7 @@ public class Game {
                     new Tower(
                             towerSprite,
                             Pair.create(field.getCenterX(), field.getCenterY()),
-                            range,
-                            towerShootInterval,0
+                            range
                     )
             ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
 
@@ -746,14 +657,14 @@ public class Game {
 
             towerDaemon.start();
 
-            towerScanClosure = new TowerScanClosure(towerDaemon, towerShootInterval);
+            towerScanClosure = new TowerScanClosure(towerDaemon);
             List<EnemyDoubleDaemon> clone = new ArrayList<EnemyDoubleDaemon>(activeEnemies.size());
             clone.addAll(activeEnemies);
             towerDaemon.scan(clone, towerScanClosure);
         }
     }
 
-    private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity) {//velocity = 13
+    private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage) {//velocity = 13
 
         if (!enemy.isShootable())
             return;

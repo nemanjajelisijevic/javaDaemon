@@ -6,6 +6,7 @@ import com.daemonize.daemondevapp.AngleToBitmapArray;
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonprocessor.annotations.CallingThread;
 
 import java.util.Arrays;
 
@@ -16,14 +17,19 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     private Image[] currentRotationSprite;
 
 
-    public RotatingSpriteImageMover(Image[] rotationSprite, float velocity, Pair<Float, Float> startingPos) {
-        super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos);
+    public synchronized void setRotationSprite(Image[] rotationSprite) {
+        setSprite(Arrays.copyOf(rotationSprite, 1));
         int step = 360 / rotationSprite.length;
         this.spriteBuffer = new AngleToBitmapArray(rotationSprite, step);
-        this.currentRotationSprite = new Image[(180 / step) + 1];//TODO check dis + 1
+        this.currentRotationSprite = new Image[(180 / step) + 1];
     }
 
-    public void rotateTowards(float x, float y) throws InterruptedException {
+    public RotatingSpriteImageMover(Image[] rotationSprite, float velocity, Pair<Float, Float> startingPos) {
+        super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos);
+        setRotationSprite(rotationSprite);
+    }
+
+    public synchronized void rotateTowards(float x, float y) throws InterruptedException {
         int targetAngle = (int) getAngle(lastX, lastY, x, y);
         rotate(targetAngle);
     }

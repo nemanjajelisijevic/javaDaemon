@@ -216,6 +216,47 @@ public class MainActivity extends AppCompatActivity {
             towerSprite[34] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower340.png")),width, height, false));
             towerSprite[35] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower350.png")),width, height, false));
 
+            Image [] towerSpriteEX =new Image[36];
+            towerSpriteEX[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione0.png")), width, height,false));
+            towerSpriteEX[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), width, height, false));
+            towerSpriteEX[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), width, height, false));
+            towerSpriteEX[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), width, height, false));
+            towerSpriteEX[4] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione40.png")), width, height, false));
+            towerSpriteEX[5] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione50.png")), width, height, false));
+            towerSpriteEX[6] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione60.png")), width, height, false));
+            towerSpriteEX[7] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione70.png")), width, height, false));
+            towerSpriteEX[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione80.png")), width, height, false));
+            towerSpriteEX[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione90.png")), width, height, false));
+
+            towerSpriteEX[10] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione100.png")),width, height, false));
+            towerSpriteEX[11] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione110.png")),width, height, false));
+            towerSpriteEX[12] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione120.png")),width, height, false));
+            towerSpriteEX[13] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione130.png")),width, height, false));
+            towerSpriteEX[14] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione140.png")),width, height, false));
+            towerSpriteEX[15] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione150.png")),width, height, false));
+            towerSpriteEX[16] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione160.png")),width, height, false));
+            towerSpriteEX[17] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione170.png")),width, height, false));
+            towerSpriteEX[18] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione180.png")),width, height, false));
+            towerSpriteEX[19] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione190.png")),width, height, false));
+
+            towerSpriteEX[20] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione200.png")),width, height, false));
+            towerSpriteEX[21] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione210.png")),width, height, false));
+            towerSpriteEX[22] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione220.png")),width, height, false));
+            towerSpriteEX[23] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione230.png")),width, height, false));
+            towerSpriteEX[24] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione240.png")),width, height, false));
+            towerSpriteEX[25] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione250.png")),width, height, false));
+            towerSpriteEX[26] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione260.png")),width, height, false));
+            towerSpriteEX[27] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione270.png")),width, height, false));
+            towerSpriteEX[28] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione280.png")),width, height, false));
+            towerSpriteEX[29] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione290.png")),width, height, false));
+
+            towerSpriteEX[30] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione300.png")),width, height, false));
+            towerSpriteEX[31] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione310.png")),width, height, false));
+            towerSpriteEX[32] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione320.png")),width, height, false));
+            towerSpriteEX[33] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")),width, height, false));
+            towerSpriteEX[34] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")),width, height, false));
+            towerSpriteEX[35] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")),width, height, false));
+
             int width_hp = 120;
             int height_hp = 30;
 
@@ -271,6 +312,7 @@ public class MainActivity extends AppCompatActivity {
                     .setExplodeSprite(explosionSprite)
                     .setMiniExplodeSprite(miniExplosionSprite)
                     .setTowerSprite(towerSprite)
+                    .setTowerSpriteEx(towerSpriteEX)
                     .setHealthBarSprite(listHealthBarImg)
                     .setBorders(borderX, borderY)
                     .setDialogueImageTowerUpgradeLevel(dialogUpgradeTower1)

@@ -18,21 +18,32 @@ import java.util.List;
 @Daemonize(doubleDaemonize = true)
 public class Tower extends RotatingSpriteImageMover {
 
+    public static class TowerLevel {
+
+        public int currentLevel;
+        public int bulletDamage;
+        public int reloadInterval;
+
+        public TowerLevel(int currentLevel, int bulletDamage, int reloadInterval) {
+            this.currentLevel = currentLevel;
+            this.bulletDamage = bulletDamage;
+            this.reloadInterval = reloadInterval;
+        }
+    }
+
+    private TowerLevel towerLevel = new TowerLevel(1,2,2000);
     private ImageView view;
     private Game.TowerScanClosure scanClosure; //TODO check dis
-
     private float range;
-    private volatile int scanInterval; // reloade interval
-    private int level = 1; //volatile ???????????? //TODO test only!!!!!!!!!!!!!!!!!!!!!!!!!! REVERT!!!!!!!!!!!!!!!!1
 
     @CallingThread
-    public int getLevel() {
-        return level;
+    public TowerLevel getTowerLevel() {
+        return towerLevel;
     }
 
     @CallingThread
-    public void setLevel(int level) {
-        this.level = level;
+    public void setTowerLevel(TowerLevel towerLevel) {
+        this.towerLevel = towerLevel;
     }
 
     private DaemonCountingSemaphore scanSemaphore = new DaemonCountingSemaphore();
@@ -48,16 +59,6 @@ public class Tower extends RotatingSpriteImageMover {
     }
 
     @CallingThread
-    public void setScanInterval(int scanInterval) {
-        this.scanInterval = scanInterval;
-    }
-
-    @CallingThread
-    public int getScanInterval() {
-        return scanInterval;
-    }
-
-    @CallingThread
     public ImageView getView() {
         return view;
     }
@@ -67,16 +68,22 @@ public class Tower extends RotatingSpriteImageMover {
         this.view = view;
     }
 
-    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, int scanIntervalInMillis, int level) {
+    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range) {
         super(rotationSprite, 0, startingPos);
         this.range = range;
-        this.level = level;
-        this.scanInterval = scanIntervalInMillis;
+//        this.level = level;
+//        this.scanInterval = scanIntervalInMillis;
     }
 
     public boolean sleep(int millis) throws InterruptedException {
         Thread.sleep(millis);
         return true;
+    }
+
+    @CallingThread
+    @Override
+    public void setRotationSprite(Image[] rotationSprite) {
+        super.setRotationSprite(rotationSprite);
     }
 
     @Override
@@ -100,7 +107,6 @@ public class Tower extends RotatingSpriteImageMover {
             }
         }
 
-        //Thread.sleep(scanInterval);//TODO check dis
         return Pair.create(false, null);
     }
 
