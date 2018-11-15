@@ -19,6 +19,8 @@ public class TowerUpgradeDialog {
         return this;
     }
 
+
+
     //    private Image upgradeButton;
 //    private Image closeButton;
 //    private Image greenDialogueImage;

@@ -22,7 +22,7 @@ public class Tower extends RotatingSpriteImageMover {
     private Game.TowerScanClosure scanClosure; //TODO check dis
 
     private float range;
-    private volatile int scanInterval;
+    private volatile int scanInterval; // reloade interval
     private int level = 1; //volatile ???????????? //TODO test only!!!!!!!!!!!!!!!!!!!!!!!!!! REVERT!!!!!!!!!!!!!!!!1
 
     @CallingThread
@@ -100,7 +100,7 @@ public class Tower extends RotatingSpriteImageMover {
             }
         }
 
-        Thread.sleep(scanInterval);//TODO check dis
+        //Thread.sleep(scanInterval);//TODO check dis
         return Pair.create(false, null);
     }
 

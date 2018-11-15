@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Game {
@@ -151,39 +150,39 @@ public class Game {
     public class TowerScanClosure implements Closure<Pair<Boolean, EnemyDoubleDaemon>> {
 
         private TowerDaemon tower;
-        private int sleepInterval;
+        private int reloadInterval;
 
-        public TowerScanClosure setSleepInterval(int sleepInterval) {
-            this.sleepInterval = sleepInterval;
+        public TowerScanClosure setReloadInteval(int reloadInteval) {
+            this.reloadInterval = reloadInteval;
             return this;
         }
 
-        public TowerScanClosure(TowerDaemon tower, int sleepInterval) {
+        public TowerScanClosure(TowerDaemon tower, int reloadInteval) {
             this.tower = tower;
-            this.sleepInterval = sleepInterval;
+            this.reloadInterval = reloadInteval;
         }
 
         @Override
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
 
             if (aReturn.get() != null && aReturn.get().getFirst()) {
+//
+//                AtomicInteger bulletsFired = new AtomicInteger(0);
+//
+//                DummyDaemon rafal = new DummyDaemon(gameConsumer, 500);//TODO BUDZEVINA!!!!
+//                rafal.setClosure(ret->{
+//                    if (bulletsFired.get() == tower.getLevel()) {
+//                        rafal.stop();
+//                    }
+//
+//                    //tower.rotateTowards(enemyCoord.getFirst(), enemyCoord.getSecond());
+//                    fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(), 15);
+//                    bulletsFired.addAndGet(1);
+//                }).start();
 
-                AtomicInteger bulletsFired = new AtomicInteger(0);
+                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(),15);
 
-                DummyDaemon rafal = new DummyDaemon(gameConsumer, 500);//TODO BUDZEVINA!!!!
-                rafal.setClosure(ret->{
-                    if (bulletsFired.get() == tower.getLevel()) {
-                        rafal.stop();
-                    }
-
-                    //tower.rotateTowards(enemyCoord.getFirst(), enemyCoord.getSecond());
-                    fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.get().getSecond(), 15);
-                    bulletsFired.addAndGet(1);
-                }).start();
-
-
-
-                tower.sleep(sleepInterval, aReturn1 -> {
+                tower.sleep(reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
                     List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
                     clone.addAll(activeEnemies);
                     tower.scan(clone, this);
@@ -400,6 +399,8 @@ public class Game {
             Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
 
                 Tower tow = towerUpgradeDialog.getTower();
+                towerShootInterval -= 100;
+                towerScanClosure.setReloadInteval(towerShootInterval);
 
                 int currentLevel = tow.getLevel();
                 tow.setLevel(++currentLevel);
@@ -419,7 +420,21 @@ public class Game {
             });
 
             towerUpgradeDialog =  new TowerUpgradeDialog(700,500,
-                    dialogueImageTowerUpgradeLevel, upgradeButton, closeButton, greenDialogueImage );
+                   dialogueImageTowerUpgradeLevel, upgradeButton, closeButton, greenDialogueImage );//.setOnUpgrade(()->{
+//                Tower tow = towerUpgradeDialog.getTower();
+//                towerShootInterval -= 100;
+//                towerScanClosure.setReloadInteval(towerShootInterval);
+//
+//                int currentLevel = tow.getLevel();
+//                tow.setLevel(++currentLevel);
+//
+//                CompositeImageViewImpl towerView = towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView");
+//
+//                if (towerView == null)
+//                    throw new IllegalStateException("towerView == null");
+//
+//                drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgradeLevel[1]));
+//            });
 
 
 
@@ -687,11 +702,11 @@ public class Game {
                 //dijalogAnimator.start();
             }
 
-            if(towerShootInterval > 200)
-                towerShootInterval -= 100;
+//            if(towerShootInterval > 1000)
+//                towerShootInterval -= 100;
 
-            tow.setScanInterval(towerShootInterval);
-            towerScanClosure.setSleepInterval(towerShootInterval);
+            //tow.setScanInterval(towerShootInterval);
+            towerScanClosure.setReloadInteval(towerShootInterval);
 
             return;
 
