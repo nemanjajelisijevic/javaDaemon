@@ -33,8 +33,23 @@ public class Tower extends RotatingSpriteImageMover {
 
     private TowerLevel towerLevel = new TowerLevel(1,2,2000);
     private ImageView view;
-    private Game.TowerScanClosure scanClosure; //TODO check dis
     private float range;
+
+    @CallingThread
+    public void levelUp(){
+        switch (++towerLevel.currentLevel) {
+            case 2:{//midle level
+                towerLevel.bulletDamage += 3;
+                towerLevel.reloadInterval -=500;
+                break;
+            }
+            case 3: { //top level
+                towerLevel.bulletDamage += 5;
+                towerLevel.reloadInterval -= 800;
+                break;
+            }
+        }
+    }
 
     @CallingThread
     public TowerLevel getTowerLevel() {
@@ -49,16 +64,6 @@ public class Tower extends RotatingSpriteImageMover {
     private DaemonCountingSemaphore scanSemaphore = new DaemonCountingSemaphore();
 
     @CallingThread
-    public void setScanClosure(Game.TowerScanClosure scanClosure) {
-        this.scanClosure = scanClosure;
-    }
-
-    @CallingThread
-    public Game.TowerScanClosure getScanClosure() {
-        return scanClosure;
-    }
-
-    @CallingThread
     public ImageView getView() {
         return view;
     }
@@ -71,8 +76,6 @@ public class Tower extends RotatingSpriteImageMover {
     public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range) {
         super(rotationSprite, 0, startingPos);
         this.range = range;
-//        this.level = level;
-//        this.scanInterval = scanIntervalInMillis;
     }
 
     public boolean sleep(int millis) throws InterruptedException {

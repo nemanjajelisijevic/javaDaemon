@@ -367,12 +367,13 @@ public class Game {
             Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
 
                 Tower tow = towerUpgradeDialog.getTower();
-                Tower.TowerLevel currentLevel = tow.getTowerLevel();
-                currentLevel.currentLevel++;
-                currentLevel.bulletDamage += 3;
-                currentLevel.reloadInterval -=500;
+                //                Tower.TowerLevel currentLevel = tow.getTowerLevel();
+//                currentLevel.currentLevel++;
+//                currentLevel.bulletDamage += 3;
+//                currentLevel.reloadInterval -=500;
 
-                tow.setTowerLevel(currentLevel);
+//                tow.setTowerLevel(currentLevel);
+                tow.levelUp();
                 tow.setRotationSprite(towerSpriteEx);
 
                 CompositeImageViewImpl towerView = towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView");
@@ -382,7 +383,7 @@ public class Game {
 
                 drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgradeLevel[1]));
                 drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide());
-                score -= 4;
+                score -= 2;
                 drawConsumer.consume(()->infoScore.setNumbers(score));
 
             });
