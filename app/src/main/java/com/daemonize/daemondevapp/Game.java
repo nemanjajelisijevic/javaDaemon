@@ -156,7 +156,7 @@ public class Game {
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
 
             if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst()) {
-                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15,tower.getTowerLevel().bulletDamage);
+                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage);
             }
 
             tower.sleep(tower.getTowerLevel().reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
@@ -178,12 +178,12 @@ public class Game {
         return this;
     }
 
-    public Game setTowerSprite(Image [] towerSprite) {
+    public Game setTowerSprite(Image[] towerSprite) {
         this.towerSprite = towerSprite;
         return this;
     }
 
-    public Game setTowerSpriteEx(Image [] towerSpriteEx) {
+    public Game setTowerSpriteEx(Image[] towerSpriteEx) {
         this.towerSpriteEx = towerSpriteEx;
         return this;
     }

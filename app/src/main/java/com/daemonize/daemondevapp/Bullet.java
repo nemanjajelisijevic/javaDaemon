@@ -105,6 +105,26 @@ public class Bullet extends CoordinatedImageTranslationMover {
                 lastY >= borderY2) {
             consumer.consume(outOfBordersClosure);
         }
+
+
+//        PositionedImage posImage = super.animate();
+//        PositionedImage posImage1 = posImage.clone();
+//        PositionedImage posImage2 = posImage.clone();
+//
+//        Direction movingDirection = getVelocity().direction;
+//        Direction offsetDirPosImage = new Direction(movingDirection.coeficientX, - movingDirection.coeficientY);
+//        Direction offsetDirPosImage2 = new Direction(- movingDirection.coeficientX, movingDirection.coeficientY);
+//
+//        posImage1.positionX = posImage.positionX + velocity.intensity * (offsetDirPosImage.coeficientX * 0.01f);
+//        posImage1.positionY = posImage.positionY + velocity.intensity * (offsetDirPosImage.coeficientY * 0.01f);
+//
+//        posImage2.positionX = posImage.positionX + velocity.intensity * (offsetDirPosImage2.coeficientX * 0.01f);
+//        posImage2.positionY = posImage.positionY + velocity.intensity * (offsetDirPosImage2.coeficientY * 0.01f);
+//
+//
+//        GenericNode<PositionedImage> ret = new GenericNode<PositionedImage>(posImage1);
+//        ret.addChild(new GenericNode<PositionedImage>(posImage2));
+
         return super.animate();
     }
 }

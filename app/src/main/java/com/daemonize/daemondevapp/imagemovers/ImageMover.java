@@ -31,6 +31,15 @@ public interface ImageMover {
         public Image image;
         public float positionX;
         public float positionY;
+
+        @Override
+        public PositionedImage clone() {
+            PositionedImage clone = new PositionedImage();
+            clone.image = this.image;
+            clone.positionX = this.positionX;
+            clone.positionY = this.positionY;
+            return clone;
+        }
     }
 
     class Direction {
