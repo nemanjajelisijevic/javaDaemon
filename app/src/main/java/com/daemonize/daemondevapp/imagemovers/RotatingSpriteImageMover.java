@@ -15,13 +15,17 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     private int currentAngle;
     private AngleToBitmapArray spriteBuffer;
     private Image[] currentRotationSprite;
-
+    private volatile int size;
 
     public synchronized void setRotationSprite(Image[] rotationSprite) {
-        setSprite(Arrays.copyOf(rotationSprite, 1));
+        //setSprite(Arrays.copyOf(rotationSprite, 1));
         int step = 360 / rotationSprite.length;
         this.spriteBuffer = new AngleToBitmapArray(rotationSprite, step);
         this.currentRotationSprite = new Image[(180 / step) + 1];
+        this.size = 0;
+        Image[] last = new Image[1];
+        last[0] = spriteBuffer.getByAngle(currentAngle);
+        setSprite(last);
     }
 
     public RotatingSpriteImageMover(Image[] rotationSprite, float velocity, Pair<Float, Float> startingPos) {
@@ -43,9 +47,9 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
             last[0] = spriteBuffer.getCurrent();
             setSprite(last);
 
-        } else { //rotate smoothly
+        } else {//rotate smoothly
 
-            int size = 0;
+            size = 0;
             int mirrorAngle;
             boolean direction; //true for increasing angle
             if (targetAngle < 180) {
@@ -56,7 +60,7 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
                 direction = currentAngle < targetAngle && currentAngle > mirrorAngle;
             }
 
-            while (!(Math.abs(targetAngle - spriteBuffer.getCurrentAngle()) < 10)) {
+            while (!(Math.abs(targetAngle - spriteBuffer.getCurrentAngle()) < 10) && size < currentRotationSprite.length) {//TODO fix this!!!!!!
                 currentRotationSprite[size++] = direction ? spriteBuffer.getIncrementedByStep() : spriteBuffer.getDecrementedByStep();
             }
 

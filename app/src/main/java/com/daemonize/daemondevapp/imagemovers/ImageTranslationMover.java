@@ -132,7 +132,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         this.velocity.intensity = velocity;
     }
 
-
     public void pause(){
         semaphore.subscribe();
     }
