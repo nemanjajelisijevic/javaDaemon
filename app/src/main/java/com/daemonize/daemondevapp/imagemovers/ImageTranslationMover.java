@@ -95,6 +95,10 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         float dX = x - lastX;
         float dY = y - lastY;
 
+        if (dX != 0 && dY != 0) {
+            dX = (float)(dX / Math.sqrt(2));
+            dY = (float)(dY / Math.sqrt(2));
+        }
 //        float a;
 //        boolean signY = dY >= 0;
 //        boolean signX = dX >= 0;
