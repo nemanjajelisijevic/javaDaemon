@@ -132,7 +132,7 @@ public class Game {
         }
     }
 
-    private class EnemyAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private class MultiViewAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
             GenericNode.forEach(aReturn.uncheckAndGet(), actionret -> {
@@ -156,7 +156,7 @@ public class Game {
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
 
             if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst()) {
-                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage);
+                fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
             }
 
             tower.sleep(tower.getTowerLevel().reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
@@ -438,7 +438,7 @@ public class Game {
                 );
 
 
-                enemy.setAnimateEnemySideQuest().setClosure(new EnemyAnimateClosure());//gui consumer
+                enemy.setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure());//gui consumer
 
                 enemyQueue.add(enemy);
 
@@ -455,6 +455,8 @@ public class Game {
                                 Pair.create((float) 0, (float) 0),
                                 bulletDamage
                         ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
+                        .setView2(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
+                        .setView3(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                 ).setName("Bullet no. " + i);
 
                 bulletDoubleDaemon.getPrototype().setBorders(
@@ -464,14 +466,15 @@ public class Game {
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(aReturn -> { //by default working on gui consumer,because of that we use  ** some part of code which we want to be executed in game  consumer, not in gui
-
-                    ImageMover.PositionedImage posBmp = aReturn.uncheckAndGet();
-                    bulletDoubleDaemon.getView().setAbsoluteX(posBmp.positionX);
-                    bulletDoubleDaemon.getView().setAbsoluteY(posBmp.positionY);
-                    bulletDoubleDaemon.getView().setImage(posBmp.image);
-
-                });
+                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure());
+//                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(aReturn -> { //by default working on gui consumer,because of that we use  ** some part of code which we want to be executed in game  consumer, not in gui
+//
+//                    ImageMover.PositionedImage posBmp = aReturn.uncheckAndGet();
+//                    bulletDoubleDaemon.getView().setAbsoluteX(posBmp.positionX);
+//                    bulletDoubleDaemon.getView().setAbsoluteY(posBmp.positionY);
+//                    bulletDoubleDaemon.getView().setImage(posBmp.image);
+//
+//                });
 
                 bulletQueue.add(bulletDoubleDaemon);
             }
@@ -665,7 +668,7 @@ public class Game {
         }
     }
 
-    private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage) {//velocity = 13
+    private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage, int noOfBulletsFired) {//velocity = 13
 
         if (!enemy.isShootable())
             return;
@@ -675,14 +678,23 @@ public class Game {
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
+        bulletDoubleDaemon.setLevel(noOfBulletsFired);
         bulletDoubleDaemon.setDamage(bulletDamage);
         bulletDoubleDaemon.setSprite(bulletSprite);
-        drawConsumer.consume(()->bulletDoubleDaemon.getView().show());
+        drawConsumer.consume(()->{
+            for (ImageView view : bulletDoubleDaemon.getViews()){
+                view.show();
+            }
+        });
 
         bulletDoubleDaemon.setStartingCoords(sourceCoord);
         bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
             bulletDoubleDaemon.stop();
-            drawConsumer.consume(()->bulletDoubleDaemon.getView().hide());
+            drawConsumer.consume(()->{
+                for (ImageView view : bulletDoubleDaemon.getViews()){
+                    view.hide();
+                }
+            });
 
             if(!bulletQueue.contains(bulletDoubleDaemon)) {
                 bulletQueue.add(bulletDoubleDaemon);
@@ -715,7 +727,11 @@ public class Game {
 
             bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
                 bulletDoubleDaemon.stop();
-                drawConsumer.consume(() -> bulletDoubleDaemon.getView().hide());
+                drawConsumer.consume(()->{
+                    for (ImageView view : bulletDoubleDaemon.getViews()){
+                        view.hide();
+                    }
+                });
 
                 if (!bulletQueue.contains(bulletDoubleDaemon))
                     bulletQueue.add(bulletDoubleDaemon);
