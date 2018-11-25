@@ -128,7 +128,8 @@ public class Grid {
     public boolean setTower(int row, int column) {
 
 //        gridLock.lock();
-        if (!grid[row][column].isWalkable()) return false;
+        if (!grid[row][column].isWalkable() ) return false;
+        if (row == grid.length - 1 && column == grid[row].length - 1) return false;
 
         //copy of grid
         Field[][] gridTemp = new Field[grid.length][grid[0].length];

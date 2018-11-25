@@ -38,7 +38,7 @@ public class Field implements  IHeapItem <Field> {
         this.weight = weight;
     }
 
-    public Field (Field field) {
+    public Field (Field field) { // copy constructor
         this.centerX = field.centerX;
         this.centerY = field.centerY;
         this.row = field.getRow();
@@ -48,6 +48,7 @@ public class Field implements  IHeapItem <Field> {
         this.gCost = field.gCost;
         this.hCost = field.hCost;
         this.heapIndex = field.getHeapIndex();
+        this.tower = field.tower;
     }
 
     public float getCenterX() {

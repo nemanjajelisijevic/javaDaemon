@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
         //renderer.setWindowSize(borderX, borderY);
         setContentView(renderer);
 
-        int rows = 6;
-        int columns = 8;
+        int rows = 9;
+        int columns = 13;
 
         int width = 160;
         int height = 160;

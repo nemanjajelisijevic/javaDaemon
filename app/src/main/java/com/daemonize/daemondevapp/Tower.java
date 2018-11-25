@@ -43,10 +43,13 @@ public class Tower extends RotatingSpriteImageMover {
                 towerLevel.reloadInterval -=500;
                 break;
             }
-            case 3: { //top level
-                towerLevel.bulletDamage += 5;
-                towerLevel.reloadInterval -= 800;
-                break;
+//            case 3: { //top level
+//                towerLevel.bulletDamage += 5;
+//                towerLevel.reloadInterval -= 800;
+//                break;
+//            }
+            default: {
+                towerLevel.currentLevel = 2; // TODO currentLevel should be equal max level
             }
         }
     }
