@@ -381,8 +381,12 @@ public class Game {
                 if (towerView == null)
                     throw new IllegalStateException("towerView == null");
 
-                drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgradeLevel[1]));
-                drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide());
+                drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgradeLevel[tow.getTowerLevel().currentLevel - 1]));
+                if (score > 2 && tow.getTowerLevel().currentLevel < 3)
+                    towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").show();
+                else
+                    towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide();
+//                drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide());
                 score -= 2;
                 drawConsumer.consume(()->infoScore.setNumbers(score));
 
@@ -617,7 +621,7 @@ public class Game {
                     towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(dijalogCoords.getSecond());
                     towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView").setImage(dialogueImageTowerUpgradeLevel[currLvl.currentLevel - 1]);
                     towerUpgradeDialog.getTowerUpgrade().show();
-                    if (hasSkillsToPayTheBills)
+                    if (hasSkillsToPayTheBills && tow.getTowerLevel().currentLevel < 3)
                         towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").show();
                     else
                         towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide();
