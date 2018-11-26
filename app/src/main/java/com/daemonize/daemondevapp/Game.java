@@ -495,7 +495,7 @@ public class Game {
                     for (int i = 0; i < columns; ++i) {
                         gridViewMatrix[j][i].setAbsoluteX(grid.getGrid()[j][i].getCenterX());
                         gridViewMatrix[j][i].setAbsoluteY(grid.getGrid()[j][i].getCenterY());
-                        gridViewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).show();
+                        gridViewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).hide();
                     }
                 }
 
@@ -578,6 +578,8 @@ public class Game {
                                             enemyQueue.add(enemy);
                                     });
                                 }
+
+                                gridViewMatrix[current.getRow()][current.getColumn()].show();
 
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 int angle = (int) RotatingSpriteImageMover.getAngle(current.getCenterX(), current.getCenterY(), next.getCenterX(), next.getCenterY());
@@ -674,7 +676,7 @@ public class Game {
 
     private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage, int noOfBulletsFired) {//velocity = 13
 
-        if (!enemy.isShootable())
+        if (!enemy.isShootable())//TODO This is what causes bullets to go out of the screen!!!!!
             return;
 
         Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
