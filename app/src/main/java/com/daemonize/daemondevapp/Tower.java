@@ -31,7 +31,7 @@ public class Tower extends RotatingSpriteImageMover {
         }
     }
 
-    private TowerLevel towerLevel = new TowerLevel(1,2,2000);
+    private TowerLevel towerLevel = new TowerLevel(1,2,50);
     private ImageView view;
     private float range;
 
