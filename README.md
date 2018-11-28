@@ -1,10 +1,10 @@
 # javaDaemon
-java code generator/library (for now operational on android) for concurrent execution. Based on the thread per object idea.
+java code generator/library for concurrent execution. Based on the thread per object idea.
 
 
 Generates a wrapper (Daemon) class which is an async representation of an annotated prototype class. Or an interface.
 It encapsulates the prototype instance and a thread that executes all the prototype method bodies in its own context,
-allowing the main thread to loop and be responsive.
+allowing the calling thread to loop and be responsive.
 
 It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with similar signature,
 differing in one thing. The return value is mapped to an output type argument
@@ -20,7 +20,7 @@ Closure exposes an abstract method onReturn() for implementation, which takes th
 argument.
 
 That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the to the settable
-consumer thread (MAIN thread in android, for updating the UI).
+consumer thread (thread stuck in an event loop ie. UI thread).
 
 Underneath, Daemon is a thread that waits on a queue for a called method, or if configured in service 
 mode (prototype method annotated with a @SideQuest annotation) constantly executing the sidequest method.
