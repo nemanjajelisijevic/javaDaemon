@@ -92,49 +92,48 @@ public class MainActivity extends AppCompatActivity {
             bulletSprite[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), bulletSize0, bulletSize0, false));
 
             //bullet sprite laser
-            int bulletSize = 100;
+            int bulletSize = 200;
             Image [] bulletSpriteLaser =new Image[36];
 //            bulletSpriteLaser[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("blueBullet.png")),  bulletSize, bulletSize, false));
 //            bulletSpriteLaser[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("redBullet.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser00x.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser10x.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser20x.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser30x.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[4] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser40x.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[5] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser50x.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[6] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser60x.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[7] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser70x.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser80x.png")),  bulletSize, bulletSize, false));
-            bulletSpriteLaser[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser90x.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning00_180.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning10_190.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning20_200.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning30_210.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[4] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning40_220.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[5] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning50_230.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[6] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning60_240.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[7] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning70_250.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning80_260.png")),  bulletSize, bulletSize, false));
+            bulletSpriteLaser[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning90_270.png")),  bulletSize, bulletSize, false));
 
-            bulletSpriteLaser[10] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser100x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[11] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser110x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[12] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser120x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[13] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser130x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[14] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser140x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[15] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser150x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[16] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser160x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[17] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser170x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[18] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser180x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[19] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser190x.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[10] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning100_280.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[11] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning110_290.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[12] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning120_300.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[13] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning130_310.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[14] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning140_320.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[15] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning150_330.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[16] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning160_340.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[17] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning170_350.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[18] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning00_180.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[19] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning10_190.png")),bulletSize, bulletSize, false));
 
-            bulletSpriteLaser[20] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser200x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[21] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser210x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[22] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser220x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[23] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser230x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[24] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser240x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[25] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser250x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[26] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser260x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[27] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser270x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[28] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser280x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[29] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser290x.png")),bulletSize, bulletSize, false));
-
-            bulletSpriteLaser[30] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser300x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[31] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser310x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[32] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser320x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[33] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser330x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[34] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser340x.png")),bulletSize, bulletSize, false));
-            bulletSpriteLaser[35] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("laser350x.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[20] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning20_200.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[21] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning30_210.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[22] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning40_220.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[23] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning50_230.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[24] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning60_240.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[25] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning70_250.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[26] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning80_260.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[27] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning90_270.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[28] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning100_280.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[29] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning110_290.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[30] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning120_300.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[31] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning130_310.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[32] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning140_320.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[33] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning150_330.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[34] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning160_340.png")),bulletSize, bulletSize, false));
+            bulletSpriteLaser[35] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lightning170_350.png")),bulletSize, bulletSize, false));
 
             //explosion sprite
             Image [] explosionSprite = new Image[33];
