@@ -1,7 +1,10 @@
 package com.daemonize.daemondevapp.imagemovers;
 
+import android.util.Log;
+
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.List;
 import java.util.concurrent.locks.Condition;
@@ -49,33 +52,15 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
 
         return true;
     }
-    public boolean launchTo(float x, float y, float velocityInt) throws InterruptedException {
-
-        super.setDirectionAndMove(x, y, velocityInt);
-        coordinateLock.lock();
-
-        targetX = x;
-        targetY = y;
-
-        try {
-            while (!coordinatesReached) {
-                coordinateReachedCondition.await();
-            }
-        } finally {
-            coordinatesReached = false;
-            coordinateLock.unlock();
-        }
-
-        return true;
-    }
 
     @Override
     public PositionedImage animate() {
-
         if (Math.abs(lastX - targetX)  <= velocity.intensity
                 && Math.abs(lastY - targetY)  <= velocity.intensity) {
             coordinateLock.lock();
             coordinatesReached = true;
+            targetX = 0;
+            targetY = 0;
             coordinateReachedCondition.signal();
             coordinateLock.unlock();
         }

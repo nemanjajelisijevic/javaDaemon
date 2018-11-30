@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 
 
@@ -105,7 +106,7 @@ public class Game {
     private DummyDaemon levelGenerator;
     private long enemyCounter = 0;
     private float enemyVelocity = 1;
-    private int enemyHp = 1000;
+    private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
     private long levelGenerateinterval = 5000;
 
@@ -167,6 +168,12 @@ public class Game {
             });
         }
     }
+
+    private static int getRandomInt(int min, int max) {
+        Random r = new Random();
+        return r.nextInt((max - min) + 1) + min;
+    }
+
 
     public Game setBorders(int x, int y) {
         this.borderX = x;
@@ -841,11 +848,53 @@ public class Game {
         bulletDoubleDaemon.start();
 
 
-        bulletDoubleDaemon.launchTo(sourceCoord.getFirst()+100,sourceCoord.getSecond()+100, velocity, aReturn1 -> {
-            int targetAngle1 = (int) RotatingSpriteImageMover.getAngle( sourceCoord.getFirst()+100, sourceCoord.getSecond()+100,enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond());
-            bulletDoubleDaemon.rotate(targetAngle1,aReturnR -> {
-                Log.w("ROTATE" , "rotacija zavrsena , ugao : "+targetAngle1);
-                bulletDoubleDaemon.goTo(enemyCoord.getFirst(), enemyCoord.getSecond(), velocity, new Attack(bulletDoubleDaemon,enemy));
+        int launchX = getRandomInt((int)(sourceCoord.getFirst() - 50), (int)(sourceCoord.getFirst() + 50));
+        int launchY = getRandomInt((int)(sourceCoord.getSecond() - 50), (int)(sourceCoord.getSecond() + 50));
+
+        bulletDoubleDaemon.goTo(launchX,launchY, 5, aReturn1 -> {
+            int targetAngle1 = (int) RotatingSpriteImageMover.getAngle( bulletDoubleDaemon.getPrototype().getLastCoordinates().getFirst(), bulletDoubleDaemon.getPrototype().getLastCoordinates().getSecond(),enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond());
+            bulletDoubleDaemon.rotate(targetAngle1, aReturnR -> {
+                bulletDoubleDaemon.goTo(
+
+                        enemy.getLastCoordinates().getFirst(),
+                        enemy.getLastCoordinates().getSecond(),
+                        velocity,
+                        /*new Attack(bulletDoubleDaemon,enemy)*/
+                        aReturn2->{
+                            if (!enemy.isShootable()) return;
+
+                            int newHp = enemy.getHp() - bulletDoubleDaemon.getPrototype().getDamage();
+
+                            if (newHp > 0) {
+                                enemy.setHp(newHp);
+                            } else {
+                                enemy.setShootable(false);
+                                drawConsumer.consume(() -> infoScore.setNumbers(++score));
+                                drawConsumer.consume(() -> enemy.getHpView().hide());
+                                enemy.pushSprite(explodeSprite, 0, aReturn3 -> {
+                                    drawConsumer.consume(() -> enemy.getView().hide());
+                                    enemy.stop();
+                                    activeEnemies.remove(enemy);
+                                    if (!enemyQueue.contains(enemy)) enemyQueue.add(enemy);
+                                });
+                            }
+
+                            bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
+                                bulletDoubleDaemon.stop();
+                                drawConsumer.consume(() -> {
+                                    for (ImageView view : bulletDoubleDaemon.getViews()) {
+                                        view.hide();
+                                    }
+                                });
+
+                                if (!bulletQueue.contains(bulletDoubleDaemon)) bulletQueue.add(bulletDoubleDaemon);
+
+                            });
+
+
+                        }
+
+                );
 
             });
         });

@@ -106,11 +106,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
     }
 
     @DedicatedThread
-    public boolean launchTo(float x, float y, float velocityInt) throws InterruptedException {
-        return super.launchTo(x, y, velocityInt);
-    }
-
-    @DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
@@ -118,6 +113,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     @Override
     public boolean pushSprite(Image [] sprite, float velocity) throws InterruptedException {
+        this.velocity.intensity = velocity;
         return rotationMover.pushSprite(sprite, velocity);
     }
 
