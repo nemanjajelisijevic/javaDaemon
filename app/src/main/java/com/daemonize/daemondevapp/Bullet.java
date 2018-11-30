@@ -15,6 +15,7 @@ import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -27,10 +28,15 @@ public class Bullet extends CoordinatedImageTranslationMover {
     private int level = 1;
     private volatile int damage = 2;
 
+    private RotatingSpriteImageMover rotationMover;
+
     public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos,
                   Pair<Float, Float> targetCoord, int damage) {
-        super(sprite, velocity, startingPos, targetCoord);
+
+        super(Arrays.copyOf(sprite, 1), velocity, startingPos, targetCoord);
         this.damage = damage;
+        this.rotationMover = new RotatingSpriteImageMover(sprite, velocity, startingPos);
+
     }
 
     @CallingThread
@@ -100,14 +106,25 @@ public class Bullet extends CoordinatedImageTranslationMover {
     }
 
     @DedicatedThread
+    public boolean launchTo(float x, float y, float velocityInt) throws InterruptedException {
+        return super.launchTo(x, y, velocityInt);
+    }
+
+    @DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
     }
 
     @Override
-    public boolean pushSprite(Image[] sprite, float velocity) throws InterruptedException {
-        return super.pushSprite(sprite, velocity);
+    public boolean pushSprite(Image [] sprite, float velocity) throws InterruptedException {
+        return rotationMover.pushSprite(sprite, velocity);
+    }
+
+    public boolean rotate(int angle) throws InterruptedException {
+//        rotationMover.setCurrentAngle(currentAngle);
+        rotationMover.rotate(angle);
+        return true;
     }
 
     @CallingThread
@@ -136,6 +153,11 @@ public class Bullet extends CoordinatedImageTranslationMover {
     public Bullet setOutOfBordersClosure(Runnable outOfBordersClosure) {
         this.outOfBordersClosure = outOfBordersClosure;
         return this;
+    }
+
+    @Override
+    public Image iterateSprite() {
+        return rotationMover.iterateSprite();
     }
 
     @SideQuest(SLEEP = 25)

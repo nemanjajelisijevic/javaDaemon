@@ -49,6 +49,25 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
 
         return true;
     }
+    public boolean launchTo(float x, float y, float velocityInt) throws InterruptedException {
+
+        super.setDirectionAndMove(x, y, velocityInt);
+        coordinateLock.lock();
+
+        targetX = x;
+        targetY = y;
+
+        try {
+            while (!coordinatesReached) {
+                coordinateReachedCondition.await();
+            }
+        } finally {
+            coordinatesReached = false;
+            coordinateLock.unlock();
+        }
+
+        return true;
+    }
 
     @Override
     public PositionedImage animate() {

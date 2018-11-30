@@ -28,6 +28,10 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         setSprite(last);
     }
 
+    public void setCurrentAngle(int currentAngle) {
+        this.currentAngle = currentAngle;
+    }
+
     public RotatingSpriteImageMover(Image[] rotationSprite, float velocity, Pair<Float, Float> startingPos) {
         super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos);
         setRotationSprite(rotationSprite);
