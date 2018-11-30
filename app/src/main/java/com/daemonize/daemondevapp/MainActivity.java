@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             bulletSprite[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), bulletSize0, bulletSize0, false));
 
             //bullet sprite laser
-            int bulletSize = 200;
+            int bulletSize = 100;
             Image [] bulletSpriteLaser =new Image[36];
 //            bulletSpriteLaser[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("blueBullet.png")),  bulletSize, bulletSize, false));
 //            bulletSpriteLaser[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("redBullet.png")),  bulletSize, bulletSize, false));

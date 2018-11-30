@@ -105,7 +105,7 @@ public class Game {
     private DummyDaemon levelGenerator;
     private long enemyCounter = 0;
     private float enemyVelocity = 1;
-    private int enemyHp = 10;
+    private int enemyHp = 1000;
     private long enemyGenerateinterval = 5000;
     private long levelGenerateinterval = 5000;
 
@@ -524,8 +524,8 @@ public class Game {
                     if(enemyVelocity < 6)
                         enemyVelocity += 1;
 
-                    if (enemyHp < 80)
-                        enemyHp += 5;
+//                    if (enemyHp < 80)
+//                        enemyHp += 5;
 
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
@@ -771,7 +771,7 @@ public class Game {
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
         bulletDoubleDaemon.setLevel(noOfBulletsFired);
-        bulletDoubleDaemon.setDamage(bulletDamage);
+        bulletDoubleDaemon.setDamage(1);
 //        bulletDoubleDaemon.setSprite(bulletSpriteLaser);
         bulletDoubleDaemon.setSprite(currentRotationSprite);
         drawConsumer.consume(()->{
