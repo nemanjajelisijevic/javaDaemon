@@ -24,6 +24,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -158,7 +159,10 @@ public class Game {
         public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
 
             if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst()) {
-                fireLaserBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
+
+                //fireContinousBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
+                //fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
+                fireRocketBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
             }
 
             tower.sleep(tower.getTowerLevel().reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
@@ -686,19 +690,18 @@ public class Game {
         }
     }
 
-    private void fireBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage, int noOfBulletsFired) {//velocity = 13
+    private void fireBullet(Pair<Float, Float> sourceCoord,Pair<Float, Float> targetCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage, int noOfBulletsFired) {//velocity = 13
 
         if (!enemy.isShootable())//TODO This is what causes bullets to go out of the screen!!!!!
             return;
 
-        Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
+        //Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
 
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
         bulletDoubleDaemon.setLevel(noOfBulletsFired);
         bulletDoubleDaemon.setDamage(bulletDamage);
-        bulletDoubleDaemon.setSprite(bulletSprite);
         drawConsumer.consume(()->{
             for (ImageView view : bulletDoubleDaemon.getViews()){
                 view.show();
@@ -719,43 +722,55 @@ public class Game {
             }
         });
 
+        //rotation bullet before fire
+        int targetAngle = (int) RotatingSpriteImageMover.getAngle(
+                sourceCoord.getFirst(),
+                sourceCoord.getSecond(),
+                targetCoord.getFirst(),
+                targetCoord.getSecond()
+        );
+
+
         bulletDoubleDaemon.start();
 
-        bulletDoubleDaemon.goTo(enemyCoord.getFirst(), enemyCoord.getSecond(), velocity, aReturn-> {
+        bulletDoubleDaemon.rotate(targetAngle, ret-> {
 
-            if (!enemy.isShootable())
-                return;
+            bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, aReturn -> {
 
-            int newHp = enemy.getHp() - bulletDoubleDaemon.getPrototype().getDamage();
+                if (!enemy.isShootable())
+                    return;
 
-            if (newHp > 0) {
-                enemy.setHp(newHp);
-            } else {
-                enemy.setShootable(false);
-                drawConsumer.consume(()-> infoScore.setNumbers(++score));
-                drawConsumer.consume(()-> enemy.getHpView().hide());
-                enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
-                    drawConsumer.consume(() -> enemy.getView().hide());
-                    enemy.stop();
-                    activeEnemies.remove(enemy);
-                    if (!enemyQueue.contains(enemy))
-                        enemyQueue.add(enemy);
+                int newHp = enemy.getHp() - bulletDoubleDaemon.getPrototype().getDamage();
+
+                if (newHp > 0) {
+                    enemy.setHp(newHp);
+                } else {
+                    enemy.setShootable(false);
+                    drawConsumer.consume(() -> infoScore.setNumbers(++score));
+                    drawConsumer.consume(() -> enemy.getHpView().hide());
+                    enemy.pushSprite(explodeSprite, 0, aReturn2 -> {
+                        drawConsumer.consume(() -> enemy.getView().hide());
+                        enemy.stop();
+                        activeEnemies.remove(enemy);
+                        if (!enemyQueue.contains(enemy))
+                            enemyQueue.add(enemy);
+                    });
+                }
+
+                bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> {
+                    bulletDoubleDaemon.stop();
+                    drawConsumer.consume(() -> {
+                        for (ImageView view : bulletDoubleDaemon.getViews()) {
+                            view.hide();
+                        }
+                    });
+
+                    if (!bulletQueue.contains(bulletDoubleDaemon))
+                        bulletQueue.add(bulletDoubleDaemon);
+
                 });
-            }
-
-            bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
-                bulletDoubleDaemon.stop();
-                drawConsumer.consume(()->{
-                    for (ImageView view : bulletDoubleDaemon.getViews()){
-                        view.hide();
-                    }
-                });
-
-                if (!bulletQueue.contains(bulletDoubleDaemon))
-                    bulletQueue.add(bulletDoubleDaemon);
 
             });
-
         });
 
     }
@@ -804,7 +819,7 @@ public class Game {
         }
     }
 
-    private void fireLaserBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage, int noOfBulletsFired) {//velocity = 13
+    private void fireRocketBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage, int noOfBulletsFired) {//velocity = 13
 
         if (!enemy.isShootable())//TODO This is what causes bullets to go out of the screen!!!!!
             return;
@@ -847,11 +862,14 @@ public class Game {
 
         bulletDoubleDaemon.start();
 
-
         int launchX = getRandomInt((int)(sourceCoord.getFirst() - 50), (int)(sourceCoord.getFirst() + 50));
         int launchY = getRandomInt((int)(sourceCoord.getSecond() - 50), (int)(sourceCoord.getSecond() + 50));
 
+        int angle = (int) RotatingSpriteImageMover.getAngle(sourceCoord.getFirst(), sourceCoord.getSecond(), launchX, launchY);
+        bulletDoubleDaemon.rotate(angle, ret1->{});
+
         bulletDoubleDaemon.goTo(launchX,launchY, 5, aReturn1 -> {
+//        bulletDoubleDaemon.goTo(sourceCoord.getFirst() + 50, sourceCoord.getSecond(), 5, aReturn1 -> {
             int targetAngle1 = (int) RotatingSpriteImageMover.getAngle( bulletDoubleDaemon.getPrototype().getLastCoordinates().getFirst(), bulletDoubleDaemon.getPrototype().getLastCoordinates().getSecond(),enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond());
             bulletDoubleDaemon.rotate(targetAngle1, aReturnR -> {
                 bulletDoubleDaemon.goTo(
@@ -900,5 +918,167 @@ public class Game {
         });
 
     }
+
+    private void fireContinousBullet(Pair<Float, Float> sourceCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage, int noOfBulletsFired) {//velocity = 13
+
+
+        Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
+
+        Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
+
+        BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
+        bulletDoubleDaemon.setLevel(noOfBulletsFired);
+        bulletDoubleDaemon.setDamage(bulletDamage);
+        bulletDoubleDaemon.setSprite(bulletSpriteLaser);
+
+        if (!enemy.isShootable()) {
+            bulletDoubleDaemon.stop();
+            drawConsumer.consume(()->{
+                for (ImageView view : bulletDoubleDaemon.getViews()){
+                    view.hide();
+                }
+            });
+
+            if (!bulletQueue.contains(bulletDoubleDaemon))
+                bulletQueue.add(bulletDoubleDaemon);
+            return;
+
+        }//TODO This is what causes bullets to go out of the screen!!!!!
+
+
+        drawConsumer.consume(()->{
+            for (ImageView view : bulletDoubleDaemon.getViews()){
+                view.show();
+            }
+        });
+
+        bulletDoubleDaemon.setStartingCoords(sourceCoord);
+        bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
+            bulletDoubleDaemon.stop();
+            drawConsumer.consume(()->{
+                for (ImageView view : bulletDoubleDaemon.getViews()){
+                    view.hide();
+                }
+            });
+
+            if(!bulletQueue.contains(bulletDoubleDaemon)) {
+                bulletQueue.add(bulletDoubleDaemon);
+            }
+        });
+
+
+
+        //rotation bullet before fire
+        int targetAngle = (int) RotatingSpriteImageMover.getAngle(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond(), sourceCoord.getFirst(), sourceCoord.getSecond());
+        bulletDoubleDaemon.setCurrentAngle(targetAngle);
+//        AngleToBitmapArray spriteBufferLaser = new AngleToBitmapArray(bulletSpriteLaser, 10); // TODO un hardcode this !!!
+//        Image[] currentRotationSprite = new Image[1];
+//        currentRotationSprite[0] = spriteBufferLaser.getByAngle(targetAngle);
+
+
+        bulletDoubleDaemon.start();
+
+        int noOfSteps = 5;
+
+        List<Pair<Float, Float>> pathList = new LinkedList<>();
+
+
+        float beginX = sourceCoord.getFirst();//Math.min(sourceCoord.getFirst(), enemy.getLastCoordinates().getFirst());
+        float endX =  enemy.getLastCoordinates().getFirst();// Math.max(sourceCoord.getFirst(), enemy.getLastCoordinates().getFirst());
+
+        float beginY = sourceCoord.getSecond();//Math.min(sourceCoord.getSecond(), enemy.getLastCoordinates().getSecond());
+        float endY =  enemy.getLastCoordinates().getSecond();//Math.max(sourceCoord.getSecond(), enemy.getLastCoordinates().getSecond());
+
+        float diffX = beginX - endX;
+        int signX = 1;
+        if (diffX > 0) signX = -1;
+        float stepX = diffX / noOfSteps;
+
+        float diffY = beginY - endY;
+        int signY = 1;
+        if (diffY > 0) signY = -1;
+        float stepY = diffY / noOfSteps;
+
+        for(int stepsCnt = 0; stepsCnt < noOfSteps; stepsCnt++) {
+            pathList.add(Pair.create((beginX + stepsCnt*stepX*signX), beginY + stepsCnt*stepY*signY));
+        }
+
+        Iterator<Pair<Float, Float>> pathIterator = pathList.iterator();
+
+        if(!pathIterator.hasNext())
+            throw new IllegalStateException("Path list has no elemnets!");
+
+        Pair<Float, Float> pathPtr = pathIterator.next();
+
+        bulletDoubleDaemon.rotate(targetAngle, ret->
+        bulletDoubleDaemon.goTo(pathPtr.getFirst(), pathPtr.getSecond(), velocity, new Closure<Boolean>() {
+            @Override
+            public void onReturn(Return<Boolean> aReturn) {
+
+                Log.w(DaemonUtils.tag(), "FIRST BULLET VELOCITY: " + bulletDoubleDaemon.getPrototype().getVelocity().intensity);
+
+                if (pathIterator.hasNext()) {
+                    fireBullet(sourceCoord, Pair.create(endX, endY),enemy, velocity, bulletDamage, 1);
+                    Pair<Float, Float> pathPtr = pathIterator.next();
+                    bulletDoubleDaemon.goTo(pathPtr.getFirst(), pathPtr.getSecond(), velocity, this);
+
+                } else {
+                    if (!enemy.isShootable())
+                        return;
+
+                    int newHp = enemy.getHp() - bulletDoubleDaemon.getPrototype().getDamage();
+
+                    if (newHp > 0) {
+                        enemy.setHp(newHp);
+                    } else {
+                        enemy.setShootable(false);
+                        drawConsumer.consume(()-> infoScore.setNumbers(++score));
+                        drawConsumer.consume(()-> enemy.getHpView().hide());
+                        enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
+                            drawConsumer.consume(() -> enemy.getView().hide());
+                            enemy.stop();
+                            activeEnemies.remove(enemy);
+                            if (!enemyQueue.contains(enemy))
+                                enemyQueue.add(enemy);
+                        });
+                    }
+
+                    bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
+                        bulletDoubleDaemon.stop();
+                        drawConsumer.consume(()->{
+                            for (ImageView view : bulletDoubleDaemon.getViews()){
+                                view.hide();
+                            }
+                        });
+
+                        if (!bulletQueue.contains(bulletDoubleDaemon))
+                            bulletQueue.add(bulletDoubleDaemon);
+
+                    });
+                }
+            }
+        }));
+
+//        @Override
+//        public int compareTo(@NonNull PrintDocumentElement printDocumentElement) {
+//            if (this.position.second > printDocumentElement.getPosition().second) {
+//                return 1;
+//            } else if (this.position.second < printDocumentElement.getPosition().second) {
+//                return -1;
+//            } else {
+//                if (this.position.first > printDocumentElement.getPosition().first) {
+//                    return 1;
+//                } else if (this.position.first < printDocumentElement.getPosition().first) {
+//                    return -1;
+//                } else {
+//                    return 0;
+//                }
+//            }
+//
+//        }
+
+
+    }
+
 
 }

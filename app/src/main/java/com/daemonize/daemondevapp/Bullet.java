@@ -3,6 +3,7 @@ package com.daemonize.daemondevapp;
 import android.util.Log;
 
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
+import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
@@ -25,6 +26,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
     private ImageView view;
     private ImageView view2;
     private ImageView view3;
+
     private int level = 1;
     private volatile int damage = 2;
 
@@ -49,6 +51,11 @@ public class Bullet extends CoordinatedImageTranslationMover {
     public void setStartingCoords(Pair<Float, Float> startingCoords) {
         lastX = startingCoords.getFirst();
         lastY = startingCoords.getSecond();
+    }
+
+    @CallingThread
+    public void setCurrentAngle(int angle) {
+        rotationMover.setCurrentAngle(angle);
     }
 
     @CallingThread
@@ -154,6 +161,11 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @Override
     public Image iterateSprite() {
         return rotationMover.iterateSprite();
+    }
+
+    @Override
+    public PositionedImage animate() {
+        return super.animate();
     }
 
     @SideQuest(SLEEP = 25)

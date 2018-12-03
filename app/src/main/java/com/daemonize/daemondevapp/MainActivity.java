@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("plane" + Integer.toString(i) + "0.png")), width, height, false));
             }
 
+
 //
 //            int i = 0;
 //            for (; i < 3; ++i)
@@ -91,8 +92,15 @@ public class MainActivity extends AppCompatActivity {
             bulletSprite[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), bulletSize0, bulletSize0, false));
             bulletSprite[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), bulletSize0, bulletSize0, false));
 
-            //bullet sprite laser
             int bulletSize = 100;
+            Image [] spriteRocket = new Image[36];
+
+            for(int i = 0; i < 36; i++) {
+                spriteRocket[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rocket" + Integer.toString(i) + "0.png")), bulletSize, bulletSize, false));
+            }
+
+            //bullet sprite laser
+
             Image [] bulletSpriteLaser =new Image[36];
 //            bulletSpriteLaser[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("blueBullet.png")),  bulletSize, bulletSize, false));
 //            bulletSpriteLaser[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("redBullet.png")),  bulletSize, bulletSize, false));
@@ -353,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
                     .setFieldImageTowerDen(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), width, height, false)))
                     .setEnemySprite(sprite)
                     .setBulletSprite(bulletSprite)
-                    .setBulletSpriteLaser(bulletSpriteLaser)
+                    .setBulletSpriteLaser(spriteRocket)
                     .setExplodeSprite(explosionSprite)
                     .setMiniExplodeSprite(miniExplosionSprite)
                     .setTowerSprite(towerSprite)
