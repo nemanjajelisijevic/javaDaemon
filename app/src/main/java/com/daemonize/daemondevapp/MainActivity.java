@@ -267,6 +267,15 @@ public class MainActivity extends AppCompatActivity {
             towerSprite[34] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower340.png")),width, height, false));
             towerSprite[35] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower350.png")),width, height, false));
 
+            Image [] towerSprite2 =new Image[36];
+            for (int i=0;i<36;i++) {
+                towerSprite2[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mg" + i + "0.png")), width, height, false));
+            }
+            Image [] towerSprite3 =new Image[36];
+            for (int i=0;i<36;i++) {
+                towerSprite3[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenLS" + i + "0.png")), width, height, false));
+            }
+
             Image [] towerSpriteEX =new Image[36];
             towerSpriteEX[0]  = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mg00.png")), width, height,false));
             towerSpriteEX[1]  = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mg10.png")), width, height, false));
@@ -364,7 +373,9 @@ public class MainActivity extends AppCompatActivity {
                     .setBulletSpriteLaser(spriteRocket)
                     .setExplodeSprite(explosionSprite)
                     .setMiniExplodeSprite(miniExplosionSprite)
-                    .setTowerSprite(towerSprite)
+                    .setTowerSprite1(towerSprite)
+                    .setTowerSprite2(towerSprite2)
+                    .setTowerSprite3(towerSprite3)
                     .setTowerSpriteEx(towerSpriteEX)
                     .setHealthBarSprite(listHealthBarImg)
                     .setBorders(borderX, borderY)
@@ -375,6 +386,9 @@ public class MainActivity extends AppCompatActivity {
                     .setRedNestedDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, dialog.getWidth() / 2, dialog.getHeight() / 2, false))/*dialog*/)
 //                    .setGreenDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, dialog.getWidth(), dialog.getHeight(), false))/*dialog*/)
                     .setGreenDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, 660, 490, false))/*dialog*/)
+                    .setSelectTowerBackgroudnImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, 200, 600, false))/*dialog*/)
+                    .setSelectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, 200, 200, false))/*dialog*/)
+                    .setDeselectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, 200, 200, false))/*dialog*/)
                     .setScoreBackGrImage(score)
                     .setScorenumbersImages(listNumberImg)
                     .setScoreTitle(titleScore);

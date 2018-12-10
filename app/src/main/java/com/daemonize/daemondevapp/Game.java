@@ -87,11 +87,20 @@ public class Game {
     private Queue<EnemyDoubleDaemon> enemyQueue = new LinkedList<>();
     private int towerShootInterval = 1500;
     private int range = 320;
-    private Image[] towerSprite;
+
+    private Image[] currentTowerSprite;
+    private Image[] towerSprite1;
+    private Image[] towerSprite2;
+    private Image[] towerSprite3;
     private Image[] towerSpriteEx;
 
+    //towers dialogue
     private TowerScanClosure towerScanClosure;
     private TowerUpgradeDialog towerUpgradeDialog;
+    private TowerSelectDialogue selectTowerDialogue;
+    private Image selectTowerBackgroudnImage;
+    private Image selection;
+    private Image deselection;
 
     //enemies
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
@@ -162,7 +171,8 @@ public class Game {
 
                 //fireContinousBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
                 //fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
-                fireRocketBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
+//                fireRocketBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
+                fireKrugBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond().getLastCoordinates(),aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
             }
 
             tower.sleep(tower.getTowerLevel().reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
@@ -190,8 +200,33 @@ public class Game {
         return this;
     }
 
-    public Game setTowerSprite(Image[] towerSprite) {
-        this.towerSprite = towerSprite;
+    public Game setTowerSprite1(Image[] towerSprite1) {
+        this.towerSprite1 = towerSprite1;
+        return this;
+    }
+
+    public Game setTowerSprite2(Image[] towerSprite2) {
+        this.towerSprite2 = towerSprite2;
+        return this;
+    }
+
+    public Game setTowerSprite3(Image[] towerSprite3) {
+        this.towerSprite3 = towerSprite3;
+        return this;
+    }
+
+    public Game setSelectTowerBackgroudnImage(Image selectTowerBackgroudnImage) {
+        this.selectTowerBackgroudnImage = selectTowerBackgroudnImage;
+        return this;
+    }
+
+    public Game setSelectionImage(Image selection) {
+        this.selection = selection;
+        return this;
+    }
+
+    public Game setDeselectionImage(Image deselection) {
+        this.deselection= deselection;
         return this;
     }
 
@@ -350,15 +385,31 @@ public class Game {
             if (towerUpgradeDialog.getTowerUpgrade().isShowing()){
                 towerUpgradeDialog.getTowerUpgrade().checkCoordinates(x, y);
             } else {
-                setTower(x, y);
+                if (selectTowerDialogue.getSelectTowerDialogue().isShowing()){
+                   selectTowerDialogue.getSelectTowerDialogue().checkCoordinates(x,y);
+                    if (towerSelect != null )Log.w("SelectTower",towerSelect.toString());
+                }
+                if (towerSelect == null ){
+                    Log.w("Select","plesase select tower");
+                    //show dialoge for selecting tower
+                } else {
+                    setTower(x, y);
+                }
             }
         });
         return this;
     }
 
-    private Pair<Integer, Integer> dijalogCoords = Pair.create(500, 500);
     private boolean dijalogActive;
     private DummyDaemon dijalogAnimator;
+
+    private enum TowerSelect {
+        TYPE1,
+        TYPE2,
+        TYPE3;
+    };
+
+    private TowerSelect towerSelect;
 
     {
         //init spell (state)
@@ -416,9 +467,36 @@ public class Game {
             towerUpgradeDialog =  new TowerUpgradeDialog(700,500,
                    dialogueImageTowerUpgradeLevel[0], upgradeButton, closeButton, greenDialogueImage );//.setOnUpgrade(()->{
 
+            Button tow1 = new Button("TowerType1",0,0,towerSprite1[0]).onClick(()->{
+                towerSelect = TowerSelect.TYPE1;
+                currentTowerSprite = towerSprite1;
+                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(selection);
+                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
+                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
+            });
+            Button tow2 = new Button("TowerType2",0,0,towerSprite2[0]).onClick(()->{
+                towerSelect = TowerSelect.TYPE2;
+                currentTowerSprite = towerSprite2;
+                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
+                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(selection);
+                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
+            });
+            Button tow3 = new Button("TowerType3",0,0,towerSprite3[0]).onClick(()->{
+                towerSelect = TowerSelect.TYPE3;
+                currentTowerSprite = towerSprite3;
+                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
+                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
+                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(selection);
+            });
+
+            selectTowerDialogue = new TowerSelectDialogue(borderX-selectTowerBackgroudnImage.getWidth(),700,selectTowerBackgroudnImage,deselection,tow1,tow2,tow3);
+
             scene.addImageViews(towerUpgradeDialog.getTowerUpgrade().getAllViews());
+            scene.addImageViews(selectTowerDialogue.getSelectTowerDialogue().getAllViews());
             scene.addImageView(scoreBackGrView);
             scene.addImageView(scoreTitleView);
+
+            selectTowerDialogue.getSelectTowerDialogue().show();
 
             for (ImageView view : viewsNum) {
                 scene.addImageView(view);
@@ -469,7 +547,7 @@ public class Game {
                         gameConsumer,
                         drawConsumer,
                         new Bullet(
-                                bulletSpriteLaser,
+                                bulletSprite,//bulletSpriteLaser,
                                 0,
                                 Pair.create((float) 0, (float) 0),
                                 Pair.create((float) 0, (float) 0),
@@ -635,8 +713,8 @@ public class Game {
                 boolean hasSkillsToPayTheBills = score > 3;
 
                 drawConsumer.consume(()->{
-                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(dijalogCoords.getFirst());
-                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(dijalogCoords.getSecond());
+                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(tow.getPrototype().getLastCoordinates().getFirst());
+                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(tow.getPrototype().getLastCoordinates().getSecond());
                     towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView").setImage(dialogueImageTowerUpgradeLevel[currLvl.currentLevel - 1]);
                     towerUpgradeDialog.getTowerUpgrade().show();
                     if (hasSkillsToPayTheBills && tow.getTowerLevel().currentLevel < 3)
@@ -657,7 +735,7 @@ public class Game {
         Image image = grid.getField(
                 field.getRow(),
                 field.getColumn()
-        ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : towerSprite[0];
+        ).isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : currentTowerSprite[0];
 
         drawConsumer.consume(()-> gridViewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
 
@@ -667,7 +745,7 @@ public class Game {
                     gameConsumer,
                     drawConsumer,
                     new Tower(
-                            towerSprite,
+                            currentTowerSprite,
                             Pair.create(field.getCenterX(), field.getCenterY()),
                             range
                     )
@@ -688,6 +766,179 @@ public class Game {
             clone.addAll(activeEnemies);
             towerDaemon.scan(clone, towerScanClosure);
         }
+    }
+
+    private Pair<Float,Float> getPointOnCircle(Pair<Float, Float> centerCord, float degress, float radius) {
+
+       double rads = Math.toRadians(degress); // 0 becomes the top
+
+        // Calculate the outter point of the line
+        float xPosy = (float) (centerCord.getFirst() + Math.cos(rads) * radius);
+        float yPosy = (float) (centerCord.getSecond() - Math.sin(rads) * radius);
+
+        return Pair.create(xPosy, yPosy);
+    }
+
+    private List<Pair<Float,Float>> getListOfPoint(Pair<Float, Float> sourceCoord, Pair<Float, Float> targetCoord) {
+        //rotation bullet before fire
+
+
+        int targetAngle = (int) RotatingSpriteImageMover.getAngle(
+                sourceCoord.getFirst(),
+                sourceCoord.getSecond(),
+                targetCoord.getFirst(),
+                targetCoord.getSecond()
+        );
+        Log.w("targetAngle"," pocetni ugao je : "+targetAngle);
+        List<Pair<Float,Float>> lst = new LinkedList<>();
+
+        float beginX = sourceCoord.getFirst();
+        float beginY = sourceCoord.getSecond();
+
+        float endX =  targetCoord.getFirst();
+        float endY =  targetCoord.getSecond();
+
+        float diffX = beginX - endX;
+        int signX = 1;
+        if (diffX > 0) signX = -1;
+        float stepX = Math.abs(diffX) / 2;
+
+        float diffY = beginY - endY;
+        int signY = 1;
+        if (diffY > 0) signY = -1;
+        float stepY = Math.abs(diffY) / 2;
+
+        float radius = (float) (Math.sqrt(diffX*diffX + diffY*diffY)/2);
+        Pair<Float,Float> centerCoord = Pair.create(sourceCoord.getFirst() + signX * stepX,
+                sourceCoord.getSecond() + signY * stepY);
+        float angle1 =  (targetAngle + 180) >= 360 ? targetAngle + 180 - 360 : targetAngle + 180  ;
+        float startAngle;
+        float endAngle;
+
+        startAngle = angle1;
+        endAngle =  targetAngle;
+//        if (diffX > 0) {
+//        } else {
+//            if (diffY >0){
+//                startAngle = angle1;
+//                endAngle = targetAngle;
+//            } else {
+//                startAngle = angle1;
+//                endAngle = targetAngle;
+//            }
+//        }
+
+        float currentAngle = startAngle;
+        Log.w("Angle"," pocetni ugao je : "+startAngle+" startAngle coord:"+sourceCoord);
+        Log.w("Angle"," zavrsi ugao je : "+endAngle+" endAngle coord:"+targetCoord);
+        Log.w("coord"," center coord : "+centerCoord);
+        while (currentAngle != endAngle) {
+            float tempAngle = currentAngle + signX * (-1) * 20; // step
+            currentAngle = tempAngle;
+            if (tempAngle >= 360) {
+                currentAngle = tempAngle - 360;
+            }
+            if (tempAngle < 0 ){
+                currentAngle = 360 + tempAngle;
+            }
+            Pair<Float,Float> co = getPointOnCircle(centerCoord,currentAngle,radius);
+            Log.w("Angle"," current angle is : " + currentAngle+"tren coord : "+co);
+
+            lst.add(co);
+        }
+        return lst;
+    }
+
+    private void fireKrugBullet(Pair<Float, Float> sourceCoord, Pair<Float, Float> targetCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage, int noOfBulletsFired) {//velocity = 13
+
+        if (!enemy.isShootable())//TODO This is what causes bullets to go out of the screen!!!!!
+            return;
+
+        //Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
+
+        Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
+
+        BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
+        bulletDoubleDaemon.setLevel(noOfBulletsFired);
+        bulletDoubleDaemon.setDamage(bulletDamage);
+        drawConsumer.consume(()->{
+            for (ImageView view : bulletDoubleDaemon.getViews()){
+                view.show();
+            }
+        });
+
+        bulletDoubleDaemon.setStartingCoords(sourceCoord);
+        bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
+            bulletDoubleDaemon.stop();
+            drawConsumer.consume(()->{
+                for (ImageView view : bulletDoubleDaemon.getViews()){
+                    view.hide();
+                }
+            });
+
+            if(!bulletQueue.contains(bulletDoubleDaemon)) {
+                bulletQueue.add(bulletDoubleDaemon);
+            }
+        });
+
+        bulletDoubleDaemon.start();
+
+        Iterator<Pair<Float,Float>> iterator = getListOfPoint(sourceCoord,targetCoord).iterator();
+
+        if(!iterator.hasNext())
+            throw new IllegalStateException("Path list has no elemnets!");
+
+        Pair<Float, Float> pathPtr = iterator.next();
+
+        bulletDoubleDaemon.goTo(pathPtr.getFirst(), pathPtr.getSecond(), velocity*2, /*aReturn -> {*/
+            new Closure<Boolean>() {
+                @Override
+                public void onReturn(Return<Boolean> aReturn) {
+                    if (iterator.hasNext()) {
+                        Pair<Float, Float> pathPtr = iterator.next();
+                        if (!iterator.hasNext()) {
+                            //in case that enemi was moved in maintime
+                            pathPtr = enemy.getLastCoordinates();
+                        }
+                        bulletDoubleDaemon.goTo(pathPtr.getFirst(), pathPtr.getSecond(), velocity*2,this);
+                    } else {
+                        // reached the enemy
+                        if (!enemy.isShootable())
+                            return;
+
+                        int newHp = enemy.getHp() - bulletDoubleDaemon.getPrototype().getDamage();
+
+                        if (newHp > 0) {
+                            enemy.setHp(newHp);
+                        } else {
+                            enemy.setShootable(false);
+                            drawConsumer.consume(() -> infoScore.setNumbers(++score));
+                            drawConsumer.consume(() -> enemy.getHpView().hide());
+                            enemy.pushSprite(explodeSprite, 0, aReturn2 -> {
+                                drawConsumer.consume(() -> enemy.getView().hide());
+                                enemy.stop();
+                                activeEnemies.remove(enemy);
+                                if (!enemyQueue.contains(enemy))
+                                    enemyQueue.add(enemy);
+                            });
+                        }
+
+                        bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> {
+                            bulletDoubleDaemon.stop();
+                            drawConsumer.consume(() -> {
+                                for (ImageView view : bulletDoubleDaemon.getViews()) {
+                                    view.hide();
+                                }
+                            });
+                            if (!bulletQueue.contains(bulletDoubleDaemon))
+                                bulletQueue.add(bulletDoubleDaemon);
+
+                        });
+                    }
+
+                }
+            });
+
     }
 
     private void fireBullet(Pair<Float, Float> sourceCoord,Pair<Float, Float> targetCoord, EnemyDoubleDaemon enemy, float velocity, int bulletDamage, int noOfBulletsFired) {//velocity = 13
