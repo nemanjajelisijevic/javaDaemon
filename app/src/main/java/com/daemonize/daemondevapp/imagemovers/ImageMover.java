@@ -12,7 +12,7 @@ import com.daemonize.daemondevapp.images.Image;
 public interface ImageMover {
 
     class Velocity {
-        public float intensity;
+        public volatile float intensity;
         public Direction direction;
 
         public Velocity(float intensity, Direction direction) {
@@ -44,8 +44,8 @@ public interface ImageMover {
 
     class Direction {
 
-        public float coeficientX;
-        public float coeficientY;
+        public volatile float coeficientX;
+        public volatile float coeficientY;
 
         public Direction(float coeficientX, float coeficientY) {
             this.coeficientX = coeficientX;

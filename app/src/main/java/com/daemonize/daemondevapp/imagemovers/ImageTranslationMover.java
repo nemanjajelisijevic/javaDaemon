@@ -5,7 +5,6 @@ import com.daemonize.daemondevapp.imagemovers.spriteiterators.BasicSpriteIterato
 import com.daemonize.daemondevapp.imagemovers.spriteiterators.SpriteIterator;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
-import com.daemonize.daemonengine.utils.DaemonSemaphore;
 
 
 public class ImageTranslationMover implements ImageMover, SpriteIterator {
@@ -15,7 +14,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     protected volatile Velocity velocity;
 
-    protected static DaemonCountingSemaphore semaphore = new DaemonCountingSemaphore();
+    protected static DaemonCountingSemaphore pauseSemaphore = new DaemonCountingSemaphore();
 
 
     public Image [] getSprite() {
@@ -92,29 +91,16 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     @Override
     public void setDirectionAndMove(float x, float y, float velocityInt) {
 
-        float dX = x - lastX;
-        float dY = y - lastY;
+        double dX = x - lastX;
+        double dY = y - lastY;
+        double hypotenuse = Math.sqrt(dX*dX + dY*dY);
 
-        if (dX != 0 && dY != 0) {
-            dX = (float)(dX / Math.sqrt(2));
-            dY = (float)(dY / Math.sqrt(2));
-        }
-//        float a;
-//        boolean signY = dY >= 0;
-//        boolean signX = dX >= 0;
+        dX = (dX / hypotenuse);
+        dY = (dY / hypotenuse);
+
         velocity.intensity = velocityInt;
-        setDirection(new ImageMover.Direction(dX, dY));
-        //velocity.direction = new ImageMover.Direction(dX, dY); //TODO check this shit
-//
-//        if (Math.abs(dY) >= Math.abs(dX)) {
-//            a = Math.abs((100*dX)/dY);
-//            float aY =  100 - a;
-//            velocity.direction = new Direction(signX ? a : - a, signY ? aY : - aY);
-//        } else {
-//            a = Math.abs((100*dY)/dX);
-//            float aX =  100 - a;
-//            velocity.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
-//        }
+        velocity.direction.coeficientX = (float) dX;
+        velocity.direction.coeficientY = (float) dY;
 
     }
 
@@ -133,11 +119,11 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     public void pause(){
-        semaphore.subscribe();
+        pauseSemaphore.subscribe();
     }
 
     public void cont(){
-        semaphore.unsubscribe();
+        pauseSemaphore.unsubscribe();
     }
 
     @Override
@@ -145,8 +131,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
         try {
 
-            semaphore.await();
-
+            pauseSemaphore.await();
 
             PositionedImage ret = new PositionedImage();
             ret.image = iterateSprite();
@@ -164,8 +149,8 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
                 lastY = borderY2;
             }
 
-            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
-            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
+            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX);
+            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY);
 
             return ret;
 
