@@ -1,7 +1,6 @@
 package com.daemonize.daemondevapp;
 
 
-import com.daemonize.daemondevapp.imagemovers.CachedArraySpriteImageMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
@@ -11,7 +10,6 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -134,7 +132,7 @@ public class Tower extends RotatingSpriteImageMover {
     @Override
     public PositionedImage animate() {
         try {
-            semaphore.await();
+            pauseSemaphore.await();
             PositionedImage ret = new PositionedImage();
             ret.image = iterateSprite();
             ret.positionX = lastX;
