@@ -159,7 +159,7 @@ public class Game {
         }
     }
 
-    public class TowerScanClosure implements Closure<Pair<Boolean, EnemyDoubleDaemon>> {
+    public class TowerScanClosure implements Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>> {
 
         private TowerDaemon tower;
 
@@ -168,14 +168,43 @@ public class Game {
         }
 
         @Override
-        public void onReturn(Return<Pair<Boolean, EnemyDoubleDaemon>> aReturn) {
+        public void onReturn(Return<Pair<Tower.TowerType, EnemyDoubleDaemon>> aReturn) {
 
-            if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst()) {
-
-                //fireContinousBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
-                //fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
-                fireRocketBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),25, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
-//                fireKrugBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond().getLastCoordinates(),aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
+            if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst() != null) {
+                switch (aReturn.get().getFirst()) {
+                    case TYPE1:
+                        fireBullet(
+                                tower.getLastCoordinates(),
+                                aReturn.uncheckAndGet().getSecond().getLastCoordinates(),
+                                aReturn.uncheckAndGet().getSecond(),
+                                25,
+                                1, //tower.getTowerLevel().bulletDamage,
+                                tower.getTowerLevel().currentLevel
+                        );
+                        break;
+                    case TYPE2:
+                        fireRocketBullet(
+                                tower.getLastCoordinates(),
+                                aReturn.uncheckAndGet().getSecond(),
+                                18,
+                                tower.getTowerLevel().bulletDamage,
+                                tower.getTowerLevel().currentLevel
+                        );
+                        break;
+                    case TYPE3:
+                        //fireContinousBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
+                        fireKrugBullet(
+                                tower.getLastCoordinates(),
+                                aReturn.uncheckAndGet().getSecond().getLastCoordinates(),
+                                aReturn.uncheckAndGet().getSecond(),
+                                15,
+                                tower.getTowerLevel().bulletDamage,
+                                tower.getTowerLevel().currentLevel
+                        );
+                        break;
+                    default:
+                        throw new IllegalStateException("Tower type does not exist!");
+                }
             }
 
             tower.sleep(tower.getTowerLevel().reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
@@ -391,7 +420,7 @@ public class Game {
                     if (towerSelect != null )Log.w("SelectTower",towerSelect.toString());
                 }
                 if (towerSelect == null ){
-                    Log.w("Select","plesase select tower");
+                    Log.w("Select","please select tower");
                     //show dialoge for selecting tower
                 } else {
                     setTower(x, y);
@@ -404,13 +433,7 @@ public class Game {
     private boolean dijalogActive;
     private DummyDaemon dijalogAnimator;
 
-    private enum TowerSelect {
-        TYPE1,
-        TYPE2,
-        TYPE3;
-    };
-
-    private TowerSelect towerSelect;
+    private Tower.TowerType towerSelect;
 
     {
         //init state
@@ -435,12 +458,6 @@ public class Game {
             Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
 
                 Tower tow = towerUpgradeDialog.getTower();
-                //                Tower.TowerLevel currentLevel = tow.getTowerLevel();
-//                currentLevel.currentLevel++;
-//                currentLevel.bulletDamage += 3;
-//                currentLevel.reloadInterval -=500;
-
-//                tow.setTowerLevel(currentLevel);
                 tow.levelUp();
                 tow.setRotationSprite(towerSpriteEx);
 
@@ -469,28 +486,38 @@ public class Game {
                    dialogueImageTowerUpgradeLevel[0], upgradeButton, closeButton, greenDialogueImage );//.setOnUpgrade(()->{
 
             Button tow1 = new Button("TowerType1",0,0,towerSprite1[0]).onClick(()->{
-                towerSelect = TowerSelect.TYPE1;
+                towerSelect = Tower.TowerType.TYPE1;
                 currentTowerSprite = towerSprite1;
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(selection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
             });
+
             Button tow2 = new Button("TowerType2",0,0,towerSprite2[0]).onClick(()->{
-                towerSelect = TowerSelect.TYPE2;
+                towerSelect = Tower.TowerType.TYPE2;
                 currentTowerSprite = towerSprite2;
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(selection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
             });
+
             Button tow3 = new Button("TowerType3",0,0,towerSprite3[0]).onClick(()->{
-                towerSelect = TowerSelect.TYPE3;
+                towerSelect = Tower.TowerType.TYPE3;
                 currentTowerSprite = towerSprite3;
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(selection);
             });
 
-            selectTowerDialogue = new TowerSelectDialogue(borderX-selectTowerBackgroudnImage.getWidth(),700,selectTowerBackgroudnImage,deselection,tow1,tow2,tow3);
+            selectTowerDialogue = new TowerSelectDialogue(
+                    borderX-selectTowerBackgroudnImage.getWidth(),
+                    700,
+                    selectTowerBackgroudnImage,
+                    deselection,
+                    tow1,
+                    tow2,
+                    tow3
+            );
 
             scene.addImageViews(towerUpgradeDialog.getTowerUpgrade().getAllViews());
             scene.addImageViews(selectTowerDialogue.getSelectTowerDialogue().getAllViews());
@@ -514,6 +541,7 @@ public class Game {
             Field firstField = grid.getField(0, 0);
 
             for (int i = 0; i < 200; ++i) {
+
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                         gameConsumer,
                         drawConsumer,
@@ -528,7 +556,6 @@ public class Game {
                                 .setHealthBarImage(healthBarSprite)
                 ).setName("Enemy no. " + i);
 
-                //enemy.getPrototype().setBorders(borderX, borderY);
                 enemy.getPrototype().setBorders(
                         grid.getStartingX(),
                         (grid.getStartingX() + grid.getGridWidth()),
@@ -541,9 +568,6 @@ public class Game {
 
                 enemyQueue.add(enemy);
 
-            }
-
-            for (int i = 0; i < 200; ++i) {
                 BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
                         gameConsumer,
                         drawConsumer,
@@ -566,14 +590,7 @@ public class Game {
                 );
 
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure());
-//                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(aReturn -> { //by default working on gui consumer,because of that we use  ** some part of code which we want to be executed in game  consumer, not in gui
-//
-//                    ImageMover.PositionedImage posBmp = aReturn.uncheckAndGet();
-//                    bulletDoubleDaemon.getView().setAbsoluteX(posBmp.positionX);
-//                    bulletDoubleDaemon.getView().setAbsoluteY(posBmp.positionY);
-//                    bulletDoubleDaemon.getView().setImage(posBmp.image);
-//
-//                });
+
                 bulletQueue.add(bulletDoubleDaemon);
             }
 
@@ -612,9 +629,6 @@ public class Game {
 
                     if(enemyVelocity < 6)
                         enemyVelocity += 1;
-
-//                    if (enemyHp < 80)
-//                        enemyHp += 5;
 
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
@@ -660,7 +674,7 @@ public class Game {
                                 Pair<Float, Float> currentCoord = enemy.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
-                                if (current == null) return;
+                                if (current == null) throw new IllegalStateException("Field can not be null");//return;
                                 else if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     //explode in  end .
                                     enemy.setShootable(false);
@@ -686,8 +700,6 @@ public class Game {
                                 enemy.rotate(angle, ret-> {});
 
                                 enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
-
-                                //enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
                             }
                         }
                 );
@@ -764,7 +776,8 @@ public class Game {
                     new Tower(
                             currentTowerSprite,
                             Pair.create(field.getCenterX(), field.getCenterY()),
-                            range
+                            range,
+                            towerSelect
                     )
             ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
 
@@ -824,38 +837,36 @@ public class Game {
         float stepY = Math.abs(diffY) / 2;
 
         float radius = (float) (Math.sqrt(diffX*diffX + diffY*diffY)/2);
-        Pair<Float,Float> centerCoord = Pair.create(sourceCoord.getFirst() + signX * stepX,
-                sourceCoord.getSecond() + signY * stepY);
+
+        Pair<Float,Float> centerCoord = Pair.create(
+                sourceCoord.getFirst() + signX * stepX,
+                sourceCoord.getSecond() + signY * stepY
+        );
+
         float angle1 =  (targetAngle + 180) >= 360 ? targetAngle + 180 - 360 : targetAngle + 180  ;
         float startAngle;
         float endAngle;
 
         startAngle = angle1;
         endAngle =  targetAngle;
-//        if (diffX > 0) {
-//        } else {
-//            if (diffY >0){
-//                startAngle = angle1;
-//                endAngle = targetAngle;
-//            } else {
-//                startAngle = angle1;
-//                endAngle = targetAngle;
-//            }
-//        }
 
         float currentAngle = startAngle;
+
         Log.w("Angle"," pocetni ugao je : "+startAngle+" startAngle coord:"+sourceCoord);
         Log.w("Angle"," zavrsi ugao je : "+endAngle+" endAngle coord:"+targetCoord);
         Log.w("coord"," center coord : "+centerCoord);
+
         while (currentAngle != endAngle) {
+
             float tempAngle = currentAngle + signX * (-1) * 20; // step
             currentAngle = tempAngle;
-            if (tempAngle >= 360) {
+
+            if (tempAngle >= 360)
                 currentAngle = tempAngle - 360;
-            }
-            if (tempAngle < 0 ){
+
+            if (tempAngle < 0 )
                 currentAngle = 360 + tempAngle;
-            }
+
             Pair<Float,Float> co = getPointOnCircle(centerCoord,currentAngle,radius);
             Log.w("Angle"," current angle is : " + currentAngle+"tren coord : "+co);
 
@@ -869,31 +880,27 @@ public class Game {
         if (!enemy.isShootable())//TODO This is what causes bullets to go out of the screen!!!!!
             return;
 
-        //Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
-
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
         bulletDoubleDaemon.setLevel(noOfBulletsFired);
         bulletDoubleDaemon.setDamage(bulletDamage);
+
         drawConsumer.consume(()->{
-            for (ImageView view : bulletDoubleDaemon.getViews()){
+            for (ImageView view : bulletDoubleDaemon.getViews())
                 view.show();
-            }
         });
 
         bulletDoubleDaemon.setStartingCoords(sourceCoord);
         bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
             bulletDoubleDaemon.stop();
             drawConsumer.consume(()->{
-                for (ImageView view : bulletDoubleDaemon.getViews()){
+                for (ImageView view : bulletDoubleDaemon.getViews())
                     view.hide();
-                }
             });
 
-            if(!bulletQueue.contains(bulletDoubleDaemon)) {
+            if(!bulletQueue.contains(bulletDoubleDaemon))
                 bulletQueue.add(bulletDoubleDaemon);
-            }
         });
 
         bulletDoubleDaemon.start();
@@ -910,12 +917,21 @@ public class Game {
                 @Override
                 public void onReturn(Return<Boolean> aReturn) {
                     if (iterator.hasNext()) {
+
                         Pair<Float, Float> pathPtr = iterator.next();
+
                         if (!iterator.hasNext()) {
                             //in case that enemi was moved in maintime
                             pathPtr = enemy.getLastCoordinates();
                         }
-                        bulletDoubleDaemon.goTo(pathPtr.getFirst(), pathPtr.getSecond(), velocity*2,this);
+
+                        bulletDoubleDaemon.goTo(
+                                pathPtr.getFirst(),
+                                pathPtr.getSecond(),
+                                velocity * 2,
+                                this
+                        );
+
                     } else {
                         // reached the enemy
                         if (!enemy.isShootable())
@@ -941,16 +957,13 @@ public class Game {
                         bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> {
                             bulletDoubleDaemon.stop();
                             drawConsumer.consume(() -> {
-                                for (ImageView view : bulletDoubleDaemon.getViews()) {
-                                    view.hide();
-                                }
+                                for (ImageView view : bulletDoubleDaemon.getViews()) view.hide();
                             });
                             if (!bulletQueue.contains(bulletDoubleDaemon))
                                 bulletQueue.add(bulletDoubleDaemon);
 
                         });
                     }
-
                 }
             });
 
@@ -961,13 +974,12 @@ public class Game {
         if (!enemy.isShootable())//TODO This is what causes bullets to go out of the screen!!!!!
             return;
 
-        //Pair<Float, Float> enemyCoord = enemy.getPrototype().getLastCoordinates();
-
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
         bulletDoubleDaemon.setLevel(noOfBulletsFired);
         bulletDoubleDaemon.setDamage(bulletDamage);
+        bulletDoubleDaemon.setSprite(bulletSprite);
         drawConsumer.consume(()->{
             for (ImageView view : bulletDoubleDaemon.getViews()){
                 view.show();
@@ -995,7 +1007,6 @@ public class Game {
                 targetCoord.getFirst(),
                 targetCoord.getSecond()
         );
-
 
         bulletDoubleDaemon.start();
 
@@ -1168,7 +1179,8 @@ public class Game {
                             float bulletX = bulletDoubleDaemon.getLastCoordinates().getFirst();
                             float bulletY = bulletDoubleDaemon.getLastCoordinates().getSecond();
 
-                            if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) > 200  && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) > 200)
+                            if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) > 200
+                                    && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) > 200)
                                 return;
 
                             int newHp = enemy.getHp() - bulletDoubleDaemon.getDamage();

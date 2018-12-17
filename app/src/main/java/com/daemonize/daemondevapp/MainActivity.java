@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
 
             Image [] towerSprite2 =new Image[36];
             for (int i=0;i<36;i++) {
-                towerSprite2[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mg" + i + "0.png")), width, height, false));
+                towerSprite2[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rocketTower" + i + "0.png")), width, height, false));
             }
             Image [] towerSprite3 =new Image[36];
             for (int i=0;i<36;i++) {

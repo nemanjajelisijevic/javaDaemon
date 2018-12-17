@@ -29,7 +29,7 @@ public class AwaitedArraySprite<T> {
     }
 
     public boolean isValid() {
-        return sprite != null && sprite.length != 0;
+        return sprite != null;
     }
 
     public void await() throws InterruptedException {

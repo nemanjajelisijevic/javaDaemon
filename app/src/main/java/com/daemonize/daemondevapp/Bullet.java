@@ -44,6 +44,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @CallingThread
     @Override
     public ImageTranslationMover setSprite(Image[] sprite) {
+        rotationMover.setRotationSprite(sprite); //TODO fixx!!!
         return super.setSprite(sprite);
     }
 

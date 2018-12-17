@@ -16,6 +16,12 @@ import java.util.List;
 @Daemonize(doubleDaemonize = true)
 public class Tower extends RotatingSpriteImageMover {
 
+    public static enum TowerType {
+        TYPE1,
+        TYPE2,
+        TYPE3;
+    };
+
     public static class TowerLevel {
 
         public int currentLevel;
@@ -29,6 +35,8 @@ public class Tower extends RotatingSpriteImageMover {
         }
     }
 
+
+    private TowerType towertype;
     private TowerLevel towerLevel = new TowerLevel(1,2,1500);
     private ImageView view;
     private float range;
@@ -74,14 +82,21 @@ public class Tower extends RotatingSpriteImageMover {
         this.view = view;
     }
 
-    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range) {
+    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, TowerType type) {
         super(rotationSprite, 0, startingPos);
         this.range = range;
+        this.towertype = type;
     }
 
     public boolean sleep(int millis) throws InterruptedException {
         Thread.sleep(millis);
         return true;
+    }
+
+    @CallingThread
+    @Override
+    public Pair<Float, Float> getLastCoordinates() {
+        return super.getLastCoordinates();
     }
 
     @CallingThread
@@ -95,7 +110,7 @@ public class Tower extends RotatingSpriteImageMover {
         super.rotateTowards(x, y);
     }
 
-    public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
+    public Pair<TowerType, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
 
         scanSemaphore.await();
 
@@ -106,11 +121,11 @@ public class Tower extends RotatingSpriteImageMover {
                         enemy.getPrototype().getLastCoordinates().getFirst(),
                         enemy.getPrototype().getLastCoordinates().getSecond()
                 );
-                return Pair.create(true, enemy);
+                return Pair.create(towertype, enemy);
             }
         }
 
-        return Pair.create(false, null);
+        return Pair.create(null, null);
     }
 
     @CallingThread
