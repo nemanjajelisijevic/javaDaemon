@@ -9,6 +9,9 @@ import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 
 public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
+    protected volatile float lastX;
+    protected volatile float lastY;
+
     private SpriteIterator spriteIterator;
     protected float initVelocity;
 
@@ -32,9 +35,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         spriteIterator.setSprite(sprite);
         return this;
     }
-
-    protected volatile float lastX;
-    protected volatile float lastY;
 
     @Override
     public Pair<Float, Float> getLastCoordinates() {
@@ -126,14 +126,15 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         pauseSemaphore.unsubscribe();
     }
 
+
+    private PositionedImage ret = new PositionedImage();
+
     @Override
     public PositionedImage animate() {
 
         try {
 
             pauseSemaphore.await();
-
-            PositionedImage ret = new PositionedImage();
             ret.image = iterateSprite();
 
             //check borders and recalculate
@@ -155,7 +156,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
             return ret;
 
         } catch (InterruptedException e) {
-                return null;
+            return null;
         }
 
     }

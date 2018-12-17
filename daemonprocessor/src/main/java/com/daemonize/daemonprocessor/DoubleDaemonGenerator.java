@@ -152,6 +152,10 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
             }
         }
 
+        if (!sideQuestFields.isEmpty()) {
+            daemonClassBuilder.addMethod(sideGenerator.generateCurrentSideQuestGetter());
+        }
+
         //add side quests
         for (Pair<TypeSpec, MethodSpec> sideQuestField : sideQuestFields) {
             daemonClassBuilder.addType(sideQuestField.getFirst());

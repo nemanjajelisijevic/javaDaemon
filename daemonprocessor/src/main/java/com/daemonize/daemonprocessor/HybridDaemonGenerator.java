@@ -103,6 +103,10 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
             sideQuestFields.add(sideGenerator.createSideQuest(sideQuestPair));
         }
 
+        if (!sideQuestFields.isEmpty()) {
+            daemonClassBuilder.addMethod(sideGenerator.generateCurrentSideQuestGetter());
+        }
+
         //add side quest setters
         for (Pair<TypeSpec, MethodSpec> sideQuestField : sideQuestFields) {
             daemonClassBuilder.addMethod(sideQuestField.getSecond());

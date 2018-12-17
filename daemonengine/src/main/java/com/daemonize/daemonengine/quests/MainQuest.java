@@ -11,6 +11,7 @@ public abstract class MainQuest<T> extends Quest<T> {
   protected Closure<T> closure;
 
   public MainQuest() {
+    super();
     this.state = DaemonState.MAIN_QUEST;
   }
 

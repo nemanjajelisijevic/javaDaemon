@@ -23,6 +23,7 @@ import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -103,6 +104,7 @@ public class Game {
     private Image deselection;
 
     //enemies
+    //private ActiveEntitySet<EnemyDoubleDaemon> activeEnemies = new ActiveEntitySet();
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private Image[] enemySprite;
     private Image [] healthBarSprite;
@@ -118,6 +120,7 @@ public class Game {
     private float enemyVelocity = 1;
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
+    private long waveInterval = 20000;
     private long levelGenerateinterval = 5000;
 
     //bullets
@@ -170,15 +173,13 @@ public class Game {
             if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst()) {
 
                 //fireContinousBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
-                //fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
-                fireRocketBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
+                //fireBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
+                fireRocketBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),25, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
 //                fireKrugBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond().getLastCoordinates(),aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,tower.getTowerLevel().currentLevel);
             }
 
             tower.sleep(tower.getTowerLevel().reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
-                List<EnemyDoubleDaemon> clone = new ArrayList<>(activeEnemies.size());
-                clone.addAll(activeEnemies);
-                tower.scan(clone, this);
+                tower.scan(new ArrayList<>(activeEnemies), this);
             });
         }
     }
@@ -343,7 +344,7 @@ public class Game {
     private void pauseAll() {
         pause = true;
         enemyGenerator.stop();
-        for (EnemyDoubleDaemon enemy : activeEnemies) {
+        for (EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) {
             enemy.pause();
         }
         for (TowerDaemon tower : towers) {
@@ -354,7 +355,7 @@ public class Game {
     private void contAll() { //continueAll
         pause = false;
         enemyGenerator.start();
-        for (EnemyDoubleDaemon enemy : activeEnemies) {
+        for (EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) {
             enemy.cont();
         }
         for (TowerDaemon tower : towers) {
@@ -371,7 +372,7 @@ public class Game {
 
     public Game stop(){
         enemyGenerator.stop();
-        for(EnemyDoubleDaemon enemy : activeEnemies) enemy.stop();
+        for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
         for (TowerDaemon tower : towers) tower.stop();
         drawConsumer.stop();
         gameConsumer.stop();
@@ -412,7 +413,7 @@ public class Game {
     private TowerSelect towerSelect;
 
     {
-        //init spell (state)
+        //init state
         chain.addState(()-> {
 
             scene.addImageView(new ImageViewImpl().setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
@@ -547,7 +548,7 @@ public class Game {
                         gameConsumer,
                         drawConsumer,
                         new Bullet(
-                                bulletSprite,//bulletSpriteLaser,
+                                /*bulletSprite,*/bulletSpriteLaser,
                                 0,
                                 Pair.create((float) 0, (float) 0),
                                 Pair.create((float) 0, (float) 0),
@@ -618,7 +619,12 @@ public class Game {
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
 
-                    enemyGenerator.setSleepInterval(20000);
+                    if (enemyCounter % 15 == 0 && waveInterval > 2000){
+                        waveInterval -= 2000;
+                    }
+
+                    enemyGenerator.setSleepInterval((int)waveInterval);//TODO set long as param in DaemonGenerators
+
                 } else {
                     enemyGenerator.setSleepInterval((int)enemyGenerateinterval);
                 }
@@ -641,7 +647,6 @@ public class Game {
                 enemy.start();
 
                 activeEnemies.add(enemy);
-
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond(), firstField.getCenterX(), firstField.getCenterY());
                 enemy.rotate(angle, ret1->{});
@@ -678,7 +683,9 @@ public class Game {
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 int angle = (int) RotatingSpriteImageMover.getAngle(current.getCenterX(), current.getCenterY(), next.getCenterX(), next.getCenterY());
                                 enemy.setVelocity(new ImageMover.Velocity(3, enemy.getVelocity().direction));
-                                enemy.rotate(angle, ret-> enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this));
+                                enemy.rotate(angle, ret-> {});
+
+                                enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
 
                                 //enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
                             }
@@ -688,6 +695,16 @@ public class Game {
             });
 
             enemyGenerator.start();
+
+//            activeEnemies.setOnDepleted(()->{
+//                for (TowerDaemon tower: towers)
+//                    tower.pauseScan();
+//            });
+//
+//            activeEnemies.setOnFirstAdded(()->{
+//                for (TowerDaemon tower: towers)
+//                    tower.contScan();
+//            });
 
             //try to garbage collect
             new DummyDaemon(gameConsumer, 3000).setClosure(aReturn -> System.gc()).start();
@@ -762,9 +779,7 @@ public class Game {
             towerDaemon.start();
 
             towerScanClosure = new TowerScanClosure(towerDaemon);
-            List<EnemyDoubleDaemon> clone = new ArrayList<EnemyDoubleDaemon>(activeEnemies.size());
-            clone.addAll(activeEnemies);
-            towerDaemon.scan(clone, towerScanClosure);
+            towerDaemon.scan(new ArrayList<>(activeEnemies), towerScanClosure);
         }
     }
 
@@ -1079,18 +1094,10 @@ public class Game {
 
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
-        //rotation bullet before fire
-        //int targetAngle = (int) RotatingSpriteImageMover.getAngle(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond(), sourceCoord.getFirst(), sourceCoord.getSecond());
-//        AngleToBitmapArray spriteBufferLaser = new AngleToBitmapArray(bulletSpriteLaser, 10); // TODO un hardcode this !!!
-//        Image[] currentRotationSprite = new Image[1];
-//        currentRotationSprite[0] = spriteBufferLaser.getByAngle(targetAngle);
-
-
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
         bulletDoubleDaemon.setLevel(noOfBulletsFired);
-        bulletDoubleDaemon.setDamage(1);
-       //bulletDoubleDaemon.setSprite(bulletSpriteLaser);
-//        bulletDoubleDaemon.setSprite(currentRotationSprite);
+        bulletDoubleDaemon.setDamage(bulletDamage);
+
         drawConsumer.consume(()->{
             for (ImageView view : bulletDoubleDaemon.getViews()){
                 view.show();
@@ -1116,14 +1123,40 @@ public class Game {
         int launchX = getRandomInt((int)(sourceCoord.getFirst() - 50), (int)(sourceCoord.getFirst() + 50));
         int launchY = getRandomInt((int)(sourceCoord.getSecond() - 50), (int)(sourceCoord.getSecond() + 50));
 
-        int angle = (int) RotatingSpriteImageMover.getAngle(sourceCoord.getFirst(), sourceCoord.getSecond(), launchX, launchY);
-        bulletDoubleDaemon.rotate(angle, ret1->{});
+        int angle = (int) RotatingSpriteImageMover.getAngle(
+                sourceCoord.getFirst(),
+                sourceCoord.getSecond(),
+                launchX,
+                launchY
+        );
 
-        bulletDoubleDaemon.goTo(launchX,launchY, 5, aReturn1 -> {
-//        bulletDoubleDaemon.goTo(sourceCoord.getFirst() + 50, sourceCoord.getSecond(), 5, aReturn1 -> {
-            int targetAngle1 = (int) RotatingSpriteImageMover.getAngle( bulletDoubleDaemon.getPrototype().getLastCoordinates().getFirst(), bulletDoubleDaemon.getPrototype().getLastCoordinates().getSecond(),enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond());
-            bulletDoubleDaemon.rotate(targetAngle1, aReturnR -> {
-                bulletDoubleDaemon.goTo(
+        bulletDoubleDaemon.rotate(angle, ret1->{
+
+            bulletDoubleDaemon.goTo(launchX,launchY, 5, aReturn1 -> {
+
+                if (!enemy.isShootable()) {
+                    bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
+                        bulletDoubleDaemon.stop();
+                        drawConsumer.consume(() -> {
+                            for (ImageView view : bulletDoubleDaemon.getViews())
+                                view.hide();
+                        });
+
+                        if (!bulletQueue.contains(bulletDoubleDaemon)) bulletQueue.add(bulletDoubleDaemon);
+
+                    });
+                }
+
+
+                int targetAngle1 = (int) RotatingSpriteImageMover.getAngle(
+                        bulletDoubleDaemon.getLastCoordinates().getFirst(),
+                        bulletDoubleDaemon.getLastCoordinates().getSecond(),
+                        enemy.getLastCoordinates().getFirst(),
+                        enemy.getLastCoordinates().getSecond()
+                );
+
+                bulletDoubleDaemon.rotate(targetAngle1, aReturnR -> {
+                    bulletDoubleDaemon.goTo(
 
                         enemy.getLastCoordinates().getFirst(),
                         enemy.getLastCoordinates().getSecond(),
@@ -1132,7 +1165,13 @@ public class Game {
                         aReturn2->{
                             if (!enemy.isShootable()) return;
 
-                            int newHp = enemy.getHp() - bulletDoubleDaemon.getPrototype().getDamage();
+                            float bulletX = bulletDoubleDaemon.getLastCoordinates().getFirst();
+                            float bulletY = bulletDoubleDaemon.getLastCoordinates().getSecond();
+
+                            if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) > 200  && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) > 200)
+                                return;
+
+                            int newHp = enemy.getHp() - bulletDoubleDaemon.getDamage();
 
                             if (newHp > 0) {
                                 enemy.setHp(newHp);
@@ -1156,15 +1195,13 @@ public class Game {
                                     }
                                 });
 
-                                if (!bulletQueue.contains(bulletDoubleDaemon)) bulletQueue.add(bulletDoubleDaemon);
+                                if (!bulletQueue.contains(bulletDoubleDaemon))
+                                    bulletQueue.add(bulletDoubleDaemon);
 
                             });
-
-
                         }
-
-                );
-
+                    );
+                });
             });
         });
 

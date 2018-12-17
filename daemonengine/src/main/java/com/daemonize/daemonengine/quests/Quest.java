@@ -11,6 +11,10 @@ public abstract class Quest<T> implements Runnable {
   protected ReturnRunnable<T> returnRunnable;
   private Consumer consumer;
 
+  public Quest() {
+    this.returnRunnable = new ReturnRunnable<T>();
+  }
+
   public String getDescription() {
     return description;
   }

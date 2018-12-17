@@ -95,7 +95,6 @@ public class Tower extends RotatingSpriteImageMover {
         super.rotateTowards(x, y);
     }
 
-    @DedicatedThread
     public Pair<Boolean, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
 
         scanSemaphore.await();
@@ -118,13 +117,23 @@ public class Tower extends RotatingSpriteImageMover {
     @Override
     public void pause() {
         super.pause();
-        scanSemaphore.subscribe();
+        pauseScan();
     }
 
     @CallingThread
     @Override
     public void cont() {
         super.cont();
+        contScan();
+    }
+
+    @CallingThread
+    public void pauseScan() {
+        scanSemaphore.subscribe();
+    }
+
+    @CallingThread
+    public void contScan() {
         scanSemaphore.unsubscribe();
     }
 

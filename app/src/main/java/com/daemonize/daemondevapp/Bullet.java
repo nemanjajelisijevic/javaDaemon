@@ -54,6 +54,12 @@ public class Bullet extends CoordinatedImageTranslationMover {
     }
 
     @CallingThread
+    @Override
+    public Pair<Float, Float> getLastCoordinates() {
+        return super.getLastCoordinates();
+    }
+
+    @CallingThread
     public void setCurrentAngle(int angle) {
         rotationMover.setCurrentAngle(angle);
     }
@@ -112,7 +118,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return this;
     }
 
-    @DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);

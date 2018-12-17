@@ -92,7 +92,6 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return rotationMover.pushSprite(sprite, velocity);
     }
 
-    @DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
@@ -144,4 +143,5 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
         return root;
     }
+
 }

@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
-    private int currentAngle;
+    //private int currentAngle;
     private AngleToBitmapArray spriteBuffer;
     private Image[] currentRotationSprite;
     private volatile int size;
@@ -23,13 +23,12 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         this.spriteBuffer = new AngleToBitmapArray(rotationSprite, step);
         this.currentRotationSprite = new Image[(180 / step) + 1];
         this.size = 0;
-        Image[] last = new Image[1];
-        last[0] = spriteBuffer.getByAngle(currentAngle);
-        setSprite(last);
+        setSprite(new Image[]{spriteBuffer.getCurrent()});
     }
 
     public void setCurrentAngle(int currentAngle) {
-        this.currentAngle = currentAngle;
+        this.spriteBuffer.setCurrentAngle(currentAngle);
+        //this.currentAngle = currentAngle;
     }
 
     public RotatingSpriteImageMover(Image[] rotationSprite, float velocity, Pair<Float, Float> startingPos) {
@@ -43,6 +42,8 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     }
 
     public void rotate(int targetAngle) throws InterruptedException {
+
+        int currentAngle = spriteBuffer.getCurrentAngle();
 
         if (Math.abs(targetAngle - currentAngle) <= spriteBuffer.getStep()) { //TODO check how many steps is the limit?
 
@@ -70,8 +71,6 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
             pushSprite(Arrays.copyOf(currentRotationSprite, size), velocity.intensity);
         }
-
-        currentAngle = spriteBuffer.getCurrentAngle();
     }
 
     public static double getAngle(float x1, float y1, float x2, float y2) {

@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
             bulletSprite[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), bulletSize0, bulletSize0, false));
             bulletSprite[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), bulletSize0, bulletSize0, false));
 
-            int bulletSize = 100;
+            int bulletSize = 60;
             Image [] spriteRocket = new Image[36];
 
             for(int i = 0; i < 36; i++) {

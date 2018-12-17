@@ -95,7 +95,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
             long t0 = System.nanoTime();
             drawViews();
             double duration = DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS);
-            if (duration < 15) {
+            if (duration < 12) {
                 try {
                     Thread.sleep(16 - (long) duration);
                 } catch (InterruptedException e) {

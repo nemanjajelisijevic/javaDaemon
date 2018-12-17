@@ -7,14 +7,23 @@ public class ReturnRunnable<T> implements Runnable {
   private Closure<T> closure;
   private Return<T> ret;
 
-  public ReturnRunnable(Closure<T> closure) {
-    this.closure = closure;
+  public ReturnRunnable() {
     this.ret = new Return<>();
+  }
+
+  public ReturnRunnable(Closure<T> closure) {
+    this();
+    this.closure = closure;
   }
 
   public ReturnRunnable(Closure<T> closure, T result) {
     this.closure = closure;
     this.ret = new Return<>(result);
+  }
+
+  public ReturnRunnable<T> setClosure(Closure<T> closure) {
+    this.closure = closure;
+    return this;
   }
 
   @SuppressWarnings("unchecked")
