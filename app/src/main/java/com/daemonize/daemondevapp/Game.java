@@ -1108,6 +1108,7 @@ public class Game {
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
         bulletDoubleDaemon.setLevel(noOfBulletsFired);
         bulletDoubleDaemon.setDamage(bulletDamage);
+        bulletDoubleDaemon.setSprite(bulletSpriteLaser);
 
         drawConsumer.consume(()->{
             for (ImageView view : bulletDoubleDaemon.getViews()){
