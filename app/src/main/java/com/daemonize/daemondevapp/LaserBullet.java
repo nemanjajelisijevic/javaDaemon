@@ -119,6 +119,9 @@ public class LaserBullet extends Bullet {
             phaseLock.unlock();
         }
 
+        if (!fire)
+            return null;
+
         if (target == null)
             throw new IllegalArgumentException("Target is null!");
 
