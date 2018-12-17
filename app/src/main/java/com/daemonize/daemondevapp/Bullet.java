@@ -114,6 +114,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return this;
     }
 
+    @CallingThread
     public Bullet setView3(ImageView view3) {
         this.view3 = view3;
         return this;

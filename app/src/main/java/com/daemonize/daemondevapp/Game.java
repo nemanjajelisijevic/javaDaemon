@@ -129,6 +129,16 @@ public class Game {
     private Image[] bulletSpriteLaser;
     private int bulletDamage = 2;
 
+    private LaserBulletDaemon laser;
+    private List<ImageView> laserViews;
+
+    public Game setLaserSprite(Image[] laserSprite) {
+        this.laserSprite = laserSprite;
+        return this;
+    }
+
+    private Image[] laserSprite;
+
     //closures
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
@@ -193,15 +203,19 @@ public class Game {
                         break;
                     case TYPE3:
                         //fireContinousBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
-                        fireKrugBullet(
-                                tower.getLastCoordinates(),
-                                aReturn.uncheckAndGet().getSecond().getLastCoordinates(),
-                                aReturn.uncheckAndGet().getSecond(),
-                                15,
-                                tower.getTowerLevel().bulletDamage,
-                                tower.getTowerLevel().currentLevel
-                        );
-                        break;
+//                        fireKrugBullet(
+//                                tower.getLastCoordinates(),
+//                                aReturn.uncheckAndGet().getSecond().getLastCoordinates(),
+//                                aReturn.uncheckAndGet().getSecond(),
+//                                15,
+//                                tower.getTowerLevel().bulletDamage,
+//                                tower.getTowerLevel().currentLevel
+//                        );
+                        fireLaser(tower.getLastCoordinates(), aReturn.get().getSecond(), 1000);
+                        tower.sleep(1000, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
+                            tower.scan(new ArrayList<>(activeEnemies), this);
+                        });
+                        return;
                     default:
                         throw new IllegalStateException("Tower type does not exist!");
                 }
@@ -400,6 +414,7 @@ public class Game {
     }
 
     public Game stop(){
+        //laser.stop();
         enemyGenerator.stop();
         for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
         for (TowerDaemon tower : towers) tower.stop();
@@ -540,7 +555,11 @@ public class Game {
 
             Field firstField = grid.getField(0, 0);
 
+            laserViews = new ArrayList<>(200);
+
             for (int i = 0; i < 200; ++i) {
+
+
 
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                         gameConsumer,
@@ -592,7 +611,33 @@ public class Game {
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure());
 
                 bulletQueue.add(bulletDoubleDaemon);
+
+                laserViews.add(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)));
+
             }
+
+            laser = new LaserBulletDaemon(
+                    gameConsumer,
+                    drawConsumer,
+                    new LaserBullet(
+                            laserSprite,
+                            40,
+                            Pair.create(0F, 0F),
+                            Pair.create(0F, 0F),
+                            1
+                    )
+            );
+
+            laser.setViews(laserViews);
+            laser.setAnimateLaserSideQuest().setClosure(ret->{
+                for (Pair<ImageView, ImageMover.PositionedImage> viewAndImage : ret.uncheckAndGet()) {
+                    viewAndImage.getFirst().setAbsoluteX(viewAndImage.getSecond().positionX);
+                    viewAndImage.getFirst().setAbsoluteY(viewAndImage.getSecond().positionY);
+                    viewAndImage.getFirst().setImage(viewAndImage.getSecond().image);
+                }
+            });
+
+            laser.start();
 
             scene.lockViews();
             renderer.setScene(scene).start();
@@ -1379,6 +1424,26 @@ public class Game {
 //        }
 
 
+    }
+
+    public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, long duration) {
+        laser.desintegrateTarget(source, enemy, duration, ret->{
+            int newHp = enemy.getHp() - laser.getDamage();
+
+            if (newHp > 0) {
+                enemy.setHp(newHp);
+            } else {
+                enemy.setShootable(false);
+                drawConsumer.consume(() -> infoScore.setNumbers(++score));
+                drawConsumer.consume(() -> enemy.getHpView().hide());
+                enemy.pushSprite(explodeSprite, 0, aReturn3 -> {
+                    drawConsumer.consume(() -> enemy.getView().hide());
+                    enemy.stop();
+                    activeEnemies.remove(enemy);
+                    if (!enemyQueue.contains(enemy)) enemyQueue.add(enemy);
+                });
+            }
+        });
     }
 
 

@@ -12,7 +12,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     protected volatile float lastX;
     protected volatile float lastY;
 
-    private SpriteIterator spriteIterator;
+    protected SpriteIterator spriteIterator;
     protected float initVelocity;
 
     protected volatile Velocity velocity;

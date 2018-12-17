@@ -19,8 +19,8 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     private Condition coordinateReachedCondition = coordinateLock.newCondition();
     private volatile boolean coordinatesReached = false;
 
-    private volatile float targetX;
-    private volatile float targetY;
+    protected volatile float targetX;
+    protected volatile float targetY;
 
     public CoordinatedImageTranslationMover(
             Image [] sprite,
