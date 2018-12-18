@@ -541,7 +541,7 @@ public class Game {
 
             for(int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i) {
-                    gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1));
+                    gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3));
                 }
             }
 
@@ -562,8 +562,8 @@ public class Game {
                                 enemyHp,
                                 Pair.create((float) 0, (float) 0),
                                 Pair.create(firstField.getCenterX(), firstField.getCenterY())
-                        ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(2)))
-                                .setHpView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(2)))
+                        ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
+                                .setHpView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
                                 .setHealthBarImage(healthBarSprite)
                 ).setName("Enemy no. " + i);
 
@@ -611,7 +611,7 @@ public class Game {
             laserViews = new ArrayList<>(laserViewNo);
 
             for (int i = 0; i < laserViewNo; ++i) {
-                laserViews.add(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)));
+                laserViews.add(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)));
             }
 
             laser = new LaserBulletDaemon(
@@ -655,7 +655,7 @@ public class Game {
 
                 scoreTitleView.setImage(scoreTitle);
                 scoreBackGrView.setImage(scoreBackGrImage);
-                infoScore = new InfoTable(borderX - scoreBackGrImage.getWidth(), 250,scoreBackGrView,scoreTitleView,viewsNum,scorenumbersImages).setNumbers(97513);
+                infoScore = new InfoTable(borderX - scoreBackGrImage.getWidth(), 250,scoreBackGrView,scoreTitleView,viewsNum,scorenumbersImages).setNumbers(00000);
 
             });
             //scoreBackGrView.setAbsoluteX(borderX - scoreBackGrImage.getWidth());
@@ -721,6 +721,7 @@ public class Game {
                                 if (current == null) return;//throw new IllegalStateException("Field can not be null");
                                 else if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     //explode in  end .
+                                    enemy.setVelocity(new ImageMover.Velocity(0, enemy.getVelocity().direction));
                                     enemy.setShootable(false);
                                     drawConsumer.consume(()-> enemy.getHpView().hide());
 

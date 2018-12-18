@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
                     .setBulletSpriteLaser(spriteRocket)
 
                     .setLaserSprite(new Image[]{
-                            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("blueBullet.png")), 10, 10, false))
+                            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("bluePhoton.png")), 10, 10, false))
                     })
                     .setExplodeSprite(explosionSprite)
                     .setMiniExplodeSprite(miniExplosionSprite)
