@@ -343,7 +343,7 @@ public class Game {
             });
 
             Button closeButton = new Button("Close", 0, 0, closeButtonImage).onClick(()->{
-                contAll();
+                //contAll();
                 drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().hide());
             });
 
@@ -641,7 +641,7 @@ public class Game {
 
             if (!towerUpgradeDialog.getTowerUpgrade().isShowing()) {
 
-                pauseAll();
+                //pauseAll();
                 Tower.TowerLevel currLvl = tow.getTowerLevel();
                 towerUpgradeDialog.setTower(tow.getPrototype());
                 boolean hasSkillsToPayTheBills = score > 3;
