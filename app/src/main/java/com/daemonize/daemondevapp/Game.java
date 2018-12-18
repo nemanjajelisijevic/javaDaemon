@@ -87,7 +87,7 @@ public class Game {
     private List<TowerDaemon> towers = new ArrayList<>();
     private Queue<EnemyDoubleDaemon> enemyQueue = new LinkedList<>();
     private int towerShootInterval = 1500;
-    private int range = 320;
+    private int range = 250;
 
     private Image[] currentTowerSprite;
     private Image[] towerSprite1;
@@ -129,15 +129,16 @@ public class Game {
     private Image[] bulletSpriteLaser;
     private int bulletDamage = 2;
 
+    //laser
     private LaserBulletDaemon laser;
     private List<ImageView> laserViews;
+    private Image[] laserSprite;
+    private int laserViewNo = 50;
 
     public Game setLaserSprite(Image[] laserSprite) {
         this.laserSprite = laserSprite;
         return this;
     }
-
-    private Image[] laserSprite;
 
     //closures
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
@@ -180,7 +181,7 @@ public class Game {
         @Override
         public void onReturn(Return<Pair<Tower.TowerType, EnemyDoubleDaemon>> aReturn) {
 
-            if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst() != null) {
+            if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst() != null && aReturn.uncheckAndGet().getSecond() != null) {
                 switch (aReturn.get().getFirst()) {
                     case TYPE1:
                         fireBullet(
@@ -202,17 +203,8 @@ public class Game {
                         );
                         break;
                     case TYPE3:
-                        //fireContinousBullet(tower.getPrototype().getLastCoordinates(), aReturn.uncheckAndGet().getSecond(),15, tower.getTowerLevel().bulletDamage,1);
-//                        fireKrugBullet(
-//                                tower.getLastCoordinates(),
-//                                aReturn.uncheckAndGet().getSecond().getLastCoordinates(),
-//                                aReturn.uncheckAndGet().getSecond(),
-//                                15,
-//                                tower.getTowerLevel().bulletDamage,
-//                                tower.getTowerLevel().currentLevel
-//                        );
-                        fireLaser(tower.getLastCoordinates(), aReturn.get().getSecond(), 1000);
-                        tower.sleep(1000, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
+                        fireLaser(tower.getLastCoordinates(), aReturn.get().getSecond(), 500);
+                        tower.sleep(500, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
                             tower.scan(new ArrayList<>(activeEnemies), this);
                         });
                         return;
@@ -555,7 +547,7 @@ public class Game {
 
             Field firstField = grid.getField(0, 0);
 
-            laserViews = new ArrayList<>(200);
+
 
             for (int i = 0; i < 200; ++i) {
 
@@ -612,8 +604,14 @@ public class Game {
 
                 bulletQueue.add(bulletDoubleDaemon);
 
-                laserViews.add(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)));
+            }
 
+
+
+            laserViews = new ArrayList<>(laserViewNo);
+
+            for (int i = 0; i < laserViewNo; ++i) {
+                laserViews.add(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)));
             }
 
             laser = new LaserBulletDaemon(
@@ -624,7 +622,7 @@ public class Game {
                             40,
                             Pair.create(0F, 0F),
                             Pair.create(0F, 0F),
-                            1
+                            bulletDamage
                     )
             );
 
@@ -637,14 +635,14 @@ public class Game {
                 }
             });
 
-            laser.start();
-
             scene.lockViews();
             renderer.setScene(scene).start();
 
             chain.next();
 
         }).addState(()->{//gameState
+
+            laser.start();
 
             drawConsumer.consume(()->{
                 for(int j = 0; j < rows; ++j ) {
@@ -682,6 +680,7 @@ public class Game {
                         waveInterval -= 2000;
                     }
 
+                    enemyHp++;
                     enemyGenerator.setSleepInterval((int)waveInterval);//TODO set long as param in DaemonGenerators
 
                 } else {
@@ -719,7 +718,7 @@ public class Game {
                                 Pair<Float, Float> currentCoord = enemy.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
-                                if (current == null) throw new IllegalStateException("Field can not be null");//return;
+                                if (current == null) return;//throw new IllegalStateException("Field can not be null");
                                 else if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     //explode in  end .
                                     enemy.setShootable(false);
@@ -731,6 +730,7 @@ public class Game {
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                                         enemy.stop();
                                         drawConsumer.consume(() -> enemy.getView().hide());
+                                        enemy.setLastCoordinates(0, 0);
                                         activeEnemies.remove(enemy);
                                         if (!enemyQueue.contains(enemy))
                                             enemyQueue.add(enemy);
@@ -993,6 +993,7 @@ public class Game {
                             enemy.pushSprite(explodeSprite, 0, aReturn2 -> {
                                 drawConsumer.consume(() -> enemy.getView().hide());
                                 enemy.stop();
+                                enemy.setLastCoordinates(0, 0);
                                 activeEnemies.remove(enemy);
                                 if (!enemyQueue.contains(enemy))
                                     enemyQueue.add(enemy);
@@ -1073,6 +1074,7 @@ public class Game {
                     enemy.pushSprite(explodeSprite, 0, aReturn2 -> {
                         drawConsumer.consume(() -> enemy.getView().hide());
                         enemy.stop();
+                        enemy.setLastCoordinates(0, 0);
                         activeEnemies.remove(enemy);
                         if (!enemyQueue.contains(enemy))
                             enemyQueue.add(enemy);
@@ -1122,6 +1124,7 @@ public class Game {
                 enemy.pushSprite(explodeSprite, 0, aReturn2 -> {
                     drawConsumer.consume(() -> enemy.getView().hide());
                     enemy.stop();
+                    enemy.setLastCoordinates(0, 0);
                     activeEnemies.remove(enemy);
                     if (!enemyQueue.contains(enemy)) enemyQueue.add(enemy);
                 });
@@ -1189,7 +1192,7 @@ public class Game {
 
         bulletDoubleDaemon.rotate(angle, ret1->{
 
-            bulletDoubleDaemon.goTo(launchX,launchY, 5, aReturn1 -> {
+            bulletDoubleDaemon.goTo(launchX,launchY, 4, aReturn1 -> {
 
                 if (!enemy.isShootable()) {
                     bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
@@ -1240,6 +1243,7 @@ public class Game {
                                 enemy.pushSprite(explodeSprite, 0, aReturn3 -> {
                                     drawConsumer.consume(() -> enemy.getView().hide());
                                     enemy.stop();
+                                    enemy.setLastCoordinates(0, 0);
                                     activeEnemies.remove(enemy);
                                     if (!enemyQueue.contains(enemy)) enemyQueue.add(enemy);
                                 });
@@ -1383,6 +1387,7 @@ public class Game {
                         enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                             drawConsumer.consume(() -> enemy.getView().hide());
                             enemy.stop();
+                            enemy.setLastCoordinates(0, 0);
                             activeEnemies.remove(enemy);
                             if (!enemyQueue.contains(enemy))
                                 enemyQueue.add(enemy);
@@ -1427,7 +1432,7 @@ public class Game {
     }
 
     public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, long duration) {
-        laser.desintegrateTarget(source, enemy, duration, ret->{
+        laser.desintegrateTarget(source, enemy, duration, drawConsumer, ret->{
             int newHp = enemy.getHp() - laser.getDamage();
 
             if (newHp > 0) {
@@ -1438,6 +1443,7 @@ public class Game {
                 drawConsumer.consume(() -> enemy.getHpView().hide());
                 enemy.pushSprite(explodeSprite, 0, aReturn3 -> {
                     drawConsumer.consume(() -> enemy.getView().hide());
+                    enemy.setLastCoordinates(0, 0);
                     enemy.stop();
                     activeEnemies.remove(enemy);
                     if (!enemyQueue.contains(enemy)) enemyQueue.add(enemy);

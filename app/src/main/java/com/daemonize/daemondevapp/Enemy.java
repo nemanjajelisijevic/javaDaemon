@@ -76,6 +76,12 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
     @CallingThread
     @Override
+    public PositionedImage setLastCoordinates(float lastX, float lastY) {
+        return super.setLastCoordinates(lastX, lastY);
+    }
+
+    @CallingThread
+    @Override
     public Pair<Float, Float> getLastCoordinates() {
         return super.getLastCoordinates();
     }
@@ -92,6 +98,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return rotationMover.pushSprite(sprite, velocity);
     }
 
+    @DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
