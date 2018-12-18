@@ -239,7 +239,7 @@ public class Game {
         );
     }
 
-    private void pauseAll() {
+    public void pauseAll() {
         pause = true;
         enemyGenerator.stop();
         for (EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) {
@@ -250,7 +250,7 @@ public class Game {
         }
     }
 
-    private void contAll() { //continueAll
+    public void contAll() { //continueAll
         pause = false;
         enemyGenerator.start();
         for (EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) {
