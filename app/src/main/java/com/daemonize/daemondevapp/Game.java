@@ -79,7 +79,7 @@ public class Game {
     private Image greenDialogueImage;
     private Image scoreBackGrImage;
     private Image scoreTitle;
-    private Image [] scorenumbersImages;
+    private Image[] scorenumbersImages;
 
     private boolean pause;
 
@@ -88,6 +88,7 @@ public class Game {
     private Queue<EnemyDoubleDaemon> enemyQueue = new LinkedList<>();
     private int towerShootInterval = 1500;
     private int range = 250;
+    private Tower.TowerType towerSelect;
 
     private Image[] currentTowerSprite;
     private Image[] towerSprite1;
@@ -107,12 +108,12 @@ public class Game {
     //private ActiveEntitySet<EnemyDoubleDaemon> activeEnemies = new ActiveEntitySet();
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private Image[] enemySprite;
-    private Image [] healthBarSprite;
+    private Image[] healthBarSprite;
 
 
     //explosions
-    private Image [] explodeSprite;
-    private Image [] miniExplodeSprite;
+    private Image[] explodeSprite;
+    private Image[] miniExplodeSprite;
 
     private DummyDaemon enemyGenerator;
     private DummyDaemon levelGenerator;
@@ -134,11 +135,6 @@ public class Game {
     private List<ImageView> laserViews;
     private Image[] laserSprite;
     private int laserViewNo = 50;
-
-    public Game setLaserSprite(Image[] laserSprite) {
-        this.laserSprite = laserSprite;
-        return this;
-    }
 
     //closures
     private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
@@ -181,7 +177,12 @@ public class Game {
         @Override
         public void onReturn(Return<Pair<Tower.TowerType, EnemyDoubleDaemon>> aReturn) {
 
-            if (aReturn.uncheckAndGet() != null && aReturn.uncheckAndGet().getFirst() != null && aReturn.uncheckAndGet().getSecond() != null) {
+            long reloadInterval = tower.getTowerLevel().reloadInterval;
+
+            if (aReturn.uncheckAndGet() != null
+                    && aReturn.uncheckAndGet().getFirst() != null
+                    && aReturn.uncheckAndGet().getSecond() != null) {
+
                 switch (aReturn.get().getFirst()) {
                     case TYPE1:
                         fireBullet(
@@ -203,17 +204,15 @@ public class Game {
                         );
                         break;
                     case TYPE3:
-                        fireLaser(tower.getLastCoordinates(), aReturn.get().getSecond(), 500);
-                        tower.sleep(500, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
-                            tower.scan(new ArrayList<>(activeEnemies), this);
-                        });
-                        return;
+                        fireLaser(tower.getLastCoordinates(), aReturn.get().getSecond(), 300);
+                        reloadInterval = 1000;
+                        break;
                     default:
                         throw new IllegalStateException("Tower type does not exist!");
                 }
             }
 
-            tower.sleep(tower.getTowerLevel().reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
+            tower.reload(reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
                 tower.scan(new ArrayList<>(activeEnemies), this);
             });
         }
@@ -222,142 +221,6 @@ public class Game {
     private static int getRandomInt(int min, int max) {
         Random r = new Random();
         return r.nextInt((max - min) + 1) + min;
-    }
-
-
-    public Game setBorders(int x, int y) {
-        this.borderX = x;
-        this.borderY = y;
-        return this;
-    }
-
-    public Game setBackgroundImage(Image backgroundImage) {
-        this.backgroundImage = backgroundImage;
-        return this;
-    }
-
-    public Game setTowerSprite1(Image[] towerSprite1) {
-        this.towerSprite1 = towerSprite1;
-        return this;
-    }
-
-    public Game setTowerSprite2(Image[] towerSprite2) {
-        this.towerSprite2 = towerSprite2;
-        return this;
-    }
-
-    public Game setTowerSprite3(Image[] towerSprite3) {
-        this.towerSprite3 = towerSprite3;
-        return this;
-    }
-
-    public Game setSelectTowerBackgroudnImage(Image selectTowerBackgroudnImage) {
-        this.selectTowerBackgroudnImage = selectTowerBackgroudnImage;
-        return this;
-    }
-
-    public Game setSelectionImage(Image selection) {
-        this.selection = selection;
-        return this;
-    }
-
-    public Game setDeselectionImage(Image deselection) {
-        this.deselection= deselection;
-        return this;
-    }
-
-    public Game setTowerSpriteEx(Image[] towerSpriteEx) {
-        this.towerSpriteEx = towerSpriteEx;
-        return this;
-    }
-
-    public Game setExplodeSprite(Image[] explodeSprite) {
-        this.explodeSprite = explodeSprite;
-        return this;
-    }
-
-    public Game setMiniExplodeSprite(Image[] miniExplodeSprite) {
-        this.miniExplodeSprite = miniExplodeSprite;
-        return this;
-    }
-
-    public Game setBulletSprite(Image[] bulletSprite) {
-        this.bulletSprite = bulletSprite;
-        return this;
-    }
-    public Game setBulletSpriteLaser(Image[] bulletSpriteLaser) {
-        this.bulletSpriteLaser = bulletSpriteLaser;
-        return this;
-    }
-
-    public Game setEnemySprite(Image[] enemySprite) {
-        this.enemySprite = enemySprite;
-        return this;
-    }
-
-    public Game setFieldImage(Image fieldImage) {
-        this.fieldImage = fieldImage;
-        return this;
-    }
-
-    public Game setFieldImageTower(Image fieldImageTower) {
-        this.fieldImageTower = fieldImageTower;
-        return this;
-    }
-
-    public Game setFieldImageTowerDen(Image fieldImageTowerDen) {
-        this.fieldImageTowerDen = fieldImageTowerDen;
-        return this;
-    }
-
-    public Game setHealthBarSprite(Image[] healthBarSprite) {
-        this.healthBarSprite = healthBarSprite;
-        return this;
-    }
-
-    public Game setDialogue(Image dialogueImage) {
-        this.dialogueImage = dialogueImage;
-        return this;
-    }
-
-    public Game setDialogueImageTowerUpgradeLevel(Image[] dialogueImageTowerUpgradeLevel) {
-        this.dialogueImageTowerUpgradeLevel = dialogueImageTowerUpgradeLevel;
-        return this;
-    }
-
-    public Game setUpgradeButtonImage(Image upgradeButtonImage) {
-        this.upgradeButtonImage = upgradeButtonImage;
-        return this;
-    }
-
-    public Game setCloseButtonImage(Image closeButtonImage) {
-        this.closeButtonImage = closeButtonImage;
-        return this;
-    }
-
-    public Game setRedNestedDialogue(Image nestedRedDialogueImage) {
-        this.nestedRedDialogueImage = nestedRedDialogueImage;
-        return this;
-    }
-
-    public Game setGreenDialogue(Image nestedDialogueImage) {
-        this.greenDialogueImage = nestedDialogueImage;
-        return this;
-    }
-
-    public Game setScoreBackGrImage(Image scoreBackGrImage) {
-        this.scoreBackGrImage = scoreBackGrImage;
-        return this;
-    }
-
-    public Game setScoreTitle(Image scoreTitle) {
-        this.scoreTitle = scoreTitle;
-        return this;
-    }
-
-    public Game setScorenumbersImages(Image[] scorenumbersImages) {
-        this.scorenumbersImages = scorenumbersImages;
-        return this;
     }
 
     public Game(Renderer2D renderer, int rows, int columns, float x, float y, int fieldWidth) {
@@ -406,10 +269,10 @@ public class Game {
     }
 
     public Game stop(){
-        //laser.stop();
         enemyGenerator.stop();
         for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
         for (TowerDaemon tower : towers) tower.stop();
+        laser.stop();
         drawConsumer.stop();
         gameConsumer.stop();
         scene.unlockViews();
@@ -436,11 +299,6 @@ public class Game {
         });
         return this;
     }
-
-    private boolean dijalogActive;
-    private DummyDaemon dijalogAnimator;
-
-    private Tower.TowerType towerSelect;
 
     {
         //init state
@@ -547,11 +405,7 @@ public class Game {
 
             Field firstField = grid.getField(0, 0);
 
-
-
             for (int i = 0; i < 200; ++i) {
-
-
 
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                         gameConsumer,
@@ -606,8 +460,6 @@ public class Game {
 
             }
 
-
-
             laserViews = new ArrayList<>(laserViewNo);
 
             for (int i = 0; i < laserViewNo; ++i) {
@@ -655,7 +507,14 @@ public class Game {
 
                 scoreTitleView.setImage(scoreTitle);
                 scoreBackGrView.setImage(scoreBackGrImage);
-                infoScore = new InfoTable(borderX - scoreBackGrImage.getWidth(), 250,scoreBackGrView,scoreTitleView,viewsNum,scorenumbersImages).setNumbers(00000);
+                infoScore = new InfoTable(
+                        borderX - scoreBackGrImage.getWidth(),
+                        250,
+                        scoreBackGrView,
+                        scoreTitleView,
+                        viewsNum,
+                        scorenumbersImages
+                ).setNumbers(00000);
 
             });
             //scoreBackGrView.setAbsoluteX(borderX - scoreBackGrImage.getWidth());
@@ -788,9 +647,15 @@ public class Game {
                 boolean hasSkillsToPayTheBills = score > 3;
 
                 drawConsumer.consume(()->{
-                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(tow.getPrototype().getLastCoordinates().getFirst());
-                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(tow.getPrototype().getLastCoordinates().getSecond());
-                    towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView").setImage(dialogueImageTowerUpgradeLevel[currLvl.currentLevel - 1]);
+                    //towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(tow.getPrototype().getLastCoordinates().getFirst());
+                    //towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(tow.getPrototype().getLastCoordinates().getSecond());
+
+                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(borderX / 2);
+                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(borderY / 2);
+
+                    towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView")
+                            .setImage(dialogueImageTowerUpgradeLevel[currLvl.currentLevel - 1]);
+
                     towerUpgradeDialog.getTowerUpgrade().show();
                     if (hasSkillsToPayTheBills && tow.getTowerLevel().currentLevel < 3)
                         towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").show();
@@ -1155,6 +1020,7 @@ public class Game {
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
+        bulletDoubleDaemon.setStartingCoords(sourceCoord);
         bulletDoubleDaemon.setLevel(noOfBulletsFired);
         bulletDoubleDaemon.setDamage(bulletDamage);
         bulletDoubleDaemon.setSprite(bulletSpriteLaser);
@@ -1165,7 +1031,6 @@ public class Game {
             }
         });
 
-        bulletDoubleDaemon.setStartingCoords(sourceCoord);
         bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
             bulletDoubleDaemon.stop();
             drawConsumer.consume(()->{
@@ -1197,13 +1062,15 @@ public class Game {
 
                 if (!enemy.isShootable()) {
                     bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
+
                         bulletDoubleDaemon.stop();
                         drawConsumer.consume(() -> {
                             for (ImageView view : bulletDoubleDaemon.getViews())
                                 view.hide();
                         });
 
-                        if (!bulletQueue.contains(bulletDoubleDaemon)) bulletQueue.add(bulletDoubleDaemon);
+                        if (!bulletQueue.contains(bulletDoubleDaemon))
+                            bulletQueue.add(bulletDoubleDaemon);
 
                     });
                 }
@@ -1453,5 +1320,145 @@ public class Game {
         });
     }
 
+    //Game setters
+    public Game setBorders(int x, int y) {
+        this.borderX = x;
+        this.borderY = y;
+        return this;
+    }
+
+    public Game setBackgroundImage(Image backgroundImage) {
+        this.backgroundImage = backgroundImage;
+        return this;
+    }
+
+    public Game setTowerSprite1(Image[] towerSprite1) {
+        this.towerSprite1 = towerSprite1;
+        return this;
+    }
+
+    public Game setTowerSprite2(Image[] towerSprite2) {
+        this.towerSprite2 = towerSprite2;
+        return this;
+    }
+
+    public Game setTowerSprite3(Image[] towerSprite3) {
+        this.towerSprite3 = towerSprite3;
+        return this;
+    }
+
+    public Game setSelectTowerBackgroudnImage(Image selectTowerBackgroudnImage) {
+        this.selectTowerBackgroudnImage = selectTowerBackgroudnImage;
+        return this;
+    }
+
+    public Game setSelectionImage(Image selection) {
+        this.selection = selection;
+        return this;
+    }
+
+    public Game setDeselectionImage(Image deselection) {
+        this.deselection= deselection;
+        return this;
+    }
+
+    public Game setTowerSpriteEx(Image[] towerSpriteEx) {
+        this.towerSpriteEx = towerSpriteEx;
+        return this;
+    }
+
+    public Game setExplodeSprite(Image[] explodeSprite) {
+        this.explodeSprite = explodeSprite;
+        return this;
+    }
+
+    public Game setMiniExplodeSprite(Image[] miniExplodeSprite) {
+        this.miniExplodeSprite = miniExplodeSprite;
+        return this;
+    }
+
+    public Game setBulletSprite(Image[] bulletSprite) {
+        this.bulletSprite = bulletSprite;
+        return this;
+    }
+    public Game setBulletSpriteLaser(Image[] bulletSpriteLaser) {
+        this.bulletSpriteLaser = bulletSpriteLaser;
+        return this;
+    }
+
+    public Game setEnemySprite(Image[] enemySprite) {
+        this.enemySprite = enemySprite;
+        return this;
+    }
+
+    public Game setFieldImage(Image fieldImage) {
+        this.fieldImage = fieldImage;
+        return this;
+    }
+
+    public Game setFieldImageTower(Image fieldImageTower) {
+        this.fieldImageTower = fieldImageTower;
+        return this;
+    }
+
+    public Game setFieldImageTowerDen(Image fieldImageTowerDen) {
+        this.fieldImageTowerDen = fieldImageTowerDen;
+        return this;
+    }
+
+    public Game setHealthBarSprite(Image[] healthBarSprite) {
+        this.healthBarSprite = healthBarSprite;
+        return this;
+    }
+
+    public Game setDialogue(Image dialogueImage) {
+        this.dialogueImage = dialogueImage;
+        return this;
+    }
+
+    public Game setDialogueImageTowerUpgradeLevel(Image[] dialogueImageTowerUpgradeLevel) {
+        this.dialogueImageTowerUpgradeLevel = dialogueImageTowerUpgradeLevel;
+        return this;
+    }
+
+    public Game setUpgradeButtonImage(Image upgradeButtonImage) {
+        this.upgradeButtonImage = upgradeButtonImage;
+        return this;
+    }
+
+    public Game setCloseButtonImage(Image closeButtonImage) {
+        this.closeButtonImage = closeButtonImage;
+        return this;
+    }
+
+    public Game setRedNestedDialogue(Image nestedRedDialogueImage) {
+        this.nestedRedDialogueImage = nestedRedDialogueImage;
+        return this;
+    }
+
+    public Game setGreenDialogue(Image nestedDialogueImage) {
+        this.greenDialogueImage = nestedDialogueImage;
+        return this;
+    }
+
+    public Game setScoreBackGrImage(Image scoreBackGrImage) {
+        this.scoreBackGrImage = scoreBackGrImage;
+        return this;
+    }
+
+    public Game setScoreTitle(Image scoreTitle) {
+        this.scoreTitle = scoreTitle;
+        return this;
+    }
+
+    public Game setScorenumbersImages(Image[] scorenumbersImages) {
+        this.scorenumbersImages = scorenumbersImages;
+        return this;
+    }
+
+    public Game setLaserSprite(Image[] laserSprite) {
+        this.laserSprite = laserSprite;
+        return this;
+    }
 
 }

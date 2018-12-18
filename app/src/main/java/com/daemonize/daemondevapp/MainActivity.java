@@ -371,9 +371,8 @@ public class MainActivity extends AppCompatActivity {
                     .setEnemySprite(sprite)
                     .setBulletSprite(bulletSprite)
                     .setBulletSpriteLaser(spriteRocket)
-
                     .setLaserSprite(new Image[]{
-                            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("bluePhoton.png")), 10, 10, false))
+                            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenPhoton.png")), 10, 10, false))
                     })
                     .setExplodeSprite(explosionSprite)
                     .setMiniExplodeSprite(miniExplosionSprite)

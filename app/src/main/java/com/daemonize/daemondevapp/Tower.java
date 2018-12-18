@@ -88,7 +88,7 @@ public class Tower extends RotatingSpriteImageMover {
         this.towertype = type;
     }
 
-    public boolean sleep(int millis) throws InterruptedException {
+    public boolean reload(long millis) throws InterruptedException {
         Thread.sleep(millis);
         return true;
     }
