@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import com.daemonize.daemondevapp.images.AndroidBitmapImage;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.renderer.AndroidSurfaceViewRenderer;
+import com.daemonize.daemondevapp.renderer.Renderer2D;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 

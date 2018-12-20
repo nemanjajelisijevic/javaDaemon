@@ -14,7 +14,7 @@ import com.daemonize.daemonengine.utils.TimeUnits;
 
 import java.util.Collections;
 
-public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D, Runnable, SurfaceHolder.Callback {
+public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback {
 
     private Scene2D scene;
 
@@ -23,7 +23,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         return scene;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public AndroidSurfaceViewRenderer setScene(Scene2D scene) {
         this.scene = scene;
@@ -56,7 +55,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         //this.backgroundView = new ImageViewImpl();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public AndroidSurfaceViewRenderer start() {
 
@@ -77,7 +75,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public AndroidSurfaceViewRenderer stop() {
         drawing = false;
