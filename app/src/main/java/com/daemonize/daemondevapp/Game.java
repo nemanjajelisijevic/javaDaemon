@@ -452,7 +452,7 @@ public class Game {
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure());
+                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 bulletQueue.add(bulletDoubleDaemon);
 
