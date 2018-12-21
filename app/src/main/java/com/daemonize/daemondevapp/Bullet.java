@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon")
+@Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon", returnDaemonInstance = true)
 public class Bullet extends CoordinatedImageTranslationMover {
 
     private ImageView view;
