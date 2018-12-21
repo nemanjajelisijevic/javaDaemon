@@ -427,7 +427,6 @@ public class Game {
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-
                 enemy.setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure());//gui consumer
 
                 enemyQueue.add(enemy);
@@ -554,7 +553,9 @@ public class Game {
                 enemy.setName("Enemy no." + enemyCounter);
                 enemy.setMaxHp(enemyHp);
                 enemy.setHp(enemyHp);
-                enemy.getPrototype().setVelocity(enemyVelocity);
+                //enemy.getPrototype().setVelocity(enemyVelocity);
+                enemy.setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(0, 0)));
+                enemy.rotate(0, ret1->{});
 
                 drawConsumer.consume(()->enemy.getView().show());
                 drawConsumer.consume(()->enemy.getHpView().show());
@@ -596,7 +597,7 @@ public class Game {
                                     });
                                 }
 
-                                gridViewMatrix[current.getRow()][current.getColumn()].show();
+                                drawConsumer.consume(()->gridViewMatrix[current.getRow()][current.getColumn()].show());
 
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 int angle = (int) RotatingSpriteImageMover.getAngle(current.getCenterX(), current.getCenterY(), next.getCenterX(), next.getCenterY());
@@ -803,11 +804,13 @@ public class Game {
 
         bulletDoubleDaemon.setStartingCoords(sourceCoord);
         bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
-            bulletDoubleDaemon.stop();
             drawConsumer.consume(()->{
                 for (ImageView view : bulletDoubleDaemon.getViews())
                     view.hide();
             });
+
+            bulletDoubleDaemon.stop();
+            bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
 
             if(!bulletQueue.contains(bulletDoubleDaemon))
                 bulletQueue.add(bulletDoubleDaemon);
@@ -866,10 +869,14 @@ public class Game {
                         }
 
                         bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> {
-                            bulletDoubleDaemon.stop();
+
                             drawConsumer.consume(() -> {
                                 for (ImageView view : bulletDoubleDaemon.getViews()) view.hide();
                             });
+
+                            bulletDoubleDaemon.stop();
+                            bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
+
                             if (!bulletQueue.contains(bulletDoubleDaemon))
                                 bulletQueue.add(bulletDoubleDaemon);
 
@@ -899,12 +906,15 @@ public class Game {
 
         bulletDoubleDaemon.setStartingCoords(sourceCoord);
         bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
-            bulletDoubleDaemon.stop();
+
             drawConsumer.consume(()->{
                 for (ImageView view : bulletDoubleDaemon.getViews()){
                     view.hide();
                 }
             });
+
+            bulletDoubleDaemon.stop();
+            bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
 
             if(!bulletQueue.contains(bulletDoubleDaemon)) {
                 bulletQueue.add(bulletDoubleDaemon);
@@ -947,12 +957,15 @@ public class Game {
                 }
 
                 bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> {
-                    bulletDoubleDaemon.stop();
+
                     drawConsumer.consume(() -> {
                         for (ImageView view : bulletDoubleDaemon.getViews()) {
                             view.hide();
                         }
                     });
+
+                    bulletDoubleDaemon.stop();
+                    bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
 
                     if (!bulletQueue.contains(bulletDoubleDaemon))
                         bulletQueue.add(bulletDoubleDaemon);
@@ -979,29 +992,32 @@ public class Game {
         bulletDoubleDaemon.setDamage(bulletDamage);
         bulletDoubleDaemon.setSprite(bulletSpriteLaser);
 
-        drawConsumer.consume(()->{
-            for (ImageView view : bulletDoubleDaemon.getViews()){
-                view.show();
-            }
-        });
-
         bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
-            bulletDoubleDaemon.stop();
+
             drawConsumer.consume(()->{
                 for (ImageView view : bulletDoubleDaemon.getViews()){
                     view.hide();
                 }
             });
 
+            bulletDoubleDaemon.stop();
+            bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
+
             if(!bulletQueue.contains(bulletDoubleDaemon)) {
                 bulletQueue.add(bulletDoubleDaemon);
             }
         });
 
-        bulletDoubleDaemon.start();
-
         int launchX = getRandomInt((int)(sourceCoord.getFirst() - 50), (int)(sourceCoord.getFirst() + 50));
         int launchY = getRandomInt((int)(sourceCoord.getSecond() - 50), (int)(sourceCoord.getSecond() + 50));
+
+        if (Math.abs(sourceCoord.getFirst() - launchX) > 50) {
+            throw  new IllegalStateException("getrandomInt() X not allowed");
+        }
+
+        if (Math.abs(sourceCoord.getSecond() - launchY) > 50) {
+            throw  new IllegalStateException("getrandomInt() Y not allowed");
+        }
 
         int angle = (int) RotatingSpriteImageMover.getAngle(
                 sourceCoord.getFirst(),
@@ -1010,18 +1026,28 @@ public class Game {
                 launchY
         );
 
+        bulletDoubleDaemon.start();
+
         bulletDoubleDaemon.rotate(angle, ret1->{
+
+            drawConsumer.consume(()->{
+                for (ImageView view : bulletDoubleDaemon.getViews()){
+                    view.show();
+                }
+            });
 
             bulletDoubleDaemon.goTo(launchX,launchY, 4, aReturn1 -> {
 
                 if (!enemy.isShootable()) {
                     bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
 
-                        bulletDoubleDaemon.stop();
                         drawConsumer.consume(() -> {
                             for (ImageView view : bulletDoubleDaemon.getViews())
                                 view.hide();
                         });
+
+                        bulletDoubleDaemon.stop();
+                        bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
 
                         if (!bulletQueue.contains(bulletDoubleDaemon))
                             bulletQueue.add(bulletDoubleDaemon);
@@ -1039,11 +1065,9 @@ public class Game {
 
                 bulletDoubleDaemon.rotate(targetAngle1, aReturnR -> {
                     bulletDoubleDaemon.goTo(
-
                         enemy.getLastCoordinates().getFirst(),
                         enemy.getLastCoordinates().getSecond(),
                         velocity,
-                        /*new Attack(bulletDoubleDaemon,enemy)*/
                         aReturn2->{
                             if (!enemy.isShootable()) return;
 
@@ -1072,12 +1096,15 @@ public class Game {
                             }
 
                             bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
-                                bulletDoubleDaemon.stop();
+
                                 drawConsumer.consume(() -> {
                                     for (ImageView view : bulletDoubleDaemon.getViews()) {
                                         view.hide();
                                     }
                                 });
+
+                                bulletDoubleDaemon.stop();
+                                bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
 
                                 if (!bulletQueue.contains(bulletDoubleDaemon))
                                     bulletQueue.add(bulletDoubleDaemon);
@@ -1092,7 +1119,9 @@ public class Game {
     }
 
     public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, long duration) {
+
         laser.desintegrateTarget(source, enemy, duration, drawConsumer, ret->{
+
             int newHp = enemy.getHp() - laser.getDamage();
 
             if (newHp > 0) {

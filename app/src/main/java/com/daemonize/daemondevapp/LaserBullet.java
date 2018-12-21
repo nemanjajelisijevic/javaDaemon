@@ -39,7 +39,7 @@ public class LaserBullet extends Bullet {
         float dc = 1F / coefficients.length;
         for (int i = 0; i < coefficients.length; ++i)  {
             coefficients[i] = (i + 1) * dc;
-            PositionedImage dummy = new PositionedImage();
+//            PositionedImage dummy = new PositionedImage();
 //            dummy.positionX = 0;
 //            dummy.positionY = 0;
 //            dummy.image = spriteIterator.getSprite()[0];
@@ -75,6 +75,11 @@ public class LaserBullet extends Bullet {
         super(sprite, velocity, startingPos, targetCoord, damage);
         this.phaseLock = new DaemonCountingSemaphore();
         this.phaseLock.subscribe();
+    }
+
+    @Override
+    public boolean rotate(int angle) throws InterruptedException {
+        return super.rotate(angle);
     }
 
     public List<ImageView> desintegrateTarget(
@@ -142,8 +147,8 @@ public class LaserBullet extends Bullet {
         if (!fire || !target.isShootable())
             return null;
 
-        if (target == null)
-            throw new IllegalArgumentException("Target is null!");
+//        if (target == null)
+//            throw new IllegalArgumentException("Target is null!");
 
         Velocity velocity = target.getVelocity();
         List<Pair<ImageView, PositionedImage>> ret = new LinkedList<>();
