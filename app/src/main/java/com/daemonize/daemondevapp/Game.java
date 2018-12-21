@@ -604,7 +604,7 @@ public class Game {
                                 enemy.setVelocity(new ImageMover.Velocity(3, enemy.getVelocity().direction));
                                 enemy.rotate(angle, ret-> {});
 
-                                enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this);
+                                enemy.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this::onReturn);
                             }
                         }
                 );
@@ -701,9 +701,7 @@ public class Game {
             towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(gridViewMatrix[field.getRow()][field.getColumn()]));
 
             towerDaemon.start();
-
-            towerScanClosure = new TowerScanClosure(towerDaemon);
-            towerDaemon.scan(new ArrayList<>(activeEnemies), towerScanClosure);
+            towerDaemon.scan(new ArrayList<>(activeEnemies), new TowerScanClosure(towerDaemon)::onReturn);
         }
     }
 
