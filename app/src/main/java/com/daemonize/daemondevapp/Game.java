@@ -578,15 +578,25 @@ public class Game {
                             @Override
                             public void onReturn(Return<Boolean> aReturn) {
 
-                                for (TowerDaemon tower : towers) {
-                                    if(Math.abs(enemy.getLastCoordinates().getFirst() - tower.getLastCoordinates().getFirst()) < tower.getRange()
-                                            && Math.abs(enemy.getLastCoordinates().getSecond() - tower.getLastCoordinates().getSecond()) < tower.getRange()) {
-                                        tower.addTarget(enemy);
-                                    }
-                                }
+
+
+//                                for (TowerDaemon tower : towers) {
+//                                    if(Math.abs(enemy.getLastCoordinates().getFirst() - tower.getLastCoordinates().getFirst()) < tower.getRange()
+//                                            && Math.abs(enemy.getLastCoordinates().getSecond() - tower.getLastCoordinates().getSecond()) < tower.getRange()) {
+//                                        tower.addTarget(enemy);
+//                                    }
+//                                }
 
                                 Pair<Float, Float> currentCoord = enemy.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
+
+                                List<Field> neighbours = grid.getNeighbors(current);
+
+                                for(Field neighbour : neighbours) {
+                                    if (neighbour.getTower() != null) {
+                                        neighbour.getTower().addTarget(enemy);
+                                    }
+                                }
 
                                 if (current == null) return;//throw new IllegalStateException("Field can not be null");
                                 else if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {

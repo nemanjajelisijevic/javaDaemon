@@ -157,6 +157,11 @@ public class Grid {
         }
     }
 
+
+    public List<Field> getNeighbors(Field field) {
+        return getNeighbors(field.row, field.column);
+    }
+
     protected List<Field> getNeighbors(int row, int column) {
         List<Field> neighbors = new ArrayList<>();
 
