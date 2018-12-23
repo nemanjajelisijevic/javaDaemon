@@ -171,29 +171,33 @@ public class Tower extends RotatingSpriteImageMover {
 
         scanSemaphore.await();
 
+        EnemyDoubleDaemon target = null;
+        Pair<TowerType, EnemyDoubleDaemon> ret = Pair.create(null, null);
+
         targetLock.lock();
         try {
-
 
             while (targetQueue.isEmpty())
                 targetCondition.await();
 
-            EnemyDoubleDaemon target = targetQueue.peek();
+            target = targetQueue.peek();
 
             if (!target.isShootable() || (Math.abs(target.getLastCoordinates().getFirst() - lastX) > range && Math.abs(target.getLastCoordinates().getSecond() - lastY) > range)) {
                 targetQueue.poll();
             } else {
-                rotateTowards(
-                        target.getLastCoordinates().getFirst(),
-                        target.getLastCoordinates().getSecond()
-                );
-                return Pair.create(towertype, target);
+                ret = Pair.create(towertype, target);
             }
         } finally {
             targetLock.unlock();
         }
 
-        return Pair.create(null, null);
+        if (target != null)
+            rotateTowards(
+                    target.getLastCoordinates().getFirst(),
+                    target.getLastCoordinates().getSecond()
+            );
+
+        return ret;
     }
 
 
