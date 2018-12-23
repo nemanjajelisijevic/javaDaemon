@@ -182,11 +182,12 @@ public class Tower extends RotatingSpriteImageMover {
 
             target = targetQueue.peek();
 
-            if (!target.isShootable() || (Math.abs(target.getLastCoordinates().getFirst() - lastX) > range && Math.abs(target.getLastCoordinates().getSecond() - lastY) > range)) {
-                targetQueue.poll();
-            } else {
+            if (target.isShootable() && (Math.abs(target.getLastCoordinates().getFirst() - lastX) < range && Math.abs(target.getLastCoordinates().getSecond() - lastY) < range)) {
                 ret = Pair.create(towertype, target);
+            } else {
+                targetQueue.poll();
             }
+
         } finally {
             targetLock.unlock();
         }
