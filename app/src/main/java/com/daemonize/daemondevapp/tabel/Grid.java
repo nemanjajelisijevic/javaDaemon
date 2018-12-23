@@ -44,8 +44,8 @@ public class Grid {
         boolean in = false;
         float x2 = xCoordinateInReal + grid[0].length * fieldWith;
         float y2 = yCoordinateInReal + grid.length * fieldWith;
-        if ( x > xCoordinateInReal && x < x2 &&
-             y > yCoordinateInReal && y < y2 ){
+        if ( x >= xCoordinateInReal && x <= x2 &&
+             y >= yCoordinateInReal && y <= y2 ){
             in = true;
         }
         return in;
@@ -80,14 +80,14 @@ public class Grid {
         return gridtemp;
     }
 
-    public synchronized Field getField(int row, int column) {
+    public Field getField(int row, int column) {
 //        gridLock.lock();
         Field ret = grid[row][column];
 //        gridLock.unlock();
         return ret;
     }
 
-    public synchronized Field getField(float x, float y) {
+    public Field getField(float x, float y) {
 //        gridLock.lock();
         Field ret = null;
 
