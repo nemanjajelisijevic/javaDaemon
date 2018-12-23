@@ -174,10 +174,9 @@ public class Tower extends RotatingSpriteImageMover {
         targetLock.lock();
         try {
 
+
             while (targetQueue.isEmpty())
                 targetCondition.await();
-
-            Log.e(DaemonUtils.tag(), "Target QUEUE size: " + targetQueue.size());
 
             EnemyDoubleDaemon target = targetQueue.peek();
 
