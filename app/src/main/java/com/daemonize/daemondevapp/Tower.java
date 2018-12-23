@@ -1,16 +1,25 @@
 package com.daemonize.daemondevapp;
 
 
+import android.util.Log;
+
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 @Daemonize(doubleDaemonize = true)
@@ -35,11 +44,37 @@ public class Tower extends RotatingSpriteImageMover {
         }
     }
 
-
     private TowerType towertype;
     private TowerLevel towerLevel = new TowerLevel(1,2,1500);
     private ImageView view;
-    private float range;
+
+    private volatile Queue<EnemyDoubleDaemon> targetQueue;
+    private Lock targetLock;
+    private Condition targetCondition;
+    //private volatile boolean targetFlag;
+
+    @CallingThread
+    public boolean addTarget(EnemyDoubleDaemon target) {
+        boolean ret = false;
+        targetLock.lock();
+        if (!targetQueue.contains(target)) {
+            if (targetQueue.isEmpty()) {
+                ret = targetQueue.add(target);
+                targetCondition.signal();
+            } else {
+                ret = targetQueue.add(target);
+            }
+        }
+        targetLock.unlock();
+        return ret;
+    }
+
+    @CallingThread
+    public float getRange() {
+        return range;
+    }
+
+    private volatile float range;
 
     @CallingThread
     public void levelUp(){
@@ -86,6 +121,9 @@ public class Tower extends RotatingSpriteImageMover {
         super(rotationSprite, 0, startingPos);
         this.range = range;
         this.towertype = type;
+        this.targetQueue = new LinkedList<EnemyDoubleDaemon>();
+        this.targetLock = new ReentrantLock();
+        this.targetCondition = targetLock.newCondition();
     }
 
     public boolean reload(long millis) throws InterruptedException {
@@ -110,23 +148,55 @@ public class Tower extends RotatingSpriteImageMover {
         super.rotateTowards(x, y);
     }
 
-    public Pair<TowerType, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
+//    public Pair<TowerType, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
+//
+//        scanSemaphore.await();
+//
+//        for (EnemyDoubleDaemon enemy : activeEnemies) {
+//            if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().getFirst()) < range
+//                    && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().getSecond()) < range) {
+//                rotateTowards(
+//                        enemy.getPrototype().getLastCoordinates().getFirst(),
+//                        enemy.getPrototype().getLastCoordinates().getSecond()
+//                );
+//                return Pair.create(towertype, enemy);
+//            }
+//        }
+//
+//        return Pair.create(null, null);
+//    }
+
+    @DedicatedThread
+    public Pair<TowerType, EnemyDoubleDaemon> scan() throws InterruptedException {
 
         scanSemaphore.await();
 
-        for (EnemyDoubleDaemon enemy : activeEnemies) {
-            if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().getFirst()) < range
-                    && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().getSecond()) < range) {
+        targetLock.lock();
+        try {
+
+            while (targetQueue.isEmpty())
+                targetCondition.await();
+
+            Log.e(DaemonUtils.tag(), "Target QUEUE size: " + targetQueue.size());
+
+            EnemyDoubleDaemon target = targetQueue.peek();
+
+            if (!target.isShootable() || (Math.abs(target.getLastCoordinates().getFirst() - lastX) > range && Math.abs(target.getLastCoordinates().getSecond() - lastY) > range)) {
+                targetQueue.poll();
+            } else {
                 rotateTowards(
-                        enemy.getPrototype().getLastCoordinates().getFirst(),
-                        enemy.getPrototype().getLastCoordinates().getSecond()
+                        target.getLastCoordinates().getFirst(),
+                        target.getLastCoordinates().getSecond()
                 );
-                return Pair.create(towertype, enemy);
+                return Pair.create(towertype, target);
             }
+        } finally {
+            targetLock.unlock();
         }
 
         return Pair.create(null, null);
     }
+
 
     @CallingThread
     @Override

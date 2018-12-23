@@ -17,8 +17,9 @@ public class DaemonCountingSemaphore {
 
     public void unsubscribe() {
         lock.lock();
-        if (--counter == 0) {
+        if (--counter < 1) {//TODO prevent counter to be less than 0
             condition.signalAll();
+            counter = 0;
         }
         lock.unlock();
     }

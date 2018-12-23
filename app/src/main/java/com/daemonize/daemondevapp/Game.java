@@ -211,8 +211,11 @@ public class Game {
                 }
             }
 
+            //tower.scan(this::onReturn);
+
             tower.reload(reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
-                tower.scan(new ArrayList<>(activeEnemies), this);
+                //tower.scan(new ArrayList<>(activeEnemies), this);
+                tower.scan(this::onReturn);
             });
         }
     }
@@ -574,6 +577,14 @@ public class Game {
                         new Closure<Boolean>() {// gameConsumer
                             @Override
                             public void onReturn(Return<Boolean> aReturn) {
+
+                                for (TowerDaemon tower : towers) {
+                                    if(Math.abs(enemy.getLastCoordinates().getFirst() - tower.getLastCoordinates().getFirst()) < tower.getRange()
+                                            && Math.abs(enemy.getLastCoordinates().getSecond() - tower.getLastCoordinates().getSecond()) < tower.getRange()) {
+                                        tower.addTarget(enemy);
+                                    }
+                                }
+
                                 Pair<Float, Float> currentCoord = enemy.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
@@ -701,7 +712,8 @@ public class Game {
             towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(gridViewMatrix[field.getRow()][field.getColumn()]));
 
             towerDaemon.start();
-            towerDaemon.scan(new ArrayList<>(activeEnemies), new TowerScanClosure(towerDaemon)::onReturn);
+            //towerDaemon.scan(new ArrayList<>(activeEnemies), new TowerScanClosure(towerDaemon)::onReturn);
+            towerDaemon.scan(new TowerScanClosure(towerDaemon)::onReturn);
         }
     }
 
