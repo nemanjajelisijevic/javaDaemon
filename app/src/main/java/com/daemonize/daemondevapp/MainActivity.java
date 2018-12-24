@@ -354,8 +354,8 @@ public class MainActivity extends AppCompatActivity {
                     .setSelectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, 200, 200, false))/*dialog*/)
                     .setDeselectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, 200, 200, false))/*dialog*/)
                     .setScoreBackGrImage(score)
-                    .setScorenumbersImages(listNumberImg)
-                    .setScoreTitle(titleScore);
+                    .setScorenumbersImages(listNumberImg);
+                    //.setScoreTitle(titleScore);
 
 
         } catch (IOException ex) {

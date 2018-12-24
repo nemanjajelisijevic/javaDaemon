@@ -217,6 +217,12 @@ public class Tower extends RotatingSpriteImageMover {
     }
 
     @CallingThread
+    @Override
+    public void setCurrentAngle(int currentAngle) {
+        super.setCurrentAngle(currentAngle);
+    }
+
+    @CallingThread
     public void pauseScan() {
         scanSemaphore.subscribe();
     }
