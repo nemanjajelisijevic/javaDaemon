@@ -315,9 +315,9 @@ public class MainActivity extends AppCompatActivity {
             listNumberImg[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("9.png")), numWidth, numHeight, false));
 
             Image [] dialogUpgradeTower1 = new Image[3];
-            dialogUpgradeTower1[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgDialog22.png")), 650, 390, false));
-            dialogUpgradeTower1[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgDialog33.png")), 650, 390, false));
-            dialogUpgradeTower1[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgDialogTOP.png")), 650, 390, false));
+            dialogUpgradeTower1[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgDialog22.png")), 800, 530, false));
+            dialogUpgradeTower1[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgDialog33.png")), 800, 530, false));
+            dialogUpgradeTower1[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgDialogTOP.png")), 800, 530, false));
 //            dialogUpgradeTower1[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("2.png")), 650, 390, false));
 //            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("upgradeDialog.png")),650,390,false))
 
@@ -349,8 +349,8 @@ public class MainActivity extends AppCompatActivity {
                     .setDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, dialog.getWidth(), dialog.getHeight(), false))/*dialog*/)
                     .setRedNestedDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, dialog.getWidth() / 2, dialog.getHeight() / 2, false))/*dialog*/)
 //                    .setGreenDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, dialog.getWidth(), dialog.getHeight(), false))/*dialog*/)
-                    .setGreenDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, 660, 490, false))/*dialog*/)
-                    .setSelectTowerBackgroudnImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, 200, 600, false))/*dialog*/)
+//                    .setGreenDialogue(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, 660, 490, false))/*dialog*/)
+//                    .setSelectTowerBackgroudnImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, 200, 600, false))/*dialog*/)
                     .setSelectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, 200, 200, false))/*dialog*/)
                     .setDeselectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, 200, 200, false))/*dialog*/)
                     .setScoreBackGrImage(score)

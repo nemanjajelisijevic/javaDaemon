@@ -76,7 +76,7 @@ public class Game {
     private Image upgradeButtonImage;
     private Image closeButtonImage;
     private Image nestedRedDialogueImage;
-    private Image greenDialogueImage;
+//    private Image greenDialogueImage;
     private Image scoreBackGrImage;
     private Image scoreTitle;
     private Image[] scorenumbersImages;
@@ -101,7 +101,7 @@ public class Game {
     private TowerScanClosure towerScanClosure;
     private TowerUpgradeDialog towerUpgradeDialog;
     private TowerSelectDialogue selectTowerDialogue;
-    private Image selectTowerBackgroudnImage;
+//    private Image selectTowerBackgroudnImage;
     private Image selection;
     private Image deselection;
 
@@ -363,7 +363,7 @@ public class Game {
             });
 
             towerUpgradeDialog =  new TowerUpgradeDialog(700,500,
-                   dialogueImageTowerUpgradeLevel[0], upgradeButton, closeButton, greenDialogueImage );//.setOnUpgrade(()->{
+                   dialogueImageTowerUpgradeLevel[0], upgradeButton, closeButton, 810, 600 );//.setOnUpgrade(()->{
 
             Button tow1 = new Button("TowerType1",0,0,redTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE1;
@@ -390,9 +390,9 @@ public class Game {
             });
 
             selectTowerDialogue = new TowerSelectDialogue(
-                    borderX-selectTowerBackgroudnImage.getWidth(),
+                    borderX - 300,
                     700,
-                    selectTowerBackgroudnImage,
+                    200, 600,
                     deselection,
                     tow1,
                     tow2,
@@ -575,11 +575,11 @@ public class Game {
 
                 drawConsumer.consume(()->enemy.getView().show());
                 drawConsumer.consume(()->enemy.getHpView().show());
-                activeEnemies.add(enemy);
+                activeEnemies.add(enemy); // todo why add enemy here and same 4 lines below
                 enemy.setShootable(true);
                 enemy.start();
 
-                activeEnemies.add(enemy);
+                activeEnemies.add(enemy); //
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond(), firstField.getCenterX(), firstField.getCenterY());
                 enemy.rotate(angle, ret1->{});
@@ -618,7 +618,7 @@ public class Game {
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                                         enemy.stop();
                                         drawConsumer.consume(() -> enemy.getView().hide());
-                                        enemy.setLastCoordinates(0, 0);
+                                        enemy.setLastCoordinates(0, 0); // ToDO maybe this causes current = null !!!!!
                                         activeEnemies.remove(enemy);
                                         if (!enemyQueue.contains(enemy))
                                             enemyQueue.add(enemy);
@@ -1180,26 +1180,6 @@ public class Game {
         return this;
     }
 
-//    public Game setTowerSprite1(Image[] towerSprite1) {
-//        this.towerSprite1 = towerSprite1;
-//        return this;
-//    }
-//
-//    public Game setTowerSprite2(Image[] towerSprite2) {
-//        this.towerSprite2 = towerSprite2;
-//        return this;
-//    }
-//
-//    public Game setTowerSprite3(Image[] towerSprite3) {
-//        this.towerSprite3 = towerSprite3;
-//        return this;
-//    }
-
-    public Game setSelectTowerBackgroudnImage(Image selectTowerBackgroudnImage) {
-        this.selectTowerBackgroudnImage = selectTowerBackgroudnImage;
-        return this;
-    }
-
     public Game setSelectionImage(Image selection) {
         this.selection = selection;
         return this;
@@ -1277,11 +1257,6 @@ public class Game {
 
     public Game setRedNestedDialogue(Image nestedRedDialogueImage) {
         this.nestedRedDialogueImage = nestedRedDialogueImage;
-        return this;
-    }
-
-    public Game setGreenDialogue(Image nestedDialogueImage) {
-        this.greenDialogueImage = nestedDialogueImage;
         return this;
     }
 

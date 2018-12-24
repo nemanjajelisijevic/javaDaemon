@@ -53,6 +53,20 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         this.setImage(image);
     }
 
+    // for root without image
+    public CompositeImageViewImpl(String name, float absX, float absY, int z, float width,float height) {
+        super();
+        this.viewName = name;
+        childrenViews = new LinkedList<>();
+        this.setAbsoluteX(absX);
+        this.setAbsoluteY(absY);
+        this.setZindex(z);
+        this.xOffset = width / 2;//TODO check if this is really neccessary
+        this.yOffset = height / 2;//TODO check if this is really neccessary
+        this.startingX = this.absoluteX - this.xOffset;
+        this.startingY = this.absoluteY - this.yOffset;
+    }
+
     @Override
     public CompositeImageViewImpl setAbsoluteX(float absoluteX) {
         this.absoluteX = absoluteX;
