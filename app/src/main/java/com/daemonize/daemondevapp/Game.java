@@ -570,7 +570,7 @@ public class Game {
                 enemy.setMaxHp(enemyHp);
                 enemy.setHp(enemyHp);
                 //enemy.getPrototype().setVelocity(enemyVelocity);
-                enemy.setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(0, 0)));
+                enemy.setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(0, 0)));// todo maybe coeficient should be grid.first fild center
                 enemy.rotate(0, ret1->{});
 
                 drawConsumer.consume(()->enemy.getView().show());
@@ -579,7 +579,7 @@ public class Game {
                 enemy.setShootable(true);
                 enemy.start();
 
-                activeEnemies.add(enemy); //
+                //activeEnemies.add(enemy); //
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond(), firstField.getCenterX(), firstField.getCenterY());
                 enemy.rotate(angle, ret1->{});
@@ -618,8 +618,8 @@ public class Game {
                                     enemy.pushSprite(explodeSprite, 0,  aReturn2-> {
                                         enemy.stop();
                                         drawConsumer.consume(() -> enemy.getView().hide());
-                                        enemy.setLastCoordinates(0, 0); // ToDO maybe this causes current = null !!!!!
                                         activeEnemies.remove(enemy);
+                                        enemy.setLastCoordinates(grid.getStartingX(),grid.getStartingY()); // ToDO maybe this causes current = null !!!!!
                                         if (!enemyQueue.contains(enemy))
                                             enemyQueue.add(enemy);
                                     });
@@ -888,8 +888,8 @@ public class Game {
                             enemy.pushSprite(explodeSprite, 0, aReturn2 -> {
                                 drawConsumer.consume(() -> enemy.getView().hide());
                                 enemy.stop();
-                                enemy.setLastCoordinates(0, 0);
                                 activeEnemies.remove(enemy);
+                                enemy.setLastCoordinates(grid.getStartingX(),grid.getStartingY());
                                 if (!enemyQueue.contains(enemy))
                                     enemyQueue.add(enemy);
                             });
@@ -976,8 +976,8 @@ public class Game {
                     enemy.pushSprite(explodeSprite, 0, aReturn2 -> {
                         drawConsumer.consume(() -> enemy.getView().hide());
                         enemy.stop();
-                        enemy.setLastCoordinates(0, 0);
                         activeEnemies.remove(enemy);
+                        enemy.setLastCoordinates(grid.getStartingX(),grid.getStartingY());
                         if (!enemyQueue.contains(enemy))
                             enemyQueue.add(enemy);
                     });
@@ -1116,8 +1116,8 @@ public class Game {
                                 enemy.pushSprite(explodeSprite, 0, aReturn3 -> {
                                     drawConsumer.consume(() -> enemy.getView().hide());
                                     enemy.stop();
-                                    enemy.setLastCoordinates(0, 0);
                                     activeEnemies.remove(enemy);
+                                    enemy.setLastCoordinates(grid.getStartingX(),grid.getStartingY());
                                     if (!enemyQueue.contains(enemy)) enemyQueue.add(enemy);
                                 });
                             }
@@ -1160,8 +1160,8 @@ public class Game {
                 enemy.pushSprite(explodeSprite, 0, aReturn3 -> {
                     drawConsumer.consume(() -> enemy.getView().hide());
                     enemy.stop();
-                    enemy.setLastCoordinates(0, 0);
                     activeEnemies.remove(enemy);
+                    enemy.setLastCoordinates(grid.getStartingX(),grid.getStartingY());
                     if (!enemyQueue.contains(enemy)) enemyQueue.add(enemy);
                 });
             }
