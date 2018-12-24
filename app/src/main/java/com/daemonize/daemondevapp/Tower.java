@@ -240,4 +240,9 @@ public class Tower extends RotatingSpriteImageMover {
             return null;
         }
     }
+
+    @CallingThread
+    public TowerType getTowertype() {
+        return towertype;
+    }
 }

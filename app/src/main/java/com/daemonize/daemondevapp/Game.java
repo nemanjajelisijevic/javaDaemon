@@ -91,10 +91,11 @@ public class Game {
     private Tower.TowerType towerSelect;
 
     private Image[] currentTowerSprite;
-    private Image[] towerSprite1;
-    private Image[] towerSprite2;
-    private Image[] towerSprite3;
-    private Image[] towerSpriteEx;
+
+    private List<Image[]> redTower;
+    private List<Image[]> blueTower;
+    private List<Image[]> greenTower;
+
 
     //towers dialogue
     private TowerScanClosure towerScanClosure;
@@ -326,7 +327,19 @@ public class Game {
 
                 Tower tow = towerUpgradeDialog.getTower();
                 tow.levelUp();
-                tow.setRotationSprite(towerSpriteEx);
+                Image[] currentSprite = null;
+                switch (tow.getTowertype()){
+                    case TYPE1:
+                        currentSprite = redTower.get(tow.getTowerLevel().currentLevel - 1);
+                        break;
+                    case TYPE2:
+                        currentSprite = blueTower.get(tow.getTowerLevel().currentLevel - 1);
+                        break;
+                    case TYPE3:
+                        currentSprite =  greenTower.get(tow.getTowerLevel().currentLevel - 1);
+                        break;
+                }
+                tow.setRotationSprite(currentSprite);
 
                 CompositeImageViewImpl towerView = towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView");
 
@@ -352,25 +365,25 @@ public class Game {
             towerUpgradeDialog =  new TowerUpgradeDialog(700,500,
                    dialogueImageTowerUpgradeLevel[0], upgradeButton, closeButton, greenDialogueImage );//.setOnUpgrade(()->{
 
-            Button tow1 = new Button("TowerType1",0,0,towerSprite1[0]).onClick(()->{
+            Button tow1 = new Button("TowerType1",0,0,redTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE1;
-                currentTowerSprite = towerSprite1;
+                currentTowerSprite = redTower.get(0);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(selection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
             });
 
-            Button tow2 = new Button("TowerType2",0,0,towerSprite2[0]).onClick(()->{
+            Button tow2 = new Button("TowerType2",0,0,blueTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE2;
-                currentTowerSprite = towerSprite2;
+                currentTowerSprite = blueTower.get(0);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(selection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
             });
 
-            Button tow3 = new Button("TowerType3",0,0,towerSprite3[0]).onClick(()->{
+            Button tow3 = new Button("TowerType3",0,0,greenTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE3;
-                currentTowerSprite = towerSprite3;
+                currentTowerSprite = greenTower.get(0);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
                 selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(selection);
@@ -1167,20 +1180,20 @@ public class Game {
         return this;
     }
 
-    public Game setTowerSprite1(Image[] towerSprite1) {
-        this.towerSprite1 = towerSprite1;
-        return this;
-    }
-
-    public Game setTowerSprite2(Image[] towerSprite2) {
-        this.towerSprite2 = towerSprite2;
-        return this;
-    }
-
-    public Game setTowerSprite3(Image[] towerSprite3) {
-        this.towerSprite3 = towerSprite3;
-        return this;
-    }
+//    public Game setTowerSprite1(Image[] towerSprite1) {
+//        this.towerSprite1 = towerSprite1;
+//        return this;
+//    }
+//
+//    public Game setTowerSprite2(Image[] towerSprite2) {
+//        this.towerSprite2 = towerSprite2;
+//        return this;
+//    }
+//
+//    public Game setTowerSprite3(Image[] towerSprite3) {
+//        this.towerSprite3 = towerSprite3;
+//        return this;
+//    }
 
     public Game setSelectTowerBackgroudnImage(Image selectTowerBackgroudnImage) {
         this.selectTowerBackgroudnImage = selectTowerBackgroudnImage;
@@ -1197,10 +1210,6 @@ public class Game {
         return this;
     }
 
-    public Game setTowerSpriteEx(Image[] towerSpriteEx) {
-        this.towerSpriteEx = towerSpriteEx;
-        return this;
-    }
 
     public Game setExplodeSprite(Image[] explodeSprite) {
         this.explodeSprite = explodeSprite;
@@ -1293,6 +1302,29 @@ public class Game {
 
     public Game setLaserSprite(Image[] laserSprite) {
         this.laserSprite = laserSprite;
+        return this;
+    }
+
+    public Game setBlueTower(Image[] towerI, Image[] towerII, Image[] towerIII) {
+        blueTower = new ArrayList<>(3);
+        blueTower.add(towerI);
+        blueTower.add(towerII);
+        blueTower.add(towerIII);
+        return this;
+    }
+
+    public Game setGreenTower(Image[] towerI,Image[] towerII,Image[] towerIII){
+        greenTower = new ArrayList<>(3);
+        greenTower.add(towerI);
+        greenTower.add(towerII);
+        greenTower.add(towerIII);
+        return this;
+    }
+    public Game setRedTower(Image[] towerI,Image[] towerII,Image[] towerIII){
+        redTower = new ArrayList<>(3);
+        redTower.add(towerI);
+        redTower.add(towerII);
+        redTower.add(towerIII);
         return this;
     }
 
