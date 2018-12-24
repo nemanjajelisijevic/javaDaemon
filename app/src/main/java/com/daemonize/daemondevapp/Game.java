@@ -1159,8 +1159,8 @@ public class Game {
                 drawConsumer.consume(() -> enemy.getHpView().hide());
                 enemy.pushSprite(explodeSprite, 0, aReturn3 -> {
                     drawConsumer.consume(() -> enemy.getView().hide());
-                    enemy.setLastCoordinates(0, 0);
                     enemy.stop();
+                    enemy.setLastCoordinates(0, 0);
                     activeEnemies.remove(enemy);
                     if (!enemyQueue.contains(enemy)) enemyQueue.add(enemy);
                 });
