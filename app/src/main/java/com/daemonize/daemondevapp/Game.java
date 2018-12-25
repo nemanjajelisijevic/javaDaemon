@@ -1057,6 +1057,21 @@ public class Game {
                 );
 
                 bulletDoubleDaemon.rotate(targetAngle1, aReturnR -> {
+
+                    if (!enemy.isShootable()) {
+                        drawConsumer.consume(() -> {
+                            for (ImageView view : bulletDoubleDaemon.getViews())
+                                view.hide();
+                        });
+
+                        bulletDoubleDaemon.setCoordinates(0F, 0F);
+                        bulletDoubleDaemon.setVelocity(0);
+                        bulletDoubleDaemon.stop();
+
+                        //if (!bulletQueue.contains(bulletDoubleDaemon))
+                        bulletQueue.add(bulletDoubleDaemon);
+                    }
+
                     bulletDoubleDaemon.goTo(
                         enemy.getLastCoordinates().getFirst(),
                         enemy.getLastCoordinates().getSecond(),
