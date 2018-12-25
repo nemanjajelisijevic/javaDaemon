@@ -87,7 +87,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteX(float absoluteX) {
         this.absoluteX = absoluteX;
-        //this.startingX = this.absoluteX - xOffset;//TODO check if this is really neccessary
+        this.startingX = absoluteX - xOffset;//TODO check if this is really neccessary
         return this;
     }
 
@@ -95,7 +95,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteY(float absoluteY) {
         this.absoluteY = absoluteY;
-        //this.startingY = absoluteY - yOffset;//TODO check if this is really neccessary
+        this.startingY = absoluteY - yOffset;//TODO check if this is really neccessary
         return this;
     }
 

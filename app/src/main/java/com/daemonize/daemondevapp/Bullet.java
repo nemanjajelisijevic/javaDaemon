@@ -1,11 +1,14 @@
 package com.daemonize.daemondevapp;
 
+import android.util.Log;
+
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
@@ -42,12 +45,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
         rotationMover.setRotationSprite(sprite); //TODO fixx!!!
         return super.setSprite(sprite);
     }
-
-//    @CallingThread
-//    public void setStartingCoords(Pair<Float, Float> startingCoords) {
-//        lastX = startingCoords.getFirst();
-//        lastY = startingCoords.getSecond();
-//    }
 
     @CallingThread
     @Override
@@ -154,6 +151,12 @@ public class Bullet extends CoordinatedImageTranslationMover {
 //        rotationMover.setCurrentAngle(currentAngle);
         rotationMover.rotate(angle);
         return true;
+    }
+
+    public boolean rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
+        setVelocity(0);
+        rotationMover.rotate(angle);
+        return goTo(x, y, velocityInt);
     }
 
     @CallingThread

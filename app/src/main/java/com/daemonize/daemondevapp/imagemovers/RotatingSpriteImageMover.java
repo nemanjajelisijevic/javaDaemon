@@ -36,12 +36,12 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         setRotationSprite(rotationSprite);
     }
 
-    public synchronized void rotateTowards(float x, float y) throws InterruptedException {
+    public void rotateTowards(float x, float y) throws InterruptedException {
         int targetAngle = (int) getAngle(lastX, lastY, x, y);
         rotate(targetAngle);
     }
 
-    public void rotate(int targetAngle) throws InterruptedException {
+    public synchronized void rotate(int targetAngle) throws InterruptedException {
 
         int currentAngle = spriteBuffer.getCurrentAngle();
 
