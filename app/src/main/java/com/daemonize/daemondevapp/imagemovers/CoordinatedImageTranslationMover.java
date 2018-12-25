@@ -54,7 +54,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     }
 
     @Override
-    public PositionedImage animate() {
+    public PositionedImage animate() throws InterruptedException {
         if (Math.abs(lastX - targetX)  <= velocity.intensity
                 && Math.abs(lastY - targetY)  <= velocity.intensity) {
             coordinateLock.lock();

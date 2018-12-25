@@ -13,7 +13,7 @@ public interface ImageMover {
 
     class Velocity {
         public volatile float intensity;
-        public Direction direction;
+        public volatile Direction direction;
 
         public Velocity(float intensity, Direction direction) {
             this.intensity = intensity;
@@ -59,7 +59,7 @@ public interface ImageMover {
     //@CallingThread
     Velocity getVelocity();
 
-    PositionedImage setLastCoordinates(float lastX, float lastY);
+    void setCoordinates(float lastX, float lastY);
 
     void setDirection(Direction direction);
 
@@ -73,6 +73,6 @@ public interface ImageMover {
     <K extends ImageMover> K setBorders(float x1, float x2, float y1, float y2);
 
     //@SideQuest(SLEEP = 25)
-    PositionedImage animate();
+    PositionedImage animate() throws InterruptedException;
 
 }

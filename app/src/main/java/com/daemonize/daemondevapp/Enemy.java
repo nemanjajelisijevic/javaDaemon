@@ -76,8 +76,8 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
     @CallingThread
     @Override
-    public PositionedImage setLastCoordinates(float lastX, float lastY) {
-        return super.setLastCoordinates(lastX, lastY);
+    public void setCoordinates(float lastX, float lastY) {
+        super.setCoordinates(lastX, lastY);
     }
 
     @CallingThread
@@ -133,13 +133,19 @@ public class Enemy extends CoordinatedImageTranslationMover {
         super.setVelocity(velocity);
     }
 
+    @CallingThread
+    @Override
+    public void setVelocity(float velocity) {
+        super.setVelocity(velocity);
+    }
+
     @Override
     public Image iterateSprite() {
         return rotationMover.iterateSprite();
     }
 
     @SideQuest(SLEEP = 25)
-    public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() {
+    public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() throws InterruptedException {
         PositionedImage enemyPosBmp = super.animate();
         GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(enemyPosBmp, view));
         PositionedImage hBar = new PositionedImage();

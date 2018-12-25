@@ -175,7 +175,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(sideGenerator.generateStartDaemonApiMethod());
         apiMethods.add(generateStopDaemonApiMethod());
         apiMethods.add(generateQueueStopDaemonApiMethod());//TODO override !!!!!!!!!!!!!!!!!!!!!!!!!!
-        apiMethods.add(mainGenerator.generateGetStateDaemonApiMethod());
+        apiMethods.add(sideGenerator.generateGetStateDaemonApiMethod());
         apiMethods.add(generateSetNameDaemonApiMethod());
         apiMethods.add(mainGenerator.generateGetNameDaemonApiMethod());//TODO CHECK THISSS!!!!!!!
         apiMethods.add(generateSetMainConsumerDaemonApiMethod());

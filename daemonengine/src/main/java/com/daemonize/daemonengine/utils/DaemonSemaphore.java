@@ -1,6 +1,5 @@
 package com.daemonize.daemonengine.utils;
 
-import com.sun.tracing.dtrace.FunctionAttributes;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;

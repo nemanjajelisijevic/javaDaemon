@@ -47,17 +47,9 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     @Override
-    public PositionedImage setLastCoordinates(float lastX, float lastY) {
+    public void setCoordinates(float lastX, float lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
-
-        PositionedImage ret = new PositionedImage();
-        ret.image = iterateSprite();
-
-        ret.positionX = lastX;
-        ret.positionY = lastY;
-        
-        return ret;
     }
 
     protected float borderX1;
@@ -130,9 +122,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     private PositionedImage ret = new PositionedImage();
 
     @Override
-    public PositionedImage animate() {
-
-        try {
+    public PositionedImage animate() throws InterruptedException {
 
             pauseSemaphore.await();
             ret.image = iterateSprite();
@@ -154,10 +144,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
             ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY);
 
             return ret;
-
-        } catch (InterruptedException e) {
-            return null;
-        }
 
     }
 }

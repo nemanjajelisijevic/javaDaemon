@@ -36,7 +36,7 @@
 //    }
 //
 //    @Override
-//    public PositionedImage setLastCoordinates(float lastX, float lastY) {
+//    public PositionedImage setCoordinates(float lastX, float lastY) {
 //        this.lastX = lastX;
 //        this.lastY = lastY;
 //

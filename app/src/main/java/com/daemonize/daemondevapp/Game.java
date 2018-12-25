@@ -489,7 +489,8 @@ public class Game {
                             view.hide();
                     });
 
-                    bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
+                    bulletDoubleDaemon.setCoordinates(0F, 0F);
+                    bulletDoubleDaemon.setVelocity(0);
                     bulletDoubleDaemon.stop();
 
                     //if(!bulletQueue.contains(bulletDoubleDaemon))
@@ -649,7 +650,7 @@ public class Game {
                                         enemy.stop();
                                         drawConsumer.consume(() -> enemy.getView().hide());
                                         activeEnemies.remove(enemy);
-                                        enemy.setLastCoordinates(grid.getStartingX(),grid.getStartingY()); // ToDO maybe this causes current = null !!!!!
+                                        enemy.setCoordinates(grid.getStartingX(),grid.getStartingY()); // ToDO maybe this causes current = null !!!!!
                                         //if (!enemyQueue.contains(enemy))
                                         enemyQueue.add(enemy);
                                     });
@@ -852,20 +853,6 @@ public class Game {
                 view.show();
         });
 
-        bulletDoubleDaemon.setStartingCoords(sourceCoord);
-        bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
-            drawConsumer.consume(()->{
-                for (ImageView view : bulletDoubleDaemon.getViews())
-                    view.hide();
-            });
-
-            bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
-            bulletDoubleDaemon.stop();
-
-            //if(!bulletQueue.contains(bulletDoubleDaemon))
-            bulletQueue.add(bulletDoubleDaemon);
-        });
-
         bulletDoubleDaemon.start();
 
         Iterator<Pair<Float,Float>> iterator = getListOfPoint(sourceCoord,targetCoord).iterator();
@@ -912,7 +899,7 @@ public class Game {
                                 drawConsumer.consume(() -> enemy.getView().hide());
                                 enemy.stop();
                                 activeEnemies.remove(enemy);
-                                enemy.setLastCoordinates(grid.getStartingX(),grid.getStartingY());
+                                enemy.setCoordinates(grid.getStartingX(),grid.getStartingY());
                                 //if (!enemyQueue.contains(enemy))
                                 enemyQueue.add(enemy);
                             });
@@ -924,7 +911,8 @@ public class Game {
                                 for (ImageView view : bulletDoubleDaemon.getViews()) view.hide();
                             });
 
-                            bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
+                            bulletDoubleDaemon.setCoordinates(0F, 0F);
+                            bulletDoubleDaemon.setVelocity(0);
                             bulletDoubleDaemon.stop();
 
                             //if (!bulletQueue.contains(bulletDoubleDaemon))
@@ -945,7 +933,7 @@ public class Game {
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletQueue.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
-        bulletDoubleDaemon.setStartingCoords(sourceCoord);
+        bulletDoubleDaemon.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
         bulletDoubleDaemon.setLevel(noOfBulletsFired);
         bulletDoubleDaemon.setDamage(bulletDamage);
         bulletDoubleDaemon.setSprite(bulletSprite);
@@ -965,6 +953,7 @@ public class Game {
 
         bulletDoubleDaemon.start();
 
+        bulletDoubleDaemon.setVelocity(0);
         bulletDoubleDaemon.rotate(targetAngle, ret-> {
 
             bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, aReturn -> {
@@ -984,7 +973,7 @@ public class Game {
                         drawConsumer.consume(() -> enemy.getView().hide());
                         enemy.stop();
                         activeEnemies.remove(enemy);
-                        enemy.setLastCoordinates(grid.getStartingX(), grid.getStartingY());
+                        enemy.setCoordinates(grid.getStartingX(), grid.getStartingY());
                         //if (!enemyQueue.contains(enemy))
                         enemyQueue.add(enemy);
                     });
@@ -997,7 +986,8 @@ public class Game {
                             view.hide();
                     });
 
-                    bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
+                    bulletDoubleDaemon.setCoordinates(0F, 0F);
+                    bulletDoubleDaemon.setVelocity(0);
                     bulletDoubleDaemon.stop();
 
                     //if (!bulletQueue.contains(bulletDoubleDaemon))
@@ -1018,14 +1008,7 @@ public class Game {
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletQueue.poll();
 
-        Log.d(DaemonUtils.tag(), bulletDoubleDaemon.getName() + " - Rocket state: " + bulletDoubleDaemon.getState());
-
-        drawConsumer.consume(()->{//TODO FIXXX!
-            for (ImageView view : bulletDoubleDaemon.getViews())
-                view.hide();
-        });
-
-        bulletDoubleDaemon.setStartingCoords(sourceCoord);
+        bulletDoubleDaemon.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
         bulletDoubleDaemon.setLevel(noOfBulletsFired);
         bulletDoubleDaemon.setDamage(bulletDamage);
         bulletDoubleDaemon.setSprite(bulletSpriteLaser);
@@ -1042,6 +1025,7 @@ public class Game {
 
         bulletDoubleDaemon.start();
 
+        bulletDoubleDaemon.setVelocity(0);
         bulletDoubleDaemon.rotate(angle, ret1->{
 
             drawConsumer.consume(()->{
@@ -1049,15 +1033,7 @@ public class Game {
                     view.show();
             });
 
-            if (!sourceCoord.getFirst().equals(bulletDoubleDaemon.getLastCoordinates().getFirst())) {
-                Log.w(DaemonUtils.tag(), bulletDoubleDaemon.getName() + " - Rocket source and actual X dont match!");
-            }
-
-            if (!sourceCoord.getSecond().equals(bulletDoubleDaemon.getLastCoordinates().getSecond())) {
-                Log.w(DaemonUtils.tag(), bulletDoubleDaemon.getName() + " - Rocket source and actual Y dont match!");
-            }
-
-            bulletDoubleDaemon.goTo(launchX,launchY, 4, aReturn1 -> {
+            bulletDoubleDaemon.goTo(launchX, launchY, 4, aReturn1 -> {
 
                 if (!enemy.isShootable()) {
                     drawConsumer.consume(() -> {
@@ -1065,8 +1041,10 @@ public class Game {
                             view.hide();
                     });
 
-                    bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
+                    bulletDoubleDaemon.setCoordinates(0F, 0F);
+                    bulletDoubleDaemon.setVelocity(0);
                     bulletDoubleDaemon.stop();
+
                     //if (!bulletQueue.contains(bulletDoubleDaemon))
                     bulletQueue.add(bulletDoubleDaemon);
                 }
@@ -1105,7 +1083,7 @@ public class Game {
                                     drawConsumer.consume(() -> enemy.getView().hide());
                                     enemy.stop();
                                     activeEnemies.remove(enemy);
-                                    enemy.setLastCoordinates(grid.getStartingX(),grid.getStartingY());
+                                    enemy.setCoordinates(grid.getStartingX(),grid.getStartingY());
                                     //if (!enemyQueue.contains(enemy))
                                     enemyQueue.add(enemy);
                                 });
@@ -1118,7 +1096,8 @@ public class Game {
                                         view.hide();
                                 });
 
-                                bulletDoubleDaemon.setStartingCoords(Pair.create(0F, 0F));
+                                bulletDoubleDaemon.setCoordinates(0F, 0F);
+                                bulletDoubleDaemon.setVelocity(0);
                                 bulletDoubleDaemon.stop();
 
                                 //if (!bulletQueue.contains(bulletDoubleDaemon))
@@ -1149,7 +1128,7 @@ public class Game {
                     drawConsumer.consume(() -> enemy.getView().hide());
                     enemy.stop();
                     activeEnemies.remove(enemy);
-                    enemy.setLastCoordinates(grid.getStartingX(),grid.getStartingY());
+                    enemy.setCoordinates(grid.getStartingX(),grid.getStartingY());
                     //if (!enemyQueue.contains(enemy))
                     enemyQueue.add(enemy);
                 });

@@ -1,18 +1,13 @@
 package com.daemonize.daemondevapp;
 
-import android.util.Log;
-
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.ArrayList;
@@ -48,10 +43,34 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return super.setSprite(sprite);
     }
 
+//    @CallingThread
+//    public void setStartingCoords(Pair<Float, Float> startingCoords) {
+//        lastX = startingCoords.getFirst();
+//        lastY = startingCoords.getSecond();
+//    }
+
     @CallingThread
-    public void setStartingCoords(Pair<Float, Float> startingCoords) {
-        lastX = startingCoords.getFirst();
-        lastY = startingCoords.getSecond();
+    @Override
+    public void setCoordinates(float lastX, float lastY) {
+        super.setCoordinates(lastX, lastY);
+    }
+
+    @CallingThread
+    @Override
+    public void setVelocity(Velocity velocity) {
+        super.setVelocity(velocity);
+    }
+
+    @CallingThread
+    @Override
+    public void setVelocity(float velocity) {
+        super.setVelocity(velocity);
+    }
+
+    @CallingThread
+    @Override
+    public Velocity getVelocity() {
+        return super.getVelocity();
     }
 
     @CallingThread
@@ -171,19 +190,19 @@ public class Bullet extends CoordinatedImageTranslationMover {
     }
 
     @Override
-    public PositionedImage animate() {
+    public PositionedImage animate() throws InterruptedException {
         return super.animate();
     }
 
     @SideQuest(SLEEP = 25)
-    public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() {
+    public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() throws InterruptedException {
+
         if (lastX <= borderX1 ||
                 lastX >= borderX2 ||
                 lastY <= borderY1 ||
                 lastY >= borderY2) {
             consumer.consume(outOfBordersClosure);
         }
-
 
         PositionedImage posImage = super.animate();
         Direction movingDirection = getVelocity().direction;

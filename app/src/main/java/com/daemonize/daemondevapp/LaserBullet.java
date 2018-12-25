@@ -1,24 +1,17 @@
 package com.daemonize.daemondevapp;
 
 
-import android.util.Log;
-
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Daemonize(doubleDaemonize = true)
 public class LaserBullet extends Bullet {
@@ -53,10 +46,16 @@ public class LaserBullet extends Bullet {
         return super.getDamage();
     }
 
+//    @CallingThread
+//    @Override
+//    public void setStartingCoords(Pair<Float, Float> startingCoords) {
+//        super.setStartingCoords(startingCoords);
+//    }
+
     @CallingThread
     @Override
-    public void setStartingCoords(Pair<Float, Float> startingCoords) {
-        super.setStartingCoords(startingCoords);
+    public void setCoordinates(float lastX, float lastY) {
+        super.setCoordinates(lastX, lastY);
     }
 
     @Override

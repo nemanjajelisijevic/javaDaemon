@@ -67,7 +67,7 @@ public class MassiveImageTranslationMover implements MassiveImageMover {
     }
 
     @Override
-    public List<ImageMover.PositionedImage> move() {
+    public List<ImageMover.PositionedImage> move() throws InterruptedException {
         List<ImageMover.PositionedImage> ret = new ArrayList<>(imageMovers.size());
         for (ImageMover imageMover : imageMovers) {
             ImageMover.PositionedImage moverRet = imageMover.animate();
