@@ -30,13 +30,10 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     private RotatingSpriteImageMover rotationMover;
 
-    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos,
-                  Pair<Float, Float> targetCoord, int damage) {
-
-        super(Arrays.copyOf(sprite, 1), velocity, startingPos, targetCoord);
+    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos, int damage) {
+        super(Arrays.copyOf(sprite, 1), velocity, startingPos);
         this.damage = damage;
         this.rotationMover = new RotatingSpriteImageMover(sprite, velocity, startingPos);
-
     }
 
     @CallingThread
@@ -200,10 +197,10 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() throws InterruptedException {
 
-        if (lastX <= borderX1 ||
-                lastX >= borderX2 ||
-                lastY <= borderY1 ||
-                lastY >= borderY2) {
+        if (lastX <= (borderX1 + velocity.intensity) ||
+                lastX >= (borderX2 - velocity.intensity)||
+                lastY <= (borderY1 + velocity.intensity) ||
+                lastY >= (borderY2 - velocity.intensity)) {
             consumer.consume(outOfBordersClosure);
         }
 

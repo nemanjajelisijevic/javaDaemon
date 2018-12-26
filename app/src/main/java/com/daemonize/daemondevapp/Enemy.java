@@ -86,8 +86,8 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return super.getLastCoordinates();
     }
 
-    public Enemy(Image [] sprite, float velocity, int hp, Pair<Float, Float> startingPos, Pair<Float, Float> targetCoord) {
-        super(Arrays.copyOf(sprite, 1), velocity, startingPos, targetCoord);
+    public Enemy(Image [] sprite, float velocity, int hp, Pair<Float, Float> startingPos) {
+        super(Arrays.copyOf(sprite, 1), velocity, startingPos);
         this.hp = hp;
         this.hpMax = hp;
         this.rotationMover = new RotatingSpriteImageMover(sprite, velocity, startingPos);
