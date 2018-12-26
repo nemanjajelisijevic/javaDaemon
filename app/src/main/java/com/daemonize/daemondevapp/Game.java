@@ -962,7 +962,7 @@ public class Game {
 
                         drawConsumer.consume(() -> {
                             for (ImageView view : bulletDoubleDaemon.getViews())
-                                view.setAbsoluteX(0).setAbsoluteY(0);//.hide();
+                                view.setAbsoluteX(0).setAbsoluteY(0).hide();
                         });
 
                         bulletDoubleDaemon.setCoordinates(0F, 0F);
