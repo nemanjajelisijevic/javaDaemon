@@ -1,11 +1,14 @@
 package com.daemonize.daemondevapp;
 
+import android.util.Log;
+
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
@@ -27,13 +30,10 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     private RotatingSpriteImageMover rotationMover;
 
-    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos,
-                  Pair<Float, Float> targetCoord, int damage) {
-
-        super(Arrays.copyOf(sprite, 1), velocity, startingPos, targetCoord);
+    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos, int damage) {
+        super(Arrays.copyOf(sprite, 1), velocity, startingPos);
         this.damage = damage;
         this.rotationMover = new RotatingSpriteImageMover(sprite, velocity, startingPos);
-
     }
 
     @CallingThread
@@ -42,12 +42,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
         rotationMover.setRotationSprite(sprite); //TODO fixx!!!
         return super.setSprite(sprite);
     }
-
-//    @CallingThread
-//    public void setStartingCoords(Pair<Float, Float> startingCoords) {
-//        lastX = startingCoords.getFirst();
-//        lastY = startingCoords.getSecond();
-//    }
 
     @CallingThread
     @Override
@@ -156,6 +150,12 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return true;
     }
 
+    public boolean rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
+        setVelocity(0);
+        rotationMover.rotate(angle);
+        return goTo(x, y, velocityInt);
+    }
+
     @CallingThread
     @Override
     public void pause() {
@@ -197,10 +197,10 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() throws InterruptedException {
 
-        if (lastX <= borderX1 ||
-                lastX >= borderX2 ||
-                lastY <= borderY1 ||
-                lastY >= borderY2) {
+        if (lastX <= (borderX1 + velocity.intensity) ||
+                lastX >= (borderX2 - velocity.intensity)||
+                lastY <= (borderY1 + velocity.intensity) ||
+                lastY >= (borderY2 - velocity.intensity)) {
             consumer.consume(outOfBordersClosure);
         }
 

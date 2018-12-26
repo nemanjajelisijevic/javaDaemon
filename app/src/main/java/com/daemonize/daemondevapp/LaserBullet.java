@@ -68,10 +68,9 @@ public class LaserBullet extends Bullet {
             Image[] sprite,
             float velocity,
             Pair<Float, Float> startingPos,
-            Pair<Float, Float> targetCoord,
             int damage
     ) {
-        super(sprite, velocity, startingPos, targetCoord, damage);
+        super(sprite, velocity, startingPos, damage);
         this.phaseLock = new DaemonCountingSemaphore();
         this.phaseLock.subscribe();
     }

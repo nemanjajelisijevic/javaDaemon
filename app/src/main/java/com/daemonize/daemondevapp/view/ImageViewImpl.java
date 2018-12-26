@@ -20,8 +20,8 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     protected volatile float startingX;
     protected volatile float startingY;
 
-    protected float xOffset;
-    protected float yOffset;
+    protected float xOffset;//TODO check if this is really neccessary
+    protected float yOffset;//TODO check if this is really neccessary
 
     public ImageViewImpl() {}
 
@@ -41,6 +41,11 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
         this.yOffset = yOffset;
         this.startingX = absoluteX - xOffset;
         this.startingY = absoluteY - yOffset;
+    }
+
+    @Override
+    public Image getImage() {
+        return image;
     }
 
     public float getxOffset() {
@@ -87,7 +92,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteX(float absoluteX) {
         this.absoluteX = absoluteX;
-        this.startingX = this.absoluteX - xOffset;
+        this.startingX = absoluteX - xOffset;//TODO check if this is really neccessary
         return this;
     }
 
@@ -95,7 +100,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteY(float absoluteY) {
         this.absoluteY = absoluteY;
-        this.startingY = absoluteY - yOffset;
+        this.startingY = absoluteY - yOffset;//TODO check if this is really neccessary
         return this;
     }
 
@@ -116,10 +121,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
         return setImageWithoutOffset(image);
     }
 
-    @Override
-    public Image getImage() {
-        return image;
-    }
+
 
     @Override
     public float getAbsoluteX() {

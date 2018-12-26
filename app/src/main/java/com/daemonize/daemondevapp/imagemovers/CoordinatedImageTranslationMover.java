@@ -25,16 +25,12 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     public CoordinatedImageTranslationMover(
             Image [] sprite,
             float velocity,
-            Pair<Float, Float> startingPos,
-            Pair<Float, Float> targetCoord
+            Pair<Float, Float> startingPos
     ) {
         super(sprite, velocity, startingPos);
-        this.targetX = targetCoord.getFirst();
-        this.targetY = targetCoord.getSecond();
     }
 
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
-
         super.setDirectionAndMove(x, y, velocityInt);
         coordinateLock.lock();
 
@@ -51,6 +47,13 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         }
 
         return true;
+    }
+
+    @Override
+    public void setCoordinates(float lastX, float lastY) {
+        super.setCoordinates(lastX, lastY);
+        targetX = 0;
+        targetY = 0;
     }
 
     @Override
