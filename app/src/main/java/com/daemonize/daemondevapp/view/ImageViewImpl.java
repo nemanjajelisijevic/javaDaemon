@@ -121,8 +121,6 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
         return setImageWithoutOffset(image);
     }
 
-
-
     @Override
     public float getAbsoluteX() {
         return absoluteX;
