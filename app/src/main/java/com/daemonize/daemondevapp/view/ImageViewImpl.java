@@ -14,14 +14,14 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     private volatile Image image;
 
     //center coords
-    protected volatile float absoluteX;
-    protected volatile float absoluteY;
+    protected float absoluteX;
+    protected float absoluteY;
 
     protected volatile float startingX;
     protected volatile float startingY;
 
-    protected volatile float xOffset;//TODO check if this is really neccessary
-    protected volatile float yOffset;//TODO check if this is really neccessary
+    protected float xOffset;
+    protected float yOffset;
 
     public ImageViewImpl() {}
 
@@ -87,7 +87,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteX(float absoluteX) {
         this.absoluteX = absoluteX;
-        //this.startingX = this.absoluteX - xOffset;//TODO check if this is really neccessary
+        this.startingX = this.absoluteX - xOffset;
         return this;
     }
 
@@ -95,7 +95,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteY(float absoluteY) {
         this.absoluteY = absoluteY;
-        //this.startingY = absoluteY - yOffset;//TODO check if this is really neccessary
+        this.startingY = absoluteY - yOffset;
         return this;
     }
 

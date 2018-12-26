@@ -125,17 +125,6 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         this.addCh(child);
     }
 
-    //@Override
-//    public void addChild(Image image, Pair<Integer, Integer> coordinates) {
-//        CompositeImageViewImpl child = new CompositeImageViewImpl(
-//                coordinates.getFirst(),
-//                coordinates.getSecond(),
-//                image
-//        );
-//
-//        addChild(child);
-//    }
-
     private void addCh(CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : this.childrenViews){
             if (child.checkRootCoordinates(newChild.getStartingX(), newChild.getStartingY())){
