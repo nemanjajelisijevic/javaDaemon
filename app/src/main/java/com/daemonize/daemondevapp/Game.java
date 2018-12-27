@@ -440,7 +440,7 @@ public class Game {
                                 enemySprite,
                                 enemyVelocity,
                                 enemyHp,
-                                Pair.create((float) 0, (float) 0)
+                                Pair.create(grid.getStartingX(), grid.getStartingY())
                         ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
                                 .setHpView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
                                 .setHealthBarImage(healthBarSprite)
@@ -650,6 +650,7 @@ public class Game {
                                         enemy.setCoordinates(grid.getStartingX(),grid.getStartingY()); // ToDO maybe this causes current = null !!!!!
                                         enemyQueue.add(enemy);
                                     });
+                                    return;
                                 }
 
                                 drawConsumer.consume(()->gridViewMatrix[current.getRow()][current.getColumn()].show());
@@ -981,6 +982,7 @@ public class Game {
                         enemy.setShootable(false);
                         drawConsumer.consume(() -> infoScore.setNumbers(++score));
                         drawConsumer.consume(() -> enemy.getHpView().hide());
+                        enemy.setVelocity(0);
                         enemy.pushSprite(explodeSprite, 0, aReturn2 -> {
                             drawConsumer.consume(() -> enemy.getView().hide());
                             enemy.stop();
