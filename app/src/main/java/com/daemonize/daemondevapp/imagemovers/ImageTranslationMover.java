@@ -17,7 +17,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     protected volatile Velocity velocity;
 
-    protected static DaemonCountingSemaphore pauseSemaphore = new DaemonCountingSemaphore();
+    protected DaemonCountingSemaphore pauseSemaphore = new DaemonCountingSemaphore();
 
 
     public Image [] getSprite() {
