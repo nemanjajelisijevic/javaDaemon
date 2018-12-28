@@ -108,7 +108,7 @@ public class Game {
 
     //enemies
     //private ActiveEntitySet<EnemyDoubleDaemon> activeEnemies = new ActiveEntitySet();
-    private int maxEnemies = 30;
+    private int maxEnemies = 40;
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private Image[] enemySprite;
     private Image[] healthBarSprite;
