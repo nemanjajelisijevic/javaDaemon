@@ -476,7 +476,6 @@ public class Game {
                 public BulletDoubleDaemon onPoll(BulletDoubleDaemon entity) {
                     Log.d(DaemonUtils.tag(), "Bullet poll state: " + entity.getState());
                     //entity.setVelocity(0);
-                    entity.setSprite(bulletSprite);
                     drawConsumer.consume(()->{
                         for (ImageView view : entity.getViews())
                             view.show();
@@ -537,7 +536,7 @@ public class Game {
 
                 bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()-> bulletRepo.add(bulletDoubleDaemon));
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
-                bulletRepo.add(bulletDoubleDaemon);
+                bulletRepo.add(bulletDoubleDaemon, true);
             }
 
             laserViews = new ArrayList<>(laserViewNo);
@@ -787,6 +786,7 @@ public class Game {
             bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
             bullet.setLevel(noOfBulletsFired);
             bullet.setDamage(bulletDamage);
+            bullet.setSprite(bulletSprite);
 
         });
 
@@ -803,8 +803,8 @@ public class Game {
         else
             bulletDoubleDaemon.cont();
 
-        bulletDoubleDaemon.rotateAndGoTo(
-                targetAngle,
+//        bulletDoubleDaemon.rotateAndGoTo(
+        bulletDoubleDaemon.goTo(
                 targetCoord.getFirst(),
                 targetCoord.getSecond(),
                 velocity,
@@ -820,8 +820,8 @@ public class Game {
                         enemy.setHp(newHp);
                     } else {
                         drawConsumer.consume(() -> infoScore.setNumbers(++score));
-                    enemyRepo.add(enemy);
-                }
+                        enemyRepo.add(enemy);
+                    }
 
                     bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> {
                         bulletRepo.add(bulletDoubleDaemon);
