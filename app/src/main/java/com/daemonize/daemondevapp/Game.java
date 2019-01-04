@@ -823,10 +823,7 @@ public class Game {
                         enemyRepo.add(enemy);
                     }
 
-                    bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> {
-                        bulletRepo.add(bulletDoubleDaemon);
-                        return;
-                    });
+                    bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> bulletRepo.add(bulletDoubleDaemon));
                 });
     }
 
@@ -908,13 +905,10 @@ public class Game {
                             enemy.setHp(newHp);
                         } else {
                             drawConsumer.consume(() -> infoScore.setNumbers(++score));
-                        enemyRepo.add(enemy);
-                    }
+                            enemyRepo.add(enemy);
+                        }
 
-                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
-                            bulletRepo.add(rocketDoubleDaemon);
-                            return;
-                        });
+                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> bulletRepo.add(rocketDoubleDaemon));
                     });
         });
     }
