@@ -1,13 +1,9 @@
-/*
 package com.daemonize.daemondevapp.view;
 
 import android.graphics.Bitmap;
 import android.view.View;
 
-import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
-
-import java.util.List;
 
 public class AndroidImageView implements ImageView {
 
@@ -18,45 +14,16 @@ public class AndroidImageView implements ImageView {
 
     @SuppressWarnings("unchecked")
     @Override
-    public AndroidImageView setAbsoluteX(float absoluteX) {
-        view.setX(absoluteX);
+    public AndroidImageView setX(float x) {
+        view.setX(x);
         return this;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public AndroidImageView setAbsoluteY(float absoluteY) {
-        view.setY(absoluteY);
+    public AndroidImageView setY(float y) {
+        view.setY(y);
         return this;
-    }
-
-    @Override
-    public Image getImage() { throw new IllegalStateException("Can not get android Bitmap from ImageView");}
-
-    @Override
-    public float getAbsoluteX() {
-        return view.getX();
-    }
-
-    @Override
-    public float getAbsoluteY() {
-        return view.getY();
-    }
-
-    @Override
-    public float getxOffset() {
-        return 0;
-    }
-
-    @Override
-    public float getyOffset() {
-        return 0;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public AndroidImageView setImageWithoutOffset(Image image) {
-        return setImage(image);
     }
 
     @SuppressWarnings("unchecked")
@@ -95,21 +62,4 @@ public class AndroidImageView implements ImageView {
     public boolean isShowing() {
         return view.isShown();
     }
-
-    @Override
-    public int compareTo(ImageView o) {
-        return 0;
-    }
-
-    @Override
-    public List<ImageView> getAllViews() {
-        return null;
-    }
-
-    @Override
-    public boolean checkCoordinates(float x, float y) {
-        return false;
-    }
-
 }
-*/
