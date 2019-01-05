@@ -11,10 +11,10 @@ import com.daemonize.daemondevapp.renderer.Renderer2D;
 import com.daemonize.daemondevapp.scene.Scene2D;
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
-import com.daemonize.daemondevapp.view.Button;
-import com.daemonize.daemondevapp.view.CompositeImageViewImpl;
-import com.daemonize.daemondevapp.view.ImageView;
-import com.daemonize.daemondevapp.view.ImageViewImpl;
+import com.daemonize.daemondevapp.scene.view.Button;
+import com.daemonize.daemondevapp.scene.view.CompositeImageViewImpl;
+import com.daemonize.daemondevapp.scene.view.ImageView;
+import com.daemonize.daemondevapp.scene.view.ImageViewImpl;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
@@ -823,7 +823,10 @@ public class Game {
                         enemyRepo.add(enemy);
                     }
 
-                    bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> bulletRepo.add(bulletDoubleDaemon));
+                    bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> {
+                        bulletRepo.add(bulletDoubleDaemon);
+                        return;
+                    });
                 });
     }
 
@@ -905,10 +908,13 @@ public class Game {
                             enemy.setHp(newHp);
                         } else {
                             drawConsumer.consume(() -> infoScore.setNumbers(++score));
-                            enemyRepo.add(enemy);
-                        }
+                        enemyRepo.add(enemy);
+                    }
 
-                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> bulletRepo.add(rocketDoubleDaemon));
+                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> {
+                            bulletRepo.add(rocketDoubleDaemon);
+                            return;
+                        });
                     });
         });
     }

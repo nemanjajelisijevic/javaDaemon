@@ -185,4 +185,11 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return Pair.create(sideQuest, sideQuestSetter);
     }
 
+    public MethodSpec generateCurrentSideQuestGetter() {
+        return  MethodSpec.methodBuilder("getCurrentSideQuest")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME))
+                .addStatement("return this.$N.getSideQuest()", daemonEngineString)
+                .build();
+    }
 }

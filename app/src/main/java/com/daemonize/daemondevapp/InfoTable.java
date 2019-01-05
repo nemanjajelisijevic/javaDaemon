@@ -2,7 +2,7 @@ package com.daemonize.daemondevapp;
 
 
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemondevapp.scene.view.ImageView;
 
 public class InfoTable {
     private int x,y;

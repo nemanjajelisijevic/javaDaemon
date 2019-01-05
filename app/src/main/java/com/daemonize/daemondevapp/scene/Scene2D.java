@@ -1,6 +1,6 @@
 package com.daemonize.daemondevapp.scene;
 
-import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemondevapp.scene.view.ImageView;
 
 import java.util.ArrayList;
 import java.util.Collections;

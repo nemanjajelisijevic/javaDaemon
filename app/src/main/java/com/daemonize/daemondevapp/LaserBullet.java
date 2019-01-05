@@ -2,7 +2,7 @@ package com.daemonize.daemondevapp;
 
 
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemondevapp.scene.view.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonprocessor.annotations.CallingThread;

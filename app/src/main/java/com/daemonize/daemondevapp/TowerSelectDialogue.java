@@ -1,8 +1,8 @@
 package com.daemonize.daemondevapp;
 
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.view.Button;
-import com.daemonize.daemondevapp.view.CompositeImageViewImpl;
+import com.daemonize.daemondevapp.scene.view.Button;
+import com.daemonize.daemondevapp.scene.view.CompositeImageViewImpl;
 
 public class TowerSelectDialogue {
 

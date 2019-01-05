@@ -1,6 +1,5 @@
-package com.daemonize.daemondevapp.view;
+package com.daemonize.daemondevapp.scene.view;
 
-import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
 public class Button extends CompositeImageViewImpl implements ClickableImageView {
