@@ -7,673 +7,405 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.Pair;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
-import android.widget.ScrollView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.MotionEvent;
+import android.view.WindowManager;
 
 
-import com.daemonize.daemondevapp.imagemovers.BouncingImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.ImageMover;
-import com.daemonize.daemondevapp.imagemovers.ImageMoverDaemon;
-import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
-import com.daemonize.daemondevapp.imagemovers.MainImageTranslationMover;
-import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.consumer.androidconsumer.AndroidLooperConsumer;
-import com.daemonize.daemonengine.dummy.DummyDaemon;
+import com.daemonize.daemondevapp.images.AndroidBitmapImage;
+import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemondevapp.renderer.AndroidSurfaceViewRenderer;
+import com.daemonize.daemondevapp.renderer.Renderer2D;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import io.github.controlwear.virtual.joystick.android.JoystickView;
-
-import static android.graphics.Color.RED;
-import static android.graphics.Color.WHITE;
 
 public class MainActivity extends AppCompatActivity {
 
     private ConstraintLayout layout;
+    private Game game;
 
-    private HorizontalScrollView horizontalSv;
-    private ScrollView verticalSv;
-
-    private BackgroundScrollerDaemon backgroundScrollerDaemon;
-
-    private ImageView background;
-    private Bitmap backgroundImg;
-
-    private DummyDaemon dummyDaemon;
-
-    private List<Bitmap> sprite;
-    private List<Bitmap> spriteMain;
-    private List<Bitmap> bulletSprite;
-    private List<Bitmap> explosionSprite;
-    private List<Bitmap> bigExplosionSprite;
-
-    private List<ImageMoverDaemon> starMovers;
-
-    private ImageMoverDaemon mainMover;
-    private ImageView mainView;
-
-//    private MassiveImageMoverDaemon massiveDaemon;
-//    private List<ImageView> massiveViews;
-
-    private int borderX;
-    private int borderY;
-
-    private JoystickView joystickViewLeft;
-    private JoystickView joystickViewRight;
-
-    private long wastedCounter;
-    private String wastedCntText = "EXPLOSIONS COUNTER: ";
-    private TextView wastedCntView;
-
-    public TextView hpView;
-    private String hpText = "HP: ";
-
-    public static class ImageMoveClosure implements Closure<ImageMover.PositionedBitmap> {
-
-        protected ImageView view;
-
-        public ImageMoveClosure(ImageView view) {
-            this.view = view;
-        }
-
-        @Override
-        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
-            ImageMover.PositionedBitmap returnVal = ret.get();
-            view.setX(returnVal.positionX);
-            view.setY(returnVal.positionY);
-            view.setImageBitmap(returnVal.image);
-        }
-    }
-
-    private class BulletClosure extends ImageMoveClosure {
-
-        private ImageMoverDaemon bulletDaemon;
-
-        public BulletClosure(ImageView view, ImageMoverDaemon bulletdaemon) {
-            super(view);
-            this.bulletDaemon = bulletdaemon;
-        }
-
-        @Override
-        public void onReturn(Return<ImageMover.PositionedBitmap> ret) {
-
-            if (
-                    ret.get().positionX <= 20
-                    || ret.get().positionX >= borderX - 20
-                    || ret.get().positionY <= 20
-                    || ret.get().positionY >= borderY - 20
-                    ) {
-
-                bulletDaemon.stop();
-                layout.removeView(view);
-                return;
-            }
-
-            for (ImageMoverDaemon starMover : starMovers) {
-                Pair<Float, Float> starMoverPos = starMover.getLastCoordinates();
-                if(Math.abs(ret.get().positionX - starMoverPos.first) <= bulletSprite.get(0).getWidth()
-                        && Math.abs(ret.get().positionY - starMoverPos.second) <= bulletSprite.get(0).getHeight()) {
-
-                    ImageTranslationMover prototype = (ImageTranslationMover) starMover.getPrototype();
-
-                    if (!prototype.isExploading()) {
-
-                        bulletDaemon.stop();
-                        layout.removeView(view);
-
-                        wastedCntView.setText(wastedCntText + Long.toString(++wastedCounter));
-                        starMover.explode(
-                                explosionSprite,
-                                binder.bindViewToClosure(prototype.getView()),
-                                ret1 -> {
-                                    prototype.getView().setImageBitmap(ret1.get().image);
-                                    prototype.setLastCoordinates(
-                                            getRandomInt(0, borderX),
-                                            getRandomInt(0, borderY)
-                                    );
-                                }
-                        );
-                    }
-                }
-            }
-
-            super.onReturn(ret);
-        }
-    }
-
-    private static int getRandomInt(int min, int max) {
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
-    }
-
-    private ImageView createImageView(int width, int height) {
-        ImageView view = new ImageView(getApplicationContext());
-        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-        );
-        view.setLayoutParams(lp);
-        view.getLayoutParams().height = height;
-        view.getLayoutParams().width = width;
-        layout.addView(view);
-        view.requestLayout();
-        return view;
-    }
-
-    @FunctionalInterface
-    private interface ViewBinder {
-        ImageMoveClosure bindViewToClosure(ImageView view);
-    }
-
-    private ViewBinder binder = ImageMoveClosure::new;
-
-    //keyboard controller
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_D:
-                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(100, 0)));
-                return true;
-            case KeyEvent.KEYCODE_A:
-                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(- 100, 0)));
-                return true;
-            case KeyEvent.KEYCODE_W:
-                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(0, - 100)));
-                return true;
-            case KeyEvent.KEYCODE_S:
-                mainMover.setVelocity(new ImageMover.Velocity(15, new ImageMover.Direction(0,  100)));
-                return true;
-
-            case KeyEvent.KEYCODE_L:
-                fireBullet(mainMover.getLastCoordinates(), 0);
-                fireBullet(mainMover.getLastCoordinates(),  - 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  - 0.1F);
-                fireBullet(mainMover.getLastCoordinates(),  0.2F);
-                return true;
-            case KeyEvent.KEYCODE_I:
-                fireBullet(mainMover.getLastCoordinates(), 90 * 0.0174533F);
-                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F - 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F + 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F - 0.1F);
-                fireBullet(mainMover.getLastCoordinates(),  90 * 0.0174533F + 0.2F);
-                return true;
-            case KeyEvent.KEYCODE_J:
-                fireBullet(mainMover.getLastCoordinates(), 180 * 0.0174533F);
-                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F - 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F + 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F - 0.1F);
-                fireBullet(mainMover.getLastCoordinates(),  180 * 0.0174533F  +0.1F);
-                return true;
-            case KeyEvent.KEYCODE_K:
-                fireBullet(mainMover.getLastCoordinates(), 270 * 0.0174533F);
-                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F - 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F + 0.2F);
-                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F - 0.1F);
-                fireBullet(mainMover.getLastCoordinates(),  270 * 0.0174533F  +0.1F);
-                return true;
-            default:
-                return super.onKeyDown(keyCode, event);
-        }
-    }
-
-    private void fireBullet(Pair<Float, Float> sourceCoord, float angleInRadians) {
-        ImageView bulletView = createImageView(40, 40);
-        ImageMoverDaemon bullet = new ImageMoverDaemon(
-                new AndroidLooperConsumer(),
-                new ImageTranslationMover(
-                        bulletSprite,
-                        50,
-                        Pair.create(
-                                sourceCoord.first + spriteMain.get(0).getWidth() / 2,
-                                sourceCoord.second + spriteMain.get(0).getHeight() / 2
-                        )
-                ).setBorders(borderX, borderY)
-        ).setName("Bullet");
-
-        bullet.setVelocity(50);
-        bullet.setMoveSideQuest().setClosure(new BulletClosure(bulletView, bullet));
-        bullet.setVelocity(new ImageMover.Velocity(
-                50,
-                new ImageMover.Direction((float) Math.cos(angleInRadians) * 100, -(float) Math.sin(angleInRadians) * 100)
-        ));
+    private int getPercentageValue(int percent, int hundredPercentValue) {
+        return (hundredPercentValue * percent) / 100;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        borderX = getResources().getDisplayMetrics().widthPixels - 100;
-        borderY = getResources().getDisplayMetrics().heightPixels - 200;
+        int borderX = getResources().getDisplayMetrics().widthPixels;
+        int borderY = getResources().getDisplayMetrics().heightPixels;
 
         layout = findViewById(R.id.cl);
-        horizontalSv = findViewById(R.id.horizontalSv);
-        verticalSv = findViewById(R.id.verticalSv);
 
-        background = findViewById(R.id.img_large);
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        //                                GAME INITIALIZATION                                    //
+        ///////////////////////////////////////////////////////////////////////////////////////////
 
-        mainView = findViewById(R.id.imageViewMain);
-        starMovers = new ArrayList<>(60);
+        //renderer init
+        AndroidSurfaceViewRenderer renderer = new AndroidSurfaceViewRenderer(this);
+        //renderer.setWindowSize(borderX, borderY);
+        setContentView(renderer);
 
-        wastedCntView = findViewById(R.id.response);
-        wastedCntView.setWidth(borderX / 3);
-        wastedCntView.setHeight(borderY / 10);
-        wastedCntView.setTextColor(WHITE);
+        int rows = 6;
+        int columns = 9;
 
-        hpView = findViewById(R.id.hp);
-        hpView.setWidth(borderX / 3);
-        hpView.setHeight(borderY / 10);
-        hpView.setTextColor(WHITE);
+        int width = 160;
+        int height = 160;
 
         try {
 
-            backgroundImg = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), 2 * borderX, 2 * borderY, false);
-            background.setImageBitmap(backgroundImg);
+            //init enemy sprite
+            Image [] sprite = new Image[36];
 
-            sprite = new ArrayList<>();
-
-            int i = 0;
-            for (; i < 3; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), 80, 80, false));
+            for(int i = 0; i < 36; i++) {
+                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("plane" + Integer.toString(i) + "0.png")), width, height, false));
             }
 
-            for (; i < 6; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), 80, 80, false));
+
+//
+//            int i = 0;
+//            for (; i < 3; ++i)
+//                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar.png")), width, height, false));
+//
+//            for (; i < 6; ++i)
+//                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar90.png")), width, height, false));
+//
+//
+//            for (; i < 9; ++i)
+//                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), width, height, false));
+//
+//            for (; i < 12; ++i)
+//                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), width, height, false));
+
+            //bullet sprite
+            int bulletSize0 = 20;
+            Image [] bulletSprite = new Image[4];
+            bulletSprite[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), bulletSize0, bulletSize0, false));
+            bulletSprite[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), bulletSize0, bulletSize0, false));
+            bulletSprite[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), bulletSize0, bulletSize0, false));
+            bulletSprite[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), bulletSize0, bulletSize0, false));
+
+            int bulletSize = 60;
+            Image [] spriteRocket = new Image[36];
+
+            for(int i = 0; i < 36; i++) {
+                spriteRocket[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rocket" + Integer.toString(i) + "0.png")), bulletSize, bulletSize, false));
             }
 
-            for (; i < 9; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar180.png")), 80, 80, false));
-            }
+            //bullet sprite laser
 
-            for (; i < 12; ++i) {
-                sprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstar270.png")), 80, 80, false));
-            }
-
-            bulletSprite = new ArrayList<>();
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), 40, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), 40, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), 60, 40, false));
-            bulletSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), 40, 40, false));
-
-            explosionSprite = new ArrayList<>();
-
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion1.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion2.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion3.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion4.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion5.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion6.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion7.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion8.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion9.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion10.png")), 80, 80, false));
-
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion11.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion12.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion13.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion14.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion15.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion16.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion17.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion18.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion19.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion20.png")), 80, 80, false));
-
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion21.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion22.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion23.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion24.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion25.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion26.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion27.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion28.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion29.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion30.png")), 80, 80, false));
-
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion31.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 80, 80, false));
-            explosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 80, 80, false));
-
-            bigExplosionSprite = new ArrayList<>();
-
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion1.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion2.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion3.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion4.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion5.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion6.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion7.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion8.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion9.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion10.png")), 200, 200, false));
-
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion11.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion12.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion13.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion14.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion15.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion16.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion17.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion18.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion19.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion20.png")), 200, 200, false));
-
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion21.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion22.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion23.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion24.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion25.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion26.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion27.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion28.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion29.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion30.png")), 200, 200, false));
-
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion31.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")), 200, 200, false));
-            bigExplosionSprite.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")), 200, 200, false));
-
-            spriteMain = new ArrayList<>();
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione30.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione20.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione10.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione330.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione340.png")), 150, 150, false));
-
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-            spriteMain.add(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione350.png")), 150, 150, false));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-//        List<ImageMover> masivePrototypes = new ArrayList<>(10);
-//        massiveViews = new ArrayList<>(10);
+            Image [] bulletSpriteLaser =new Image[36];
 //
-//        for (int k = 0; k < 10; ++k) {
-//            masivePrototypes.add(
-//                    new BouncingImageTranslationMover(
-//                            bulletSprite,
-//                            10,
-//                            Pair.create(
-//                                    (float)getRandomInt(borderX / 4, borderX * 3 / 4),
-//                                    (float)getRandomInt(borderY / 4, borderY * 3 / 4)
-//                            )
-//                    ).setBorders(borderX, borderY)
-//            );
-//            massiveViews.add(createImageView(60, 60));
-//        }
+            //explosion sprite
+            Image [] explosionSprite = new Image[33];
+
+            explosionSprite[0] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion1.png")), width,height, false));
+            explosionSprite[1] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion2.png")), width,height, false));
+            explosionSprite[2] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion3.png")), width,height, false));
+            explosionSprite[3] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion4.png")), width,height, false));
+            explosionSprite[4] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion5.png")), width,height, false));
+            explosionSprite[5] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion6.png")), width,height, false));
+            explosionSprite[6] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion7.png")), width,height, false));
+            explosionSprite[7] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion8.png")), width,height, false));
+            explosionSprite[8] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion9.png")), width,height, false));
+            explosionSprite[9] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion10.png")),width, height, false));
+
+            explosionSprite[10] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion11.png")),width, height, false));
+            explosionSprite[11] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion12.png")),width, height, false));
+            explosionSprite[12] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion13.png")),width, height, false));
+            explosionSprite[13] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion14.png")),width, height, false));
+            explosionSprite[14] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion15.png")),width, height, false));
+            explosionSprite[15] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion16.png")),width, height, false));
+            explosionSprite[16] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion17.png")),width, height, false));
+            explosionSprite[17] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion18.png")),width, height, false));
+            explosionSprite[18] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion19.png")),width, height, false));
+            explosionSprite[19] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion20.png")),width, height, false));
+
+            explosionSprite[20] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion21.png")),width, height, false));
+            explosionSprite[21] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion22.png")),width, height, false));
+            explosionSprite[22] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion23.png")),width, height, false));
+            explosionSprite[23] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion24.png")),width, height, false));
+            explosionSprite[24] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion25.png")),width, height, false));
+            explosionSprite[25] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion26.png")),width, height, false));
+            explosionSprite[26] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion27.png")),width, height, false));
+            explosionSprite[27] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion28.png")),width, height, false));
+            explosionSprite[28] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion29.png")),width, height, false));
+            explosionSprite[29] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion30.png")),width, height, false));
+
+            explosionSprite[30] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion31.png")),width, height, false));
+            explosionSprite[31] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")),width, height, false));
+            explosionSprite[32] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")),width, height, false));
 
 
-//        massiveDaemon = new MassiveImageMoverDaemon(
-//                new MassiveImageTranslationMover(masivePrototypes)
-//        ).setName("MASSIVEEEE");
+            int miniWidth = width / 3;
+            int miniHeight = height / 3;
+
+            Image[] miniExplosionSprite = new Image[20];
+
+            miniExplosionSprite[0] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000001.png")), miniWidth, miniHeight, false));
+            miniExplosionSprite[1] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000002.png")), miniWidth, miniHeight, false));
+            miniExplosionSprite[2] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000003.png")), miniWidth, miniHeight, false));
+            miniExplosionSprite[3] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000004.png")), miniWidth, miniHeight, false));
+            miniExplosionSprite[4] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000005.png")), miniWidth, miniHeight, false));
+            miniExplosionSprite[5] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000006.png")), miniWidth, miniHeight, false));
+            miniExplosionSprite[6] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000007.png")), miniWidth, miniHeight, false));
+            miniExplosionSprite[7] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000008.png")), miniWidth, miniHeight, false));
+            miniExplosionSprite[8] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000009.png")), miniWidth, miniHeight, false));
+            miniExplosionSprite[9] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-0000010.png")),miniWidth, miniHeight, false));
+
+            miniExplosionSprite[10] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000011.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[11] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000012.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[12] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000013.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[13] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000014.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[14] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000015.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[15] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000016.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[16] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000017.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[17] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000018.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[18] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000019.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[19] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000020.png")),miniWidth, miniHeight, false));
+
+//            miniExplosionSprite[20] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion21.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[21] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion22.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[22] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion23.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[23] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion24.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[24] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion25.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[25] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion26.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[26] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion27.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[27] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion28.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[28] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion29.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[29] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion30.png")),miniWidth, miniHeight, false));
 //
-//        massiveDaemon.setSideQuest(massiveDaemon.moveSideQuest.setClosure(
-//                ret -> {
-//                    int i = 0;
-//                    for (ImageMover.PositionedBitmap pb : ret.get()) {
-//                        massiveViews.get(i).setX(pb.positionX);
-//                        massiveViews.get(i).setY(pb.positionY);
-//                        massiveViews.get(i).setImageBitmap(pb.image);
-//                        i++;
-//                    }
-//                }));
+//            miniExplosionSprite[30] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion31.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[31] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")),miniWidth, miniHeight, false));
+//            miniExplosionSprite[32] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")),miniWidth, miniHeight, false));
+
+//            Image [] towerSprite =new Image[36];
+//            towerSprite[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower0.png")), width, height,false));
+//            towerSprite[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower10.png")), width, height, false));
+//            towerSprite[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower20.png")), width, height, false));
+//            towerSprite[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower30.png")), width, height, false));
+//            towerSprite[4] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower40.png")), width, height, false));
+//            towerSprite[5] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower50.png")), width, height, false));
+//            towerSprite[6] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower60.png")), width, height, false));
+//            towerSprite[7] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower70.png")), width, height, false));
+//            towerSprite[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower80.png")), width, height, false));
+//            towerSprite[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower90.png")), width, height, false));
 //
-//        massiveDaemon.start();
-
-        int i = 5;
-        for(int j = 0; j < 40; ++j) {
-
-            ImageView view = createImageView(80, 80);
-            ImageMoverDaemon starMover = new ImageMoverDaemon(
-                    new AndroidLooperConsumer(),
-                    new BouncingImageTranslationMover(
-                            sprite,
-                            8,
-                            Pair.create(
-                                    (float) borderX % i,
-                                    (float) borderY % i
-                            )
-                    ).setBorders(borderX, borderY).setView(view)
-            ).setName("Star " + Integer.toString(i));
-            starMover.setMoveSideQuest().setClosure(binder.bindViewToClosure(view));
-            starMover.start();
-
-            starMovers.add(starMover);
-            i += 5;
-
-        }
-
-        mainMover = new ImageMoverDaemon(
-                new AndroidLooperConsumer(),
-                new MainImageTranslationMover(
-                        spriteMain,
-                        10f,
-                        Pair.create(borderX/2f, borderY/2f),
-                        starMovers
-                )
-                .setBorders(borderX, borderY)
-                .setHpClosure(hp -> {
-                    if (hp.get() <= 0) {
-                        for (ImageMoverDaemon star : starMovers) {
-                            //star.stop();
-                            BouncingImageTranslationMover prototype = ((BouncingImageTranslationMover) star.getPrototype());
-                            star.explode(explosionSprite,
-                                    binder.bindViewToClosure(prototype.getView()),
-                                    ret1 -> {
-                                        prototype.getView().setImageBitmap(ret1.get().image);
-                                        prototype.setLastCoordinates(
-                                                getRandomInt(0, borderX),
-                                                getRandomInt(0, borderY)
-                                        );
-                                        star.stop();
-                                    });
-                        }
-                        wastedCounter = 0;
-                        hpView.setTextColor(RED);
-                        hpView.setText("!!!!!!WASTED!!!!!!!!!");
-                        ((MainImageTranslationMover) mainMover.getPrototype()).setHp(1000);
-
-                    } else {
-
-                        if (hp.get() % 50 == 0) {
-                            ((MainImageTranslationMover) mainMover.getPrototype()).pushSprite(bigExplosionSprite);
-                        }
-
-                        hpView.setTextColor(WHITE);
-                        hpView.setText(hpText + new Integer(hp.get() / 10).toString());
-                    }
-                })
-        ).setName("Exceptione");
-        mainMover.setMoveSideQuest().setClosure(binder.bindViewToClosure(mainView));
-        mainMover.start();
-
-        backgroundScrollerDaemon = new BackgroundScrollerDaemon(new AndroidLooperConsumer(), new BackgroundScroller(mainMover)).setName("Background scroller");
-        backgroundScrollerDaemon.setScrollSideQuest().setClosure(ret -> {
-            horizontalSv.scrollTo(ret.get().first, ret.get().second);
-            verticalSv.scrollTo(ret.get().first, ret.get().second);
-        });
-        backgroundScrollerDaemon.start();
-
-        joystickViewLeft = findViewById(R.id.joystickLeft);
-        joystickViewLeft.setOnMoveListener((angle, strength) -> {
-            if (strength > 0) {
-                float angleF = (float) angle * 0.0174533F;
-                float coeficientX = (float) Math.cos(angleF) * 100;
-                float coeficientY = -(float) Math.sin(angleF) * 100;
-                mainMover.setVelocity(new ImageMover.Velocity(
-                        strength / 8,
-                        new ImageMover.Direction(coeficientX, coeficientY)
-                ));
-            }
-        }, 100);
-
-        joystickViewRight = findViewById(R.id.joystickRight);
-        joystickViewRight.setOnMoveListener((angle, strength) -> {
-
-            if (mainMover.getVelocity().intensity < 1)
-                return;
-
-            float angleF = (float) angle * 0.0174533F;
-            Pair<Float, Float> lastMainCoord = mainMover.getLastCoordinates();
-
-            //bullet 1
-            fireBullet(lastMainCoord, angleF);
-            if (strength > 30) {
-                //bullet 2
-                fireBullet(lastMainCoord, angleF - 0.2F);
-                if (strength > 60) {
-                    //bullet 3
-                    fireBullet(lastMainCoord, angleF + 0.2F);
-                    if (strength > 70) {
-                        //bullet 4
-                        fireBullet(lastMainCoord, angleF - 0.1F);
-                        if (strength > 98) {
-                            //bullet 5
-                            fireBullet(lastMainCoord, angleF + 0.1F);
-                        }
-                    }
-                }
-            }
-        }, 100);
-
+//            towerSprite[10] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower100.png")),width, height, false));
+//            towerSprite[11] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower110.png")),width, height, false));
+//            towerSprite[12] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower120.png")),width, height, false));
+//            towerSprite[13] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower130.png")),width, height, false));
+//            towerSprite[14] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower140.png")),width, height, false));
+//            towerSprite[15] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower150.png")),width, height, false));
+//            towerSprite[16] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower160.png")),width, height, false));
+//            towerSprite[17] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower170.png")),width, height, false));
+//            towerSprite[18] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower180.png")),width, height, false));
+//            towerSprite[19] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower190.png")),width, height, false));
 //
-//        ExampleDaemon exampleDaemon = new ExampleDaemon(
-//                new Example()
-//        ).setName("ExampleDaemon");
-//        exampleDaemon.evenMoreComplicated(
-//                        "Constantly updated from another thread: ",
-//                        update -> wastedCntView.setText(update.get()),
-//                        ret -> {
-//                            try {
-//                                wastedCntView.setText(ret.checkAndGet());
-//                            } catch (DaemonException e) {
-//                                Log.e("DAEMON ERROR", Log.getStackTraceString(e));
-//                                wastedCntView.setText(e.getMessage());
-//                                return;
-//                            }
-//                            exampleDaemon.evenMoreComplicated(
-//                                    "Here we go again: ",
-//                                    update -> wastedCntView.setText(update.get()),
-//                                    ret2 ->  wastedCntView.setText(ret2.get())
-//                            );
-//                        }
-//                );
-
-
-//        new RestClientTestScript(
-//                wastedCntView,
-//                new RestClientDaemon(new RestClient("https://reqres.in"))
-//        ).run();
-
-
-//        dummyDaemon = new DummyDaemon(
-//                new AndroidLooperConsumer(),
-//                500
-//        ).setClosure(ret -> fireBullet(Pair.create((float)0 , (float)0), 340 * 0.0174533F));
+//            towerSprite[20] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower200.png")),width, height, false));
+//            towerSprite[21] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower210.png")),width, height, false));
+//            towerSprite[22] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower220.png")),width, height, false));
+//            towerSprite[23] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower230.png")),width, height, false));
+//            towerSprite[24] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower240.png")),width, height, false));
+//            towerSprite[25] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower250.png")),width, height, false));
+//            towerSprite[26] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower260.png")),width, height, false));
+//            towerSprite[27] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower270.png")),width, height, false));
+//            towerSprite[28] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower280.png")),width, height, false));
+//            towerSprite[29] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower290.png")),width, height, false));
 //
-//        dummyDaemon.start();
-
-        Toast.makeText(MainActivity.this, "MODE: GRAVITY", Toast.LENGTH_LONG).show();
-
-
-//        DoubleExampleDaemon dd = new DoubleExampleDaemon(
-//                new AndroidLooperConsumer(),
-//                new AndroidLooperConsumer(),
-//                new DoubleExample()
-//        );
+//            towerSprite[30] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower300.png")),width, height, false));
+//            towerSprite[31] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower310.png")),width, height, false));
+//            towerSprite[32] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower320.png")),width, height, false));
+//            towerSprite[33] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower330.png")),width, height, false));
+//            towerSprite[34] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower340.png")),width, height, false));
+//            towerSprite[35] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Tower350.png")),width, height, false));
 //
-//        dd.setLogAndReturnSideQuest().setClosure(aReturn -> Log.e(DaemonUtils.tag(), "DoubleExampleDaemon::LogAndReturnSideQuest returned: " + Integer.toString(aReturn.get())));
-//
-//        dd.start();
-//
-//        dd.increment(new Closure<Boolean>() {
-//            @Override
-//            public void onReturn(Return<Boolean> aReturn) {
-//                dd.increment(this);
+//            Image [] towerSprite2 =new Image[36];
+//            for (int i=0;i<36;i++) {
+//                towerSprite2[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rocketTower" + i + "0.png")), width, height, false));
 //            }
-//        });
+//            Image [] towerSprite3 =new Image[36];
+//            for (int i=0;i<36;i++) {
+//                towerSprite3[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenLS" + i + "0.png")), width, height, false));
+//            }
+
+            // blue tower
+            Image [] blueTowerI = new Image[36];
+            for (int i = 0; i < 36; i++) {
+                blueTowerI[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mg" + i + "0.png")), width, height, false));
+            }
+            Image [] blueTowerII = new Image[36];
+            for (int i = 0; i < 36; i++) {
+                blueTowerII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("bgII" + i + "0.png")), width, height, false));
+            }
+            Image [] blueTowerIII = new Image[36];
+            for (int i = 0; i < 36; i++) {
+                blueTowerIII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("bgIII" + i + "0.png")), width, height, false));
+            }
+
+            //green tower
+            Image [] greenTowerI = new Image[36];
+            for (int i = 0; i < 36; i++) {
+                greenTowerI[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenLS00" + i + "0.png")), width, height, false));
+            }
+            Image [] greenTowerII = new Image[36];
+            for (int i = 0; i < 36; i++) {
+                greenTowerII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsII" + i + "0.png")), width, height, false));
+            }
+            Image [] greenTowerIII = new Image[36];
+            for (int i = 0; i < 36; i++) {
+                greenTowerIII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsIII" + i + "0.png")), width, height, false));
+            }
+
+            //red tower
+            Image [] redTowerI = new Image[36];
+            for (int i = 0; i < 36; i++) {
+                redTowerI[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rmI" + i + "0.png")), width, height, false));
+            }
+            Image [] redTowerII = new Image[36];
+            for (int i = 0; i < 36; i++) {
+                redTowerII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rmII" + i + "0.png")), width, height, false));
+            }
+            Image [] redTowerIII = new Image[36];
+            for (int i = 0; i < 36; i++) {
+                redTowerIII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rmIII" + i + "0.png")), width, height, false));
+            }
+
+            int width_hp = 120;
+            int height_hp = 30;
+
+            Image [] listHealthBarImg = new Image[10];
+            listHealthBarImg[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_10.png")), width_hp, height_hp, false));
+            listHealthBarImg[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_20.png")), width_hp, height_hp, false));
+            listHealthBarImg[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_30.png")), width_hp, height_hp, false));
+            listHealthBarImg[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_40.png")), width_hp, height_hp, false));
+            listHealthBarImg[4] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_50.png")), width_hp, height_hp, false));
+            listHealthBarImg[5] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_60.png")), width_hp, height_hp, false));
+            listHealthBarImg[6] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_70.png")), width_hp, height_hp, false));
+            listHealthBarImg[7] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_80.png")), width_hp, height_hp, false));
+            listHealthBarImg[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_90.png")), width_hp, height_hp, false));
+            listHealthBarImg[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_100.png")), width_hp, height_hp, false));
 
 
+            Image score = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("SmallBox.png")), 300, 150, false));
+            Image titleScore = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("HealthBar.png")), 300, 70, false));
+
+            int numWidth = 50;
+            int numHeight = 70;
+
+            Image [] listNumberImg = new Image[10];
+            listNumberImg[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("0.png")), numWidth, numHeight, false));
+            listNumberImg[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("1.png")), numWidth, numHeight, false));
+            listNumberImg[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("2.png")), numWidth, numHeight, false));
+            listNumberImg[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("3.png")), numWidth, numHeight, false));
+            listNumberImg[4] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("4.png")), numWidth, numHeight, false));
+            listNumberImg[5] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("5.png")), numWidth, numHeight, false));
+            listNumberImg[6] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("6.png")), numWidth, numHeight, false));
+            listNumberImg[7] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("7.png")), numWidth, numHeight, false));
+            listNumberImg[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("8.png")), numWidth, numHeight, false));
+            listNumberImg[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("9.png")), numWidth, numHeight, false));
+
+            Image [] dialogUpgradeTower1 = new Image[3];
+            dialogUpgradeTower1[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgleve2.png")), 800, 530, false));
+            dialogUpgradeTower1[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgleve3.png")), 800, 530, false));
+            dialogUpgradeTower1[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgleveTOP.png")), 800, 530, false));
+            Image [] dialogUpgradeTower2 = new Image[3];
+            dialogUpgradeTower2[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rcleve2.png")), 800, 530, false));
+            dialogUpgradeTower2[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rcleve3.png")), 800, 530, false));
+            dialogUpgradeTower2[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rcleveTOP.png")), 800, 530, false));
+            Image [] dialogUpgradeTower3 = new Image[3];
+            dialogUpgradeTower3[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsleve2.png")), 800, 530, false));
+            dialogUpgradeTower3[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsleve3.png")), 800, 530, false));
+            dialogUpgradeTower3[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsleveTOP.png")), 800, 530, false));
+//            dialogUpgradeTower1[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("2.png")), 650, 390, false));
+//            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("upgradeDialog.png")),650,390,false))
+
+
+            Bitmap green = Bitmap.createBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")));
+            Bitmap red = Bitmap.createBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")));
+
+            game = new Game(renderer, rows, columns,50,50, width)
+                    .setBackgroundImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false)))
+                    .setFieldImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
+                    .setFieldImageTower(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), width, height, false)))
+                    .setFieldImageTowerDen(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), width, height, false)))
+                    .setEnemySprite(sprite)
+                    .setBulletSprite(bulletSprite)
+                    .setBulletSpriteLaser(spriteRocket)
+                    .setLaserSprite(new Image[]{
+                            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenPhoton.png")), 10, 10, false))
+                    })
+                    .setExplodeSprite(explosionSprite)
+                    .setMiniExplodeSprite(miniExplosionSprite)
+                    .setRedTower(redTowerI, redTowerII, redTowerIII)
+                    .setBlueTower(blueTowerI, blueTowerII, blueTowerIII)
+                    .setGreenTower(greenTowerI, greenTowerII, greenTowerIII)
+                    .setHealthBarSprite(listHealthBarImg)
+                    .setBorders(borderX, borderY)
+                    .setUpgradeTowerDialogue(dialogUpgradeTower1, dialogUpgradeTower2, dialogUpgradeTower3)
+                    .setUpgradeButtonImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("ButtonUpgrade.png")),350,90,false)))
+                    .setCloseButtonImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("ButtonX.png")),110,120,false)))
+                    .setSaleButtonImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("ButtonSale.png")),250,90,false)))
+                    .setSelectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, 200, 200, false))/*dialog*/)
+                    .setDeselectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, 200, 200, false))/*dialog*/)
+                    .setScoreBackGrImage(score)
+                    .setScorenumbersImages(listNumberImg);
+
+
+        } catch (IOException ex) {
+            Log.e(DaemonUtils.tag(), "Could not init game!", ex);
+        }
+
+        Log.e(DaemonUtils.tag(), "ACTIVITY ON CREATE----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.e(DaemonUtils.tag(), "ACTIVITY ON START----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+        game.run();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if(event.getAction() == MotionEvent.ACTION_DOWN)
+            game.onTouch(event.getX(), event.getY());
+        return true;
+        //return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        Log.w(DaemonUtils.tag(), "ACTIVITY ON RESUME----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.w(DaemonUtils.tag(), "ACTIVITY ON ON PAUSE----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+    }
 
-        mainMover.stop();
-        for(ImageMoverDaemon mover : starMovers) {
-            mover.stop();
-        }
-
-        //dummyDaemon.stop();
-        //massiveDaemon.stop();
-        //exampleDaemon.stop();
-        backgroundScrollerDaemon.stop();
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.e(DaemonUtils.tag(), "ACTIVITY ON STOP----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+        game.stop();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.e(DaemonUtils.tag(), "ACTIVITY ON DESTROY----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
     }
 
     @Override
@@ -697,5 +429,4 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 }

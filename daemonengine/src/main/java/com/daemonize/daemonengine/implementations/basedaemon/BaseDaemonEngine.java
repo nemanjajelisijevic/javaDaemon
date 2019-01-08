@@ -5,6 +5,7 @@ import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseDaemonEngine implements Daemon {
 
@@ -67,6 +68,8 @@ public abstract class BaseDaemonEngine implements Daemon {
       currentQuest.setConsumer(consumer).run();
     }
 
+    System.out.println(DaemonUtils.tag() + "Daemon stopped!");
+
     setState(DaemonState.STOPPED);
   }
 
@@ -88,11 +91,13 @@ public abstract class BaseDaemonEngine implements Daemon {
 
   @Override
   public void stop() {
-    state = DaemonState.GONE_DAEMON;
-    if (daemonThread != null
-        && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stopDaemon from daemon thread
-        && daemonThread.isAlive()) {
-      daemonThread.interrupt();
+    if (state != DaemonState.STOPPED) {
+      state = DaemonState.GONE_DAEMON;
+      if (daemonThread != null
+              && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stopDaemon from daemon thread
+              && daemonThread.isAlive()) {
+        daemonThread.interrupt();
+      }
     }
   }
 

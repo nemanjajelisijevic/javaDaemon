@@ -1,60 +1,38 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.graphics.Bitmap;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Pair;
-import android.widget.ImageView;
+import com.daemonize.daemondevapp.Pair;
+import com.daemonize.daemondevapp.imagemovers.spriteiterators.BasicSpriteIterator;
+import com.daemonize.daemondevapp.imagemovers.spriteiterators.SpriteIterator;
+import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 
-import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ReturnRunnable;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-public class ImageTranslationMover implements ImageMover {
-
-    protected List<Bitmap> sprite;
-    protected Iterator<Bitmap> spriteIterator;
-    protected float initVelocity = 20;
-
-    protected volatile Velocity velocity;
-
-//    private Lock moveLock = new ReentrantLock();
-//    private Condition moveCondition = moveLock.newCondition();
-//
-//    protected void startMoving() {
-//        moveLock.lock();
-//        moveCondition.signalAll();
-//        moveLock.unlock();
-//    }
-//
-//    protected void awaitForMovement() throws InterruptedException {
-//        moveLock.lock();
-//        try {
-//            while (velocity.intensity <= 0) {
-//                moveCondition.await();
-//            }
-//        } finally {
-//            moveLock.unlock();
-//        }
-//    }
-
+public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     protected volatile float lastX;
     protected volatile float lastY;
 
-    private ImageView view;
+    protected SpriteIterator spriteIterator;
+    protected float initVelocity;
 
-    public ImageView getView() {
-        return view;
+    protected volatile Velocity velocity;
+
+    protected DaemonCountingSemaphore pauseSemaphore = new DaemonCountingSemaphore();
+
+
+    public Image [] getSprite() {
+        return spriteIterator.getSprite();
     }
 
-    public ImageTranslationMover setView(ImageView view) {
-        this.view = view;
+    @Override
+    public int getSize() {
+        return spriteIterator.getSize();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public ImageTranslationMover setSprite(Image[] sprite) { //TODO That's how it must be
+        spriteIterator.setSprite(sprite);
         return this;
     }
 
@@ -69,37 +47,27 @@ public class ImageTranslationMover implements ImageMover {
     }
 
     @Override
-    public PositionedBitmap setLastCoordinates(float lastX, float lastY) {
+    public void setCoordinates(float lastX, float lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
-
-        PositionedBitmap ret = new PositionedBitmap();
-        ret.image = iterateSprite();
-
-        ret.positionX = lastX;
-        ret.positionY = lastY;
-        
-        return ret;
     }
 
-    protected float borderX;
-    protected float borderY;
+    protected float borderX1;
+    protected float borderX2;
 
-    public ImageTranslationMover(List<Bitmap> sprite, float velocity, Pair<Float, Float> startingPos) {
-        this.sprite = sprite;
+    protected float borderY1;
+    protected float borderY2;
+
+    public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos) {
+        this.spriteIterator = new BasicSpriteIterator(sprite);
         this.initVelocity = velocity;
-        this.velocity = new Velocity(velocity, new Direction(80, 20));
-        lastX = startingPos.first;
-        lastY = startingPos.second;
-        spriteIterator = sprite.iterator();
-
+        this.velocity = new Velocity(velocity, new Direction(0, 0));
+        lastX = startingPos.getFirst();
+        lastY = startingPos.getSecond();
     }
 
-    protected Bitmap iterateSprite() {
-        if(!spriteIterator.hasNext()) {
-            spriteIterator = sprite.iterator();
-        }
-        return spriteIterator.next();
+    public Image iterateSprite() {
+        return spriteIterator.iterateSprite();
     }
 
     @Override
@@ -110,114 +78,73 @@ public class ImageTranslationMover implements ImageMover {
     @Override
     public void setVelocity(Velocity velocity) {
         this.velocity = velocity;
-        //startMoving();
     }
 
     @Override
     public void setDirectionAndMove(float x, float y, float velocityInt) {
 
-        exploading = false;
+        double dX = x - lastX;
+        double dY = y - lastY;
+        double hypotenuse = Math.sqrt(dX*dX + dY*dY);
 
-        float dX = x - lastX;
-        float dY = y - lastY;
+        dX = (dX / hypotenuse);
+        dY = (dY / hypotenuse);
 
-        float a;
-        boolean signY = dY >= 0;
-        boolean signX = dX >= 0;
         velocity.intensity = velocityInt;
+        velocity.direction.coeficientX = (float) dX;
+        velocity.direction.coeficientY = (float) dY;
 
-        if (Math.abs(dY) >= Math.abs(dX)) {
-            a = Math.abs((100*dX)/dY);
-            float aY =  100 - a;
-            velocity.direction = new Direction(signX ? a : - a, signY ? aY : - aY);
-        } else {
-            a = Math.abs((100*dY)/dX);
-            float aX =  100 - a;
-            velocity.direction = new Direction(signX ? aX : -aX, signY ? a : -a);
-        }
-
-        //startMoving();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public ImageTranslationMover setBorders(float x, float y) {
-        this.borderX = x;
-        this.borderY = y;
+    public ImageTranslationMover setBorders(float x1, float x2, float y1, float y2) {
+        this.borderX1 = x1;
+        this.borderX2 = x2;
+        this.borderY1 = y1;
+        this.borderY2 = y2;
         return this;
     }
 
     @Override
     public void setVelocity(float velocity) {
         this.velocity.intensity = velocity;
-//        startMoving();
     }
 
-    @Override
-    public void checkCollisionAndBounce(
-            Pair<Float, Float> colliderCoordinates,
-            Velocity velocity
-    ) {}
-
-    @Override
-    public PositionedBitmap move() {
-
-        PositionedBitmap ret = new PositionedBitmap();
-        ret.image = iterateSprite();
-//        try {
-//            awaitForMovement();
-//        } catch (InterruptedException e) {
-//            //
-//        }
-
-        //check borders and recalculate
-        if (lastX <= 0) {
-            lastX = 0;
-        } else if (lastX >= borderX) {
-            lastX = borderX;
-        }
-
-        if(lastY <= 0) {
-            lastY = 0;
-        } else if( lastY >= borderY) {
-            lastY = borderY;
-        }
-
-        lastX += velocity.intensity * (velocity.direction.coeficientX * 0.01f);
-        lastY += velocity.intensity * (velocity.direction.coeficientY * 0.01f);
-
-
-        ret.positionX = lastX;
-        ret.positionY = lastY;
-
-        return ret;
+    public void pause(){
+        pauseSemaphore.subscribe();
     }
 
-    private volatile boolean exploading;
-
-    public boolean isExploading() {
-        return exploading;
+    public void cont(){
+        pauseSemaphore.unsubscribe();
     }
 
+
+    private PositionedImage ret = new PositionedImage();
+
     @Override
-    public PositionedBitmap explode(List<Bitmap> explodeSprite, Closure<PositionedBitmap> update) throws InterruptedException {
+    public PositionedImage animate() throws InterruptedException {
 
-        Handler handler = new Handler(Looper.getMainLooper());
-        PositionedBitmap updatePB = new PositionedBitmap();
-        exploading = true;
+            pauseSemaphore.await();
+            ret.image = iterateSprite();
 
-        for (Bitmap bmp : explodeSprite) {
+            //check borders and recalculate
+            if (lastX <= borderX1) {
+                lastX = borderX1;
+            } else if (lastX >= borderX2) {
+                lastX = borderX2;
+            }
 
-            updatePB.image = bmp;
-            updatePB.positionX = lastX;
-            updatePB.positionY = lastY;
-            handler.post(new ReturnRunnable<>(update).setResult(updatePB));
-            Thread.sleep(25);
-        }
+            if(lastY <= borderY1) {
+                lastY = borderY1;
+            } else if( lastY >= borderY2) {
+                lastY = borderY2;
+            }
 
-        Thread.sleep(3000);
-        updatePB.image = explodeSprite.get(explodeSprite.size() - 1);
-        return updatePB;
+            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX);
+            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY);
+
+            return ret;
+
     }
 }
 

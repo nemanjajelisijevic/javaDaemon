@@ -1,21 +1,19 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.graphics.Bitmap;
-import android.util.Pair;
 
-import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.SideQuest;
+import com.daemonize.daemondevapp.Pair;
+import com.daemonize.daemondevapp.images.Image;
+//import com.daemonize.daemonprocessor.annotations.CallingThread;
+//import com.daemonize.daemonprocessor.annotations.Daemonize;
+//import com.daemonize.daemonprocessor.annotations.SideQuest;
 
-import java.util.List;
 
-@Daemonize(returnDaemonInstance = true)
+//@Daemonize(returnDaemonInstance = true)
 public interface ImageMover {
 
     class Velocity {
-        public float intensity;
-        public Direction direction;
+        public volatile float intensity;
+        public volatile Direction direction;
 
         public Velocity(float intensity, Direction direction) {
             this.intensity = intensity;
@@ -29,16 +27,25 @@ public interface ImageMover {
         }
     }
 
-    class PositionedBitmap {
-        public Bitmap image;
+    class PositionedImage {
+        public Image image;
         public float positionX;
         public float positionY;
+
+        @Override
+        public PositionedImage clone() {
+            PositionedImage clone = new PositionedImage();
+            clone.image = this.image;
+            clone.positionX = this.positionX;
+            clone.positionY = this.positionY;
+            return clone;
+        }
     }
 
     class Direction {
 
-        public float coeficientX;
-        public float coeficientY;
+        public volatile float coeficientX;
+        public volatile float coeficientY;
 
         public Direction(float coeficientX, float coeficientY) {
             this.coeficientX = coeficientX;
@@ -46,15 +53,13 @@ public interface ImageMover {
         }
     }
 
-    @CallingThread
+    //@CallingThread
     Pair<Float, Float> getLastCoordinates();
 
-    @CallingThread
+    //@CallingThread
     Velocity getVelocity();
 
-    PositionedBitmap setLastCoordinates(float lastX, float lastY);
-
-    void checkCollisionAndBounce(Pair<Float, Float> colliderCoordinates, Velocity velocity);
+    void setCoordinates(float lastX, float lastY);
 
     void setDirection(Direction direction);
 
@@ -64,12 +69,10 @@ public interface ImageMover {
 
     void setVelocity(float velocity);
 
-    @CallingThread
-    <K extends ImageMover> K setBorders(float x, float y);
+    //@CallingThread
+    <K extends ImageMover> K setBorders(float x1, float x2, float y1, float y2);
 
-    @SideQuest(SLEEP = 25)
-    PositionedBitmap move();
-
-    PositionedBitmap explode(List<Bitmap> explodeSprite, Closure<PositionedBitmap> update) throws InterruptedException;
+    //@SideQuest(SLEEP = 25)
+    PositionedImage animate() throws InterruptedException;
 
 }

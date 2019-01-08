@@ -18,12 +18,13 @@ public abstract class SideQuest<T> extends Quest<T> {
   }
 
   public SideQuest() {
+    super();
     this.state = DaemonState.SIDE_QUEST;
   }
 
   @SuppressWarnings("unchecked")
   public SideQuest<T> setClosure(Closure<T> closure) {
-    this.returnRunnable = new ReturnRunnable<>(closure);
+    this.returnRunnable.setClosure(closure);
     return this;
   }
 

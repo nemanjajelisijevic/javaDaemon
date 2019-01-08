@@ -152,6 +152,10 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
             }
         }
 
+        if (!sideQuestFields.isEmpty()) {
+            daemonClassBuilder.addMethod(sideGenerator.generateCurrentSideQuestGetter());
+        }
+
         //add side quests
         for (Pair<TypeSpec, MethodSpec> sideQuestField : sideQuestFields) {
             daemonClassBuilder.addType(sideQuestField.getFirst());
@@ -171,7 +175,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(sideGenerator.generateStartDaemonApiMethod());
         apiMethods.add(generateStopDaemonApiMethod());
         apiMethods.add(generateQueueStopDaemonApiMethod());//TODO override !!!!!!!!!!!!!!!!!!!!!!!!!!
-        apiMethods.add(mainGenerator.generateGetStateDaemonApiMethod());
+        apiMethods.add(sideGenerator.generateGetStateDaemonApiMethod());
         apiMethods.add(generateSetNameDaemonApiMethod());
         apiMethods.add(mainGenerator.generateGetNameDaemonApiMethod());//TODO CHECK THISSS!!!!!!!
         apiMethods.add(generateSetMainConsumerDaemonApiMethod());

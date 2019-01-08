@@ -1,6 +1,6 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.util.Pair;
+import com.daemonize.daemondevapp.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,10 +67,10 @@ public class MassiveImageTranslationMover implements MassiveImageMover {
     }
 
     @Override
-    public List<ImageMover.PositionedBitmap> move() {
-        List<ImageMover.PositionedBitmap> ret = new ArrayList<>(imageMovers.size());
+    public List<ImageMover.PositionedImage> move() throws InterruptedException {
+        List<ImageMover.PositionedImage> ret = new ArrayList<>(imageMovers.size());
         for (ImageMover imageMover : imageMovers) {
-            ImageMover.PositionedBitmap moverRet = imageMover.move();
+            ImageMover.PositionedImage moverRet = imageMover.animate();
             if (moverRet != null)
                 ret.add(moverRet);
         }
