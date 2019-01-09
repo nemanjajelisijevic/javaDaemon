@@ -799,7 +799,7 @@ public class Game {
                             }
                         }
 
-                        towerDaemon.reload(reloadInterval, aReturn1 -> towerDaemon.scan(this::onReturn));
+                        towerDaemon.reload(reloadInterval, ()-> towerDaemon.scan(this::onReturn));
                     }
                 });
             }
