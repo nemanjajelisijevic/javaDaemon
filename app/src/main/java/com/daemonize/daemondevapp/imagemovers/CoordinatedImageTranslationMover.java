@@ -1,12 +1,9 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.util.Log;
 
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 
-import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

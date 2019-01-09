@@ -1,12 +1,9 @@
 package com.daemonize.daemondevapp.imagemovers;
 
-import android.util.Log;
 
 import com.daemonize.daemondevapp.AngleToBitmapArray;
 import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemonengine.utils.DaemonUtils;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
 
 import java.util.Arrays;
 
