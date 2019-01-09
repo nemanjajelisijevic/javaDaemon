@@ -35,7 +35,7 @@ public class DummyDaemon extends BaseDaemonEngine {
         return this;
     }
 
-    public DummyDaemon setSleepInterval(int sleepInMillis) {
+    public DummyDaemon setSleepInterval(long sleepInMillis) {
         dummyQuest.setSleepInterval(sleepInMillis);
         return this;
     }

@@ -1,7 +1,5 @@
 package com.daemonize.daemondevapp;
 
-//import android.util.Log;
-
 import android.util.Log;
 
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
@@ -25,9 +23,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
@@ -227,7 +223,7 @@ public class Game {
         return this;
     }
 
-    public Game onTouch(float x, float y) {//TODO use root dialogs only!!!!
+    public Game onTouch(float x, float y) {
         gameConsumer.consume(()->{
             if (towerUpgradeDialog.getTowerUpgrade().isShowing()){
                 towerUpgradeDialog.getTowerUpgrade().checkCoordinates(x, y);
@@ -394,6 +390,7 @@ public class Game {
                     enemy.setShootable(false);
                     drawConsumer.consume(() -> enemy.getHpView().hide());
                     enemy.setVelocity(0);
+                    activeEnemies.remove(enemy);
                     enemy.pushSprite(explodeSprite, 0, () -> {
                         drawConsumer.consume(() -> enemy.getView().hide());
                         enemy.stop();
@@ -405,9 +402,15 @@ public class Game {
                 public EnemyDoubleDaemon onGet(EnemyDoubleDaemon enemy) {
                     enemy.setShootable(true);
                     enemy.setCoordinates(grid.getStartingX(), grid.getStartingY());
-                    enemy.setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1, 0)));// todo maybe coeficient should be grid.first fild center
+                    enemy.setVelocity(
+                            new ImageMover.Velocity(
+                                    enemyVelocity,
+                                    new ImageMover.Direction(1, 0)
+                            )
+                    );
                     drawConsumer.consume(()->enemy.getView().show());
                     drawConsumer.consume(()->enemy.getHpView().show());
+                    activeEnemies.add(enemy);
                     return enemy;
                 }
             };
@@ -447,8 +450,8 @@ public class Game {
                                 enemyHp,
                                 Pair.create(grid.getStartingX(), grid.getStartingY())
                         ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
-                                .setHpView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
-                                .setHealthBarImage(healthBarSprite)
+                        .setHpView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
+                        .setHealthBarImage(healthBarSprite)
                 ).setName("Enemy no. " + i);
 
                 enemy.getPrototype().setBorders(
@@ -651,7 +654,7 @@ public class Game {
         });
     }
 
-    public void setTower(float x, float y) {
+    private void setTower(float x, float y) {
 
         //check if correct field
         Field field = grid.getField(x, y);
@@ -695,8 +698,6 @@ public class Game {
                         towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide();
                 });
             }
-
-            return;
 
         } else if (pause) {
 
