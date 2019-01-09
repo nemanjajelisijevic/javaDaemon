@@ -10,6 +10,10 @@ public class DummyDaemon extends BaseDaemonEngine {
 
     private DummyQuest dummyQuest;
 
+    public static DummyDaemon create(Consumer consumer, long sleep) {
+        return new DummyDaemon(consumer, sleep);
+    }
+
     @Override
     protected Quest getQuest() {
         return dummyQuest;
