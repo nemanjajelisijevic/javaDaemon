@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 @Daemonize(doubleDaemonize = true)
@@ -12,6 +13,11 @@ public class DoubleExample {
     private volatile int cnt;
 
     public DoubleExample() {}
+
+    @GenerateRunnable
+    public void testVoid(long sleepMillis) throws InterruptedException {
+        Thread.sleep(sleepMillis);
+    }
 
     public synchronized boolean increment() throws InterruptedException {
         Thread.sleep(5000);

@@ -30,7 +30,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         super(sprite, velocity, startingPos);
     }
 
-    public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
+    public void goTo(float x, float y, float velocityInt) throws InterruptedException {
         super.setDirectionAndMove(x, y, velocityInt);
         coordinateLock.lock();
 
@@ -45,8 +45,6 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
             coordinatesReached = false;
             coordinateLock.unlock();
         }
-
-        return true;
     }
 
     @Override

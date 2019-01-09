@@ -393,7 +393,7 @@ public class Game {
                     entity.setShootable(false);
                     drawConsumer.consume(() -> entity.getHpView().hide());
                     entity.setVelocity(0);
-                    entity.pushSprite(explodeSprite, 0, aReturn2 -> {
+                    entity.pushSprite(explodeSprite, 0, () -> {
                         drawConsumer.consume(() -> entity.getView().hide());
                         entity.stop();
 //                        activeEnemies.remove(enemy);TODO is this nesesary
@@ -597,9 +597,9 @@ public class Game {
                 enemyDoubleDaemon.rotate(angle, ret1->{});
 
                 enemyDoubleDaemon.goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
-                        new Closure<Boolean>() {// gameConsumer
+                        new Runnable() {// gameConsumer
                             @Override
-                            public void onReturn(Return<Boolean> aReturn) {
+                            public void run() {
 
                                 Pair<Float, Float> currentCoord = enemyDoubleDaemon.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
@@ -630,7 +630,7 @@ public class Game {
                                 enemyDoubleDaemon.setVelocity(new ImageMover.Velocity(3, enemyDoubleDaemon.getVelocity().direction));
                                 enemyDoubleDaemon.rotate(angle, ret-> {});
 
-                                enemyDoubleDaemon.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this::onReturn);
+                                enemyDoubleDaemon.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this::run);
                             }
                         }
                 );
@@ -809,7 +809,7 @@ public class Game {
                 targetCoord.getFirst(),
                 targetCoord.getSecond(),
                 velocity,
-                aReturn -> {
+                () -> {
 
                     if (!enemy.isShootable()) {
                         bulletRepo.add(bulletDoubleDaemon);
@@ -824,7 +824,7 @@ public class Game {
                         enemyRepo.add(enemy);
                     }
 
-                    bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret2 -> bulletRepo.add(bulletDoubleDaemon));
+                    bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, () -> bulletRepo.add(bulletDoubleDaemon));
                 });
     }
 
@@ -865,7 +865,7 @@ public class Game {
 
         //rocketDoubleDaemon.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
 
-        rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, aReturn1 -> {
+        rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, () -> {
 
             if (!enemy.isShootable()) {
                 bulletRepo.add(rocketDoubleDaemon);
@@ -884,7 +884,7 @@ public class Game {
                     enemy.getLastCoordinates().getFirst(),
                     enemy.getLastCoordinates().getSecond(),
                     velocity,
-                    aReturn2->{
+                    ()->{
 
                         if (!enemy.isShootable()){
                             bulletRepo.add(rocketDoubleDaemon);
@@ -909,7 +909,7 @@ public class Game {
                             enemyRepo.add(enemy);
                         }
 
-                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, ret -> bulletRepo.add(rocketDoubleDaemon));
+                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, () -> bulletRepo.add(rocketDoubleDaemon));
                     });
         });
     }

@@ -7,6 +7,7 @@ import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.Arrays;
@@ -93,15 +94,17 @@ public class Enemy extends CoordinatedImageTranslationMover {
         this.rotationMover = new RotatingSpriteImageMover(sprite, velocity, startingPos);
     }
 
+    @GenerateRunnable
     @Override
-    public boolean pushSprite(Image [] sprite, float velocity) throws InterruptedException {
-        return rotationMover.pushSprite(sprite, velocity);
+    public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
+        rotationMover.pushSprite(sprite, velocity);
     }
 
+    @GenerateRunnable
     @DedicatedThread
     @Override
-    public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
-        return super.goTo(x, y, velocityInt);
+    public void goTo(float x, float y, float velocityInt) throws InterruptedException {
+        super.goTo(x, y, velocityInt);
     }
 
     public boolean rotate(int angle) throws InterruptedException {

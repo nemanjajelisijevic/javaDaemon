@@ -9,10 +9,10 @@ public abstract class Quest<T> implements Runnable {
   protected DaemonState state;
   protected String description = "";
   protected ReturnRunnable<T> returnRunnable;
-  private Consumer consumer;
+  protected Consumer consumer;
 
   public Quest() {
-    this.returnRunnable = new ReturnRunnable<T>();
+    this.returnRunnable = new ReturnRunnable<>();
   }
 
   public String getDescription() {

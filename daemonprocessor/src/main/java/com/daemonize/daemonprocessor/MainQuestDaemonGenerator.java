@@ -4,6 +4,7 @@ package com.daemonize.daemonprocessor;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.LogExecutionTime;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -31,6 +32,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     private Set<String> overloadedPrototypeMethods = new TreeSet<>();
     private String currentMainQuestName = "";
     private boolean returnInstance;
+
+    private final String VOID_QUEST_TYPE_NAME = "VoidMainQuest";
 
     private ClassName daemonEngineClass;
     private Map<ExecutableElement, Pair<String, FieldSpec>> dedicatedThreadEngines;
@@ -91,9 +94,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     public TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods) {
 
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
-                .addModifiers(
-                        Modifier.PUBLIC
-                ).addSuperinterface(daemonInterface);
+                .addModifiers(Modifier.PUBLIC)
+                .addSuperinterface(daemonInterface);
 
         daemonClassBuilder = addTypeParameters(classElement, daemonClassBuilder);
 
@@ -101,7 +103,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         for (ExecutableElement method : publicPrototypeMethods) {
             if (method.getAnnotation(CallingThread.class) != null) {
-                daemonClassBuilder.addMethod(copyMethod(method));
+                daemonClassBuilder.addMethod(wrapMethod(method));
                 continue;
             }
 
@@ -200,8 +202,12 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
 
+        boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
+
+        ClassName className = voidWithRunnable ? ClassName.get(QUEST_PACKAGE, VOID_QUEST_TYPE_NAME) : ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME);
+
         TypeName mainQuestOfRet = ParameterizedTypeName.get(
-                ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME),
+                className,
                 prototypeMethodData.getMethodRetTypeName()
         );
 
@@ -230,7 +236,9 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         for (Pair<TypeName, String> parameter : prototypeMethodData.getParameters()){
             mainQuestBuilder.addField(parameter.getFirst(), parameter.getSecond(),Modifier.PRIVATE);
             mainQuestConstructorBuilder.addParameter(parameter.getFirst(), parameter.getSecond());
+
         }
+
 
         if(!prototypeMethodData.isVoid()) {
             mainQuestConstructorBuilder.addParameter(
@@ -239,7 +247,11 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             );
             mainQuestConstructorBuilder.addStatement("super(closure)");
         } else {
-            mainQuestConstructorBuilder.addStatement("setVoid()");
+            if (voidWithRunnable) {
+                mainQuestConstructorBuilder.addParameter(TypeName.get(Runnable.class), "retRun");
+                mainQuestConstructorBuilder.addStatement("super(retRun)");
+            } else
+                mainQuestConstructorBuilder.addStatement("setVoid()");
         }
 
         for (Pair<TypeName, String> parameter : prototypeMethodData.getParameters()){
@@ -275,6 +287,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addModifiers(Modifier.PUBLIC)
                 .addJavadoc("Prototype method {@link $N#$N}", prototypeMethod.getEnclosingElement().getSimpleName(), prototypeMethod.getSimpleName());
 
+        boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
+
         apiMethodBuilder = addTypeParameters(prototypeMethod, apiMethodBuilder);
 
         for (Pair<TypeName, String> field : prototypeMethodData.getParameters()) {
@@ -292,16 +306,27 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             apiMethodBuilder.addParameter(prototypeMethodData.getClosureOfRet(),"closure");
             apiMethodBuilder.addStatement(
                     daemonEngineString + ".pursueQuest(new "
-                            + currentMainQuestName + "MainQuest("
+                            + currentMainQuestName + QUEST_TYPE_NAME + "("
                             + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ")
                             + "closure))"
             );
         } else {
-            apiMethodBuilder.addStatement(
-                    daemonEngineString + ".pursueQuest(new "
-                            + currentMainQuestName + "MainQuest("
-                            + prototypeMethodData.getArguments() + "))"
-            );
+
+            if (voidWithRunnable) {
+
+                apiMethodBuilder.addParameter(TypeName.get(Runnable.class), "retRun");
+
+                apiMethodBuilder.addStatement(
+                        daemonEngineString + ".pursueQuest(new "
+                                + currentMainQuestName + QUEST_TYPE_NAME + "("
+                                + prototypeMethodData.getArguments() + ", retRun))"
+                );
+            } else
+                apiMethodBuilder.addStatement(
+                        daemonEngineString + ".pursueQuest(new "
+                                + currentMainQuestName + QUEST_TYPE_NAME + "("
+                                + prototypeMethodData.getArguments() + "))"
+                );
         }
 
         if (returnInstance) {
@@ -314,7 +339,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return apiMethodBuilder.build();
     }
 
-    public MethodSpec copyMethod(ExecutableElement prototypeMethod){
+    public MethodSpec wrapMethod(ExecutableElement prototypeMethod){
 
         PrototypeMethodData methodData = new PrototypeMethodData(prototypeMethod);
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(

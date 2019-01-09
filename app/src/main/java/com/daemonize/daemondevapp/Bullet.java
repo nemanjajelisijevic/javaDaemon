@@ -11,6 +11,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.ArrayList;
@@ -133,27 +134,29 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return this;
     }
 
+    @GenerateRunnable
     @Override
-    public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
-        return super.goTo(x, y, velocityInt);
+    public void goTo(float x, float y, float velocityInt) throws InterruptedException {
+        super.goTo(x, y, velocityInt);
     }
 
+    @GenerateRunnable
     @Override
-    public boolean pushSprite(Image [] sprite, float velocity) throws InterruptedException {
+    public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
         this.velocity.intensity = velocity;
-        return rotationMover.pushSprite(sprite, velocity);
+        rotationMover.pushSprite(sprite, velocity);
     }
 
-    public boolean rotate(int angle) throws InterruptedException {
-//        rotationMover.setCurrentAngle(currentAngle);
+    @GenerateRunnable
+    public void rotate(int angle) throws InterruptedException {
         rotationMover.rotate(angle);
-        return true;
     }
 
-    public boolean rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
+    @GenerateRunnable
+    public void rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
         setVelocity(0);
         rotationMover.rotate(angle);
-        return goTo(x, y, velocityInt);
+        goTo(x, y, velocityInt);
     }
 
     @CallingThread

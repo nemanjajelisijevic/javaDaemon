@@ -372,9 +372,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         protected TypeName getMethodRetTypeName() {
             return methodRetTypeName;
         }
-        protected boolean isVoid() {
-            return isVoid;
-        }
+        protected boolean isVoid() { return isVoid; }
         protected String getArguments() {
             return arguments;
         }

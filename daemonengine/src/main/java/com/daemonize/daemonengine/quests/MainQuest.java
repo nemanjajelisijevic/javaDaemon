@@ -18,11 +18,11 @@ public abstract class MainQuest<T> extends Quest<T> {
   public MainQuest(Closure<T> closure){
     this();
     this.closure = closure;
-    this.returnRunnable = new ReturnRunnable<>(closure);
+    this.returnRunnable.setClosure(closure);
   }
 
   @Override
-  public final void run() {
+  public void run() {
     try {
       T result = pursue();
       if (!Thread.currentThread().isInterrupted() && result != null) {

@@ -117,7 +117,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         for (ExecutableElement method : publicPrototypeMethods) {
 
             if (method.getAnnotation(CallingThread.class) != null) {
-                daemonClassBuilder.addMethod(mainGenerator.copyMethod(method));
+                daemonClassBuilder.addMethod(mainGenerator.wrapMethod(method));
                 continue;
             }
 

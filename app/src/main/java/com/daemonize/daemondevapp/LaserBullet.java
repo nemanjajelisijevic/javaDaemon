@@ -76,8 +76,8 @@ public class LaserBullet extends Bullet {
     }
 
     @Override
-    public boolean rotate(int angle) throws InterruptedException {
-        return super.rotate(angle);
+    public void rotate(int angle) throws InterruptedException {
+        super.rotate(angle);
     }
 
     public List<ImageView> desintegrateTarget(
