@@ -97,7 +97,7 @@ public class Game {
 
 
     //towers dialogue
-    private TowerScanClosure towerScanClosure;
+    //private TowerScanClosure towerScanClosure;
     private TowerUpgradeDialog towerUpgradeDialog;
     private TowerSelectDialogue selectTowerDialogue;
 //    private Image selectTowerBackgroudnImage;
@@ -166,71 +166,6 @@ public class Game {
                 imageAndView.getSecond().setAbsoluteX(imageAndView.getFirst().positionX);
                 imageAndView.getSecond().setAbsoluteY(imageAndView.getFirst().positionY);
                 imageAndView.getSecond().setImage(imageAndView.getFirst().image);
-            });
-        }
-    }
-
-    public class TowerScanClosure implements Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>> {
-
-        private TowerDaemon tower;
-
-        public TowerScanClosure(TowerDaemon tower) {
-            this.tower = tower;
-        }
-
-        @Override
-        public void onReturn(Return<Pair<Tower.TowerType, EnemyDoubleDaemon>> aReturn) {
-
-            long reloadInterval = tower.getTowerLevel().reloadInterval;
-
-            if (aReturn.uncheckAndGet() != null
-                    && aReturn.uncheckAndGet().getFirst() != null
-                    && aReturn.uncheckAndGet().getSecond() != null) {
-
-                switch (aReturn.get().getFirst()) {
-                    case TYPE1:
-                        fireBullet(
-                                tower.getLastCoordinates(),
-                                aReturn.uncheckAndGet().getSecond().getLastCoordinates(),
-                                aReturn.uncheckAndGet().getSecond(),
-                                25,
-                                tower.getTowerLevel().bulletDamage,
-                                tower.getTowerLevel().currentLevel
-                        );
-                        break;
-                    case TYPE2:
-                        fireRocketBullet(
-                                tower.getLastCoordinates(),
-                                aReturn.uncheckAndGet().getSecond(),
-                                18,
-                                tower.getTowerLevel().bulletDamage,
-                                tower.getTowerLevel().currentLevel
-                        );
-                        break;
-                    case TYPE3:
-
-                        double angle = RotatingSpriteImageMover.getAngle(
-                                tower.getLastCoordinates().getFirst(),
-                                tower.getLastCoordinates().getSecond(),
-                                aReturn.get().getSecond().getLastCoordinates().getFirst(),
-                                aReturn.get().getSecond().getLastCoordinates().getSecond()
-                        );
-
-                        tower.setCurrentAngle((int) angle);
-
-                        fireLaser(tower.getLastCoordinates(), aReturn.get().getSecond(), 300);
-                        reloadInterval = 1000;
-                        break;
-                    default:
-                        throw new IllegalStateException("Tower type does not exist!");
-                }
-            }
-
-            //tower.scan(this::onReturn);
-
-            tower.reload(reloadInterval, aReturn1 -> { // this method should name reload, after reloading we get the current list of active enemies, and scan over this list
-                //tower.scan(new ArrayList<>(activeEnemies), this);
-                tower.scan(this::onReturn);
             });
         }
     }
@@ -598,13 +533,11 @@ public class Game {
 
             Field firstField = grid.getField(0, 0);
 
-            enemyGenerator = new DummyDaemon(gameConsumer, enemyGenerateinterval).setClosure(ret->{
+            enemyGenerator = DummyDaemon.create(gameConsumer, enemyGenerateinterval).setClosure(ret->{
 
                 enemyCounter++;
 
-                //Log.d(DaemonUtils.tag(), "Enemy queue size: " + enemyQueue.size());
-
-                //every 15 enemies increase the pain!!!!
+                //every ... enemies increase the pain!!!!
                 if (enemyCounter % 3 == 0) {
 
                     if(enemyVelocity < 6)
@@ -640,7 +573,6 @@ public class Game {
                 Log.d(DaemonUtils.tag(), "Enemy state: " + enemyDoubleDaemon.getState());
 
                 enemyDoubleDaemon.start();
-//                enemyDoubleDaemon.rotate(0, ret1->{});
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(enemyDoubleDaemon.getLastCoordinates().getFirst(), enemyDoubleDaemon.getLastCoordinates().getSecond(), firstField.getCenterX(), firstField.getCenterY());
 
@@ -684,23 +616,9 @@ public class Game {
                             }
                         }
                 );
-
             });
 
             enemyGenerator.start();
-
-//            activeEnemies.setOnDepleted(()->{
-//                for (TowerDaemon tower: towers)
-//                    tower.pauseScan();
-//            });
-//
-//            activeEnemies.setOnFirstAdded(()->{
-//                for (TowerDaemon tower: towers)
-//                    tower.contScan();
-//            });
-
-            //try to garbage collect
-            //new DummyDaemon(gameConsumer, 3000).setClosure(aReturn -> System.gc()).start();
         });
     }
 
@@ -768,10 +686,63 @@ public class Game {
             field.setTower(towerDaemon);
 
             towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(gridViewMatrix[field.getRow()][field.getColumn()]));
-
             towerDaemon.start();
 
-            towerDaemon.scan(new TowerScanClosure(towerDaemon)::onReturn);
+            towerDaemon.scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
+                @Override
+                public void onReturn(Return<Pair<Tower.TowerType, EnemyDoubleDaemon>> towerTypeAndEnemy) {
+
+                    long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
+
+                    if (towerTypeAndEnemy.uncheckAndGet() != null
+                            && towerTypeAndEnemy.uncheckAndGet().getFirst() != null
+                            && towerTypeAndEnemy.uncheckAndGet().getSecond() != null) {
+
+                        Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
+                        EnemyDoubleDaemon enemy = towerTypeAndEnemy.get().getSecond();
+
+                        switch (towerType) {
+                            case TYPE1:
+                                fireBullet(
+                                        towerDaemon.getLastCoordinates(),
+                                        enemy.getLastCoordinates(),
+                                        enemy,
+                                        25,
+                                        towerDaemon.getTowerLevel().bulletDamage,
+                                        towerDaemon.getTowerLevel().currentLevel
+                                );
+                                break;
+                            case TYPE2:
+                                fireRocketBullet(
+                                        towerDaemon.getLastCoordinates(),
+                                        enemy,
+                                        18,
+                                        towerDaemon.getTowerLevel().bulletDamage,
+                                        towerDaemon.getTowerLevel().currentLevel
+                                );
+                                break;
+                            case TYPE3:
+
+                                double angle = RotatingSpriteImageMover.getAngle(
+                                        towerDaemon.getLastCoordinates().getFirst(),
+                                        towerDaemon.getLastCoordinates().getSecond(),
+                                        enemy.getLastCoordinates().getFirst(),
+                                        enemy.getLastCoordinates().getSecond()
+                                );
+
+                                towerDaemon.setCurrentAngle((int) angle);
+
+                                fireLaser(towerDaemon.getLastCoordinates(), enemy, 300);
+                                reloadInterval = 1000;
+                                break;
+                            default:
+                                throw new IllegalStateException("Tower type does not exist!");
+                        }
+                    }
+
+                    towerDaemon.reload(reloadInterval, aReturn1 -> towerDaemon.scan(this::onReturn));
+                }
+            });
         }
     }
 
@@ -787,7 +758,6 @@ public class Game {
             bullet.setLevel(noOfBulletsFired);
             bullet.setDamage(bulletDamage);
             bullet.setSprite(bulletSprite);
-
         });
 
         //rotation bullet before fire

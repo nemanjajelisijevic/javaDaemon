@@ -143,24 +143,6 @@ public class Tower extends RotatingSpriteImageMover {
         super.rotateTowards(x, y);
     }
 
-//    public Pair<TowerType, EnemyDoubleDaemon> scan (List<EnemyDoubleDaemon> activeEnemies) throws InterruptedException {
-//
-//        scanSemaphore.await();
-//
-//        for (EnemyDoubleDaemon enemy : activeEnemies) {
-//            if (Math.abs( lastX - enemy.getPrototype().getLastCoordinates().getFirst()) < range
-//                    && Math.abs(lastY - enemy.getPrototype().getLastCoordinates().getSecond()) < range) {
-//                rotateTowards(
-//                        enemy.getPrototype().getLastCoordinates().getFirst(),
-//                        enemy.getPrototype().getLastCoordinates().getSecond()
-//                );
-//                return Pair.create(towertype, enemy);
-//            }
-//        }
-//
-//        return Pair.create(null, null);
-//    }
-
     @DedicatedThread
     public Pair<TowerType, EnemyDoubleDaemon> scan() throws InterruptedException {
 
@@ -227,12 +209,13 @@ public class Tower extends RotatingSpriteImageMover {
         scanSemaphore.unsubscribe();
     }
 
+    private PositionedImage ret = new PositionedImage();
+
     @SideQuest(SLEEP = 25)
     @Override
     public PositionedImage animate() {
         try {
             pauseSemaphore.await();
-            PositionedImage ret = new PositionedImage();
             ret.image = iterateSprite();
             ret.positionX = lastX;
             ret.positionY = lastY;
