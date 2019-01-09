@@ -35,24 +35,24 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<T> {
     }
 
     @Override
-    public final T poll(EntityConfigurator<T> configurator) {
+    public final T get(EntityConfigurator<T> configurator) {
         T ret  = queue.poll();
         if (ret != null) {
             if (configurator != null)
                 configurator.configure(ret);
-            this.onPoll(ret);
+            this.onGet(ret);
         }
         return ret;
     }
 
     @Override
-    public final T poll() {
-        return poll(null);
+    public final T get() {
+        return get(null);
     }
 
     @Override
     public abstract void onAdd(T entity);
 
     @Override
-    public abstract T onPoll(T entity);
+    public abstract T onGet(T entity);
 }

@@ -402,7 +402,7 @@ public class Game {
                 }
 
                 @Override
-                public EnemyDoubleDaemon onPoll(EnemyDoubleDaemon entity) {
+                public EnemyDoubleDaemon onGet(EnemyDoubleDaemon entity) {
                     entity.setShootable(true);
                     entity.setCoordinates(grid.getStartingX(), grid.getStartingY());
                     entity.setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1, 0)));// todo maybe coeficient should be grid.first fild center
@@ -426,8 +426,8 @@ public class Game {
                 }
 
                 @Override
-                public BulletDoubleDaemon onPoll(BulletDoubleDaemon entity) {
-                    Log.d(DaemonUtils.tag(), "Bullet poll state: " + entity.getState());
+                public BulletDoubleDaemon onGet(BulletDoubleDaemon entity) {
+                    Log.d(DaemonUtils.tag(), "Bullet get state: " + entity.getState());
                     //entity.setVelocity(0);
                     drawConsumer.consume(()->{
                         for (ImageView view : entity.getViews())
@@ -580,8 +580,8 @@ public class Game {
                         bulletDamage += 1;
                 }
 
-//                EnemyDoubleDaemon enemy = enemyQueue.poll();
-                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.poll(enemy -> {
+//                EnemyDoubleDaemon enemy = enemyQueue.get();
+                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.get(enemy -> {
                     enemy.setName("Enemy no." + enemyCounter);
                     enemy.setMaxHp(enemyHp);
                     enemy.setHp(enemyHp);
@@ -784,7 +784,7 @@ public class Game {
 
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletRepo.size());
 
-        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.poll(bullet -> {
+        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.get(bullet -> {
             bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
             bullet.setLevel(noOfBulletsFired);
             bullet.setDamage(bulletDamage);
@@ -841,7 +841,7 @@ public class Game {
 
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletRepo.size());
 
-        BulletDoubleDaemon rocketDoubleDaemon = bulletRepo.poll(rocket->{
+        BulletDoubleDaemon rocketDoubleDaemon = bulletRepo.get(rocket->{
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
             rocket.setLevel(noOfBulletsFired);
             rocket.setDamage(bulletDamage);

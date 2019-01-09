@@ -145,9 +145,6 @@ public class LaserBullet extends Bullet {
         if (!fire || !target.isShootable())
             return null;
 
-//        if (target == null)
-//            throw new IllegalArgumentException("Target is null!");
-
         Velocity velocity = target.getVelocity();
         List<Pair<ImageView, PositionedImage>> ret = new LinkedList<>();
 
