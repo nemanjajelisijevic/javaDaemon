@@ -34,7 +34,7 @@ public class Return<T> {
         return result;
     }
 
-    public T uncheckAndGet() {
+    public T runtimeCheckAndGet() {
         if(error != null) {
             DaemonRuntimeError err = new DaemonRuntimeError(daemonDescription, error);
             err.setStackTrace(new StackTraceElement[]{});

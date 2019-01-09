@@ -149,7 +149,7 @@ public class Game {
 
         @Override
         public void onReturn(Return<ImageMover.PositionedImage> aReturn) {
-            ImageMover.PositionedImage posBmp = aReturn.uncheckAndGet();
+            ImageMover.PositionedImage posBmp = aReturn.runtimeCheckAndGet();
             view.setAbsoluteX(posBmp.positionX);
             view.setAbsoluteY(posBmp.positionY);
             view.setImage(posBmp.image);
@@ -159,8 +159,8 @@ public class Game {
     private static class MultiViewAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
-            GenericNode.forEach(aReturn.uncheckAndGet(), actionret -> {
-                Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.uncheckAndGet();
+            GenericNode.forEach(aReturn.runtimeCheckAndGet(), actionret -> {
+                Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.runtimeCheckAndGet();
                 imageAndView.getSecond().setAbsoluteX(imageAndView.getFirst().positionX);
                 imageAndView.getSecond().setAbsoluteY(imageAndView.getFirst().positionY);
                 imageAndView.getSecond().setImage(imageAndView.getFirst().image);
@@ -530,7 +530,7 @@ public class Game {
 
             laser.setViews(laserViews);
             laser.setAnimateLaserSideQuest().setClosure(ret->{
-                for (Pair<ImageView, ImageMover.PositionedImage> viewAndImage : ret.uncheckAndGet()) {
+                for (Pair<ImageView, ImageMover.PositionedImage> viewAndImage : ret.runtimeCheckAndGet()) {
                     viewAndImage.getFirst().setAbsoluteX(viewAndImage.getSecond().positionX);
                     viewAndImage.getFirst().setAbsoluteY(viewAndImage.getSecond().positionY);
                     viewAndImage.getFirst().setImage(viewAndImage.getSecond().image);
@@ -753,9 +753,9 @@ public class Game {
 
                         long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
 
-                        if (towerTypeAndEnemy.uncheckAndGet() != null
-                                && towerTypeAndEnemy.uncheckAndGet().getFirst() != null
-                                && towerTypeAndEnemy.uncheckAndGet().getSecond() != null) {
+                        if (towerTypeAndEnemy.runtimeCheckAndGet() != null
+                                && towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
+                                && towerTypeAndEnemy.runtimeCheckAndGet().getSecond() != null) {
 
                             Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
                             EnemyDoubleDaemon enemy = towerTypeAndEnemy.get().getSecond();
