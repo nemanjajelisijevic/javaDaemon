@@ -12,7 +12,7 @@ public interface EntityRepo<T> {
     }
 
     boolean add(T entity);
-    boolean add(T entity,boolean executOnAdd);
+
     T poll(EntityConfigurator<T> configurator);
     T poll();
 

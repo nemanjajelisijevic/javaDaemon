@@ -11,20 +11,26 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<T> {
         this.queue = new LinkedList<>();
     }
 
+    public QueuedEntityRepo(Queue<T> queue) {
+        this.queue = queue;
+    }
+
+    public void setQueue(Queue<T> queue) {
+        this.queue = queue;
+    }
+
+    public Queue<T> getQueue() {
+        return queue;
+    }
+
     @Override
     public int size() {
         return queue.size();
     }
 
     @Override
-    public final boolean add(T entity) {
-        return add(entity,false);
-    }
-
-    @Override
-    public boolean add(T entity, boolean ignoreOnAdd) {
-        if (!ignoreOnAdd)
-            this.onAdd(entity);
+    public boolean add(T entity) {
+        this.onAdd(entity);
         return queue.add(entity);
     }
 
