@@ -323,8 +323,7 @@ public class Game {
                 field.getTower().stop();
                 field.setTower(null);
 
-                boolean b = grid.destroyTower(field.getRow(), field.getColumn());
-                if (b) {
+                if (grid.destroyTower(field.getRow(), field.getColumn())) {
                     drawConsumer.consume(() -> {
                         gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).show();
                         towerUpgradeDialog.getTowerUpgrade().hide();
@@ -333,8 +332,16 @@ public class Game {
                 }
             });
 
-            towerUpgradeDialog =  new TowerUpgradeDialog(700,500,
-                   dialogueImageTowerUpgrade[0], upgradeButton, closeButton, saleButton, 810, 750 );//.setOnUpgrade(()->{
+            towerUpgradeDialog = new TowerUpgradeDialog(
+                    700,
+                    500,
+                    dialogueImageTowerUpgrade[0],
+                    upgradeButton,
+                    closeButton,
+                    saleButton,
+                    810,
+                    750
+            );
 
             Button tow1 = new Button("TowerType1",0,0,redTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE1;
@@ -699,6 +706,7 @@ public class Game {
                             .setImage(dialogueImageTowerUpgrade[currLvl.currentLevel - 1]);
 
                     towerUpgradeDialog.getTowerUpgrade().show();
+
                     if (hasSkillsToPayTheBills && tow.getTowerLevel().currentLevel < 3)
                         towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").show();
                     else
