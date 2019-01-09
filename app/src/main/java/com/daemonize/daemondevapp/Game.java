@@ -47,7 +47,6 @@ public class Game {
 
     //BackgroundImage
     private Image backgroundImage;
-    private ImageView backgroundView;
 
     //screen borders
     private int borderX;
@@ -81,8 +80,6 @@ public class Game {
 
     //towers
     private List<TowerDaemon> towers = new ArrayList<>();
-    private Queue<EnemyDoubleDaemon> enemyQueue = new LinkedList<>();
-    private int towerShootInterval = 1500;
     private int range = 250;
     private Tower.TowerType towerSelect;
 
@@ -98,15 +95,13 @@ public class Game {
 
 
     //towers dialogue
-    //private TowerScanClosure towerScanClosure;
     private TowerUpgradeDialog towerUpgradeDialog;
     private TowerSelectDialogue selectTowerDialogue;
-//    private Image selectTowerBackgroudnImage;
+
     private Image selection;
     private Image deselection;
 
     //enemies
-    //private ActiveEntitySet<EnemyDoubleDaemon> activeEnemies = new ActiveEntitySet();
     private int maxEnemies = 40;
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private Image[] enemySprite;
@@ -126,7 +121,6 @@ public class Game {
 
     //bullets
     private int maxBullets = 100;
-//    private Queue<BulletDoubleDaemon> bulletQueue = new LinkedList<>();
     private Image[] bulletSprite;
     private Image[] bulletSpriteLaser;
     private int bulletDamage = 2;
@@ -396,7 +390,6 @@ public class Game {
                     entity.pushSprite(explodeSprite, 0, () -> {
                         drawConsumer.consume(() -> entity.getView().hide());
                         entity.stop();
-//                        activeEnemies.remove(enemy);TODO is this nesesary
                         entity.setCoordinates(grid.getStartingX(), grid.getStartingY());
                     });
                 }
@@ -408,7 +401,6 @@ public class Game {
                     entity.setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1, 0)));// todo maybe coeficient should be grid.first fild center
                     drawConsumer.consume(()->entity.getView().show());
                     drawConsumer.consume(()->entity.getHpView().show());
-                    //activeEnemies.add(enemy); // todo why add enemy here and same 4 lines below
                     return entity;
                 }
             };
@@ -416,7 +408,6 @@ public class Game {
             bulletRepo = new QueuedEntityRepo<BulletDoubleDaemon>() {
                 @Override
                 public void onAdd(BulletDoubleDaemon entity) {
-
                     drawConsumer.consume(() -> {
                         for (ImageView view : entity.getViews())
                             view.hide();
@@ -428,7 +419,6 @@ public class Game {
                 @Override
                 public BulletDoubleDaemon onGet(BulletDoubleDaemon entity) {
                     Log.d(DaemonUtils.tag(), "Bullet get state: " + entity.getState());
-                    //entity.setVelocity(0);
                     drawConsumer.consume(()->{
                         for (ImageView view : entity.getViews())
                             view.show();
@@ -489,6 +479,7 @@ public class Game {
 
                 bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()-> bulletRepo.add(bulletDoubleDaemon));
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
+
                 bulletRepo.getQueue().add(bulletDoubleDaemon);
             }
 
@@ -580,7 +571,6 @@ public class Game {
                         bulletDamage += 1;
                 }
 
-//                EnemyDoubleDaemon enemy = enemyQueue.get();
                 EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.get(enemy -> {
                     enemy.setName("Enemy no." + enemyCounter);
                     enemy.setMaxHp(enemyHp);
@@ -594,7 +584,7 @@ public class Game {
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(enemyDoubleDaemon.getLastCoordinates().getFirst(), enemyDoubleDaemon.getLastCoordinates().getSecond(), firstField.getCenterX(), firstField.getCenterY());
 
-                enemyDoubleDaemon.rotate(angle, ret1->{});
+                enemyDoubleDaemon.rotate(angle);
 
                 enemyDoubleDaemon.goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
                         new Runnable() {// gameConsumer
@@ -628,7 +618,7 @@ public class Game {
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 int angle = (int) RotatingSpriteImageMover.getAngle(current.getCenterX(), current.getCenterY(), next.getCenterX(), next.getCenterY());
                                 enemyDoubleDaemon.setVelocity(new ImageMover.Velocity(3, enemyDoubleDaemon.getVelocity().direction));
-                                enemyDoubleDaemon.rotate(angle, ret-> {});
+                                enemyDoubleDaemon.rotate(angle);
 
                                 enemyDoubleDaemon.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this::run);
                             }

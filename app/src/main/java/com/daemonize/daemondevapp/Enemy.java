@@ -107,9 +107,8 @@ public class Enemy extends CoordinatedImageTranslationMover {
         super.goTo(x, y, velocityInt);
     }
 
-    public boolean rotate(int angle) throws InterruptedException {
+    public void rotate(int angle) throws InterruptedException {
         rotationMover.rotate(angle);
-        return true;
     }
 
     @CallingThread
