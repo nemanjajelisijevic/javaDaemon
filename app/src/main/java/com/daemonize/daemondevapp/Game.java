@@ -4,15 +4,20 @@ import android.util.Log;
 
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
+
 import com.daemonize.daemondevapp.images.Image;
+
 import com.daemonize.daemondevapp.renderer.Renderer2D;
 import com.daemonize.daemondevapp.scene.Scene2D;
+
 import com.daemonize.daemondevapp.tabel.Field;
 import com.daemonize.daemondevapp.tabel.Grid;
+
 import com.daemonize.daemondevapp.view.Button;
 import com.daemonize.daemondevapp.view.CompositeImageViewImpl;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemondevapp.view.ImageViewImpl;
+
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
@@ -120,6 +125,7 @@ public class Game {
     private Image[] bulletSprite;
     private Image[] bulletSpriteLaser;
     private int bulletDamage = 2;
+    private int rocketExplosionRange = 200;
 
 
     QueuedEntityRepo<BulletDoubleDaemon> bulletRepo;
@@ -900,9 +906,8 @@ public class Game {
                         float bulletX = rocketDoubleDaemon.getLastCoordinates().getFirst();
                         float bulletY = rocketDoubleDaemon.getLastCoordinates().getSecond();
 
-                        if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) > 200
-                                && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) > 200) {
-//                            bulletRepo.add(rocketDoubleDaemon); //todo in case if rocket miss enemy
+                        if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) > rocketExplosionRange
+                                && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) > rocketExplosionRange) {
                             return;
                         }
 
