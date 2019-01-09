@@ -312,8 +312,10 @@ public class Game {
                 TowerDaemon tower = towerUpgradeDialog.getTower();
 
                 Field field = grid.getField(tower.getLastCoordinates().getFirst(), tower.getLastCoordinates().getSecond());
+
                 field.getTower().stop();
                 field.setTower(null);
+
                 boolean b = grid.destroyTower(field.getRow(), field.getColumn());
                 if (b) {
                     drawConsumer.consume(() -> {
@@ -321,8 +323,6 @@ public class Game {
                         towerUpgradeDialog.getTowerUpgrade().hide();
                         infoScore.setNumbers(++score);
                     });
-                    tower.stop();
-                    towers.remove(tower);
                 }
             });
 
