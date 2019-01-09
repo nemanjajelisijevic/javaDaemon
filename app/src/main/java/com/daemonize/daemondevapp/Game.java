@@ -451,7 +451,7 @@ public class Game {
 
                 enemy.setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure());//gui consumer
 
-                enemyRepo.getQueue().add(enemy);
+                enemyRepo.getStructure().add(enemy);
 
             }
 
@@ -480,7 +480,7 @@ public class Game {
                 bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()-> bulletRepo.add(bulletDoubleDaemon));
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
-                bulletRepo.getQueue().add(bulletDoubleDaemon);
+                bulletRepo.getStructure().add(bulletDoubleDaemon);
             }
 
             laserViews = new ArrayList<>(laserViewNo);

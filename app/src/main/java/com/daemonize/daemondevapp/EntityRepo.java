@@ -1,12 +1,17 @@
 package com.daemonize.daemondevapp;
 
 
-public interface EntityRepo<T> {
+import java.util.Collection;
+
+public interface EntityRepo<C extends Collection<T>, T> {
 
     @FunctionalInterface
     interface EntityConfigurator<T> {
         void configure(T entity);
     }
+
+    void setStructure(C structure);
+    C getStructure();
 
     boolean add(T entity);
 

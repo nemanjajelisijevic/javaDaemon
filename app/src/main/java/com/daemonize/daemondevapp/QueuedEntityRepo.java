@@ -3,7 +3,7 @@ package com.daemonize.daemondevapp;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public abstract class QueuedEntityRepo<T> implements EntityRepo<T> {
+public abstract class QueuedEntityRepo<T> implements EntityRepo<Queue<T>, T> {
 
     protected Queue<T> queue;
 
@@ -15,11 +15,13 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<T> {
         this.queue = queue;
     }
 
-    public void setQueue(Queue<T> queue) {
-        this.queue = queue;
+    @Override
+    public void setStructure(Queue<T> structure) {
+        this.queue = structure;
     }
 
-    public Queue<T> getQueue() {
+    @Override
+    public Queue<T> getStructure() {
         return queue;
     }
 
