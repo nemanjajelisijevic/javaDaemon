@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.util.Log;
 
 import com.daemonize.daemondevapp.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.daemondevapp.imagemovers.ImageTranslationMover;
@@ -8,7 +7,7 @@ import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonUtils;
+
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
@@ -250,7 +249,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
         posImage2.positionY = posImage.positionY + spaceBetweenBullet*(offsetDirPosImage2.coeficientY);
 
         GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(posImage1, view));
-//        GenericNode<PositionedImage,ImageView> ret = new GenericNode<PositionedImage>(posImage1,view);
         root.addChild(new GenericNode<>(Pair.create(posImage2,view2)));
        return root;
 
