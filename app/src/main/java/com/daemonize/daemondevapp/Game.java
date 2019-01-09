@@ -8,6 +8,7 @@ import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 
 import com.daemonize.daemondevapp.renderer.Renderer2D;
+import com.daemonize.daemondevapp.repo.QueuedEntityRepo;
 import com.daemonize.daemondevapp.scene.Scene2D;
 
 import com.daemonize.daemondevapp.tabel.Field;

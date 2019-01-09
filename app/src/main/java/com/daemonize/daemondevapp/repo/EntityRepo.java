@@ -1,5 +1,4 @@
-package com.daemonize.daemondevapp;
-
+package com.daemonize.daemondevapp.repo;
 
 import java.util.Collection;
 
