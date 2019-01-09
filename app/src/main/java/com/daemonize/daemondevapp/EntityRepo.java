@@ -1,13 +1,10 @@
 package com.daemonize.daemondevapp;
 
-import com.daemonize.daemonengine.Daemon;
-
-import java.util.List;
 
 public interface EntityRepo<T> {
 
     @FunctionalInterface
-    public static interface EntityConfigurator<T> {
+    interface EntityConfigurator<T> {
         void configure(T entity);
     }
 
