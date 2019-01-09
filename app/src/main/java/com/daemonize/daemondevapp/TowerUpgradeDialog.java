@@ -7,14 +7,14 @@ import com.daemonize.daemondevapp.view.CompositeImageViewImpl;
 public class TowerUpgradeDialog {
 
     private CompositeImageViewImpl towerUpgrade;
-    private Tower tower;
+    private TowerDaemon tower;
     //private Image dialogueImageTowerUpgrade;
 
-    public Tower getTower() {
+    public TowerDaemon getTower() {
         return tower;
     }
 
-    public TowerUpgradeDialog setTower(Tower tower) {
+    public TowerUpgradeDialog setTower(TowerDaemon tower) {
         this.tower = tower;
         return this;
     }

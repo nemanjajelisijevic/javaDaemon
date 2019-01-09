@@ -269,7 +269,7 @@ public class Game {
 
             Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
 
-                Tower tow = towerUpgradeDialog.getTower();
+                Tower tow = towerUpgradeDialog.getTower().getPrototype();
                 tow.levelUp();
                 Image[] currentSprite = null;
                 switch (tow.getTowertype()) {
@@ -309,7 +309,9 @@ public class Game {
             Button saleButton = new Button("Sale", 0, 0, saleButtonImage).onClick(()->{
                 //contAll();
 
-                Field field = grid.getField(towerUpgradeDialog.getTower().getLastCoordinates().getFirst(), towerUpgradeDialog.getTower().getLastCoordinates().getSecond());
+                TowerDaemon tower = towerUpgradeDialog.getTower();
+
+                Field field = grid.getField(tower.getLastCoordinates().getFirst(), tower.getLastCoordinates().getSecond());
                 field.getTower().stop();
                 field.setTower(null);
                 boolean b = grid.destroyTower(field.getRow(), field.getColumn());
@@ -318,8 +320,9 @@ public class Game {
                         gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).show();
                         towerUpgradeDialog.getTowerUpgrade().hide();
                         infoScore.setNumbers(++score);
-
                     });
+                    tower.stop();
+                    towers.remove(tower);
                 }
             });
 
@@ -536,7 +539,7 @@ public class Game {
                         scoreTitleView,
                         viewsNum,
                         scorenumbersImages
-                ).setNumbers(00000);
+                ).setNumbers(0);
 
             });
 
@@ -643,7 +646,7 @@ public class Game {
 
                 //pauseAll();
                 Tower.TowerLevel currLvl = tow.getTowerLevel();
-                towerUpgradeDialog.setTower(tow.getPrototype());
+                towerUpgradeDialog.setTower(tow);
 
                 boolean hasSkillsToPayTheBills = score > 3;
 
