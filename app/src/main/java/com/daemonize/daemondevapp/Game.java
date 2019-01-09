@@ -139,7 +139,7 @@ public class Game {
     private int laserViewNo = 50;
 
     //closures
-    private class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
+    private static class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
         private ImageView view;
 
@@ -156,7 +156,7 @@ public class Game {
         }
     }
 
-    private class MultiViewAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private static class MultiViewAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
             GenericNode.forEach(aReturn.uncheckAndGet(), actionret -> {
