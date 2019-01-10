@@ -424,8 +424,12 @@ public class Game {
                                     new ImageMover.Direction(1, 0)
                             )
                     );
-                    drawConsumer.consume(()->enemy.getView().show());
-                    drawConsumer.consume(()->enemy.getHpView().show());
+
+                    drawConsumer.consume(()->{
+                        enemy.getView().show();
+                        enemy.getHpView().show();
+                    });
+
                     activeEnemies.add(enemy);
                     return enemy;
                 }
@@ -633,10 +637,6 @@ public class Game {
                                 Pair<Float, Float> currentCoord = enemyDoubleDaemon.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
-                                if (current == null) {
-                                    Log.e("MARKO ","coord x: "+currentCoord.getFirst()+", coord y: "+currentCoord.getSecond());
-                                }
-
                                 List<Field> neighbours = grid.getNeighbors(current);
                                 for(Field neighbour : neighbours) {
                                     if (neighbour.getTower() != null) {
@@ -655,9 +655,17 @@ public class Game {
                                 drawConsumer.consume(()->gridViewMatrix[current.getRow()][current.getColumn()].show());
 
                                 Field next = grid.getMinWeightOfNeighbors(current);
-                                int angle = (int) RotatingSpriteImageMover.getAngle(current.getCenterX(), current.getCenterY(), next.getCenterX(), next.getCenterY());
+
                                 enemyDoubleDaemon.setVelocity(new ImageMover.Velocity(3, enemyDoubleDaemon.getVelocity().direction));
-                                enemyDoubleDaemon.rotate(angle);
+
+                                enemyDoubleDaemon.rotate(
+                                        (int) RotatingSpriteImageMover.getAngle(
+                                                current.getCenterX(),
+                                                current.getCenterY(),
+                                                next.getCenterX(),
+                                                next.getCenterY()
+                                        )
+                                );
 
                                 enemyDoubleDaemon.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this::run);
                             }
