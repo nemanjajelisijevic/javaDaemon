@@ -149,10 +149,11 @@ public class Tower extends RotatingSpriteImageMover {
     @DedicatedThread
     public Pair<TowerType, EnemyDoubleDaemon> scan() throws InterruptedException {
 
+        //pause scan semaphore
         scanSemaphore.await();
 
-        EnemyDoubleDaemon target = null;
-        Pair<TowerType, EnemyDoubleDaemon> ret = Pair.create(null, null);
+        EnemyDoubleDaemon target;
+        Pair<TowerType, EnemyDoubleDaemon> scanRet = Pair.create(null, null);
 
         targetLock.lock();
         try {
@@ -162,23 +163,24 @@ public class Tower extends RotatingSpriteImageMover {
 
             target = targetQueue.peek();
 
-            if (target.isShootable() && (Math.abs(target.getLastCoordinates().getFirst() - lastX) < range && Math.abs(target.getLastCoordinates().getSecond() - lastY) < range)) {
-                ret = Pair.create(towertype, target);
-            } else {
+            if (target.isShootable()
+                    && (Math.abs(target.getLastCoordinates().getFirst() - lastX) < range
+                    && Math.abs(target.getLastCoordinates().getSecond() - lastY) < range)
+            )
+                scanRet = Pair.create(towertype, target);
+            else
                 targetQueue.poll();
-            }
 
         } finally {
             targetLock.unlock();
         }
 
-        if (target != null)
-            rotateTowards(
-                    target.getLastCoordinates().getFirst(),
-                    target.getLastCoordinates().getSecond()
-            );
+        rotateTowards(
+                target.getLastCoordinates().getFirst(),
+                target.getLastCoordinates().getSecond()
+        );
 
-        return ret;
+        return scanRet;
     }
 
 

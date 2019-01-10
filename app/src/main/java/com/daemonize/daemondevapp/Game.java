@@ -8,6 +8,7 @@ import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 
 import com.daemonize.daemondevapp.renderer.Renderer2D;
+import com.daemonize.daemondevapp.repo.EntityRepo;
 import com.daemonize.daemondevapp.repo.QueuedEntityRepo;
 import com.daemonize.daemondevapp.scene.Scene2D;
 
@@ -30,6 +31,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
@@ -109,6 +111,8 @@ public class Game {
     private Image[] enemySprite;
     private Image[] healthBarSprite;
 
+    private EntityRepo<Queue<EnemyDoubleDaemon>, EnemyDoubleDaemon> enemyRepo;
+
     //explosions
     private Image[] explodeSprite;
     private Image[] miniExplodeSprite;
@@ -128,9 +132,7 @@ public class Game {
     private int bulletDamage = 2;
     private int rocketExplosionRange = 200;
 
-
-    QueuedEntityRepo<BulletDoubleDaemon> bulletRepo;
-    QueuedEntityRepo<EnemyDoubleDaemon> enemyRepo;
+    private EntityRepo<Queue<BulletDoubleDaemon>, BulletDoubleDaemon> bulletRepo;
 
     //laser
     private LaserBulletDaemon laser;
@@ -753,8 +755,7 @@ public class Game {
 
                         long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
 
-                        if (towerTypeAndEnemy.runtimeCheckAndGet() != null
-                                && towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
+                        if (towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
                                 && towerTypeAndEnemy.runtimeCheckAndGet().getSecond() != null) {
 
                             Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();

@@ -25,8 +25,6 @@ public class Grid {
         return yCoordinateInReal;
     }
 
-    Lock gridLock  = new ReentrantLock();
-
     private Field[][] grid;
     int fieldWith ;
 
@@ -40,6 +38,7 @@ public class Grid {
 //        pathFinding.recalculate(this);//new Pair<>(0,0),new Pair<>(row - 1,column - 1)
 //
 //    }
+
     public boolean isInsideOfGrid (float x, float y){
         boolean in = false;
         float x2 = xCoordinateInReal + grid[0].length * fieldWith;
@@ -81,22 +80,17 @@ public class Grid {
     }
 
     public Field getField(int row, int column) {
-//        gridLock.lock();
-        Field ret = grid[row][column];
-//        gridLock.unlock();
-        return ret;
+        return grid[row][column];
     }
 
     public Field getField(float x, float y) {
-//        gridLock.lock();
+
         Field ret = null;
 
         if (isInsideOfGrid(x,y)) {
             int row = (int) ((y - yCoordinateInReal) / fieldWith);//TODO this shit right here
             int column = (int) ((x - xCoordinateInReal) / fieldWith);
             ret = grid[row][column];
-            //        gridLock.unlock();
-
         }
 
         return ret;
@@ -121,13 +115,11 @@ public class Grid {
     public boolean setTower(float x, float y) {
         int row = (int) ((y) / fieldWith);
         int column = (int) ((x) / fieldWith);
-
         return setTower(row, column);
     }
 
     public boolean setTower(int row, int column) {
 
-    //  gridLock.lock();
         if (!grid[row][column].isWalkable() ) return false;
         if (row == grid.length - 1 && column == grid[row].length - 1) return false;
 
@@ -147,12 +139,10 @@ public class Grid {
 
 
         if (acceptTower) {
-//            gridLock.unlock();
             return true;
         } else {
             grid = gridTemp;
             pathFinding.recalculate(this);
-//            gridLock.unlock();
             return false;
         }
     }
@@ -212,7 +202,6 @@ public class Grid {
     }
 
     public Field getMinWeightOfNeighbors(int row, int column) {
-//        gridLock.lock();
         List<Field> neighbors = new ArrayList<>();
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
@@ -241,7 +230,7 @@ public class Grid {
                 }
             }
         }
-//        gridLock.unlock();
+
         return currentMinField;
     }
 

@@ -31,7 +31,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     @SuppressWarnings("unchecked")
     @Override
-    public ImageTranslationMover setSprite(Image[] sprite) { //TODO That's how it must be
+    public ImageTranslationMover setSprite(Image[] sprite) {
         spriteIterator.setSprite(sprite);
         return this;
     }
@@ -96,6 +96,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ImageTranslationMover setBorders(float x1, float x2, float y1, float y2) {
         this.borderX1 = x1;
