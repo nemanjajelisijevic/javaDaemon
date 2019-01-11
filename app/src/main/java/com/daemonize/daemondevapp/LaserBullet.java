@@ -25,6 +25,12 @@ public class LaserBullet extends Bullet {
     private DaemonCountingSemaphore phaseLock;
 
     @CallingThread
+    @Override
+    public List<ImageView> getViews() {
+        return views;
+    }
+
+    @CallingThread
     public void setViews(List<ImageView> views) {
         this.views = views;
         this.photonList = new ArrayList<>(views.size());

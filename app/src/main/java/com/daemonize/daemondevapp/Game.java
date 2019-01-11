@@ -97,7 +97,6 @@ public class Game {
     private Image[] blueTowerUpgDialoge;
     private Image[] greenTowerUpgDialoge;
 
-
     //towers dialogue
     private TowerUpgradeDialog towerUpgradeDialog;
     private TowerSelectDialogue selectTowerDialogue;
@@ -277,7 +276,7 @@ public class Game {
 
             Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
 
-                Tower tow = towerUpgradeDialog.getTower().getPrototype();
+                TowerDaemon tow = towerUpgradeDialog.getTower();
                 tow.levelUp();
                 Image[] currentSprite = null;
                 switch (tow.getTowertype()) {
@@ -291,7 +290,9 @@ public class Game {
                         currentSprite =  greenTower.get(tow.getTowerLevel().currentLevel - 1);
                         break;
                 }
+
                 tow.setRotationSprite(currentSprite);
+                tow.updateSprite(update->drawConsumer.consume(()->new ImageAnimateClosure(tow.getView()).onReturn(update)));//hack
 
                 CompositeImageViewImpl towerView = towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView");
 
@@ -516,6 +517,8 @@ public class Game {
                 bulletRepo.getStructure().add(bulletDoubleDaemon);
             }
 
+
+
             //laser views init
             laserViews = new ArrayList<>(laserViewNo);
 
@@ -709,6 +712,7 @@ public class Game {
                 }
 
                 drawConsumer.consume(()->{
+
                     towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(borderX / 2);
                     towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(borderY / 2);
 

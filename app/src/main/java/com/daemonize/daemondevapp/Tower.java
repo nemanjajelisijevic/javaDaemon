@@ -58,7 +58,7 @@ public class Tower extends RotatingSpriteImageMover {
         if (!targetQueue.contains(target)) {
             if (targetQueue.isEmpty()) {
                 ret = targetQueue.add(target);
-                targetCondition.signal();
+                targetCondition.signalAll();
             } else {
                 ret = targetQueue.add(target);
             }
@@ -119,7 +119,7 @@ public class Tower extends RotatingSpriteImageMover {
         super(rotationSprite, 0, startingPos);
         this.range = range;
         this.towertype = type;
-        this.targetQueue = new LinkedList<EnemyDoubleDaemon>();
+        this.targetQueue = new LinkedList<>();
         this.targetLock = new ReentrantLock();
         this.targetCondition = targetLock.newCondition();
     }
@@ -216,15 +216,28 @@ public class Tower extends RotatingSpriteImageMover {
 
     private PositionedImage ret = new PositionedImage();
 
+    public PositionedImage updateSprite() {//hack but improves performance
+        ret.image = iterateSprite();
+        ret.positionX = lastX;
+        ret.positionY = lastY;
+        return ret;
+    }
+
     @SideQuest(SLEEP = 25)
     @Override
     public PositionedImage animate() {
         try {
             pauseSemaphore.await();
-            ret.image = iterateSprite();
-            ret.positionX = lastX;
-            ret.positionY = lastY;
-            return ret;
+
+            targetLock.lock();
+            try {
+                while(targetQueue.isEmpty())
+                    targetCondition.await();
+            } finally {
+                targetLock.unlock();
+            }
+
+            return updateSprite();
         } catch (InterruptedException ex) {
             return null;
         }
