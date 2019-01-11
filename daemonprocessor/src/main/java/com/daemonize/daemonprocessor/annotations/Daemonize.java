@@ -1,8 +1,6 @@
 package com.daemonize.daemonprocessor.annotations;
 
 
-import com.daemonize.daemonprocessor.Platform;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,5 +13,5 @@ public @interface Daemonize {
     boolean returnDaemonInstance() default false;
     boolean doubleDaemonize() default false;
     String className() default "";
-    Platform platform() default Platform.ANDROID;
+    boolean consumer() default false;
 }

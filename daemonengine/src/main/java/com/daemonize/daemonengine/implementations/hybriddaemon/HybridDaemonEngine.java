@@ -21,13 +21,14 @@ public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQue
   }
 
   @Override
-  public void pursueQuest(MainQuest quest) {
-    addMainQuest(quest);
+  public boolean pursueQuest(MainQuest quest) {
+    boolean ret = addMainQuest(quest);
     if (getState().equals(DaemonState.STOPPED)) {
       start();
     } else if (getState().equals(DaemonState.SIDE_QUEST) && !daemonThread.isInterrupted()) {
       daemonThread.interrupt();
     }
+    return ret;
   }
 
   @Override

@@ -33,7 +33,8 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         this.mainGenerator = new MainQuestDaemonGenerator(
                 classElement,
                 false,
-                classElement.getAnnotation(Daemonize.class).returnDaemonInstance()
+                classElement.getAnnotation(Daemonize.class).returnDaemonInstance(),
+                classElement.getAnnotation(Daemonize.class).consumer()
         );
         this.sideGenerator = new SideQuestDaemonGenerator(classElement);
 
@@ -48,6 +49,9 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addModifiers(
                         Modifier.PUBLIC
                 ).addSuperinterface(daemonInterface);
+
+        if (mainGenerator.isConsumer())
+            daemonClassBuilder.addSuperinterface(consumerInterface);
 
         daemonClassBuilder = addTypeParameters(classElement, daemonClassBuilder);
 
@@ -170,6 +174,9 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
             daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
 
         }
+
+        if (mainGenerator.isConsumer())
+            daemonApiMethods.add(mainGenerator.generateConsumeMethod());
 
         for (MethodSpec apiMethod : daemonApiMethods) {
             daemonClassBuilder.addMethod(apiMethod);

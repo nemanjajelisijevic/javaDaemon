@@ -36,6 +36,15 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     private final String VOID_QUEST_TYPE_NAME = "VoidMainQuest";
 
     private ClassName daemonEngineClass;
+
+    private boolean consumerDaemon = false;
+
+    private String CONSUME_QUEST_TYPE_NAME = "ConsumeQuest";
+
+    public boolean isConsumer() {
+        return consumerDaemon;
+    }
+
     private Map<ExecutableElement, Pair<String, FieldSpec>> dedicatedThreadEngines;
 
     public Map<ExecutableElement, Pair<String, FieldSpec>> getDedicatedThreadEngines() {
@@ -52,19 +61,23 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         this(
                 classElement,
                 classElement.getAnnotation(Daemonize.class).eager(),
-                classElement.getAnnotation(Daemonize.class).returnDaemonInstance()
+                classElement.getAnnotation(Daemonize.class).returnDaemonInstance(),
+                classElement.getAnnotation(Daemonize.class).consumer()
         );
     }
 
     public MainQuestDaemonGenerator(
             TypeElement classElement,
             boolean eager,
-            boolean returnInstance
+            boolean returnInstance,
+            boolean consumer
     ) {
         super(classElement);
+
         if(eager) {
             daemonEngineSimpleName = "EagerMainQuestDaemonEngine";
         }
+
         this.returnInstance = returnInstance;
 
         this.daemonEngineClass = ClassName.get(daemonPackage, daemonEngineSimpleName);
@@ -86,9 +99,10 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             );
         }
 
-        if(!dedicatedThreadMethods.isEmpty())
+        if (!dedicatedThreadMethods.isEmpty())
             autoGenerateApiMethods = false;
 
+        this.consumerDaemon = consumer;
     }
 
     public TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods) {
@@ -96,6 +110,9 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
                 .addModifiers(Modifier.PUBLIC)
                 .addSuperinterface(daemonInterface);
+
+        if (consumerDaemon)
+            daemonClassBuilder.addSuperinterface(consumerInterface);
 
         daemonClassBuilder = addTypeParameters(classElement, daemonClassBuilder);
 
@@ -189,6 +206,9 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
 
         }
+
+        if (consumerDaemon)
+            daemonApiMethods.add(generateConsumeMethod());
 
         for (MethodSpec apiMethod : daemonApiMethods) {
             daemonClassBuilder.addMethod(apiMethod);
@@ -409,6 +429,17 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         return  builder.addStatement("return this")
                .build();
+    }
+
+
+    public MethodSpec generateConsumeMethod(){
+        return MethodSpec.methodBuilder("consume")
+                .addParameter(TypeName.get(Runnable.class), "runnable")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(boolean.class)
+                .addStatement("return " + daemonEngineString + ".pursueQuest(new $T(runnable))", ClassName.get(QUEST_PACKAGE, CONSUME_QUEST_TYPE_NAME))
+                .build();
     }
 
 }

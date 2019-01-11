@@ -16,11 +16,13 @@ public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine {
   }
 
   @Override
-  protected void addMainQuest(MainQuest quest) {
+  protected boolean addMainQuest(MainQuest quest) {
+    boolean ret;
     mainQuestLock.lock();
-    mainQuestQueue.add(quest);//TODO check ret of this expression
+    ret = mainQuestQueue.add(quest);//TODO check ret of this expression
     mainQuestAvailable.signal();
     mainQuestLock.unlock();
+    return ret;
   }
 
   @Override

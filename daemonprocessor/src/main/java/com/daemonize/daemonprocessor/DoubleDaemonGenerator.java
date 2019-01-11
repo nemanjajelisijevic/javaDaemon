@@ -30,7 +30,8 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         this.mainGenerator = new MainQuestDaemonGenerator(
                 classElement,
                 true,
-                classElement.getAnnotation(Daemonize.class).returnDaemonInstance()
+                classElement.getAnnotation(Daemonize.class).returnDaemonInstance(),
+                classElement.getAnnotation(Daemonize.class).consumer()
         );
         this.sideGenerator = new SideQuestDaemonGenerator(classElement);
 
@@ -43,9 +44,11 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
     public TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods) {
 
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
-                .addModifiers(
-                        Modifier.PUBLIC
-                ).addSuperinterface(daemonInterface);
+                .addModifiers(Modifier.PUBLIC)
+                .addSuperinterface(daemonInterface);
+
+        if (mainGenerator.isConsumer())
+            daemonClassBuilder.addSuperinterface(consumerInterface);
 
         daemonClassBuilder = addTypeParameters(classElement, daemonClassBuilder);
 
@@ -169,7 +172,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         //Add API METHODS
         List<MethodSpec> apiMethods = new ArrayList<>(7);
 
-
         apiMethods.add(generateGetPrototypeDaemonApiMethod());
         apiMethods.add(generateSetPrototypeDaemonApiMethod());
         apiMethods.add(sideGenerator.generateStartDaemonApiMethod());
@@ -181,6 +183,9 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(generateSetMainConsumerDaemonApiMethod());
         apiMethods.add(generateSetSideConsumerDaemonApiMethod());
         apiMethods.add(generateSetConsumerDaemonApiMethod());
+
+        if (mainGenerator.isConsumer())
+            apiMethods.add(mainGenerator.generateConsumeMethod());
 
         for(MethodSpec apiMethod : apiMethods) {
             daemonClassBuilder.addMethod(apiMethod);

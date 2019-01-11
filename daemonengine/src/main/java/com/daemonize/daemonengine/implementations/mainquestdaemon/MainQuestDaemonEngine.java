@@ -23,17 +23,20 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine {
     super(consumer);
   }
 
-  protected void addMainQuest(MainQuest quest) {
+  protected boolean addMainQuest(MainQuest quest) {
+    boolean ret;
     mainQuestLock.lock();
-    mainQuestQueue.add(quest);
+    ret = mainQuestQueue.add(quest);
     mainQuestLock.unlock();
+    return ret;
   }
 
-  public void pursueQuest(MainQuest quest) {
-    addMainQuest(quest);
+  public boolean pursueQuest(MainQuest quest) {
+    boolean ret = addMainQuest(quest);
     if (getState().equals(DaemonState.STOPPED)) {
       start();
     }
+    return ret;
   }
 
   //returns null

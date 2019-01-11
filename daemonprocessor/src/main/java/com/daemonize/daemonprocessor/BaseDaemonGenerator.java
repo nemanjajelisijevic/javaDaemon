@@ -71,7 +71,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     protected final ClassName DAEMON_UTILS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "DaemonUtils");
     private final ClassName TIMEUNITS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "TimeUnits");
 
-
     protected TypeElement classElement;
 
     protected String prototypeClassQualifiedName;
@@ -80,11 +79,15 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     protected String packageName;
     protected String daemonSimpleName;
 
-    protected Platform platform;
     protected String returnRunnableType;
 
     protected String daemonPackage;
     protected String daemonEngineSimpleName;
+
+    protected final String CONSUME_QUEST_TYPE_NAME = "ConsumeQuest";
+    protected final String CONSUMER_PACKAGE_ROOT = "com.daemonize.daemonengine.consumer";
+
+    protected ClassName consumerInterface = ClassName.get(CONSUMER_PACKAGE_ROOT, "Consumer");
 
     public String getDaemonPackage() {
         return daemonPackage;
@@ -117,8 +120,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         this.prototypeClassQualifiedName = classElement.getQualifiedName().toString();
         this.prototypeClassSimpleName = classElement.getSimpleName().toString();
         this.packageName = prototypeClassQualifiedName.substring(0, prototypeClassQualifiedName.lastIndexOf("."));
-        this.platform = classElement.getAnnotation(Daemonize.class).platform();
-        this.returnRunnableType = platform.equals(Platform.ANDROID) ? "AndroidReturnRunnable" : "ReturnRunnable"; //TODO REFACTOR THIS!!!
         String name = classElement.getAnnotation(Daemonize.class).className();
         this.daemonSimpleName = name.isEmpty() ? prototypeClassSimpleName + "Daemon" : name;
 
