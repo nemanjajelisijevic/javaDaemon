@@ -296,9 +296,6 @@ public class Game {
 
                 CompositeImageViewImpl towerView = towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView");
 
-                if (towerView == null)
-                    throw new IllegalStateException("towerView == null");
-
                 drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
 
                 if (score > 2 && tow.getTowerLevel().currentLevel < 3)
@@ -557,7 +554,7 @@ public class Game {
             //laser start
             laser.start();
 
-            //hide the grid at start and init score keeping dialogue
+            //hide the grid at start and draw the score keeping dialogue
             drawConsumer.consume(()->{
 
                 for(int j = 0; j < rows; ++j ) {
