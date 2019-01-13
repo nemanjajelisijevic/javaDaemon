@@ -1,13 +1,12 @@
 # javaDaemon
-java code generator/library for concurrent execution. Based on the thread per object idea.
-
+java code generator/library for creating service objects. Based on the thread per object idea.
 
 Generates a wrapper (Daemon) class which is an async representation of an annotated prototype class. Or an interface.
-It encapsulates the prototype instance and a thread that executes all the prototype method bodies in its own context,
-allowing the calling thread to loop and be responsive.
+It encapsulates the prototype instance and a thread that executes all the prototype method bodies in its own context, 
+queuing the return value to a consuming (calling thread), allowing the calling thread to loop and be responsive.
 
 It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with similar signature,
-differing in one thing. The return value is mapped to an output type argument
+differing in one thing. The return value is mapped to an output argument of a type:
    
     public interface Closure<ReturnType> {
       void onReturn(Return<ReturnType> ret);
@@ -16,10 +15,10 @@ differing in one thing. The return value is mapped to an output type argument
 which is implemented and instantiated upon the Daemon method's call, and handed to the main looper for execution once 
 the prototype method returns in Daemon threads context.
     
-Closure exposes an abstract method onReturn() for implementation, which takes the prototype methods return value as an
+Closure exposes an abstract method onReturn(ReturnType ret) for implementation, which takes the prototype methods return value as an
 argument.
 
-That being said, a Daemon can be called anywhere (multiple producers), but it only returns a Closure to the to the settable
+That being said, a Daemon can be called anywhere, but it only returns a Closure to the to the settable
 consumer thread (thread stuck in an event loop ie. UI thread).
 
 Underneath, Daemon is a thread that waits on a queue for a called method, or if configured in service 
@@ -31,7 +30,7 @@ For now, consumer implementation is android only as a main looper wrapper.
 Daemonengine is a library that holds the classes needed to run the Daemons.
 
 Daemonprocessor is an annotation processor that generates the Daemon class (.java source file using Javapoet and Java apt 
-api) with dependencies to the daemonengine lib, by parsing your prototype class.
+api) with dependencies to the daemonengine lib, by parsing users prototype class.
 
 Some clarification with an example:
 
