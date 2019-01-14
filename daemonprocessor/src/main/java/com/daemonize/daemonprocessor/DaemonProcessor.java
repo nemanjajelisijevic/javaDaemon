@@ -86,11 +86,6 @@ public class DaemonProcessor extends AbstractProcessor {
 
                 DaemonGenerator generator;
 
-                messager.printMessage(
-                        Diagnostic.Kind.NOTE,
-                        "Annotated type found: " + classElement.asType().toString() + ", consumer: " + classElement.getAnnotation(Daemonize.class).consumer()
-                );
-
                 if(sideQuestMethods.isEmpty()) {
                     generator = new MainQuestDaemonGenerator(((TypeElement) classElement));
                 } else {
