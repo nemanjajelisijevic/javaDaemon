@@ -73,7 +73,7 @@ public class Game {
     private Image fieldImage;
     private Image fieldImageTower;
     private Image fieldImageTowerDen;
-    private Image [] dialogueImageTowerUpgrade;
+    private Image[] dialogueImageTowerUpgrade;
     private Image upgradeButtonImage;
     private Image saleButtonImage;
     private Image closeButtonImage;
@@ -635,9 +635,8 @@ public class Game {
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
                                 for(Field neighbour : grid.getNeighbors(current)) {
-                                    if (neighbour.getTower() != null) {
+                                    if (neighbour.getTower() != null)
                                         neighbour.getTower().addTarget(enemyDoubleDaemon);
-                                    }
                                 }
 
                                 //show enemy progress on grid
@@ -816,10 +815,6 @@ public class Game {
             int bulletDamage,
             int noOfBulletsFired
     ) {
-
-        if (!enemy.isShootable())
-            return;
-
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletRepo.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet -> {
@@ -860,10 +855,6 @@ public class Game {
             int bulletDamage,
             int noOfBulletsFired
     ) {
-
-        if (!enemy.isShootable())
-            return;
-
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletRepo.size());
 
         BulletDoubleDaemon rocketDoubleDaemon = bulletRepo.configureAndGet(rocket->{
@@ -1076,5 +1067,4 @@ public class Game {
         dialogueImageTowerUpgrade =  redTowerUpgDialoge;
         return this;
     }
-
 }
