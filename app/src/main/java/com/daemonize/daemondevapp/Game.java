@@ -389,17 +389,15 @@ public class Game {
 
             drawConsumer.consume(()->selectTowerDialogue.getSelectTowerDialogue().show());
 
-            for (ImageView view : viewsNum) {
+            for (ImageView view : viewsNum)
                 scene.addImageView(view);
-            }
 
             //grid views
             gridViewMatrix = new ImageView[rows][columns];
 
-            for(int j = 0; j < rows; ++j ) {
-                for (int i = 0; i < columns; ++i) {
+            for (int j = 0; j < rows; ++j ) {
+                for (int i = 0; i < columns; ++i)
                     gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3));
-                }
             }
 
             //enemy repo init
