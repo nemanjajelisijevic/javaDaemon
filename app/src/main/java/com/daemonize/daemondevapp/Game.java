@@ -402,11 +402,11 @@ public class Game {
                 @Override
                 public void onAdd(EnemyDoubleDaemon enemy) {
                     enemy.setShootable(false);
-                    drawConsumer.consume(() -> enemy.getHpView().hide());
+                    drawConsumer.consume(enemy.getHpView()::hide);
                     enemy.setVelocity(0);
                     activeEnemies.remove(enemy);
                     enemy.pushSprite(explodeSprite, 0, () -> {
-                        drawConsumer.consume(() -> enemy.getView().hide());
+                        drawConsumer.consume(enemy.getView()::hide);
                         enemy.stop();
                         enemy.setCoordinates(grid.getStartingX(), grid.getStartingY());
                     });
@@ -479,7 +479,7 @@ public class Game {
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-                enemy.setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure());//gui consumer
+                enemy.setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);//gui consumer
 
                 enemyRepo.getStructure().add(enemy);
 
@@ -609,7 +609,7 @@ public class Game {
                         bulletDamage += 1;
                 }
 
-                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.get(enemy -> {
+                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.configureAndGet(enemy -> {
                     enemy.setName("Enemy no." + enemyCounter);
                     enemy.setMaxHp(enemyHp);
                     enemy.setHp(enemyHp);
@@ -755,7 +755,7 @@ public class Game {
 
                 field.setTower(towerDaemon);
 
-                towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(gridViewMatrix[field.getRow()][field.getColumn()]));
+                towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(gridViewMatrix[field.getRow()][field.getColumn()])::onReturn);
                 towerDaemon.start();
 
                 towerDaemon.scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
@@ -830,7 +830,7 @@ public class Game {
 
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletRepo.size());
 
-        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.get(bullet -> {
+        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet -> {
             bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
             bullet.setLevel(noOfBulletsFired);
             bullet.setDamage(bulletDamage);
@@ -874,7 +874,7 @@ public class Game {
 
         Log.i(DaemonUtils.tag(), "Bullet queue size: " + bulletRepo.size());
 
-        BulletDoubleDaemon rocketDoubleDaemon = bulletRepo.get(rocket->{
+        BulletDoubleDaemon rocketDoubleDaemon = bulletRepo.configureAndGet(rocket->{
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
             rocket.setLevel(noOfBulletsFired);
             rocket.setDamage(bulletDamage);

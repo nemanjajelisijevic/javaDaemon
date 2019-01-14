@@ -14,7 +14,8 @@ public interface EntityRepo<C extends Collection<T>, T> {
 
     boolean add(T entity);
 
-    T get(EntityConfigurator<T> configurator);
+    T configureAndGet(EntityConfigurator<T> configurator);
+    T getAndConfigure(EntityConfigurator<T> configurator);
     T get();
 
     void onAdd(T entity);

@@ -37,7 +37,7 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<Queue<T>, T> {
     }
 
     @Override
-    public final T get(EntityConfigurator<T> configurator) {
+    public final T configureAndGet(EntityConfigurator<T> configurator) {
         T ret  = queue.poll();
         if (ret != null) {
             if (configurator != null)
@@ -48,8 +48,19 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<Queue<T>, T> {
     }
 
     @Override
+    public T getAndConfigure(EntityConfigurator<T> configurator) {
+        T ret = queue.poll();
+        if(ret != null) {
+            this.onGet(ret);
+            if (configurator != null)
+                configurator.configure(ret);
+        }
+        return null;
+    }
+
+    @Override
     public final T get() {
-        return get(null);
+        return configureAndGet(null);
     }
 
     @Override

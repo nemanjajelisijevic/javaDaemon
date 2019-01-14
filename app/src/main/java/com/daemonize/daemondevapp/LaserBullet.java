@@ -69,7 +69,6 @@ public class LaserBullet extends Bullet {
         return spriteIterator.iterateSprite();
     }
 
-
     public LaserBullet(
             Image[] sprite,
             float velocity,
@@ -97,7 +96,7 @@ public class LaserBullet extends Bullet {
             return null;
 
         for (ImageView view : views)
-            drawConsumer.consume(()->view.hide());
+            drawConsumer.consume(view::hide);
 
         this.target = target;
 
@@ -123,7 +122,7 @@ public class LaserBullet extends Bullet {
             photonList.add(current);
             current = photonList.get(photonList.size() - 1).clone();
             ImageView currView = views.get(i);
-            drawConsumer.consume(()->currView.show());
+            drawConsumer.consume(currView::show);
         }
 
         fire = true;
