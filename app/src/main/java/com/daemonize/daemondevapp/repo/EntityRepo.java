@@ -19,7 +19,7 @@ public interface EntityRepo<C extends Collection<T>, T> {
     T get();
 
     void onAdd(T entity);
-    T onGet(T entity);
+    void onGet(T entity);
 
     //List<T> asList();
     int size();

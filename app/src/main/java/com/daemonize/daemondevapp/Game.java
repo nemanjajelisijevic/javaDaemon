@@ -222,7 +222,7 @@ public class Game {
     public Game stop(){
         enemyGenerator.stop();
         for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
-        for (TowerDaemon tower : towers) tower.stop();
+        //for (TowerDaemon tower : towers) tower.stop();
         laser.stop();
         drawConsumer.stop();
         gameConsumer.stop();
@@ -264,7 +264,6 @@ public class Game {
             dialogue.addChild(new GenericNode<>(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(4)), "KILL DIALOGUE BUTTON"));
 
             scoreBackGrView = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(3).show();
-
             scoreTitleView = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(4).show();
 
             viewsNum = new ImageView[5];
@@ -299,9 +298,9 @@ public class Game {
                 drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
 
                 if (score > 2 && tow.getTowerLevel().currentLevel < 3)
-                    towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").show();
+                    drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").show());
                 else
-                    towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide();
+                    drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide());
 
                 score -= 2;
                 drawConsumer.consume(()->infoScore.setNumbers(score));
@@ -318,11 +317,17 @@ public class Game {
 
                 TowerDaemon tower = towerUpgradeDialog.getTower();
 
-                Field field = grid.getField(tower.getLastCoordinates().getFirst(), tower.getLastCoordinates().getSecond());
+                Field field = grid.getField(
+                        tower.getLastCoordinates().getFirst(),
+                        tower.getLastCoordinates().getSecond()
+                );
 
-                field.getTower().stop();
+                //stop and remove tower
+                tower.stop();
+                towers.remove(tower);
                 field.setTower(null);
 
+                //remove tower from grid and recalculate path
                 if (grid.destroyTower(field.getRow(), field.getColumn())) {
                     drawConsumer.consume(() -> {
                         gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).show();
@@ -382,7 +387,7 @@ public class Game {
             scene.addImageView(scoreBackGrView);
             scene.addImageView(scoreTitleView);
 
-            selectTowerDialogue.getSelectTowerDialogue().show();
+            drawConsumer.consume(()->selectTowerDialogue.getSelectTowerDialogue().show());
 
             for (ImageView view : viewsNum) {
                 scene.addImageView(view);
@@ -413,7 +418,7 @@ public class Game {
                 }
 
                 @Override
-                public EnemyDoubleDaemon onGet(EnemyDoubleDaemon enemy) {
+                public void onGet(EnemyDoubleDaemon enemy) {
                     enemy.setShootable(true);
                     enemy.setCoordinates(grid.getStartingX(), grid.getStartingY());
                     enemy.setVelocity(
@@ -429,7 +434,6 @@ public class Game {
                     });
 
                     activeEnemies.add(enemy);
-                    return enemy;
                 }
             };
 
@@ -446,13 +450,12 @@ public class Game {
                 }
 
                 @Override
-                public BulletDoubleDaemon onGet(BulletDoubleDaemon bullet) {
+                public void onGet(BulletDoubleDaemon bullet) {
                     Log.d(DaemonUtils.tag(), "Bullet get state: " + bullet.getState());
                     drawConsumer.consume(()->{
                         for (ImageView view : bullet.getViews())
                             view.show();
                     });
-                    return bullet;
                 }
             };
 
@@ -482,7 +485,6 @@ public class Game {
                 enemy.setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);//gui consumer
 
                 enemyRepo.getStructure().add(enemy);
-
             }
 
             //init bullets and fill bullet repo
@@ -513,8 +515,6 @@ public class Game {
 
                 bulletRepo.getStructure().add(bulletDoubleDaemon);
             }
-
-
 
             //laser views init
             laserViews = new ArrayList<>(laserViewNo);
@@ -604,9 +604,8 @@ public class Game {
                     enemyGenerator.setSleepInterval((int)enemyGenerateinterval);
                 }
 
-                if (enemyCounter % 20 == 0) {
-                    if (bulletDamage < 10)
-                        bulletDamage += 1;
+                if (enemyCounter % 20 == 0 && bulletDamage < 10) {
+                    bulletDamage += 1;
                 }
 
                 EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.configureAndGet(enemy -> {
@@ -637,27 +636,25 @@ public class Game {
                                 Pair<Float, Float> currentCoord = enemyDoubleDaemon.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
-                                List<Field> neighbours = grid.getNeighbors(current);
-                                for(Field neighbour : neighbours) {
+                                for(Field neighbour : grid.getNeighbors(current)) {
                                     if (neighbour.getTower() != null) {
                                         neighbour.getTower().addTarget(enemyDoubleDaemon);
                                     }
                                 }
 
-                                if (current == null) return;//throw new IllegalStateException("Field can not be null");
-                                else if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
+                                //show enemy progress on grid
+                                drawConsumer.consume(()->gridViewMatrix[current.getRow()][current.getColumn()].show());
+
+                                //if enemy reaches last field
+                                if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     if (score > 0)
                                         drawConsumer.consume(()-> infoScore.setNumbers(--score));
                                     enemyRepo.add(enemyDoubleDaemon);
                                     return;
                                 }
 
-                                drawConsumer.consume(()->gridViewMatrix[current.getRow()][current.getColumn()].show());
-
+                                //go to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
-
-                                enemyDoubleDaemon.setVelocity(new ImageMover.Velocity(3, enemyDoubleDaemon.getVelocity().direction));
-
                                 enemyDoubleDaemon.rotate(
                                         (int) RotatingSpriteImageMover.getAngle(
                                                 current.getCenterX(),
@@ -684,14 +681,13 @@ public class Game {
         Field field = grid.getField(x, y);
         if (field == null) return;
 
-        //upgrade existing tower
         TowerDaemon tow = field.getTower();
-        if (tow != null) {
 
-            if (!towerUpgradeDialog.getTowerUpgrade().isShowing()) {
-
+        if (tow != null) {//upgrade existing tower
+            if (!towerUpgradeDialog.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
                 //pauseAll();
                 Tower.TowerLevel currLvl = tow.getTowerLevel();
+
                 towerUpgradeDialog.setTower(tow);
 
                 boolean hasSkillsToPayTheBills = score > 3;
@@ -708,10 +704,12 @@ public class Game {
                         break;
                 }
 
+                //show upgrade dialog
                 drawConsumer.consume(()->{
 
-                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteX(borderX / 2);
-                    towerUpgradeDialog.getTowerUpgrade().setAbsoluteY(borderY / 2);
+                    towerUpgradeDialog.getTowerUpgrade()
+                            .setAbsoluteX(borderX / 2)
+                            .setAbsoluteY(borderY / 2);
 
                     towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView")
                             .setImage(dialogueImageTowerUpgrade[currLvl.currentLevel - 1]);
@@ -724,19 +722,16 @@ public class Game {
                         towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide();
                 });
             }
-
-        } else if (pause) {
-
         } else { //init and set new tower
 
-            boolean b = grid.setTower(field.getRow(), field.getColumn());
+            ImageView fieldView = gridViewMatrix[field.getRow()][field.getColumn()];
 
-            Image image = grid.getField(field.getRow(), field.getColumn())
-                    .isWalkable() ? (!b ? fieldImageTowerDen : fieldImage) : currentTowerSprite[0];
+            //check if selected field is on the last remaining path
+            if (!grid.setTower(field.getRow(), field.getColumn())){
+                drawConsumer.consume(()->fieldView.setImage(fieldImageTowerDen).show());
+            } else {
 
-            drawConsumer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(image).show());
-
-            if (b) {
+                drawConsumer.consume(()->fieldView.setImage(currentTowerSprite[0]).show());
 
                 TowerDaemon towerDaemon = new TowerDaemon(
                         gameConsumer,
@@ -749,13 +744,12 @@ public class Game {
                         )
                 ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
 
-                towerDaemon.setView(gridViewMatrix[field.getRow()][field.getColumn()]);
+                towerDaemon.setView(fieldView);
 
                 towers.add(towerDaemon);
-
                 field.setTower(towerDaemon);
 
-                towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(gridViewMatrix[field.getRow()][field.getColumn()])::onReturn);
+                towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(fieldView)::onReturn);
                 towerDaemon.start();
 
                 towerDaemon.scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
@@ -809,7 +803,7 @@ public class Game {
                             }
                         }
 
-                        towerDaemon.reload(reloadInterval, ()-> towerDaemon.scan(this::onReturn));
+                        towerDaemon.reload(reloadInterval, ()->towerDaemon.scan(this::onReturn));
                     }
                 });
             }
@@ -853,11 +847,11 @@ public class Game {
             if (newHp > 0) {
                 enemy.setHp(newHp);
             } else {
-                drawConsumer.consume(() -> infoScore.setNumbers(++score));
+                drawConsumer.consume(()->infoScore.setNumbers(++score));
                 enemyRepo.add(enemy);
             }
 
-            bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, () -> bulletRepo.add(bulletDoubleDaemon));
+            bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
         });
     }
 
@@ -935,11 +929,11 @@ public class Game {
                         if (newHp > 0) {
                             enemy.setHp(newHp);
                         } else {
-                            drawConsumer.consume(() -> infoScore.setNumbers(++score));
+                            drawConsumer.consume(()->infoScore.setNumbers(++score));
                             enemyRepo.add(enemy);
                         }
 
-                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, () -> bulletRepo.add(rocketDoubleDaemon));
+                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, ()->bulletRepo.add(rocketDoubleDaemon));
                     });
         });
     }
@@ -950,7 +944,7 @@ public class Game {
             if (newHp > 0) {
                 enemy.setHp(newHp);
             } else {
-                drawConsumer.consume(() -> infoScore.setNumbers(++score));
+                drawConsumer.consume(()->infoScore.setNumbers(++score));
                 enemyRepo.add(enemy);
             }
         });

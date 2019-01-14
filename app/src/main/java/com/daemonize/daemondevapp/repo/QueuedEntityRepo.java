@@ -67,5 +67,5 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<Queue<T>, T> {
     public abstract void onAdd(T entity);
 
     @Override
-    public abstract T onGet(T entity);
+    public abstract void onGet(T entity);
 }
