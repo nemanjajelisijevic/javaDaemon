@@ -19,7 +19,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
     private ImageView view;
     private ImageView hpView;
     private int hpMax;
-    private volatile int hp = 30;
+    private volatile int hp;
     private volatile boolean shootable = true;
     private Image[] spriteHealthBarImage;
 
