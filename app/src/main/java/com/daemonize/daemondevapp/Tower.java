@@ -26,8 +26,8 @@ public class Tower extends RotatingSpriteImageMover {
     public enum TowerType {
         TYPE1,
         TYPE2,
-        TYPE3;
-    };
+        TYPE3
+    }
 
     public static class TowerLevel {
 
@@ -49,7 +49,6 @@ public class Tower extends RotatingSpriteImageMover {
     private volatile Queue<EnemyDoubleDaemon> targetQueue;
     private Lock targetLock;
     private Condition targetCondition;
-    //private volatile boolean targetFlag;
 
     @CallingThread
     public boolean addTarget(EnemyDoubleDaemon target) {
@@ -214,7 +213,7 @@ public class Tower extends RotatingSpriteImageMover {
         scanSemaphore.unsubscribe();
     }
 
-    private PositionedImage ret = new PositionedImage();
+    private volatile PositionedImage ret = new PositionedImage();
 
     public PositionedImage updateSprite() {//hack but improves performance
         ret.image = iterateSprite();

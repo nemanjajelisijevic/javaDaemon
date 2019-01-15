@@ -9,23 +9,23 @@ import java.util.Arrays;
 
 public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
-    //private int currentAngle;
     private volatile AngleToBitmapArray spriteBuffer;
     private volatile Image[] currentRotationSprite;
     private volatile int size;
 
     public void setRotationSprite(Image[] rotationSprite) {
-        //setSprite(Arrays.copyOf(rotationSprite, 1));
+        int currentAngle = spriteBuffer != null ? spriteBuffer.getCurrentAngle() : 0;
         int step = 360 / rotationSprite.length;
         this.spriteBuffer = new AngleToBitmapArray(rotationSprite, step);
         this.currentRotationSprite = new Image[(180 / step) + 1];
         this.size = 0;
+        popSprite();
+        this.spriteBuffer.setCurrentAngle(currentAngle);
         setSprite(new Image[]{spriteBuffer.getCurrent()});
     }
 
     public void setCurrentAngle(int currentAngle) {
         this.spriteBuffer.setCurrentAngle(currentAngle);
-        //this.currentAngle = currentAngle;
     }
 
     public RotatingSpriteImageMover(Image[] rotationSprite, float velocity, Pair<Float, Float> startingPos) {

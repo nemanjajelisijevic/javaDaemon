@@ -55,7 +55,7 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<Queue<T>, T> {
             if (configurator != null)
                 configurator.configure(ret);
         }
-        return null;
+        return ret;
     }
 
     @Override

@@ -35,8 +35,13 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
-
 public class Game {
+
+    //running flag
+    private volatile boolean running;
+
+    //pause flag
+    private volatile boolean paused;
 
     //game threads
     private Renderer2D renderer;
@@ -61,7 +66,6 @@ public class Game {
     private int rows;
     private int columns;
     private ImageView[][] gridViewMatrix;
-    private GenericNode<ImageView> dialogue;
 
     //score
     private int score = 0;
@@ -80,41 +84,32 @@ public class Game {
     private Image scoreBackGrImage;
     private Image[] scorenumbersImages;
 
-    private boolean pause;
 
     //towers
-    private List<TowerDaemon> towers = new ArrayList<>();
-    private int range = 250;
-    private Tower.TowerType towerSelect;
-
-    private Image[] currentTowerSprite;
+    private Image[] redTowerUpgSprite;
+    private Image[] blueTowerUpgSprite;
+    private Image[] greenTowerUpgSprite;
 
     private List<Image[]> redTower;
     private List<Image[]> blueTower;
     private List<Image[]> greenTower;
 
-    private Image[] redTowerUpgDialoge;
-    private Image[] blueTowerUpgDialoge;
-    private Image[] greenTowerUpgDialoge;
+    private Set<TowerDaemon> towers = new HashSet<>();
+    private int range = 250;
+    private Tower.TowerType towerSelect;
+
+    private Image[] currentTowerSprite;
 
     //towers dialogue
-    private TowerUpgradeDialog towerUpgradeDialog;
+    private TowerUpgradeDialog towerUpgradeDialogue;
     private TowerSelectDialogue selectTowerDialogue;
 
     private Image selection;
     private Image deselection;
 
     //enemies
-    private int maxEnemies = 40;
-    private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
     private Image[] enemySprite;
     private Image[] healthBarSprite;
-
-    private EntityRepo<Queue<EnemyDoubleDaemon>, EnemyDoubleDaemon> enemyRepo;
-
-    //explosions
-    private Image[] explodeSprite;
-    private Image[] miniExplodeSprite;
 
     private DummyDaemon enemyGenerator;
     private long enemyCounter = 0;
@@ -122,15 +117,24 @@ public class Game {
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
     private long waveInterval = 20000;
-    private long levelGenerateinterval = 5000;
+
+    private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
+
+    private int maxEnemies = 40;
+    private EntityRepo<Queue<EnemyDoubleDaemon>, EnemyDoubleDaemon> enemyRepo;
+
+    //explosions
+    private Image[] explodeSprite;
+    private Image[] miniExplodeSprite;
 
     //bullets
-    private int maxBullets = 100;
     private Image[] bulletSprite;
-    private Image[] bulletSpriteLaser;
+    private Image[] bulletSpriteRocket;
+
     private int bulletDamage = 2;
     private int rocketExplosionRange = 200;
 
+    private int maxBullets = 100;
     private EntityRepo<Queue<BulletDoubleDaemon>, BulletDoubleDaemon> bulletRepo;
 
     //laser
@@ -138,6 +142,13 @@ public class Game {
     private List<ImageView> laserViews;
     private Image[] laserSprite;
     private int laserViewNo = 50;
+
+    //random int
+    private Random random = new Random();
+
+    private int getRandomInt(int min, int max) {
+        return random.nextInt((max - min) + 1) + min;
+    }
 
     //closures
     private static class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
@@ -169,11 +180,6 @@ public class Game {
         }
     }
 
-    private static int getRandomInt(int min, int max) {
-        Random r = new Random();
-        return r.nextInt((max - min) + 1) + min;
-    }
-
     public Game(Renderer2D renderer, int rows, int columns, float x, float y, int fieldWidth) {
         this.renderer = renderer;
         this.scene = new Scene2D();
@@ -190,51 +196,69 @@ public class Game {
         );
     }
 
-    public void pauseAll() {
-        pause = true;
-        enemyGenerator.stop();
-        for (EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) {
-            enemy.pause();
-        }
-        for (TowerDaemon tower : towers) {
-            tower.pause();
-        }
+    public boolean isPaused() {
+        return paused;
     }
 
-    public void contAll() { //continueAll
-        pause = false;
-        enemyGenerator.start();
-        for (EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) {
-            enemy.cont();
-        }
-        for (TowerDaemon tower : towers) {
-            tower.cont();
-        }
+    public void pause() {
+        gameConsumer.consume(()->{
+            enemyGenerator.stop();
+            for (EnemyDoubleDaemon enemy : activeEnemies)
+                enemy.pause();
+            for (TowerDaemon tower : towers)
+                tower.pause();
+            renderer.stop();
+            paused = true;
+        });
+
+    }
+
+    public void cont() { //continueAll
+        gameConsumer.consume(()->{
+            enemyGenerator.start();
+            for (EnemyDoubleDaemon enemy : activeEnemies)
+                enemy.cont();
+            for (TowerDaemon tower : towers)
+                tower.cont();
+            renderer.start();
+            paused = false;
+        });
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     public Game run() {
-        drawConsumer.start();
+        gameConsumer.consume(()->{
+            drawConsumer.start();
+            gameConsumer.consume(()->chain.run());
+            this.running = true;
+            this.paused = false;
+        });
         gameConsumer.start();
-        gameConsumer.consume(()->chain.run());
         return this;
     }
 
     public Game stop(){
-        enemyGenerator.stop();
-        for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
-        //for (TowerDaemon tower : towers) tower.stop();
-        laser.stop();
-        drawConsumer.stop();
-        gameConsumer.stop();
-        scene.unlockViews();
-        renderer.stop();
+        gameConsumer.consume(()->{
+            enemyGenerator.stop();
+            for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
+            for (TowerDaemon tower : towers) tower.stop();
+            laser.stop();
+            drawConsumer.stop();
+            scene.unlockViews();
+            renderer.stop();
+            this.running = false;
+            gameConsumer.stop();
+        });
         return this;
     }
 
     public Game onTouch(float x, float y) {
         gameConsumer.consume(()->{
-            if (towerUpgradeDialog.getTowerUpgrade().isShowing()){
-                towerUpgradeDialog.getTowerUpgrade().checkCoordinates(x, y);
+            if (towerUpgradeDialogue.getTowerUpgrade().isShowing()){
+                towerUpgradeDialogue.getTowerUpgrade().checkCoordinates(x, y);
             } else {
 
                 if (selectTowerDialogue.getSelectTowerDialogue().isShowing()){
@@ -260,9 +284,6 @@ public class Game {
             scene.addImageView(new ImageViewImpl().setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
 
             //dialogues and ui views
-            dialogue = new GenericNode<>(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)), "TEST DIALOGUE");
-            dialogue.addChild(new GenericNode<>(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(4)), "KILL DIALOGUE BUTTON"));
-
             scoreBackGrView = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(3).show();
             scoreTitleView = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(4).show();
 
@@ -275,7 +296,7 @@ public class Game {
 
             Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
 
-                TowerDaemon tow = towerUpgradeDialog.getTower();
+                TowerDaemon tow = towerUpgradeDialogue.getTower();
                 tow.levelUp();
                 Image[] currentSprite = null;
                 switch (tow.getTowertype()) {
@@ -291,16 +312,24 @@ public class Game {
                 }
 
                 tow.setRotationSprite(currentSprite);
-                tow.updateSprite(update->drawConsumer.consume(()->new ImageAnimateClosure(tow.getView()).onReturn(update)));//hack
 
-                CompositeImageViewImpl towerView = towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView");
+                //drawConsumer.consume(()->new ImageAnimateClosure(tow.getView()).onReturn(tow.updateSprite()));
+
+                tow.updateSprite(update-> drawConsumer.consume(()->{
+                    ImageMover.PositionedImage posBmp = update.runtimeCheckAndGet();
+                    tow.getView().setAbsoluteX(posBmp.positionX);
+                    tow.getView().setAbsoluteY(posBmp.positionY);
+                    tow.getView().setImage(posBmp.image);
+                }));
+
+                CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
 
                 drawConsumer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
 
                 if (score > 2 && tow.getTowerLevel().currentLevel < 3)
-                    drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").show());
+                    drawConsumer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").show());
                 else
-                    drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide());
+                    drawConsumer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide());
 
                 score -= 2;
                 drawConsumer.consume(()->infoScore.setNumbers(score));
@@ -308,14 +337,13 @@ public class Game {
             });
 
 
-            Button closeButton = new Button("Close", 0, 0, closeButtonImage).onClick(()->{
-                drawConsumer.consume(()->towerUpgradeDialog.getTowerUpgrade().hide());
-            });
+            Button closeButton = new Button("Close", 0, 0, closeButtonImage).onClick(()->
+                drawConsumer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().hide()));
 
             Button saleButton = new Button("Sale", 0, 0, saleButtonImage).onClick(()->{
-                //contAll();
+                //cont();
 
-                TowerDaemon tower = towerUpgradeDialog.getTower();
+                TowerDaemon tower = towerUpgradeDialogue.getTower();
 
                 Field field = grid.getField(
                         tower.getLastCoordinates().getFirst(),
@@ -331,13 +359,13 @@ public class Game {
                 if (grid.destroyTower(field.getRow(), field.getColumn())) {
                     drawConsumer.consume(() -> {
                         gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).show();
-                        towerUpgradeDialog.getTowerUpgrade().hide();
+                        towerUpgradeDialogue.getTowerUpgrade().hide();
                         infoScore.setNumbers(++score);
                     });
                 }
             });
 
-            towerUpgradeDialog = new TowerUpgradeDialog(
+            towerUpgradeDialogue = new TowerUpgradeDialog(
                     700,
                     500,
                     dialogueImageTowerUpgrade[0],
@@ -382,7 +410,7 @@ public class Game {
                     tow3
             );
 
-            scene.addImageViews(towerUpgradeDialog.getTowerUpgrade().getAllViews());
+            scene.addImageViews(towerUpgradeDialogue.getTowerUpgrade().getAllViews());
             scene.addImageViews(selectTowerDialogue.getSelectTowerDialogue().getAllViews());
             scene.addImageView(scoreBackGrView);
             scene.addImageView(scoreTitleView);
@@ -471,7 +499,7 @@ public class Game {
                         ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
                         .setHpView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
                         .setHealthBarImage(healthBarSprite)
-                ).setName("Enemy no. " + i);
+                ).setName("Enemy instance no.: " + i);
 
                 enemy.getPrototype().setBorders(
                         grid.getStartingX(),
@@ -492,7 +520,7 @@ public class Game {
                         gameConsumer,
                         drawConsumer,
                         new Bullet(
-                                /*bulletSprite,*/bulletSpriteLaser,
+                                /*bulletSprite,*/bulletSpriteRocket,
                                 0,
                                 Pair.create((float) 0, (float) 0),
                                 bulletDamage
@@ -606,16 +634,14 @@ public class Game {
                     bulletDamage += 1;
                 }
 
-                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.configureAndGet(enemy -> {
-                    enemy.setName("Enemy no." + enemyCounter);
+                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy -> {
                     enemy.setMaxHp(enemyHp);
                     enemy.setHp(enemyHp);
                 });
 
+                Log.d(DaemonUtils.tag(), "Enemy counter: " + enemyCounter);
                 Log.d(DaemonUtils.tag(), "Enemy queue size: " + enemyRepo.size());
                 Log.d(DaemonUtils.tag(), "Enemy state: " + enemyDoubleDaemon.getState());
-
-                enemyDoubleDaemon.start();
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(
                         enemyDoubleDaemon.getLastCoordinates().getFirst(),
@@ -623,6 +649,8 @@ public class Game {
                         firstField.getCenterX(),
                         firstField.getCenterY()
                 );
+
+                enemyDoubleDaemon.start();
 
                 enemyDoubleDaemon.rotate(angle);
 
@@ -681,44 +709,49 @@ public class Game {
         TowerDaemon tow = field.getTower();
 
         if (tow != null) {//upgrade existing tower
-            if (!towerUpgradeDialog.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
-                //pauseAll();
+            if (!towerUpgradeDialogue.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
+                //pause();
                 Tower.TowerLevel currLvl = tow.getTowerLevel();
 
-                towerUpgradeDialog.setTower(tow);
+                towerUpgradeDialogue.setTower(tow);
 
                 boolean hasSkillsToPayTheBills = score > 3;
 
                 switch (tow.getTowertype()) {
                     case TYPE1:
-                        dialogueImageTowerUpgrade = redTowerUpgDialoge;
+                        dialogueImageTowerUpgrade = redTowerUpgSprite;
                         break;
                     case TYPE2:
-                        dialogueImageTowerUpgrade = blueTowerUpgDialoge;
+                        dialogueImageTowerUpgrade = blueTowerUpgSprite;
                         break;
                     case TYPE3:
-                        dialogueImageTowerUpgrade = greenTowerUpgDialoge;
+                        dialogueImageTowerUpgrade = greenTowerUpgSprite;
                         break;
                 }
 
                 //show upgrade dialog
                 drawConsumer.consume(()->{
 
-                    towerUpgradeDialog.getTowerUpgrade()
+                    towerUpgradeDialogue.getTowerUpgrade()
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2);
 
-                    towerUpgradeDialog.getTowerUpgrade().getViewByName("TowerView")
+                    towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView")
                             .setImage(dialogueImageTowerUpgrade[currLvl.currentLevel - 1]);
 
-                    towerUpgradeDialog.getTowerUpgrade().show();
+                    towerUpgradeDialogue.getTowerUpgrade().show();
 
                     if (hasSkillsToPayTheBills && tow.getTowerLevel().currentLevel < 3)
-                        towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").show();
+                        towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").show();
                     else
-                        towerUpgradeDialog.getTowerUpgrade().getViewByName("Upgrade").hide();
+                        towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide();
                 });
             }
+
+
+            Log.w(DaemonUtils.tag(), "TOWER STATE: " + tow.getState());
+            Log.w(DaemonUtils.tag(), tow.getName() + (towers.contains(tow) ? " IS IN ACTIVE TOWERS!" : " IS NOT IN ACTIVE TOWERS!"));
+
         } else { //init and set new tower
 
             ImageView fieldView = gridViewMatrix[field.getRow()][field.getColumn()];
@@ -861,7 +894,7 @@ public class Game {
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
             rocket.setLevel(noOfBulletsFired);
             rocket.setDamage(bulletDamage);
-            rocket.setSprite(bulletSpriteLaser);
+            rocket.setSprite(bulletSpriteRocket);
         });
 
         int launchX = getRandomInt((int)(sourceCoord.getFirst() - 50), (int)(sourceCoord.getFirst() + 50));
@@ -976,8 +1009,8 @@ public class Game {
         this.bulletSprite = bulletSprite;
         return this;
     }
-    public Game setBulletSpriteLaser(Image[] bulletSpriteLaser) {
-        this.bulletSpriteLaser = bulletSpriteLaser;
+    public Game setBulletSpriteRocket(Image[] bulletSpriteRocket) {
+        this.bulletSpriteRocket = bulletSpriteRocket;
         return this;
     }
 
@@ -1061,10 +1094,10 @@ public class Game {
     }
 
     public Game setUpgradeTowerDialogue(Image[] upgDialogTowerI,Image[] upgDialogTowerII,Image[] upgDialogTowerIII){
-        redTowerUpgDialoge = upgDialogTowerI;
-        blueTowerUpgDialoge = upgDialogTowerII;
-        greenTowerUpgDialoge = upgDialogTowerIII;
-        dialogueImageTowerUpgrade =  redTowerUpgDialoge;
+        redTowerUpgSprite = upgDialogTowerI;
+        blueTowerUpgSprite = upgDialogTowerII;
+        greenTowerUpgSprite = upgDialogTowerIII;
+        dialogueImageTowerUpgrade = redTowerUpgSprite;
         return this;
     }
 }
