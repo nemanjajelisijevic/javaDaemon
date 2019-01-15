@@ -624,10 +624,10 @@ public class Game {
                     }
 
                     enemyHp++;
-                    enemyGenerator.setSleepInterval((int)waveInterval);//TODO set long as param in DaemonGenerators
+                    enemyGenerator.setSleepInterval(waveInterval);//TODO set long as param in DaemonGenerators
 
                 } else {
-                    enemyGenerator.setSleepInterval((int)enemyGenerateinterval);
+                    enemyGenerator.setSleepInterval(enemyGenerateinterval);
                 }
 
                 if (enemyCounter % 20 == 0 && bulletDamage < 10) {
