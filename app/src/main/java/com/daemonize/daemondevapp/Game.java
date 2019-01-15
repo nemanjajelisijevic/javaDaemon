@@ -748,10 +748,6 @@ public class Game {
                 });
             }
 
-
-            Log.w(DaemonUtils.tag(), "TOWER STATE: " + tow.getState());
-            Log.w(DaemonUtils.tag(), tow.getName() + (towers.contains(tow) ? " IS IN ACTIVE TOWERS!" : " IS NOT IN ACTIVE TOWERS!"));
-
         } else { //init and set new tower
 
             ImageView fieldView = gridViewMatrix[field.getRow()][field.getColumn()];
