@@ -16,7 +16,6 @@ import android.view.WindowManager;
 import com.daemonize.daemondevapp.images.AndroidBitmapImage;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.renderer.AndroidSurfaceViewRenderer;
-import com.daemonize.daemondevapp.renderer.Renderer2D;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
@@ -260,10 +259,8 @@ public class MainActivity extends AppCompatActivity {
                     .setFieldImageTowerDen(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), width, height, false)))
                     .setEnemySprite(sprite)
                     .setBulletSprite(bulletSprite)
-                    .setBulletSpriteLaser(spriteRocket)
-                    .setLaserSprite(new Image[]{
-                            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenPhoton.png")), 10, 10, false))
-                    })
+                    .setBulletSpriteRocket(spriteRocket)
+                    .setLaserSprite(new Image[]{new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenPhoton.png")), 10, 10, false))})
                     .setExplodeSprite(explosionSprite)
                     .setMiniExplodeSprite(miniExplosionSprite)
                     .setRedTower(redTowerI, redTowerII, redTowerIII)
@@ -285,6 +282,10 @@ public class MainActivity extends AppCompatActivity {
             Log.e(DaemonUtils.tag(), "Could not init game!", ex);
         }
 
+
+        if(!game.isRunning())
+            game.run();
+
         Log.e(DaemonUtils.tag(), "ACTIVITY ON CREATE----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 
@@ -293,7 +294,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         Log.e(DaemonUtils.tag(), "ACTIVITY ON START----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
-        game.run();
     }
 
     @Override
@@ -308,25 +308,30 @@ public class MainActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         Log.w(DaemonUtils.tag(), "ACTIVITY ON RESUME----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+        if (game.isRunning() && game.isPaused())
+            game.cont();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.w(DaemonUtils.tag(), "ACTIVITY ON ON PAUSE----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+        if (game.isRunning() && !game.isPaused())
+            game.pause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         Log.e(DaemonUtils.tag(), "ACTIVITY ON STOP----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
-        game.stop();
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Log.e(DaemonUtils.tag(), "ACTIVITY ON DESTROY----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+        game.stop();
     }
 
     @Override

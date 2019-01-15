@@ -26,7 +26,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
     private ImageView view3;
 
     private int level = 1;
-    private volatile int damage = 2;
+    private volatile int damage;
 
     private RotatingSpriteImageMover rotationMover;
 

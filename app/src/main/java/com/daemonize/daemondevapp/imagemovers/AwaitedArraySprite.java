@@ -23,7 +23,7 @@ public class AwaitedArraySprite<T> {
         return this;
     }
 
-    public AwaitedArraySprite<T> clearCache() {
+    public synchronized AwaitedArraySprite<T> clearCache() {
         sprite = null;
         return this;
     }
