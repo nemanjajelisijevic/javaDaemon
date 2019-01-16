@@ -68,4 +68,10 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<Queue<T>, T> {
 
     @Override
     public abstract void onGet(T entity);
+
+    @Override
+    public void forEach(EntityConfigurator<T> configurator) {
+        for(T entity : getStructure())
+            configurator.configure(entity);
+    }
 }

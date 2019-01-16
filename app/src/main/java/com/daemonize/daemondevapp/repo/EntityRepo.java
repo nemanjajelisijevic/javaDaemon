@@ -24,4 +24,6 @@ public interface EntityRepo<C extends Collection<T>, T> {
     //List<T> asList();
     int size();
 
+    void forEach(EntityConfigurator<T> configurator);
+
 }

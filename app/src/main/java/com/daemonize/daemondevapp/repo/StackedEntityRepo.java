@@ -68,4 +68,10 @@ public abstract class StackedEntityRepo<T> implements EntityRepo<Stack<T>, T> {
     public int size() {
         return stack.size();
     }
+
+    @Override
+    public void forEach(EntityConfigurator<T> configurator) {
+        for(T entity : getStructure())
+            configurator.configure(entity);
+    }
 }

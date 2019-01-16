@@ -335,7 +335,6 @@ public class Game {
 
                 score -= 2;
                 drawConsumer.consume(()->infoScore.setNumbers(score));
-
             });
 
 
