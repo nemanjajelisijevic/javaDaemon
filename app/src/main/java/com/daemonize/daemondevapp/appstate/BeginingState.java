@@ -27,9 +27,9 @@ public class BeginingState extends DaemonState<BeginingState> {
     @Override
     public void enter() {
 
+        //TODO Daemon to be used here...
 
-
-        transientStatePreparer.prepareTransientState(ret-> transition(ret.get()));
+        transientStatePreparer.prepareTransientState(ret->transition(ret.get()));
 
     }
 

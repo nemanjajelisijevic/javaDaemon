@@ -11,6 +11,7 @@ import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.renderer.Renderer2D;
 import com.daemonize.daemondevapp.repo.EntityRepo;
 import com.daemonize.daemondevapp.repo.QueuedEntityRepo;
+import com.daemonize.daemondevapp.repo.StackedEntityRepo;
 import com.daemonize.daemondevapp.scene.Scene2D;
 
 import com.daemonize.daemondevapp.tabel.Field;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.Stack;
 
 public class Game {
 
@@ -136,7 +138,7 @@ public class Game {
     private int rocketExplosionRange = 200;
 
     private int maxBullets = 100;
-    private EntityRepo<Queue<BulletDoubleDaemon>, BulletDoubleDaemon> bulletRepo;
+    private EntityRepo<Stack<BulletDoubleDaemon>, BulletDoubleDaemon> bulletRepo;
 
     //laser
     private LaserBulletDaemon laser;
@@ -465,7 +467,7 @@ public class Game {
             };
 
             //bullet repo init
-            bulletRepo = new QueuedEntityRepo<BulletDoubleDaemon>() {
+            bulletRepo = new StackedEntityRepo<BulletDoubleDaemon>() {
                 @Override
                 public void onAdd(BulletDoubleDaemon bullet) {
                     drawConsumer.consume(() -> {
@@ -540,7 +542,7 @@ public class Game {
                 bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()-> bulletRepo.add(bulletDoubleDaemon));
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
-                bulletRepo.getStructure().add(bulletDoubleDaemon);
+                bulletRepo.getStructure().push(bulletDoubleDaemon);
             }
 
             //laser views init
