@@ -305,7 +305,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
         MethodSpec.Builder apiMethodBuilder = MethodSpec.methodBuilder(prototypeMethodData.getMethodName())
                 .addModifiers(Modifier.PUBLIC)
-                .addJavadoc("Prototype method {@link $N#$N}", prototypeMethod.getEnclosingElement().getSimpleName(), prototypeMethod.getSimpleName());
+                .addJavadoc("Prototype mapped method {@link $N#$N}", prototypeMethod.getEnclosingElement().getSimpleName(), prototypeMethod.getSimpleName());
 
         boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
 
