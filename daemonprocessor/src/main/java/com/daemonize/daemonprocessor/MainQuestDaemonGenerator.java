@@ -339,7 +339,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 apiMethodBuilder.addStatement(
                         daemonEngineString + ".pursueQuest(new "
                                 + currentMainQuestName + QUEST_TYPE_NAME + "("
-                                + prototypeMethodData.getArguments() + ", retRun))"
+                                + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ") + "retRun))"
                 );
             } else
                 apiMethodBuilder.addStatement(
