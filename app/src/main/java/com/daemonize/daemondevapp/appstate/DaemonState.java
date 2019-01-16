@@ -13,9 +13,13 @@ public abstract class DaemonState<T extends DaemonState> {
         return (T) this;
     }
 
-    protected abstract void onEnter();
+    @SuppressWarnings("unchecked")
+    public final T enter() {
+        onEnter();
+        return (T) this;
+    }
 
-    public abstract void enter();
+    protected abstract void onEnter();
 
     protected abstract void onExit();
 
@@ -25,7 +29,6 @@ public abstract class DaemonState<T extends DaemonState> {
         consumer.consume(new Runnable() {
             @Override
             public void run() {
-                next.onEnter();
                 next.enter();
             }
         });

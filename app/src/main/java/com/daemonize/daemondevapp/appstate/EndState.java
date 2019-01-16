@@ -4,7 +4,7 @@ package com.daemonize.daemondevapp.appstate;
  * Created by nemanja.jelisijevic on 1/15/2019.
  */
 
-public class EndState extends DaemonState {
+public class EndState extends DaemonState<EndState> {
 
     private String number;
 
@@ -15,11 +15,6 @@ public class EndState extends DaemonState {
     @Override
     protected void onEnter() {
 
-    }
-
-    @Override
-    public void enter() {
-        System.out.println(this.getClass().getSimpleName() + " - Endeed up with a string: " + number);
     }
 
     @Override

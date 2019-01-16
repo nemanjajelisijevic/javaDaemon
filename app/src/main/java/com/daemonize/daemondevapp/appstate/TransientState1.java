@@ -4,7 +4,7 @@ package com.daemonize.daemondevapp.appstate;
  * Created by nemanja.jelisijevic on 1/15/2019.
  */
 
-public class TransientState1 extends DaemonState {
+public class TransientState1 extends DaemonState<TransientState1> {
 
     private Integer number;
 
@@ -16,11 +16,6 @@ public class TransientState1 extends DaemonState {
     @Override
     protected void onEnter() {
 
-    }
-
-    @Override
-    public void enter() {
-        transition(new EndState(number.toString()));
     }
 
     @Override
