@@ -2,7 +2,6 @@ package com.daemonize.daemondevapp;
 
 import android.util.Log;
 
-import com.daemonize.daemondevapp.appstate.BeginingState;
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 
