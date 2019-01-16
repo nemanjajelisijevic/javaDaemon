@@ -20,6 +20,7 @@ import java.util.TreeSet;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
@@ -120,6 +121,11 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         this.prototypeClassQualifiedName = classElement.getQualifiedName().toString();
         this.prototypeClassSimpleName = classElement.getSimpleName().toString();
         this.packageName = prototypeClassQualifiedName.substring(0, prototypeClassQualifiedName.lastIndexOf("."));
+
+        if (classElement.getNestingKind().equals(NestingKind.MEMBER)) {
+            this.packageName = this.packageName.substring(0, packageName.lastIndexOf("."));
+        }
+
         String name = classElement.getAnnotation(Daemonize.class).className();
         this.daemonSimpleName = name.isEmpty() ? prototypeClassSimpleName + "Daemon" : name;
 
@@ -188,7 +194,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     public MethodSpec generateGetPrototypeDaemonApiMethod() {
         return MethodSpec.methodBuilder("getPrototype")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(ClassName.get(packageName, prototypeClassSimpleName))
+                .returns(ClassName.get(classElement.asType()))
                 .addStatement("return prototype")
                 .build();
     }
@@ -196,7 +202,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     public MethodSpec generateSetPrototypeDaemonApiMethod() {
         return MethodSpec.methodBuilder("setPrototype")
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(packageName, prototypeClassSimpleName), "prototype")
+                .addParameter(ClassName.get(classElement.asType()), "prototype")
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement("this.prototype = prototype")
                 .addStatement("return this")
