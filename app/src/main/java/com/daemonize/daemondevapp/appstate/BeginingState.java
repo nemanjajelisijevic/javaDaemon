@@ -2,33 +2,39 @@ package com.daemonize.daemondevapp.appstate;
 
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 
-public class BeginingState extends DaemonState {
+public class BeginingState extends DaemonState<BeginingState> {
 
     private Float number;
+
+    private TransientStatePreparerDaemon transientStatePreparer;
 
     public BeginingState(Float number) {
         this.number = number;
     }
 
-    //@Daemonize
+    @Daemonize
     public static class TransientStatePreparer {
         public TransientState1 prepareTransientState(){
-            return new TransientState1(Integer.valueOf((int) 3.14F));
+            return new TransientState1((int) 3.14F);
         }
+    }
+
+    @Override
+    protected void onEnter() {
+        transientStatePreparer = new TransientStatePreparerDaemon(consumer, new TransientStatePreparer());
     }
 
     @Override
     public void enter() {
 
-        //com.daemonize.daemondevapp.appstate.TransientStatePreparerDaemon transientStatePreparer = new com.daemonize.daemondevapp.appstate.TransientStatePreparerDaemon(consumer, new TransientStatePreparer());
 
-        //transientStatePreparer.prepareTransientState(ret->transit(ret.get()));
 
-        //transit();
+        transientStatePreparer.prepareTransientState(ret-> transition(ret.get()));
+
     }
 
     @Override
     protected void onExit() {
-
+        transientStatePreparer.stop();
     }
 }

@@ -2,6 +2,7 @@ package com.daemonize.daemondevapp;
 
 import android.util.Log;
 
+import com.daemonize.daemondevapp.appstate.BeginingState;
 import com.daemonize.daemondevapp.imagemovers.ImageMover;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 
@@ -619,9 +620,8 @@ public class Game {
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
 
-                    if (enemyCounter % 15 == 0 && waveInterval > 2000){ //TODO fix this!
+                    if (enemyCounter % 15 == 0 && waveInterval > 2000) //TODO fix this!
                         waveInterval -= 2000;
-                    }
 
                     enemyHp++;
                     enemyGenerator.setSleepInterval(waveInterval);//TODO set long as param in DaemonGenerators
@@ -630,11 +630,10 @@ public class Game {
                     enemyGenerator.setSleepInterval(enemyGenerateinterval);
                 }
 
-                if (enemyCounter % 20 == 0 && bulletDamage < 10) {
+                if (enemyCounter % 20 == 0 && bulletDamage < 10)
                     bulletDamage += 1;
-                }
 
-                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy -> {
+                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy->{
                     enemy.setMaxHp(enemyHp);
                     enemy.setHp(enemyHp);
                 });

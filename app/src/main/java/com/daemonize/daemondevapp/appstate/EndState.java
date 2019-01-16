@@ -1,7 +1,5 @@
 package com.daemonize.daemondevapp.appstate;
 
-import com.daemonize.daemondevapp.appstate.DaemonState;
-
 /**
  * Created by nemanja.jelisijevic on 1/15/2019.
  */
@@ -12,6 +10,11 @@ public class EndState extends DaemonState {
 
     public EndState(String number) {
         this.number = number;
+    }
+
+    @Override
+    protected void onEnter() {
+
     }
 
     @Override

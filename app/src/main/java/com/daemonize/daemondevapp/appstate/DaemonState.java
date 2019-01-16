@@ -3,23 +3,32 @@ package com.daemonize.daemondevapp.appstate;
 import com.daemonize.daemonengine.consumer.Consumer;
 
 
-public abstract class DaemonState {
+public abstract class DaemonState<T extends DaemonState> {
 
     protected Consumer consumer;
 
-    public final DaemonState setConsumer(Consumer consumer){
+    @SuppressWarnings("unchecked")
+    public final T setConsumer(Consumer consumer){
         this.consumer = consumer;
-        return this;
+        return (T) this;
     }
+
+    protected abstract void onEnter();
 
     public abstract void enter();
 
     protected abstract void onExit();
 
-    protected final void transit(DaemonState next) {
+    protected final void transition(DaemonState next) {
         onExit();
         next.setConsumer(consumer);
-        consumer.consume(()->next.enter());
+        consumer.consume(new Runnable() {
+            @Override
+            public void run() {
+                next.onEnter();
+                next.enter();
+            }
+        });
     }
 }
 
