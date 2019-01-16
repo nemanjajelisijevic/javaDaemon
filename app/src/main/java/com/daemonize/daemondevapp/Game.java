@@ -7,6 +7,7 @@ import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 
 import com.daemonize.daemondevapp.images.Image;
 
+import com.daemonize.daemondevapp.renderer.DrawConsumer;
 import com.daemonize.daemondevapp.renderer.Renderer2D;
 import com.daemonize.daemondevapp.repo.EntityRepo;
 import com.daemonize.daemondevapp.repo.QueuedEntityRepo;
@@ -47,8 +48,8 @@ public class Game {
 
     //game threads
     private Renderer2D renderer;
-    private DaemonConsumer gameConsumer = new DaemonConsumer("Game Consumer");
-    private DaemonConsumer drawConsumer = new DaemonConsumer("Draw Consumer");
+    private DaemonConsumer gameConsumer;
+    private DaemonConsumer drawConsumer;
 
     //state holder
     private DaemonChainScript chain = new DaemonChainScript();
@@ -185,6 +186,8 @@ public class Game {
     public Game(Renderer2D renderer, int rows, int columns, float x, float y, int fieldWidth) {
         this.renderer = renderer;
         this.scene = new Scene2D();
+        this.drawConsumer = new DrawConsumer(renderer, "Draw Consumer");
+        this.gameConsumer = new DaemonConsumer("Game Consumer");
         this.rows = rows;
         this.columns = columns;
         this.grid = new Grid(

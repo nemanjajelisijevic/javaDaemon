@@ -13,10 +13,31 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.TimeUnits;
 
 import java.util.Collections;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback {
 
     private Scene2D scene;
+
+    private volatile boolean dirtyFlag;
+    private Lock dirtyLock = new ReentrantLock();
+    private Condition dirtyCondition = dirtyLock.newCondition();
+
+    @Override
+    public void setDirty() {
+        dirtyLock.lock();
+        this.dirtyFlag = true;
+        dirtyCondition.signal();
+        dirtyLock.unlock();
+    }
+
+    private void clean() {
+        dirtyLock.lock();
+        dirtyFlag = false;
+        dirtyLock.unlock();
+    }
 
     @Override
     public Scene2D getScene() {
@@ -79,6 +100,12 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     public AndroidSurfaceViewRenderer stop() {
         drawing = false;
         try {
+
+            dirtyLock.lock();
+            dirtyFlag = true;
+            dirtyCondition.signal();
+            dirtyLock.unlock();
+
             drawThread.join();
         } catch (InterruptedException e) {
             //
@@ -89,16 +116,28 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     @Override
     public void run() {
         while (drawing){
-            long t0 = System.nanoTime();
-            drawViews();
-            double duration = DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS);
-            if (duration < 12) {
-                try {
-                    Thread.sleep(16 - (long) duration);
-                } catch (InterruptedException e) {
-                    //
-                }
+//            long t0 = System.nanoTime();
+
+            dirtyLock.lock();
+            try {
+                while (!dirtyFlag)
+                    dirtyCondition.await();
+            } catch (InterruptedException e) {
+             //
+            } finally {
+                dirtyLock.unlock();
             }
+
+            drawViews();
+//            double duration = DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS);
+//            if (duration < 12) {
+//                try {
+//                    Thread.sleep(16 - (long) duration);
+//                } catch (InterruptedException e) {
+//                    //
+//                }
+//            }
+            clean();
         }
     }
 
