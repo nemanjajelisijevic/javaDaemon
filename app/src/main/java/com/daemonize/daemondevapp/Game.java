@@ -309,7 +309,7 @@ public class Game {
             //add background to scene
             backgroundView = scene.addImageView(new ImageViewImpl().setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
 
-//            backgroundMover = DummyDaemon.create(drawConsumer, 25).setClosure(aVoid->{
+//            backgroundMover = DummyDaemon.create(gameConsumer, 25).setClosure(aVoid->{
 //
 //                int dX;
 //                int dY;
@@ -342,9 +342,11 @@ public class Game {
 //                        break;
 //                }
 //
-//                backgroundView.setAbsoluteX(backgroundView.getAbsoluteX() + dX);
-//                backgroundView.setAbsoluteY(backgroundView.getAbsoluteY() + dY);
+//                drawConsumer.consume(()->{
+//                    backgroundView.setAbsoluteX(backgroundView.getAbsoluteX() + dX);
+//                    backgroundView.setAbsoluteY(backgroundView.getAbsoluteY() + dY);
 //
+//                });
 //                pixelsMoved++;
 //
 //            });
