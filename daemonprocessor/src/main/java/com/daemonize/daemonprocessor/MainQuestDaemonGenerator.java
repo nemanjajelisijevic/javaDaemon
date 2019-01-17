@@ -23,6 +23,7 @@ import java.util.TreeSet;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
@@ -305,7 +306,13 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
         MethodSpec.Builder apiMethodBuilder = MethodSpec.methodBuilder(prototypeMethodData.getMethodName())
                 .addModifiers(Modifier.PUBLIC)
-                .addJavadoc("Prototype mapped method {@link $N#$N}", prototypeMethod.getEnclosingElement().getSimpleName(), prototypeMethod.getSimpleName());
+                .addJavadoc(
+                        "Prototype mapped method {@link $N#$N}",
+                        classElement.getNestingKind().equals(NestingKind.MEMBER)
+                                ? prototypeMethod.getEnclosingElement().toString()
+                                : prototypeMethod.getEnclosingElement().getSimpleName(),
+                        prototypeMethod.getSimpleName()
+                );
 
         boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
 

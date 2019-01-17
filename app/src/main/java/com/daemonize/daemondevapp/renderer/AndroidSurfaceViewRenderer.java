@@ -116,7 +116,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     @Override
     public void run() {
         while (drawing){
-//            long t0 = System.nanoTime();
 
             dirtyLock.lock();
             try {
@@ -129,14 +128,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
             }
 
             drawViews();
-//            double duration = DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS);
-//            if (duration < 12) {
-//                try {
-//                    Thread.sleep(16 - (long) duration);
-//                } catch (InterruptedException e) {
-//                    //
-//                }
-//            }
             clean();
         }
     }
