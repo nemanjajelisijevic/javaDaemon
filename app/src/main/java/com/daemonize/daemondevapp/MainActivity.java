@@ -70,9 +70,8 @@ public class MainActivity extends AppCompatActivity {
             //init enemy sprite
             Image [] sprite = new Image[36];
 
-            for(int i = 0; i < 36; i++) {
+            for(int i = 0; i < 36; i++)
                 sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("plane" + Integer.toString(i) + "0.png")), width, height, false));
-            }
 
             //bullet sprite
             int bulletSize0 = width / 8;//20;
@@ -85,9 +84,9 @@ public class MainActivity extends AppCompatActivity {
             int bulletSize = width / 3;//60;
             Image [] spriteRocket = new Image[36];
 
-            for(int i = 0; i < 36; i++) {
+            for(int i = 0; i < 36; i++)
                 spriteRocket[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rocket" + Integer.toString(i) + "0.png")), bulletSize, bulletSize, false));
-            }
+
 
             //explosion sprite
             Image [] explosionSprite = new Image[33];
@@ -159,45 +158,42 @@ public class MainActivity extends AppCompatActivity {
 
             // blue tower
             Image [] blueTowerI = new Image[36];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 36; i++)
                 blueTowerI[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mg" + i + "0.png")), width, height, false));
-            }
+
             Image [] blueTowerII = new Image[36];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 36; i++)
                 blueTowerII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("bgII" + i + "0.png")), width, height, false));
-            }
+
             Image [] blueTowerIII = new Image[36];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 36; i++)
                 blueTowerIII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("bgIII" + i + "0.png")), width, height, false));
-            }
 
             //green tower
             Image [] greenTowerI = new Image[36];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 36; i++)
                 greenTowerI[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenLS00" + i + "0.png")), width, height, false));
-            }
+
             Image [] greenTowerII = new Image[36];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 36; i++)
                 greenTowerII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsII" + i + "0.png")), width, height, false));
-            }
+
             Image [] greenTowerIII = new Image[36];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 36; i++)
                 greenTowerIII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsIII" + i + "0.png")), width, height, false));
-            }
 
             //red tower
             Image [] redTowerI = new Image[36];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 36; i++)
                 redTowerI[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rmI" + i + "0.png")), width, height, false));
-            }
+
             Image [] redTowerII = new Image[36];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 36; i++)
                 redTowerII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rmII" + i + "0.png")), width, height, false));
-            }
+
             Image [] redTowerIII = new Image[36];
-            for (int i = 0; i < 36; i++) {
+            for (int i = 0; i < 36; i++)
                 redTowerIII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rmIII" + i + "0.png")), width, height, false));
-            }
 
             int width_hp = (width * 3) / 4; //120;
             int height_hp = height / 5;//30;
@@ -253,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
             Bitmap red = Bitmap.createBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")));
 
             game = new Game(renderer, rows, columns,50,50, width)
-                    .setBackgroundImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX * 2, borderY * 2, false)))
+                    .setBackgroundImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false)))
                     .setFieldImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
                     .setFieldImageTower(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), width, height, false)))
                     .setFieldImageTowerDen(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), width, height, false)))
