@@ -314,27 +314,27 @@ public class Game {
 //                int dX;
 //                int dY;
 //
-//                if (pixelsMoved >= 400) {
+//                if (pixelsMoved >= (currentDir.equals(Dir.RIGHT) || currentDir.equals(Dir.LEFT) ? borderX  : borderY)) {
 //                    pixelsMoved = 0;
 //                    currentDir = currentDir.next();
 //                }
 //
 //                switch(currentDir) {
 //                    case RIGHT:
-//                        dX = -2;
+//                        dX = -1;
 //                        dY = 0;
 //                        break;
 //                    case DOWN:
 //                        dX = 0;
-//                        dY = -2;
+//                        dY = -1;
 //                        break;
 //                    case LEFT:
-//                        dX = 2;
+//                        dX = 1;
 //                        dY = 0;
 //                        break;
 //                    case UP:
 //                        dX = 0;
-//                        dY = 2;
+//                        dY = 1;
 //                        break;
 //                    default:
 //                        dX = 0;
@@ -345,9 +345,8 @@ public class Game {
 //                drawConsumer.consume(()->{
 //                    backgroundView.setAbsoluteX(backgroundView.getAbsoluteX() + dX);
 //                    backgroundView.setAbsoluteY(backgroundView.getAbsoluteY() + dY);
-//
 //                });
-//                pixelsMoved++;
+//                pixelsMoved ++;
 //
 //            });
 
@@ -773,7 +772,7 @@ public class Game {
             //start enemy generator
             enemyGenerator.start();
 
-            //backgroundMover.start();
+//            backgroundMover.start();
         });
     }
 
