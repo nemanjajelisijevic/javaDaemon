@@ -4,8 +4,8 @@ package com.daemonize.daemondevapp;
 import com.daemonize.daemondevapp.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.daemondevapp.images.Image;
 import com.daemonize.daemondevapp.view.ImageView;
-import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
@@ -102,7 +102,7 @@ public class Tower extends RotatingSpriteImageMover {
         this.towerLevel = towerLevel;
     }
 
-    private DaemonCountingSemaphore scanSemaphore = new DaemonCountingSemaphore();
+    private DaemonSemaphore scanSemaphore = new DaemonSemaphore();
 
     @CallingThread
     public ImageView getView() {
@@ -208,12 +208,12 @@ public class Tower extends RotatingSpriteImageMover {
 
     @CallingThread
     public void pauseScan() {
-        scanSemaphore.subscribe();
+        scanSemaphore.stop();
     }
 
     @CallingThread
     public void contScan() {
-        scanSemaphore.unsubscribe();
+        scanSemaphore.go();
     }
 
     private volatile PositionedImage ret = new PositionedImage();
