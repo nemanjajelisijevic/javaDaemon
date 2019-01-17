@@ -195,6 +195,9 @@ public class Tower extends RotatingSpriteImageMover {
     public void cont() {
         super.cont();
         contScan();
+        targetLock.lock();
+        targetCondition.signalAll();
+        targetLock.unlock();
     }
 
     @CallingThread

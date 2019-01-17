@@ -383,25 +383,32 @@ public class Game {
             Button tow1 = new Button("TowerType1",0,0,redTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE1;
                 currentTowerSprite = redTower.get(0);
-                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(selection);
-                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
-                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
+                drawConsumer.consume(()->{
+                    selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(selection);
+                    selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
+                    selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
+                });
             });
 
             Button tow2 = new Button("TowerType2",0,0,blueTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE2;
                 currentTowerSprite = blueTower.get(0);
-                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
-                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(selection);
-                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
+                drawConsumer.consume(()->{
+                    selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
+                    selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(selection);
+                    selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(deselection);
+                });
+
             });
 
             Button tow3 = new Button("TowerType3",0,0,greenTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE3;
                 currentTowerSprite = greenTower.get(0);
-                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
-                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
-                selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(selection);
+                drawConsumer.consume(()->{
+                    selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
+                    selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
+                    selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower3").setImage(selection);
+                });
             });
 
             selectTowerDialogue = new TowerSelectDialogue(
@@ -512,7 +519,7 @@ public class Game {
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-                enemy.setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);//gui consumer
+                enemy.setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 enemyRepo.getStructure().add(enemy);
             }
@@ -642,7 +649,7 @@ public class Game {
                 });
 
                 Log.d(DaemonUtils.tag(), "Enemy counter: " + enemyCounter);
-                Log.d(DaemonUtils.tag(), "Enemy queue size: " + enemyRepo.size());
+                Log.d(DaemonUtils.tag(), "Enemy repo size: " + enemyRepo.size());
                 Log.d(DaemonUtils.tag(), "Enemy state: " + enemyDoubleDaemon.getState());
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(
