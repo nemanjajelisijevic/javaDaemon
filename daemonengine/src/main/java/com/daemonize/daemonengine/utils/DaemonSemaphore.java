@@ -11,10 +11,16 @@ public class DaemonSemaphore {
 
         public DaemonSemaphore() {}
 
-        public void signal() {
+        public void stop(){
+            lock.lock();
+            flag = false;
+            lock.unlock();
+        }
+
+        public void go() {
             lock.lock();
             flag = true;
-            condition.signal();
+            condition.signalAll();
             lock.unlock();
         }
 
@@ -25,7 +31,6 @@ public class DaemonSemaphore {
                     condition.await();
                 }
             } finally {
-                flag = false;
                 lock.unlock();
             }
         }
