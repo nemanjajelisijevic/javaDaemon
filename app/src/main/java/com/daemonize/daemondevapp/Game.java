@@ -281,12 +281,73 @@ public class Game {
         return this;
     }
 
+    private ImageView backgroundView;
+    private DummyDaemon backgroundMover;
+
+    private enum Dir {
+        RIGHT,
+        DOWN,
+        LEFT,
+        UP;
+
+        private static Dir[] vals = values();
+
+        public Dir next()
+        {
+            return vals[(this.ordinal()+1) % vals.length];
+        }
+    }
+
+    private Dir currentDir = Dir.RIGHT;
+    private int pixelsMoved = 0;
+
     {
         //init state
         chain.addState(()-> {
 
             //add background to scene
-            scene.addImageView(new ImageViewImpl().setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
+            backgroundView = scene.addImageView(new ImageViewImpl().setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
+
+            backgroundMover = DummyDaemon.create(drawConsumer, 25).setClosure(aVoid->{
+
+                int dX;
+                int dY;
+
+                if (pixelsMoved >= 400) {
+                    pixelsMoved = 0;
+                    currentDir = currentDir.next();
+                }
+
+                switch(currentDir) {
+                    case RIGHT:
+                        dX = -2;
+                        dY = 0;
+                        break;
+                    case DOWN:
+                        dX = 0;
+                        dY = -2;
+                        break;
+                    case LEFT:
+                        dX = 2;
+                        dY = 0;
+                        break;
+                    case UP:
+                        dX = 0;
+                        dY = 2;
+                        break;
+                    default:
+                        dX = 0;
+                        dY = 0;
+                        break;
+                }
+
+                backgroundView.setAbsoluteX(backgroundView.getAbsoluteX() + dX);
+                backgroundView.setAbsoluteY(backgroundView.getAbsoluteY() + dY);
+
+                pixelsMoved++;
+
+            });
+
 
             //dialogues and ui views
             scoreBackGrView = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(3).show();
@@ -326,6 +387,8 @@ public class Game {
                     tow.getView().setAbsoluteY(posBmp.positionY);
                     tow.getView().setImage(posBmp.image);
                 }));
+
+                tow.cont();
 
                 CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
 
@@ -706,6 +769,8 @@ public class Game {
 
             //start enemy generator
             enemyGenerator.start();
+
+            backgroundMover.start();
         });
     }
 

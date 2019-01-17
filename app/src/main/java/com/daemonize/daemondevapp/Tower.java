@@ -145,6 +145,8 @@ public class Tower extends RotatingSpriteImageMover {
         super.rotateTowards(x, y);
     }
 
+    private Pair<TowerType, EnemyDoubleDaemon> scanRet = Pair.create(null, null);
+
     @DedicatedThread
     public Pair<TowerType, EnemyDoubleDaemon> scan() throws InterruptedException {
 
@@ -152,7 +154,7 @@ public class Tower extends RotatingSpriteImageMover {
         scanSemaphore.await();
 
         EnemyDoubleDaemon target;
-        Pair<TowerType, EnemyDoubleDaemon> scanRet = Pair.create(null, null);
+        scanRet = Pair.create(null, null);
 
         targetLock.lock();
         try {
