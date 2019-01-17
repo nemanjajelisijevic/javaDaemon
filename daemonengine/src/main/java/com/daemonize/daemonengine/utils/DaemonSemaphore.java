@@ -7,7 +7,7 @@ public class DaemonSemaphore {
 
         private ReentrantLock lock = new ReentrantLock();
         private Condition condition = lock.newCondition();
-        private volatile boolean flag = false;
+        private volatile boolean flag = true;
 
         public DaemonSemaphore() {}
 
