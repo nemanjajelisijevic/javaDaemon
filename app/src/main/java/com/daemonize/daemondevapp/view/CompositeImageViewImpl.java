@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp.view;
 
-import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
 
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.List;
 
 public class CompositeImageViewImpl extends ImageViewImpl {
 
-    private String viewName;
     protected List<CompositeImageViewImpl> childrenViews;
 
     private float relativeX;
@@ -34,8 +32,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     }
 
     public CompositeImageViewImpl(String name, float relX, float relY, Image image) {
-        super();
-        this.viewName = name;
+        super(name);
         childrenViews = new LinkedList<>();
         this.relativeX = relX;
         this.relativeY = relY;
@@ -44,8 +41,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     //for root only!
     public CompositeImageViewImpl(String name, float absX, float absY, int z, Image image) {
-        super();
-        this.viewName = name;
+        super(name);
         childrenViews = new LinkedList<>();
         this.setAbsoluteX(absX);
         this.setAbsoluteY(absY);
@@ -55,8 +51,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     // for root without image
     public CompositeImageViewImpl(String name, float absX, float absY, int z, float width,float height) {
-        super();
-        this.viewName = name;
+        super(name);
         childrenViews = new LinkedList<>();
         this.setAbsoluteX(absX);
         this.setAbsoluteY(absY);
@@ -128,12 +123,11 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     private void addCh(CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : this.childrenViews){
             if (child.checkRootCoordinates(newChild.getStartingX(), newChild.getStartingY())){
-                //ponovi sve za dete
                 newChild.setRelativeX(newChild.getRelativeX() - (child.startingX - this.startingX));
                 newChild.setRelativeY(newChild.getRelativeY() - (child.startingY - this.startingY));
                 newChild.setAbsoluteX((child.startingX + newChild.getRelativeX()));//TODO check this reson to stay duble check
                 newChild.setAbsoluteY((child.startingY + newChild.getRelativeY()));//TODO check this
-                newChild.setZindex(child.getZindex() + 1); // povecamo z index mozda treba i kordinate prevezati
+                newChild.setZindex(child.getZindex() + 1);
                 child.addCh(newChild);
                 return;
             }
@@ -152,7 +146,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     @Override
     public List<ImageView> getAllViews () {
-        return  getAllViews(this);
+        return getAllViews(this);
     }
 
     private List<ImageView> getAllViews (CompositeImageViewImpl compositeImageViewImpl) {
@@ -163,7 +157,10 @@ public class CompositeImageViewImpl extends ImageViewImpl {
                 lst.addAll(getAllViews(child));
             }
         }
-        lst.add(compositeImageViewImpl);
+
+        if (compositeImageViewImpl.getImage() != null)// TODO fix!!!
+            lst.add(compositeImageViewImpl);
+
         return lst;
     }
 

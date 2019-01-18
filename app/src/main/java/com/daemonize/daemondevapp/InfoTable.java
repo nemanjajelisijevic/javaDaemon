@@ -34,7 +34,6 @@ public class InfoTable {
         numbersView[2].setImage(numberImages[((int)(number/100))%10]);
         numbersView[1].setImage(numberImages[((int)(number/1000))%10]);
         numbersView[0].setImage(numberImages[((int)(number/10000))%10]);
-
         return this;
     }
 }

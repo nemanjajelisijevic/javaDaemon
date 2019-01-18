@@ -52,7 +52,7 @@ public class InitState extends DaemonState<InitState> {
     @Override
     protected void onEnter() {
 
-        initScene.addImageView(new ImageViewImpl().setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
+        initScene.addImageView(new ImageViewImpl("background").setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
 
 
 

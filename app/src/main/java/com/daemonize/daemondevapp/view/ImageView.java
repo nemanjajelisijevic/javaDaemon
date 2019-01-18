@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface ImageView extends Comparable<ImageView> {
 
+    String getName();
+
     <K extends ImageView> K setAbsoluteX(float absoluteX);
     <K extends ImageView> K setAbsoluteY(float absoluteY);
 

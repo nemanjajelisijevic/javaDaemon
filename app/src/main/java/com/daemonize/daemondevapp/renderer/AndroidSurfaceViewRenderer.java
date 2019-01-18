@@ -9,10 +9,7 @@ import android.view.SurfaceView;
 
 import com.daemonize.daemondevapp.scene.Scene2D;
 import com.daemonize.daemondevapp.view.ImageView;
-import com.daemonize.daemonengine.utils.DaemonUtils;
-import com.daemonize.daemonengine.utils.TimeUnits;
 
-import java.util.Collections;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -69,11 +66,9 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
 
     public AndroidSurfaceViewRenderer(Context context) {
         super(context);
-        //this.views = new ArrayList<>();
         this.surfaceHolder = getHolder();
         this.surfaceHolder.addCallback(this);
         this.paint = new Paint();
-        //this.backgroundView = new ImageViewImpl();
     }
 
     @Override
@@ -92,7 +87,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         drawThread.setName("AndroidSurfaceViewRenderer");
         drawing = true;
         drawThread.start();
-
         return this;
     }
 
@@ -100,12 +94,10 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     public AndroidSurfaceViewRenderer stop() {
         drawing = false;
         try {
-
             dirtyLock.lock();
             dirtyFlag = true;
             dirtyCondition.signal();
             dirtyLock.unlock();
-
             drawThread.join();
         } catch (InterruptedException e) {
             //
@@ -116,7 +108,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     @Override
     public void run() {
         while (drawing){
-
             dirtyLock.lock();
             try {
                 while (!dirtyFlag)
@@ -126,33 +117,25 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
             } finally {
                 dirtyLock.unlock();
             }
-
             drawViews();
             clean();
         }
     }
 
     protected void drawViews(){
-
         if (surfaceHolder.getSurface().isValid()) {
-
             canvas = surfaceHolder.lockCanvas();
-
             for (ImageView view : scene.getViews()) {
-
-                if (view.isShowing() && view.getImage() != null)//TODO this should never be null
+                if (view.isShowing()) {
                     canvas.drawBitmap(
                             ((Bitmap) view.getImage().getImageImp()),
                             view.getStartingX(),
                             view.getStartingY(),
-                            paint);
+                            paint
+                    );
+                }
             }
-
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
-
     }
-
-
-
 }

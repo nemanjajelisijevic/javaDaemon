@@ -11,7 +11,7 @@ public class TowerSelectDialogue {
     public TowerSelectDialogue(int absX, int absY,float width,float height,Image selection,
                                Button towerType1, Button towerType2, Button towerType3) {
 
-        selectTowerDialogue = new CompositeImageViewImpl("SelecDialogBackground", absX, absY,6, width, height);
+        selectTowerDialogue = new CompositeImageViewImpl("SelectDialogBackground", absX, absY,6, width, height);
         selectTowerDialogue.addChild(new CompositeImageViewImpl("Tower1",selection.getWidth()/2,selection.getHeight()/2,selection));
         selectTowerDialogue.addChild(new CompositeImageViewImpl("Tower2",selection.getWidth()/2,height / 3 + selection.getHeight()/2,selection));
         selectTowerDialogue.addChild(new CompositeImageViewImpl("Tower3",selection.getWidth()/2,height * 2 / 3 +selection.getHeight()/2,selection));

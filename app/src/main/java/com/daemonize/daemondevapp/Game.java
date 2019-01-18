@@ -178,6 +178,11 @@ public class Game {
                 Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.runtimeCheckAndGet();
                 imageAndView.getSecond().setAbsoluteX(imageAndView.getFirst().positionX);
                 imageAndView.getSecond().setAbsoluteY(imageAndView.getFirst().positionY);
+
+                if (imageAndView.getFirst().image == null) {
+                    Log.e(DaemonUtils.tag(), imageAndView.getSecond().getName() + " image == NULL");
+                }
+
                 imageAndView.getSecond().setImage(imageAndView.getFirst().image);
             });
         }
@@ -307,7 +312,7 @@ public class Game {
         chain.addState(()-> {
 
             //add background to scene
-            backgroundView = scene.addImageView(new ImageViewImpl().setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
+            backgroundView = scene.addImageView(new ImageViewImpl("Background").setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
 
 //            backgroundMover = DummyDaemon.create(gameConsumer, 25).setClosure(aVoid->{
 //
@@ -352,15 +357,15 @@ public class Game {
 
 
             //dialogues and ui views
-            scoreBackGrView = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(3).show();
-            scoreTitleView = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(4).show();
+            scoreBackGrView = new ImageViewImpl("Score Background").setImage(scoreBackGrImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(3).show();
+            scoreTitleView = new ImageViewImpl("Score Title").setAbsoluteX(0).setAbsoluteY(0).setZindex(4).show();
 
             viewsNum = new ImageView[5];
-            viewsNum[0] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
-            viewsNum[1] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
-            viewsNum[2] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
-            viewsNum[3] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
-            viewsNum[4] = new ImageViewImpl().setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[0] = new ImageViewImpl("Score 1. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[1] = new ImageViewImpl("Score 2. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[2] = new ImageViewImpl("Score 3. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[3] = new ImageViewImpl("Score 4. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[4] = new ImageViewImpl("Score 5. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
 
             Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
 
@@ -489,7 +494,7 @@ public class Game {
             scene.addImageViews(towerUpgradeDialogue.getTowerUpgrade().getAllViews());
             scene.addImageViews(selectTowerDialogue.getSelectTowerDialogue().getAllViews());
             scene.addImageView(scoreBackGrView);
-            scene.addImageView(scoreTitleView);
+            //scene.addImageView(scoreTitleView);
 
             drawConsumer.consume(()->selectTowerDialogue.getSelectTowerDialogue().show());
 
@@ -501,7 +506,7 @@ public class Game {
 
             for (int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i)
-                    gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3));
+                    gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl("Gird [" + j + "][" + i +"]").hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3));
             }
 
             //enemy repo init
@@ -564,6 +569,8 @@ public class Game {
             //init enemies and fill enemy repo
             for (int i = 0; i < maxEnemies; ++i) {
 
+                String enemyName = "Enemy instance no.: " + i;
+
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                         gameConsumer,
                         drawConsumer,
@@ -572,10 +579,10 @@ public class Game {
                                 enemyVelocity,
                                 enemyHp,
                                 Pair.create(grid.getStartingX(), grid.getStartingY())
-                        ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
-                        .setHpView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
+                        ).setView(scene.addImageView(new ImageViewImpl(enemyName + " View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
+                        .setHpView(scene.addImageView(new ImageViewImpl(enemyName + " HP View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
                         .setHealthBarImage(healthBarSprite)
-                ).setName("Enemy instance no.: " + i);
+                ).setName(enemyName);
 
                 enemy.getPrototype().setBorders(
                         grid.getStartingX(),
@@ -592,6 +599,8 @@ public class Game {
             //init bullets and fill bullet repo
             for (int i = 0; i < maxBullets; ++i) {
 
+                String bulletName = "Bullet instance no. " + i;
+
                 BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
                         gameConsumer,
                         drawConsumer,
@@ -600,10 +609,10 @@ public class Game {
                                 0,
                                 Pair.create((float) 0, (float) 0),
                                 bulletDamage
-                        ).setView(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
-                        .setView2(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
-                        .setView3(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
-                ).setName("Bullet no. " + i);
+                        ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
+                        .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
+                        .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
+                ).setName(bulletName);
 
                 bulletDoubleDaemon.getPrototype().setBorders(
                         - 50,//grid.getStartingX(),//TODO fix offset
@@ -622,7 +631,7 @@ public class Game {
             laserViews = new ArrayList<>(laserViewNo);
 
             for (int i = 0; i < laserViewNo; ++i)
-                laserViews.add(scene.addImageView(new ImageViewImpl().hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)));
+                laserViews.add(scene.addImageView(new ImageViewImpl("laser View " + i).setImage(laserSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)));
 
             //laser init
             laser = new LaserBulletDaemon(
@@ -645,8 +654,27 @@ public class Game {
                 }
             });
 
+            //draw grid
+            for(int j = 0; j < rows; ++j ) {
+                for (int i = 0; i < columns; ++i) {
+                    gridViewMatrix[j][i].setAbsoluteX(grid.getGrid()[j][i].getCenterX());
+                    gridViewMatrix[j][i].setAbsoluteY(grid.getGrid()[j][i].getCenterY());
+                    gridViewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).hide();
+                }
+            }
+
             //prepare the scene and start the renderer
             scene.lockViews();
+
+            scene.forEach(view->{
+                Log.d(DaemonUtils.tag(), view.getName());
+                Log.d(DaemonUtils.tag(), "X: " + view.getAbsoluteX());
+                Log.d(DaemonUtils.tag(),"Y: " + view.getAbsoluteY());
+                Log.d(DaemonUtils.tag(),"Image: "  + view.getImage().toString());
+                Log.d(DaemonUtils.tag(),"Image imp: " + view.getImage().getImageImp().toString());
+
+            });
+
             renderer.setScene(scene).start();
 
             chain.next();
@@ -658,16 +686,6 @@ public class Game {
 
             //hide the grid at start and draw the score keeping dialogue
             drawConsumer.consume(()->{
-
-                for(int j = 0; j < rows; ++j ) {
-                    for (int i = 0; i < columns; ++i) {
-                        gridViewMatrix[j][i].setAbsoluteX(grid.getGrid()[j][i].getCenterX());
-                        gridViewMatrix[j][i].setAbsoluteY(grid.getGrid()[j][i].getCenterY());
-                        gridViewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).hide();
-                    }
-                }
-
-                scoreBackGrView.setImage(scoreBackGrImage);
                 infoScore = new InfoTable(
                         borderX - scoreBackGrImage.getWidth(),
                         250,

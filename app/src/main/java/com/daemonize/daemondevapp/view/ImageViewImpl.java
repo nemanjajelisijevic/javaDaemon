@@ -1,13 +1,13 @@
 package com.daemonize.daemondevapp.view;
 
-import com.daemonize.daemondevapp.Pair;
 import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ImageViewImpl implements ImageView, Comparable<ImageView> {
 
+    protected volatile String viewName;
     private volatile int zIndex;
     private volatile boolean showing;
 
@@ -23,24 +23,31 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     protected float xOffset;//TODO check if this is really neccessary
     protected float yOffset;//TODO check if this is really neccessary
 
-    public ImageViewImpl() {}
+    public ImageViewImpl(String name) {
+        this.viewName = name;
+    }
 
     public ImageViewImpl(
+            String name,
             int zIndex,
-            boolean showing,
             float absoluteX,
             float absoluteY,
             float xOffset,
             float yOffset
     ) {
+        this(name);
         this.zIndex = zIndex;
-        this.showing = showing;
         this.absoluteX = absoluteX;
         this.absoluteY = absoluteY;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
         this.startingX = absoluteX - xOffset;
         this.startingY = absoluteY - yOffset;
+    }
+
+    @Override
+    public String getName() {
+        return viewName;
     }
 
     @Override
@@ -92,7 +99,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteX(float absoluteX) {
         this.absoluteX = absoluteX;
-        this.startingX = absoluteX - xOffset;//TODO check if this is really neccessary
+        this.startingX = absoluteX - xOffset;
         return this;
     }
 
@@ -100,7 +107,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @Override
     public ImageViewImpl setAbsoluteY(float absoluteY) {
         this.absoluteY = absoluteY;
-        this.startingY = absoluteY - yOffset;//TODO check if this is really neccessary
+        this.startingY = absoluteY - yOffset;
         return this;
     }
 
@@ -114,8 +121,8 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl setImage(Image image) {
-        this.xOffset = image.getWidth() / 2;//TODO check if this is really neccessary
-        this.yOffset = image.getHeight() / 2;//TODO check if this is really neccessary
+        this.xOffset = image.getWidth() / 2;
+        this.yOffset = image.getHeight() / 2;
         this.startingX = this.absoluteX - this.xOffset;
         this.startingY = this.absoluteY - this.yOffset;
         return setImageWithoutOffset(image);

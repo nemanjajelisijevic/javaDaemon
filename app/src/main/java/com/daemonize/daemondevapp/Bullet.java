@@ -98,6 +98,11 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return this;
     }
 
+    @CallingThread
+    public Bullet setView3(ImageView view3) {
+        this.view3 = view3;
+        return this;
+    }
 
     @CallingThread
     public List<ImageView> getViews() {
@@ -124,12 +129,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
         if (level >=1 &&  level <= 3){
             this.level = level;
         }
-        return this;
-    }
-
-    @CallingThread
-    public Bullet setView3(ImageView view3) {
-        this.view3 = view3;
         return this;
     }
 
@@ -211,7 +210,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
         switch (level){
             case 1:
-                return  new GenericNode<>(Pair.create(posImage, view));
+                return new GenericNode<>(Pair.create(posImage, view));
             case 2:
                 return calculateOffsetImage(posImage,movingDirection,40);
             case 3:

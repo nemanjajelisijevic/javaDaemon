@@ -6,9 +6,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 public class Scene2D {
 
-    private List<ImageView> views = new ArrayList<>();
+    @FunctionalInterface
+    public interface Action{
+        void execute(ImageView entity);
+    }
+
+    private volatile List<ImageView> views = new ArrayList<>();
     private volatile boolean locked = false;
 
     public Scene2D lockViews() {
@@ -44,6 +50,13 @@ public class Scene2D {
 
     public int viewsSize() {
         return views.size();
+    }
+
+    public Scene2D forEach(Action action) {
+        for (ImageView view : views) {
+            action.execute(view);
+        }
+        return this;
     }
 
 }
