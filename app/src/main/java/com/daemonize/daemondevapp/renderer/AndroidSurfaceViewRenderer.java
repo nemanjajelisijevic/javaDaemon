@@ -78,7 +78,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     }
 
     @Override
-    public AndroidSurfaceViewRenderer start() {
+    public void start() {
 
         if(scene.getViews() == null)
             throw new IllegalStateException("Scene not set!");
@@ -93,11 +93,10 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         drawThread.setName("AndroidSurfaceViewRenderer");
         drawing = true;
         drawThread.start();
-        return this;
     }
 
     @Override
-    public AndroidSurfaceViewRenderer stop() {
+    public void stop() {
         drawing = false;
         try {
             dirtyLock.lock();
@@ -108,7 +107,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         } catch (InterruptedException e) {
             //
         }
-        return this;
     }
 
     @Override
