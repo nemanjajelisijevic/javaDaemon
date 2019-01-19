@@ -9,6 +9,8 @@ import android.view.SurfaceView;
 
 import com.daemonize.daemondevapp.scene.Scene2D;
 import com.daemonize.daemondevapp.view.ImageView;
+import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.consumer.DaemonConsumer;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -16,11 +18,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback {
 
+    private DrawConsumer consumer;
+
     private Scene2D scene;
 
     private volatile boolean dirtyFlag;
     private Lock dirtyLock = new ReentrantLock();
     private Condition dirtyCondition = dirtyLock.newCondition();
+
 
     @Override
     public void setDirty() {
@@ -69,6 +74,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         this.surfaceHolder = getHolder();
         this.surfaceHolder.addCallback(this);
         this.paint = new Paint();
+        this.consumer = new DrawConsumer(this, "Renderer Consumer");
     }
 
     @Override
@@ -135,5 +141,10 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
             }
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
+    }
+
+    @Override
+    public boolean consume(Runnable runnable) {
+        return consumer.consume(runnable);
     }
 }
