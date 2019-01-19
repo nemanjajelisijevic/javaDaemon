@@ -149,7 +149,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         return getAllViews(this);
     }
 
-    private List<ImageView> getAllViews(CompositeImageViewImpl compositeImageViewImpl) {
+    private List<ImageView> getAllViews (CompositeImageViewImpl compositeImageViewImpl) {
         List<ImageView> lst = new ArrayList<>();
         for (CompositeImageViewImpl child : compositeImageViewImpl.getChildrenViews()){
             lst.add(child);
