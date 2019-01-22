@@ -56,8 +56,8 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         this.setAbsoluteX(absX);
         this.setAbsoluteY(absY);
         this.setZindex(z);
-        this.xOffset = width / 2;//TODO check if this is really neccessary
-        this.yOffset = height / 2;//TODO check if this is really neccessary
+        this.xOffset = width / 2;
+        this.yOffset = height / 2;
         this.startingX = this.absoluteX - this.xOffset;
         this.startingY = this.absoluteY - this.yOffset;
     }

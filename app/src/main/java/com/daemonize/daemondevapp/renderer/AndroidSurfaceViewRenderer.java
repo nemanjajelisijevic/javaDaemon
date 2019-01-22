@@ -16,7 +16,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback {
+public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback, Consumer {
 
     private Scene2D scene;
 
@@ -24,6 +24,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     private Lock dirtyLock = new ReentrantLock();
     private Condition dirtyCondition = dirtyLock.newCondition();
 
+    private DrawConsumer drawConsumer;
 
     @Override
     public void setDirty() {
@@ -72,6 +73,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         this.surfaceHolder = getHolder();
         this.surfaceHolder.addCallback(this);
         this.paint = new Paint();
+        this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer");
     }
 
     @Override
@@ -89,12 +91,14 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         drawThread = new Thread(this);
         drawThread.setName("AndroidSurfaceViewRenderer");
         drawing = true;
+        drawConsumer.start();
         drawThread.start();
         return this;
     }
 
     @Override
     public AndroidSurfaceViewRenderer stop() {
+        drawConsumer.stop();
         drawing = false;
         try {
             dirtyLock.lock();
@@ -140,5 +144,10 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
             }
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
+    }
+
+    @Override
+    public boolean consume(Runnable runnable) {
+        return drawConsumer.consume(runnable);
     }
 }

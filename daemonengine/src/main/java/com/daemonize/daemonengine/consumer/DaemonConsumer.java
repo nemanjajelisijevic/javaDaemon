@@ -14,27 +14,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DaemonConsumer implements Consumer, Daemon {
 
-//    @FunctionalInterface
-//    public static interface ConsumerStateNotifier {
-//        void onStateChange(DaemonState state);
-//    }
-
     private volatile DaemonState state = DaemonState.STOPPED;
     private Queue<Runnable> closureQueue = new LinkedList<>();
     private final Lock closureLock = new ReentrantLock();
     private Condition closureAvailable = closureLock.newCondition();
     private String name;
     private Thread looperThread;
-
-//    private ConsumerStateNotifier stateNotifier = new ConsumerStateNotifier() {
-//        @Override
-//        public void onStateChange(DaemonState state) {}
-//    };
-//
-//    public DaemonConsumer setStateNotifier(ConsumerStateNotifier stateNotifier) {
-//        this.stateNotifier = stateNotifier;
-//        return this;
-//    }
 
     public DaemonConsumer(String name) {
         this.name = name;
@@ -60,12 +45,10 @@ public class DaemonConsumer implements Consumer, Daemon {
                 closureLock.lock();
                 while (closureQueue.isEmpty()) {
                     state = DaemonState.IDLE;
-                    //stateNotifier.onStateChange(this.state);
                     closureAvailable.await();
                 }
                 closure = closureQueue.poll();//TODO null safety
             } catch (InterruptedException ex) {
-                //System.out.println(DaemonUtils.tag() + " Waiting on a closure interrupted");
                 break;
             } finally { //TODO Handle Exceptions
                 closureLock.unlock();
@@ -78,7 +61,6 @@ public class DaemonConsumer implements Consumer, Daemon {
 
         state = DaemonState.STOPPED;
         System.out.println(DaemonUtils.tag() + name + " stopped!");
-        //stateNotifier.onStateChange(this.state);
     }
 
     @Override
@@ -93,7 +75,6 @@ public class DaemonConsumer implements Consumer, Daemon {
             });
             looperThread.setName(name);
             state = DaemonState.INITIALIZING;
-            //stateNotifier.onStateChange(this.state);
             looperThread.start();
         }
     }
@@ -101,7 +82,6 @@ public class DaemonConsumer implements Consumer, Daemon {
     @Override
     public void stop() {
         state = DaemonState.GONE_DAEMON;
-        //stateNotifier.onStateChange(this.state);
         if (looperThread != null && !Thread.currentThread().equals(looperThread) && looperThread.isAlive()) {
             looperThread.interrupt();
         }
