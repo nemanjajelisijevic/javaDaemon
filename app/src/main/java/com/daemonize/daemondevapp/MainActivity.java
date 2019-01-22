@@ -15,6 +15,8 @@ import android.view.WindowManager;
 
 import com.daemonize.daemondevapp.images.AndroidBitmapImage;
 import com.daemonize.daemondevapp.images.Image;
+import com.daemonize.daemondevapp.images.imageloader.AndroidImageLoader;
+import com.daemonize.daemondevapp.images.imageloader.ImageLoader;
 import com.daemonize.daemondevapp.renderer.AndroidSurfaceViewRenderer;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         //renderer.setWindowSize(borderX, borderY);
         setContentView(renderer);
 
+        ImageLoader imageLoader = new AndroidImageLoader(this);
 
         int screenWidth = borderX;
         int screenHeight = borderY;
@@ -71,145 +74,140 @@ public class MainActivity extends AppCompatActivity {
             Image [] sprite = new Image[36];
 
             for(int i = 0; i < 36; i++)
-                sprite[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("plane" + Integer.toString(i) + "0.png")), width, height, false));
+                sprite[i] = imageLoader.loadImageFromAssets("plane" + Integer.toString(i) + "0.png", width, height);
 
             //bullet sprite
             int bulletSize0 = width / 8;//20;
             Image [] bulletSprite = new Image[4];
-            bulletSprite[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed.png")), bulletSize0, bulletSize0, false));
-            bulletSprite[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed90.png")), bulletSize0, bulletSize0, false));
-            bulletSprite[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed180.png")), bulletSize0, bulletSize0, false));
-            bulletSprite[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("thebarnstarRed270.png")), bulletSize0, bulletSize0, false));
+            bulletSprite[0] = imageLoader.loadImageFromAssets("thebarnstarRed.png", bulletSize0, bulletSize0);
+            bulletSprite[1] = imageLoader.loadImageFromAssets("thebarnstarRed90.png", bulletSize0, bulletSize0);
+            bulletSprite[2] = imageLoader.loadImageFromAssets("thebarnstarRed180.png", bulletSize0, bulletSize0);
+            bulletSprite[3] = imageLoader.loadImageFromAssets("thebarnstarRed270.png", bulletSize0, bulletSize0);
 
             int bulletSize = width / 3;//60;
             Image [] spriteRocket = new Image[36];
 
             for(int i = 0; i < 36; i++)
-                spriteRocket[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rocket" + Integer.toString(i) + "0.png")), bulletSize, bulletSize, false));
-
+                spriteRocket[i] = imageLoader.loadImageFromAssets("rocket" + Integer.toString(i) + "0.png", bulletSize, bulletSize);
 
             //explosion sprite
             Image [] explosionSprite = new Image[33];
+            explosionSprite[0] =  imageLoader.loadImageFromAssets("Explosion1.png", width,height);
+            explosionSprite[1] =  imageLoader.loadImageFromAssets("Explosion2.png", width,height);
+            explosionSprite[2] =  imageLoader.loadImageFromAssets("Explosion3.png", width,height);
+            explosionSprite[3] =  imageLoader.loadImageFromAssets("Explosion4.png", width,height);
+            explosionSprite[4] =  imageLoader.loadImageFromAssets("Explosion5.png", width,height);
+            explosionSprite[5] =  imageLoader.loadImageFromAssets("Explosion6.png", width,height);
+            explosionSprite[6] =  imageLoader.loadImageFromAssets("Explosion7.png", width,height);
+            explosionSprite[7] =  imageLoader.loadImageFromAssets("Explosion8.png", width,height);
+            explosionSprite[8] =  imageLoader.loadImageFromAssets("Explosion9.png", width,height);
+            explosionSprite[9] =  imageLoader.loadImageFromAssets("Explosion10.png", width, height);
 
-            explosionSprite[0] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion1.png")), width,height, false));
-            explosionSprite[1] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion2.png")), width,height, false));
-            explosionSprite[2] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion3.png")), width,height, false));
-            explosionSprite[3] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion4.png")), width,height, false));
-            explosionSprite[4] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion5.png")), width,height, false));
-            explosionSprite[5] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion6.png")), width,height, false));
-            explosionSprite[6] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion7.png")), width,height, false));
-            explosionSprite[7] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion8.png")), width,height, false));
-            explosionSprite[8] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion9.png")), width,height, false));
-            explosionSprite[9] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion10.png")),width, height, false));
+            explosionSprite[10] = imageLoader.loadImageFromAssets("Explosion11.png",width, height);
+            explosionSprite[11] = imageLoader.loadImageFromAssets("Explosion12.png",width, height);
+            explosionSprite[12] = imageLoader.loadImageFromAssets("Explosion13.png",width, height);
+            explosionSprite[13] = imageLoader.loadImageFromAssets("Explosion14.png",width, height);
+            explosionSprite[14] = imageLoader.loadImageFromAssets("Explosion15.png",width, height);
+            explosionSprite[15] = imageLoader.loadImageFromAssets("Explosion16.png",width, height);
+            explosionSprite[16] = imageLoader.loadImageFromAssets("Explosion17.png",width, height);
+            explosionSprite[17] = imageLoader.loadImageFromAssets("Explosion18.png",width, height);
+            explosionSprite[18] = imageLoader.loadImageFromAssets("Explosion19.png",width, height);
+            explosionSprite[19] = imageLoader.loadImageFromAssets("Explosion20.png",width, height);
 
-            explosionSprite[10] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion11.png")),width, height, false));
-            explosionSprite[11] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion12.png")),width, height, false));
-            explosionSprite[12] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion13.png")),width, height, false));
-            explosionSprite[13] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion14.png")),width, height, false));
-            explosionSprite[14] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion15.png")),width, height, false));
-            explosionSprite[15] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion16.png")),width, height, false));
-            explosionSprite[16] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion17.png")),width, height, false));
-            explosionSprite[17] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion18.png")),width, height, false));
-            explosionSprite[18] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion19.png")),width, height, false));
-            explosionSprite[19] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion20.png")),width, height, false));
+            explosionSprite[20] = imageLoader.loadImageFromAssets("Explosion21.png",width, height);
+            explosionSprite[21] = imageLoader.loadImageFromAssets("Explosion22.png",width, height);
+            explosionSprite[22] = imageLoader.loadImageFromAssets("Explosion23.png",width, height);
+            explosionSprite[23] = imageLoader.loadImageFromAssets("Explosion24.png",width, height);
+            explosionSprite[24] = imageLoader.loadImageFromAssets("Explosion25.png",width, height);
+            explosionSprite[25] = imageLoader.loadImageFromAssets("Explosion26.png",width, height);
+            explosionSprite[26] = imageLoader.loadImageFromAssets("Explosion27.png",width, height);
+            explosionSprite[27] = imageLoader.loadImageFromAssets("Explosion28.png",width, height);
+            explosionSprite[28] = imageLoader.loadImageFromAssets("Explosion29.png",width, height);
+            explosionSprite[29] = imageLoader.loadImageFromAssets("Explosion30.png",width, height);
 
-            explosionSprite[20] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion21.png")),width, height, false));
-            explosionSprite[21] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion22.png")),width, height, false));
-            explosionSprite[22] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion23.png")),width, height, false));
-            explosionSprite[23] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion24.png")),width, height, false));
-            explosionSprite[24] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion25.png")),width, height, false));
-            explosionSprite[25] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion26.png")),width, height, false));
-            explosionSprite[26] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion27.png")),width, height, false));
-            explosionSprite[27] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion28.png")),width, height, false));
-            explosionSprite[28] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion29.png")),width, height, false));
-            explosionSprite[29] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion30.png")),width, height, false));
-
-            explosionSprite[30] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion31.png")),width, height, false));
-            explosionSprite[31] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion32.png")),width, height, false));
-            explosionSprite[32] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Explosion33.png")),width, height, false));
-
+            explosionSprite[30] = imageLoader.loadImageFromAssets("Explosion31.png",width, height);
+            explosionSprite[31] = imageLoader.loadImageFromAssets("Explosion32.png",width, height);
+            explosionSprite[32] = imageLoader.loadImageFromAssets("Explosion33.png",width, height);
 
             int miniWidth = width / 3;
             int miniHeight = height / 3;
 
             Image[] miniExplosionSprite = new Image[20];
+            miniExplosionSprite[0] =  imageLoader.loadImageFromAssets("Bild-000001.png", miniWidth, miniHeight);
+            miniExplosionSprite[1] =  imageLoader.loadImageFromAssets("Bild-000002.png", miniWidth, miniHeight);
+            miniExplosionSprite[2] =  imageLoader.loadImageFromAssets("Bild-000003.png", miniWidth, miniHeight);
+            miniExplosionSprite[3] =  imageLoader.loadImageFromAssets("Bild-000004.png", miniWidth, miniHeight);
+            miniExplosionSprite[4] =  imageLoader.loadImageFromAssets("Bild-000005.png", miniWidth, miniHeight);
+            miniExplosionSprite[5] =  imageLoader.loadImageFromAssets("Bild-000006.png", miniWidth, miniHeight);
+            miniExplosionSprite[6] =  imageLoader.loadImageFromAssets("Bild-000007.png", miniWidth, miniHeight);
+            miniExplosionSprite[7] =  imageLoader.loadImageFromAssets("Bild-000008.png", miniWidth, miniHeight);
+            miniExplosionSprite[8] =  imageLoader.loadImageFromAssets("Bild-000009.png", miniWidth, miniHeight);
+            miniExplosionSprite[9] =  imageLoader.loadImageFromAssets("Bild-0000010.png" ,miniWidth, miniHeight);
 
-            miniExplosionSprite[0] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000001.png")), miniWidth, miniHeight, false));
-            miniExplosionSprite[1] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000002.png")), miniWidth, miniHeight, false));
-            miniExplosionSprite[2] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000003.png")), miniWidth, miniHeight, false));
-            miniExplosionSprite[3] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000004.png")), miniWidth, miniHeight, false));
-            miniExplosionSprite[4] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000005.png")), miniWidth, miniHeight, false));
-            miniExplosionSprite[5] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000006.png")), miniWidth, miniHeight, false));
-            miniExplosionSprite[6] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000007.png")), miniWidth, miniHeight, false));
-            miniExplosionSprite[7] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000008.png")), miniWidth, miniHeight, false));
-            miniExplosionSprite[8] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000009.png")), miniWidth, miniHeight, false));
-            miniExplosionSprite[9] =  new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-0000010.png")),miniWidth, miniHeight, false));
-
-            miniExplosionSprite[10] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000011.png")),miniWidth, miniHeight, false));
-            miniExplosionSprite[11] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000012.png")),miniWidth, miniHeight, false));
-            miniExplosionSprite[12] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000013.png")),miniWidth, miniHeight, false));
-            miniExplosionSprite[13] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000014.png")),miniWidth, miniHeight, false));
-            miniExplosionSprite[14] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000015.png")),miniWidth, miniHeight, false));
-            miniExplosionSprite[15] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000016.png")),miniWidth, miniHeight, false));
-            miniExplosionSprite[16] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000017.png")),miniWidth, miniHeight, false));
-            miniExplosionSprite[17] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000018.png")),miniWidth, miniHeight, false));
-            miniExplosionSprite[18] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000019.png")),miniWidth, miniHeight, false));
-            miniExplosionSprite[19] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Bild-000020.png")),miniWidth, miniHeight, false));
+            miniExplosionSprite[10] = imageLoader.loadImageFromAssets("Bild-000011.png",miniWidth, miniHeight);
+            miniExplosionSprite[11] = imageLoader.loadImageFromAssets("Bild-000012.png",miniWidth, miniHeight);
+            miniExplosionSprite[12] = imageLoader.loadImageFromAssets("Bild-000013.png",miniWidth, miniHeight);
+            miniExplosionSprite[13] = imageLoader.loadImageFromAssets("Bild-000014.png",miniWidth, miniHeight);
+            miniExplosionSprite[14] = imageLoader.loadImageFromAssets("Bild-000015.png",miniWidth, miniHeight);
+            miniExplosionSprite[15] = imageLoader.loadImageFromAssets("Bild-000016.png",miniWidth, miniHeight);
+            miniExplosionSprite[16] = imageLoader.loadImageFromAssets("Bild-000017.png",miniWidth, miniHeight);
+            miniExplosionSprite[17] = imageLoader.loadImageFromAssets("Bild-000018.png",miniWidth, miniHeight);
+            miniExplosionSprite[18] = imageLoader.loadImageFromAssets("Bild-000019.png",miniWidth, miniHeight);
+            miniExplosionSprite[19] = imageLoader.loadImageFromAssets("Bild-000020.png",miniWidth, miniHeight);
 
             // blue tower
             Image [] blueTowerI = new Image[36];
             for (int i = 0; i < 36; i++)
-                blueTowerI[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mg" + i + "0.png")), width, height, false));
+                blueTowerI[i] = imageLoader.loadImageFromAssets("mg" + i + "0.png", width, height);
 
             Image [] blueTowerII = new Image[36];
             for (int i = 0; i < 36; i++)
-                blueTowerII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("bgII" + i + "0.png")), width, height, false));
+                blueTowerII[i] = imageLoader.loadImageFromAssets("bgII" + i + "0.png", width, height);
 
             Image [] blueTowerIII = new Image[36];
             for (int i = 0; i < 36; i++)
-                blueTowerIII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("bgIII" + i + "0.png")), width, height, false));
+                blueTowerIII[i] = imageLoader.loadImageFromAssets("bgIII" + i + "0.png", width, height);
 
             //green tower
             Image [] greenTowerI = new Image[36];
             for (int i = 0; i < 36; i++)
-                greenTowerI[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenLS00" + i + "0.png")), width, height, false));
+                greenTowerI[i] = imageLoader.loadImageFromAssets("greenLS00" + i + "0.png", width, height);
 
             Image [] greenTowerII = new Image[36];
             for (int i = 0; i < 36; i++)
-                greenTowerII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsII" + i + "0.png")), width, height, false));
+                greenTowerII[i] = imageLoader.loadImageFromAssets("lsII" + i + "0.png", width, height);
 
             Image [] greenTowerIII = new Image[36];
             for (int i = 0; i < 36; i++)
-                greenTowerIII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsIII" + i + "0.png")), width, height, false));
+                greenTowerIII[i] = imageLoader.loadImageFromAssets("lsIII" + i + "0.png", width, height);
 
             //red tower
             Image [] redTowerI = new Image[36];
             for (int i = 0; i < 36; i++)
-                redTowerI[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rmI" + i + "0.png")), width, height, false));
+                redTowerI[i] = imageLoader.loadImageFromAssets("rmI" + i + "0.png", width, height);
 
             Image [] redTowerII = new Image[36];
             for (int i = 0; i < 36; i++)
-                redTowerII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rmII" + i + "0.png")), width, height, false));
+                redTowerII[i] = imageLoader.loadImageFromAssets("rmII" + i + "0.png", width, height);
 
             Image [] redTowerIII = new Image[36];
             for (int i = 0; i < 36; i++)
-                redTowerIII[i] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rmIII" + i + "0.png")), width, height, false));
+                redTowerIII[i] = imageLoader.loadImageFromAssets("rmIII" + i + "0.png", width, height);
 
             int width_hp = (width * 3) / 4; //120;
             int height_hp = height / 5;//30;
 
             Image [] listHealthBarImg = new Image[10];
-            listHealthBarImg[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_10.png")), width_hp, height_hp, false));
-            listHealthBarImg[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_20.png")), width_hp, height_hp, false));
-            listHealthBarImg[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_30.png")), width_hp, height_hp, false));
-            listHealthBarImg[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_40.png")), width_hp, height_hp, false));
-            listHealthBarImg[4] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_50.png")), width_hp, height_hp, false));
-            listHealthBarImg[5] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_60.png")), width_hp, height_hp, false));
-            listHealthBarImg[6] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_70.png")), width_hp, height_hp, false));
-            listHealthBarImg[7] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_80.png")), width_hp, height_hp, false));
-            listHealthBarImg[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_90.png")), width_hp, height_hp, false));
-            listHealthBarImg[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("health_bar_100.png")), width_hp, height_hp, false));
-
+            listHealthBarImg[0] = imageLoader.loadImageFromAssets("health_bar_10.png", width_hp, height_hp);
+            listHealthBarImg[1] = imageLoader.loadImageFromAssets("health_bar_20.png", width_hp, height_hp);
+            listHealthBarImg[2] = imageLoader.loadImageFromAssets("health_bar_30.png", width_hp, height_hp);
+            listHealthBarImg[3] = imageLoader.loadImageFromAssets("health_bar_40.png", width_hp, height_hp);
+            listHealthBarImg[4] = imageLoader.loadImageFromAssets("health_bar_50.png", width_hp, height_hp);
+            listHealthBarImg[5] = imageLoader.loadImageFromAssets("health_bar_60.png", width_hp, height_hp);
+            listHealthBarImg[6] = imageLoader.loadImageFromAssets("health_bar_70.png", width_hp, height_hp);
+            listHealthBarImg[7] = imageLoader.loadImageFromAssets("health_bar_80.png", width_hp, height_hp);
+            listHealthBarImg[8] = imageLoader.loadImageFromAssets("health_bar_90.png", width_hp, height_hp);
+            listHealthBarImg[9] = imageLoader.loadImageFromAssets("health_bar_100.png", width_hp, height_hp);
 
             Image score = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("SmallBox.png")), 300, 150, false));
             Image titleScore = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("HealthBar.png")), 300, 70, false));
@@ -218,45 +216,43 @@ public class MainActivity extends AppCompatActivity {
             int numHeight = width / 2;//70;
 
             Image [] listNumberImg = new Image[10];
-            listNumberImg[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("0.png")), numWidth, numHeight, false));
-            listNumberImg[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("1.png")), numWidth, numHeight, false));
-            listNumberImg[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("2.png")), numWidth, numHeight, false));
-            listNumberImg[3] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("3.png")), numWidth, numHeight, false));
-            listNumberImg[4] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("4.png")), numWidth, numHeight, false));
-            listNumberImg[5] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("5.png")), numWidth, numHeight, false));
-            listNumberImg[6] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("6.png")), numWidth, numHeight, false));
-            listNumberImg[7] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("7.png")), numWidth, numHeight, false));
-            listNumberImg[8] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("8.png")), numWidth, numHeight, false));
-            listNumberImg[9] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("9.png")), numWidth, numHeight, false));
+
+            listNumberImg[0] = imageLoader.loadImageFromAssets("0.png", numWidth, numHeight);
+            listNumberImg[1] = imageLoader.loadImageFromAssets("1.png", numWidth, numHeight);
+            listNumberImg[2] = imageLoader.loadImageFromAssets("2.png", numWidth, numHeight);
+            listNumberImg[3] = imageLoader.loadImageFromAssets("3.png", numWidth, numHeight);
+            listNumberImg[4] = imageLoader.loadImageFromAssets("4.png", numWidth, numHeight);
+            listNumberImg[5] = imageLoader.loadImageFromAssets("5.png", numWidth, numHeight);
+            listNumberImg[6] = imageLoader.loadImageFromAssets("6.png", numWidth, numHeight);
+            listNumberImg[7] = imageLoader.loadImageFromAssets("7.png", numWidth, numHeight);
+            listNumberImg[8] = imageLoader.loadImageFromAssets("8.png", numWidth, numHeight);
+            listNumberImg[9] = imageLoader.loadImageFromAssets("9.png", numWidth, numHeight);
 
             Image [] dialogUpgradeTower1 = new Image[3];
-            dialogUpgradeTower1[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgleve2.png")), 800, 530, false));
-            dialogUpgradeTower1[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgleve3.png")), 800, 530, false));
-            dialogUpgradeTower1[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("mgleveTOP.png")), 800, 530, false));
+
+            dialogUpgradeTower1[0] = imageLoader.loadImageFromAssets("mgleve2.png", 800, 530);
+            dialogUpgradeTower1[1] = imageLoader.loadImageFromAssets("mgleve3.png", 800, 530);
+            dialogUpgradeTower1[2] = imageLoader.loadImageFromAssets("mgleveTOP.png", 800, 530);
+
             Image [] dialogUpgradeTower2 = new Image[3];
-            dialogUpgradeTower2[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rcleve2.png")), 800, 530, false));
-            dialogUpgradeTower2[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rcleve3.png")), 800, 530, false));
-            dialogUpgradeTower2[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("rcleveTOP.png")), 800, 530, false));
+            dialogUpgradeTower2[0] = imageLoader.loadImageFromAssets("rcleve2.png", 800, 530);
+            dialogUpgradeTower2[1] = imageLoader.loadImageFromAssets("rcleve3.png", 800, 530);
+            dialogUpgradeTower2[2] = imageLoader.loadImageFromAssets("rcleveTOP.png", 800, 530);
+
             Image [] dialogUpgradeTower3 = new Image[3];
-            dialogUpgradeTower3[0] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsleve2.png")), 800, 530, false));
-            dialogUpgradeTower3[1] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsleve3.png")), 800, 530, false));
-            dialogUpgradeTower3[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("lsleveTOP.png")), 800, 530, false));
-//            dialogUpgradeTower1[2] = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("2.png")), 650, 390, false));
-//            new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("upgradeDialog.png")),650,390,false))
-
-
-            Bitmap green = Bitmap.createBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")));
-            Bitmap red = Bitmap.createBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")));
+            dialogUpgradeTower3[0] = imageLoader.loadImageFromAssets("lsleve2.png", 800, 530);
+            dialogUpgradeTower3[1] = imageLoader.loadImageFromAssets("lsleve3.png", 800, 530);
+            dialogUpgradeTower3[2] = imageLoader.loadImageFromAssets("lsleveTOP.png", 800, 530);
 
             game = new Game(renderer, rows, columns,50,50, width)
-                    .setBackgroundImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("maphi.jpg")), borderX, borderY, false)))
-                    .setFieldImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("green.png")), width, height, false)))
-                    .setFieldImageTower(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("Exceptione.png")), width, height, false)))
-                    .setFieldImageTowerDen(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("red.png")), width, height, false)))
+                    .setBackgroundImage(imageLoader.loadImageFromAssets("maphi.jpg", borderX, borderY))
+                    .setFieldImage(imageLoader.loadImageFromAssets("green.png", width, height))
+                    .setFieldImageTower(imageLoader.loadImageFromAssets("Exceptione.png", width, height))
+                    .setFieldImageTowerDen(imageLoader.loadImageFromAssets("red.png", width, height))
                     .setEnemySprite(sprite)
                     .setBulletSprite(bulletSprite)
                     .setBulletSpriteRocket(spriteRocket)
-                    .setLaserSprite(new Image[]{new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("greenPhoton.png")), 10, 10, false))})
+                    .setLaserSprite(new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png", 10, 10)})
                     .setExplodeSprite(explosionSprite)
                     .setMiniExplodeSprite(miniExplosionSprite)
                     .setRedTower(redTowerI, redTowerII, redTowerIII)
@@ -265,14 +261,13 @@ public class MainActivity extends AppCompatActivity {
                     .setHealthBarSprite(listHealthBarImg)
                     .setBorders(borderX, borderY)
                     .setUpgradeTowerDialogue(dialogUpgradeTower1, dialogUpgradeTower2, dialogUpgradeTower3)
-                    .setUpgradeButtonImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("ButtonUpgrade.png")),350,90,false)))
-                    .setCloseButtonImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("ButtonX.png")),110,120,false)))
-                    .setSaleButtonImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("ButtonSale.png")),250,90,false)))
-                    .setSelectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(green, 200, 200, false))/*dialog*/)
-                    .setDeselectionImage(new AndroidBitmapImage(Bitmap.createScaledBitmap(red, 200, 200, false))/*dialog*/)
+                    .setUpgradeButtonImage(imageLoader.loadImageFromAssets("ButtonUpgrade.png",350,90))
+                    .setCloseButtonImage(imageLoader.loadImageFromAssets("ButtonX.png",110,120))
+                    .setSaleButtonImage(imageLoader.loadImageFromAssets("ButtonSale.png",250,90))
+                    .setSelectionImage(imageLoader.loadImageFromAssets("green.png", 200, 200))
+                    .setDeselectionImage(imageLoader.loadImageFromAssets("red.png", 200, 200))
                     .setScoreBackGrImage(score)
                     .setScorenumbersImages(listNumberImg);
-
 
         } catch (IOException ex) {
             Log.e(DaemonUtils.tag(), "Could not init game!", ex);
