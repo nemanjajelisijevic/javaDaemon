@@ -17,7 +17,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback, Consumer {
+public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback {
 
     private Scene2D scene;
 
