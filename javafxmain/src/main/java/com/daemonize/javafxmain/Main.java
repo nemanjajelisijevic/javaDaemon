@@ -252,7 +252,7 @@ public class Main extends Application {
             primaryStage.setScene(scene);
             primaryStage.show();
 
-            scene.addEventFilter(MouseEvent.MOUSE_PRESSED,event -> game.onTouch((float) event.getSceneX(), (float) event.getSceneY()));
+            scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> game.onTouch((float) event.getSceneX(), (float) event.getSceneY()));
 
             if(!game.isRunning())
                 game.run();

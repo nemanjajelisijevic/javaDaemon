@@ -126,7 +126,21 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer>, Runnable {
             } finally {
                 dirtyLock.unlock();
             }
+
+            long t0 = System.nanoTime();
             drawViews();
+            double duration = DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS);
+            //
+            // System.out.println("DRAW LASTED: " + Double.toString(duration));
+            if (duration < 15) {
+                try {
+                    Thread.sleep(16 - (long) duration);
+                } catch (InterruptedException e) {
+                    //
+                }
+            }
+
+
             clean();
         }
     }
