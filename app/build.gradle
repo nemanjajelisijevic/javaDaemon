@@ -36,58 +36,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile 'com.squareup.okhttp3:okhttp:3.9.1'
-    compile 'com.google.code.gson:gson:2.8.0'
-    compile 'io.github.controlwear:virtualjoystick:1.8.0'
-    //    implementation project(':daemonengine')
-    //    implementation project(':androidconsumer')
-    annotationProcessor project(':daemonprocessor')
+    implementation project(':daemonengine')
+    implementation project (':game')
 }
-
-
-task engineTask(type: Copy) {
-    from '../daemonengine/build/libs/daemonengine.jar'
-    into 'libs/'
-}
-
-task processorTask(type: Copy) {
-    from '../daemonprocessor/build/libs/daemonprocessor.jar'
-    into 'libs/'
-}
-
-task consumerTask(type: Copy) {
-    from zipTree('../androidconsumer/build/outputs/aar/androidconsumer-release.aar')
-    include('classes.jar')
-    rename('classes.jar', 'androidconsumer.jar')
-    into 'libs/'
-}
-
-task gameTask(type: Copy) {
-    from '../game/build/libs/game.jar'
-    into 'libs/'
-}
-
-engineTask.dependsOn(':daemonengine:build')
-engineTask.dependsOn(':daemonprocessor:build')
-
-consumerTask.dependsOn(':daemonengine:build')
-consumerTask.dependsOn(':daemonprocessor:build')
-
-processorTask.dependsOn(':daemonengine:build')
-processorTask.dependsOn(':daemonprocessor:build')
-
-gameTask.dependsOn(':daemonengine:build')
-gameTask.dependsOn(':daemonprocessor:build')
-gameTask.dependsOn(engineTask)
-gameTask.dependsOn(processorTask)
-gameTask.dependsOn(':game:build')
-
-//preBuild.dependsOn(engineTask)
-//preBuild.dependsOn(consumerTask)
-//preBuild.dependsOn(processorTask)
-preBuild.dependsOn(gameTask)
-
-
-
-
 
