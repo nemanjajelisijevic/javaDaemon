@@ -15,23 +15,18 @@ def daemonsSource = "/generated/daemons"
 
 compileJava {
     options.compilerArgs << "-s"
-    options.compilerArgs << "$projectDir$daemonsSource"
+    options.compilerArgs << "$buildDir$daemonsSource"
 
     doFirst {
         // make sure that directory exists
-        file(new File(projectDir, daemonsSource)).mkdirs()
+        file(new File(buildDir, daemonsSource)).mkdirs()
     }
-}
-
-clean.doLast {
-    // clean-up directory when necessary
-    file(new File(projectDir, daemonsSource)).deleteDir()
 }
 
 sourceSets {
     generated {
         java {
-            srcDir "$projectDir$daemonsSource"
+            srcDir "$buildDir$daemonsSource"
         }
     }
 }
