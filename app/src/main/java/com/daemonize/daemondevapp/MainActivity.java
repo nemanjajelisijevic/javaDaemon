@@ -1,8 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -207,8 +204,8 @@ public class MainActivity extends AppCompatActivity {
             listHealthBarImg[8] = imageLoader.loadImageFromAssets("health_bar_90.png", width_hp, height_hp);
             listHealthBarImg[9] = imageLoader.loadImageFromAssets("health_bar_100.png", width_hp, height_hp);
 
-            Image score = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("SmallBox.png")), 300, 150, false));
-            Image titleScore = new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getAssets().open("HealthBar.png")), 300, 70, false));
+            Image score = imageLoader.loadImageFromAssets("SmallBox.png", 300, 150);
+            Image titleScore = imageLoader.loadImageFromAssets("HealthBar.png", 300, 70);
 
             int numWidth = width / 3;//50;
             int numHeight = width / 2;//70;

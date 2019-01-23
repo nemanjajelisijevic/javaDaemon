@@ -12,39 +12,27 @@ dependencies {
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
+def daemonsSource = "/generated/daemons"
 
 compileJava {
     options.compilerArgs << "-s"
-    options.compilerArgs << "$projectDir/generated/daemons"
+    options.compilerArgs << "$projectDir$daemonsSource"
 
     doFirst {
         // make sure that directory exists
-        file(new File(projectDir, "generated/daemons")).mkdirs()
+        file(new File(projectDir, daemonsSource)).mkdirs()
     }
 }
 
 clean.doLast {
     // clean-up directory when necessary
-    file(new File(projectDir, "generated/daemons")).deleteDir()
+    file(new File(projectDir, daemonsSource)).deleteDir()
 }
 
 sourceSets {
     generated {
         java {
-            srcDir "$projectDir/generated/daemons"
+            srcDir "$projectDir$daemonsSource"
         }
     }
 }
-
-//task engineTask(type: Copy) {
-//    from '../daemonengine/build/libs/daemonengine.jar'
-//    into 'libs/'
-//}
-//
-//task processorTask(type: Copy) {
-//    from '../daemonprocessor/build/libs/daemonprocessor.jar'
-//    into 'libs/'
-//}
-//
-//build.dependsOn(engineTask)
-//build.dependsOn(processorTask)
