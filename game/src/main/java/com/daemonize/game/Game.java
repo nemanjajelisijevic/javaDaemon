@@ -648,13 +648,12 @@ public class Game {
             });
 
             //draw grid
-            for(int j = 0; j < rows; ++j ) {
+            for(int j = 0; j < rows; ++j )
                 for (int i = 0; i < columns; ++i) {
                     gridViewMatrix[j][i].setAbsoluteX(grid.getGrid()[j][i].getCenterX());
                     gridViewMatrix[j][i].setAbsoluteY(grid.getGrid()[j][i].getCenterY());
-                    gridViewMatrix[j][i].setImage(grid.getField(j,i).isWalkable()?fieldImage:fieldImageTower).hide();
+                    gridViewMatrix[j][i].setImage(grid.getField(j, i).isWalkable() ? fieldImage : fieldImageTower).show();
                 }
-            }
 
             //prepare the scene and start the renderer
             scene.lockViews();

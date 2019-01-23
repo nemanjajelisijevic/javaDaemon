@@ -1,4 +1,14 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 
-apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/0.3.0/javafx.plugin"
+apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin"
+
+
+dependencies {
+    implementation project(':daemonengine')
+    implementation project (':game')
+}
+
+javafx {
+    mainClass = 'com.daemonize.javafxmain.Main'
+}
