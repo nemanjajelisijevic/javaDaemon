@@ -114,7 +114,7 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer>, Runnable {
                 while (!dirtyFlag)
                     dirtyCondition.await();
             } catch (InterruptedException e) {
-                System.err.println("Diarty await interrupted!");
+
             } finally {
                 dirtyLock.unlock();
             }
@@ -134,14 +134,13 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer>, Runnable {
     }
 
     protected void drawViews(){
-        for (ImageView view : scene.getViews()) {
+        for (ImageView view : scene.getViews())
             if (view.isShowing())
                 gc.drawImage(
                         (javafx.scene.image.Image) view.getImage().getImageImp(),
                         view.getStartingX(),
                         view.getStartingY()
                 );
-        }
     }
 
     @Override
