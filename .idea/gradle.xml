@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/daemonengine" />
             <option value="$PROJECT_DIR$/daemonprocessor" />
             <option value="$PROJECT_DIR$/game" />
+            <option value="$PROJECT_DIR$/javafxmain" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

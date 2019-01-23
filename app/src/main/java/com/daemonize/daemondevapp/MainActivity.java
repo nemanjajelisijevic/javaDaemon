@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
             miniExplosionSprite[6] =  imageLoader.loadImageFromAssets("Bild-000007.png", miniWidth, miniHeight);
             miniExplosionSprite[7] =  imageLoader.loadImageFromAssets("Bild-000008.png", miniWidth, miniHeight);
             miniExplosionSprite[8] =  imageLoader.loadImageFromAssets("Bild-000009.png", miniWidth, miniHeight);
-            miniExplosionSprite[9] =  imageLoader.loadImageFromAssets("Bild-0000010.png" ,miniWidth, miniHeight);
+            miniExplosionSprite[9] =  imageLoader.loadImageFromAssets("Bild-0000010.png",miniWidth, miniHeight);
 
             miniExplosionSprite[10] = imageLoader.loadImageFromAssets("Bild-000011.png",miniWidth, miniHeight);
             miniExplosionSprite[11] = imageLoader.loadImageFromAssets("Bild-000012.png",miniWidth, miniHeight);
