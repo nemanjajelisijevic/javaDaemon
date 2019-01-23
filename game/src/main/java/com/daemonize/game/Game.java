@@ -779,8 +779,8 @@ public class Game {
                 );
             });
 
-            //start enemy generator
-            enemyGenerator.start();
+            //start enemy generatorh
+            enemyGenerator.setName("Enemy Generator").start();
 
 //            backgroundMover.start();
         });

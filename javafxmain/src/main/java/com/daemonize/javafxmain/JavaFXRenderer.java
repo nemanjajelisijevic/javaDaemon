@@ -7,17 +7,9 @@ import com.daemonize.game.renderer.DrawConsumer;
 import com.daemonize.game.renderer.Renderer2D;
 
 import com.daemonize.game.images.Image;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.stage.Stage;
 
 import com.daemonize.game.scene.Scene2D;
 import com.daemonize.game.view.ImageView;
@@ -122,7 +114,7 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer>, Runnable {
                 while (!dirtyFlag)
                     dirtyCondition.await();
             } catch (InterruptedException e) {
-                //
+                System.err.println("Diarty await interrupted!");
             } finally {
                 dirtyLock.unlock();
             }
@@ -130,8 +122,6 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer>, Runnable {
             long t0 = System.nanoTime();
             drawViews();
             double duration = DaemonUtils.convertNanoTimeUnits(System.nanoTime() - t0, TimeUnits.MILLISECONDS);
-            //
-            // System.out.println("DRAW LASTED: " + Double.toString(duration));
             if (duration < 15) {
                 try {
                     Thread.sleep(16 - (long) duration);
@@ -139,8 +129,6 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer>, Runnable {
                     //
                 }
             }
-
-
             clean();
         }
     }
