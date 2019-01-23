@@ -1,0 +1,50 @@
+apply plugin: 'java-library'
+apply plugin: 'idea'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project (':daemonengine')
+    implementation project (':daemonprocessor')
+    annotationProcessor project(':daemonprocessor')
+}
+
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+
+compileJava {
+    options.compilerArgs << "-s"
+    options.compilerArgs << "$projectDir/generated/daemons"
+
+    doFirst {
+        // make sure that directory exists
+        file(new File(projectDir, "generated/daemons")).mkdirs()
+    }
+}
+
+clean.doLast {
+    // clean-up directory when necessary
+    file(new File(projectDir, "generated/daemons")).deleteDir()
+}
+
+sourceSets {
+    generated {
+        java {
+            srcDir "$projectDir/generated/daemons"
+        }
+    }
+}
+
+//task engineTask(type: Copy) {
+//    from '../daemonengine/build/libs/daemonengine.jar'
+//    into 'libs/'
+//}
+//
+//task processorTask(type: Copy) {
+//    from '../daemonprocessor/build/libs/daemonprocessor.jar'
+//    into 'libs/'
+//}
+//
+//build.dependsOn(engineTask)
+//build.dependsOn(processorTask)

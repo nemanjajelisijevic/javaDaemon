@@ -13,11 +13,9 @@ import android.view.MotionEvent;
 import android.view.WindowManager;
 
 
-import com.daemonize.daemondevapp.images.AndroidBitmapImage;
-import com.daemonize.daemondevapp.images.Image;
-import com.daemonize.daemondevapp.images.imageloader.AndroidImageLoader;
-import com.daemonize.daemondevapp.images.imageloader.ImageLoader;
-import com.daemonize.daemondevapp.renderer.AndroidSurfaceViewRenderer;
+import com.daemonize.game.Game;
+import com.daemonize.game.images.Image;
+import com.daemonize.game.images.imageloader.ImageLoader;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 

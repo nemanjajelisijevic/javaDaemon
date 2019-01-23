@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonengine/daemonengine.iml" filepath="$PROJECT_DIR$/daemonengine/daemonengine.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" filepath="$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/game/game.iml" filepath="$PROJECT_DIR$/game/game.iml" />
       <module fileurl="file://$PROJECT_DIR$/javaDaemon.iml" filepath="$PROJECT_DIR$/javaDaemon.iml" />
     </modules>
   </component>

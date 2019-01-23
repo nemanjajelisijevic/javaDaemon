@@ -62,24 +62,30 @@ task consumerTask(type: Copy) {
     into 'libs/'
 }
 
+task gameTask(type: Copy) {
+    from '../game/build/libs/game.jar'
+    into 'libs/'
+}
 
 engineTask.dependsOn(':daemonengine:build')
-engineTask.dependsOn(':androidconsumer:build')
 engineTask.dependsOn(':daemonprocessor:build')
 
-
 consumerTask.dependsOn(':daemonengine:build')
-consumerTask.dependsOn(':androidconsumer:build')
 consumerTask.dependsOn(':daemonprocessor:build')
 
 processorTask.dependsOn(':daemonengine:build')
-processorTask.dependsOn(':androidconsumer:build')
 processorTask.dependsOn(':daemonprocessor:build')
 
-preBuild.dependsOn(engineTask)
-preBuild.dependsOn(consumerTask)
-preBuild.dependsOn(processorTask)
+gameTask.dependsOn(':daemonengine:build')
+gameTask.dependsOn(':daemonprocessor:build')
+gameTask.dependsOn(engineTask)
+gameTask.dependsOn(processorTask)
+gameTask.dependsOn(':game:build')
 
+//preBuild.dependsOn(engineTask)
+//preBuild.dependsOn(consumerTask)
+//preBuild.dependsOn(processorTask)
+preBuild.dependsOn(gameTask)
 
 
 

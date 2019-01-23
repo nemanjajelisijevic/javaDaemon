@@ -1,1 +1,1 @@
-include ':app',':daemonengine',':daemonprocessor',':androidconsumer'
+include ':app',':daemonengine',':daemonprocessor',':androidconsumer', ':game'
