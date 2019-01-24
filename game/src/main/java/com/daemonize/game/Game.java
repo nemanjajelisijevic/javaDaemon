@@ -175,11 +175,6 @@ public class Game {
                 Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.runtimeCheckAndGet();
                 imageAndView.getSecond().setAbsoluteX(imageAndView.getFirst().positionX);
                 imageAndView.getSecond().setAbsoluteY(imageAndView.getFirst().positionY);
-
-                if (imageAndView.getFirst().image == null) {
-                    System.out.println(DaemonUtils.tag() + imageAndView.getSecond().getName() + " image == NULL");
-                }
-
                 imageAndView.getSecond().setImage(imageAndView.getFirst().image);
             });
         }
@@ -267,8 +262,6 @@ public class Game {
 
                 if (selectTowerDialogue.getSelectTowerDialogue().isShowing()){
                    selectTowerDialogue.getSelectTowerDialogue().checkCoordinates(x,y);
-                    if (towerSelect != null )
-                        System.out.println("SelectTower" + towerSelect.toString());
                 }
 
                 if (towerSelect == null ){
@@ -833,8 +826,6 @@ public class Game {
                     else
                         towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide();
                 });
-
-                System.err.println(DaemonUtils.tag() + "RENDERER CONSUME RETURNED: " + consumed);
             }
 
         } else { //init and set new tower
