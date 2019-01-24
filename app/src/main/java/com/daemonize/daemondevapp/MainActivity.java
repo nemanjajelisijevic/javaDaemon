@@ -59,15 +59,12 @@ public class MainActivity extends AppCompatActivity {
 
         if(!game.isRunning())
             game.run();
-
-        Log.e(DaemonUtils.tag(), "ACTIVITY ON CREATE----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.e(DaemonUtils.tag(), "ACTIVITY ON START----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
     }
 
     @Override
@@ -81,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        Log.w(DaemonUtils.tag(), "ACTIVITY ON RESUME----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
         if (game.isRunning() && game.isPaused())
             game.cont();
     }
@@ -89,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.w(DaemonUtils.tag(), "ACTIVITY ON ON PAUSE----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
         if (game.isRunning() && !game.isPaused())
             game.pause();
     }
@@ -97,14 +92,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Log.e(DaemonUtils.tag(), "ACTIVITY ON STOP----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e(DaemonUtils.tag(), "ACTIVITY ON DESTROY----------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
         game.stop();
     }
 
