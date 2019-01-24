@@ -33,6 +33,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Random;
@@ -302,9 +303,30 @@ public class Game {
 
                 backgroundImage = imageLoader.loadImageFromAssets("maphi.jpg", borderX, borderY);
 
+                //laser views init
+                laserViews = new ArrayList<>(laserViewNo);
+
+                Image[] loadingSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png", 15, 15)};
+
+                int step = borderX / laserViewNo;
+
+                for (int i = 0; i < laserViewNo; ++i) {
+                    int currX = i * step;
+                    laserViews.add(new ImageViewImpl("laser View " + i).setImage(loadingSprite[0]).hide().setAbsoluteX(currX).setAbsoluteY(borderY * 3 / 4).setZindex(1));
+                }
+
+                Iterator<ImageView> loaderBar = laserViews.iterator();
+
                 Scene2D loadingScene = new Scene2D();
                 loadingScene.addImageView(new ImageViewImpl("Loading background").setAbsoluteX(borderX /2).setAbsoluteY(borderY /2).setImage(backgroundImage).setZindex(0).show());
+                loadingScene.addImageViews(laserViews);
                 renderer.drawScene(loadingScene.lockViews());
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
 
                 int gridWidth = (borderX * 70) / 100;
 
@@ -318,6 +340,11 @@ public class Game {
                 fieldImageTower = imageLoader.loadImageFromAssets("Exceptione.png", width, height);
                 fieldImageTowerDen = imageLoader.loadImageFromAssets("red.png", width, height);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 upgradeButtonImage = imageLoader.loadImageFromAssets("ButtonUpgrade.png",350,90);
                 closeButtonImage = imageLoader.loadImageFromAssets("ButtonX.png",110,120);
                 saleButtonImage = imageLoader.loadImageFromAssets("ButtonSale.png",250,90);
@@ -325,17 +352,30 @@ public class Game {
                 selection = imageLoader.loadImageFromAssets("green.png", 200, 200);
                 deselection = imageLoader.loadImageFromAssets("red.png", 200, 200);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 scoreBackGrImage = imageLoader.loadImageFromAssets("SmallBox.png", 300, 150);
-
-
 
                 laserSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png", 10, 10)};
 
                 //init enemy sprite
                 enemySprite = new Image[36];
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 for (int i = 0; i < 36; i++)
                     enemySprite[i] = imageLoader.loadImageFromAssets("plane" + Integer.toString(i) + "0.png", width, height);
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 //bullet sprite
                 int bulletSize0 = width / 8;//20;
@@ -351,6 +391,11 @@ public class Game {
                 for (int i = 0; i < 36; i++)
                     bulletSpriteRocket[i] = imageLoader.loadImageFromAssets("rocket" + Integer.toString(i) + "0.png", bulletSize, bulletSize);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 //explosion sprite
                 explodeSprite = new Image[33];
                 explodeSprite[0] = imageLoader.loadImageFromAssets("Explosion1.png", width, height);
@@ -363,6 +408,11 @@ public class Game {
                 explodeSprite[7] = imageLoader.loadImageFromAssets("Explosion8.png", width, height);
                 explodeSprite[8] = imageLoader.loadImageFromAssets("Explosion9.png", width, height);
                 explodeSprite[9] = imageLoader.loadImageFromAssets("Explosion10.png", width, height);
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 explodeSprite[10] = imageLoader.loadImageFromAssets("Explosion11.png", width, height);
                 explodeSprite[11] = imageLoader.loadImageFromAssets("Explosion12.png", width, height);
@@ -386,12 +436,22 @@ public class Game {
                 explodeSprite[28] = imageLoader.loadImageFromAssets("Explosion29.png", width, height);
                 explodeSprite[29] = imageLoader.loadImageFromAssets("Explosion30.png", width, height);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 explodeSprite[30] = imageLoader.loadImageFromAssets("Explosion31.png", width, height);
                 explodeSprite[31] = imageLoader.loadImageFromAssets("Explosion32.png", width, height);
                 explodeSprite[32] = imageLoader.loadImageFromAssets("Explosion33.png", width, height);
 
                 int miniWidth = width / 3;
                 int miniHeight = height / 3;
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 miniExplodeSprite = new Image[20];
                 miniExplodeSprite[0] = imageLoader.loadImageFromAssets("Bild-000001.png", miniWidth, miniHeight);
@@ -405,6 +465,11 @@ public class Game {
                 miniExplodeSprite[8] = imageLoader.loadImageFromAssets("Bild-000009.png", miniWidth, miniHeight);
                 miniExplodeSprite[9] = imageLoader.loadImageFromAssets("Bild-0000010.png", miniWidth, miniHeight);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 miniExplodeSprite[10] = imageLoader.loadImageFromAssets("Bild-000011.png", miniWidth, miniHeight);
                 miniExplodeSprite[11] = imageLoader.loadImageFromAssets("Bild-000012.png", miniWidth, miniHeight);
                 miniExplodeSprite[12] = imageLoader.loadImageFromAssets("Bild-000013.png", miniWidth, miniHeight);
@@ -415,6 +480,11 @@ public class Game {
                 miniExplodeSprite[17] = imageLoader.loadImageFromAssets("Bild-000018.png", miniWidth, miniHeight);
                 miniExplodeSprite[18] = imageLoader.loadImageFromAssets("Bild-000019.png", miniWidth, miniHeight);
                 miniExplodeSprite[19] = imageLoader.loadImageFromAssets("Bild-000020.png", miniWidth, miniHeight);
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 // blue tower
                 Image[] blueTowerI = new Image[36];
@@ -429,47 +499,96 @@ public class Game {
                 for (int i = 0; i < 36; i++)
                     blueTowerIII[i] = imageLoader.loadImageFromAssets("bgIII" + i + "0.png", width, height);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 blueTower = new ArrayList<>(3);
                 blueTower.add(blueTowerI);
                 blueTower.add(blueTowerII);
                 blueTower.add(blueTowerIII);
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 //green tower
                 Image[] greenTowerI = new Image[36];
                 for (int i = 0; i < 36; i++)
                     greenTowerI[i] = imageLoader.loadImageFromAssets("greenLS00" + i + "0.png", width, height);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 Image[] greenTowerII = new Image[36];
                 for (int i = 0; i < 36; i++)
                     greenTowerII[i] = imageLoader.loadImageFromAssets("lsII" + i + "0.png", width, height);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 Image[] greenTowerIII = new Image[36];
                 for (int i = 0; i < 36; i++)
                     greenTowerIII[i] = imageLoader.loadImageFromAssets("lsIII" + i + "0.png", width, height);
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 greenTower = new ArrayList<>(3);
                 greenTower.add(greenTowerI);
                 greenTower.add(greenTowerII);
                 greenTower.add(greenTowerIII);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 //red tower
                 Image[] redTowerI = new Image[36];
                 for (int i = 0; i < 36; i++)
                     redTowerI[i] = imageLoader.loadImageFromAssets("rmI" + i + "0.png", width, height);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 Image[] redTowerII = new Image[36];
                 for (int i = 0; i < 36; i++)
                     redTowerII[i] = imageLoader.loadImageFromAssets("rmII" + i + "0.png", width, height);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 Image[] redTowerIII = new Image[36];
                 for (int i = 0; i < 36; i++)
                     redTowerIII[i] = imageLoader.loadImageFromAssets("rmIII" + i + "0.png", width, height);
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 redTower = new ArrayList<>(3);
                 redTower.add(redTowerI);
                 redTower.add(redTowerII);
                 redTower.add(redTowerIII);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 int width_hp = (width * 3) / 4; //120;
                 int height_hp = height / 5;//30;
@@ -486,11 +605,21 @@ public class Game {
                 healthBarSprite[8] = imageLoader.loadImageFromAssets("health_bar_90.png", width_hp, height_hp);
                 healthBarSprite[9] = imageLoader.loadImageFromAssets("health_bar_100.png", width_hp, height_hp);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
                 Image score = imageLoader.loadImageFromAssets("SmallBox.png", 300, 150);
                 Image titleScore = imageLoader.loadImageFromAssets("HealthBar.png", 300, 70);
 
                 int numWidth = width / 3;//50;
                 int numHeight = width / 2;//70;
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 scorenumbersImages = new Image[10];
 
@@ -504,6 +633,11 @@ public class Game {
                 scorenumbersImages[7] = imageLoader.loadImageFromAssets("7.png", numWidth, numHeight);
                 scorenumbersImages[8] = imageLoader.loadImageFromAssets("8.png", numWidth, numHeight);
                 scorenumbersImages[9] = imageLoader.loadImageFromAssets("9.png", numWidth, numHeight);
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 Image[] dialogUpgradeTower1 = new Image[3];
 
@@ -521,11 +655,37 @@ public class Game {
                 dialogUpgradeTower3[1] = imageLoader.loadImageFromAssets("lsleve3.png", 800, 530);
                 dialogUpgradeTower3[2] = imageLoader.loadImageFromAssets("lsleveTOP.png", 800, 530);
 
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
 
                 redTowerUpgSprite = dialogUpgradeTower1;
                 blueTowerUpgSprite = dialogUpgradeTower2;
                 greenTowerUpgSprite = dialogUpgradeTower3;
                 dialogueImageTowerUpgrade = redTowerUpgSprite;
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
+                while (loaderBar.hasNext()){
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        //
+                    }
+                }
+
+                for(ImageView view: laserViews)
+                    view.hide();
+
+
+                renderer.drawScene(loadingScene);
 
                 chain.next();
 
@@ -535,6 +695,7 @@ public class Game {
             }
 
         }).addState(()-> { //view populating
+
 
             //add background to scene
             backgroundView = scene.addImageView(new ImageViewImpl("Background").setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
@@ -810,11 +971,8 @@ public class Game {
                 bulletRepo.getStructure().push(bulletDoubleDaemon);
             }
 
-            //laser views init
-            laserViews = new ArrayList<>(laserViewNo);
 
-            for (int i = 0; i < laserViewNo; ++i)
-                laserViews.add(scene.addImageView(new ImageViewImpl("laser View " + i).setImage(laserSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)));
+            scene.addImageViews(laserViews);
 
             //laser init
             laser = new LaserBulletDaemon(
