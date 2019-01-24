@@ -13,8 +13,8 @@ public class DrawConsumer extends DaemonConsumer {
 
     @Override
     public boolean consume(Runnable runnable) {
-        super.consume(runnable);
+        boolean ret = super.consume(runnable);
         this.renderer.setDirty();
-        return true;
+        return ret;
     }
 }

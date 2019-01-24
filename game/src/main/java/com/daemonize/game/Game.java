@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.Daemon;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
@@ -115,7 +116,7 @@ public class Game {
     private float enemyVelocity = 1;
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
-    private long waveInterval = 20000;
+    private long waveInterval = 30000;
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
@@ -816,7 +817,7 @@ public class Game {
                 }
 
                 //show upgrade dialog
-                renderer.consume(()->{
+                boolean consumed = renderer.consume(()->{
 
                     towerUpgradeDialogue.getTowerUpgrade()
                             .setAbsoluteX(borderX / 2)
@@ -832,6 +833,8 @@ public class Game {
                     else
                         towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide();
                 });
+
+                System.err.println(DaemonUtils.tag() + "RENDERER CONSUME RETURNED: " + consumed);
             }
 
         } else { //init and set new tower

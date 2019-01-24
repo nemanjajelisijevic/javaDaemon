@@ -35,12 +35,6 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
         dirtyLock.unlock();
     }
 
-    private void clean() {
-        dirtyLock.lock();
-        dirtyFlag = false;
-        dirtyLock.unlock();
-    }
-
     @Override
     public Scene2D getScene() {
         return scene;
@@ -123,10 +117,10 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
             } catch (InterruptedException e) {
              //
             } finally {
+                dirtyFlag = false;
                 dirtyLock.unlock();
             }
             drawViews();
-            clean();
         }
     }
 
