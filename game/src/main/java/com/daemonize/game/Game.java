@@ -116,7 +116,7 @@ public class Game {
     private float enemyVelocity = 1;
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
-    private long waveInterval = 30000;
+    private long waveInterval = 20000;
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
