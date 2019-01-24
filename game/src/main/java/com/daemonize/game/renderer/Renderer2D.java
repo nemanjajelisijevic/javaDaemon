@@ -8,5 +8,6 @@ public interface Renderer2D<T extends Renderer2D> extends Consumer {
     T stop();
     Scene2D getScene();
     T setScene(Scene2D scene);
-    void setDirty();
+    T setDirty();
+    T drawScene(Scene2D scene);
 }

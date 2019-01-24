@@ -28,11 +28,12 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     private DrawConsumer drawConsumer;
 
     @Override
-    public void setDirty() {
+    public AndroidSurfaceViewRenderer setDirty() {
         dirtyLock.lock();
         this.dirtyFlag = true;
         dirtyCondition.signal();
         dirtyLock.unlock();
+        return this;
     }
 
     @Override
@@ -120,11 +121,12 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
                 dirtyFlag = false;
                 dirtyLock.unlock();
             }
-            drawViews();
+            drawScene(scene);
         }
     }
 
-    protected void drawViews(){
+    @Override
+    public AndroidSurfaceViewRenderer drawScene(Scene2D scene) {
         if (surfaceHolder.getSurface().isValid()) {
             canvas = surfaceHolder.lockCanvas();
             for (ImageView view : scene.getViews()) {
@@ -139,6 +141,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
             }
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
+        return this;
     }
 
     @Override

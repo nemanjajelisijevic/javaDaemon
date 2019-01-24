@@ -26,7 +26,7 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         @Override
         public void handle(long l) {
             if (dirtyFlag) {
-                drawViews();
+                drawScene(scene);
                 dirtyFlag = false;
             }
         }
@@ -52,8 +52,9 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
     }
 
     @Override
-    public void setDirty() {
+    public JavaFXRenderer setDirty() {
         this.dirtyFlag = true;
+        return this;
     }
 
     @Override
@@ -80,7 +81,8 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         return this;
     }
 
-    protected void drawViews() {
+    @Override
+    public JavaFXRenderer drawScene(Scene2D scene) {
         gc.fillRect(0, 0, width, height);
         for (ImageView view : scene.getViews())
             if (view.isShowing())
@@ -89,6 +91,7 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
                         view.getStartingX(),
                         view.getStartingY()
                 );
+        return this;
     }
 
     @Override

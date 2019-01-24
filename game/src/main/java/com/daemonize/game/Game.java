@@ -300,6 +300,12 @@ public class Game {
 
             try {
 
+                backgroundImage = imageLoader.loadImageFromAssets("maphi.jpg", borderX, borderY);
+
+                Scene2D loadingScene = new Scene2D();
+                loadingScene.addImageView(new ImageViewImpl("Loading background").setAbsoluteX(borderX /2).setAbsoluteY(borderY /2).setImage(backgroundImage).setZindex(0).show());
+                renderer.drawScene(loadingScene.lockViews());
+
                 int gridWidth = (borderX * 70) / 100;
 
                 int rows = 6;
@@ -307,8 +313,6 @@ public class Game {
 
                 int width = gridWidth/columns;
                 int height = width; //160
-
-                backgroundImage = imageLoader.loadImageFromAssets("maphi.jpg", borderX, borderY);
 
                 fieldImage = imageLoader.loadImageFromAssets("green.png", width, height);
                 fieldImageTower = imageLoader.loadImageFromAssets("Exceptione.png", width, height);
@@ -853,6 +857,7 @@ public class Game {
 
             });
 
+//            renderer.stop();
             renderer.setScene(scene).start();
 
             chain.next();
