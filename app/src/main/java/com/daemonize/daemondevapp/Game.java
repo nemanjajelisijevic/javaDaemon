@@ -176,11 +176,6 @@ public class Game {
                 Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.runtimeCheckAndGet();
                 imageAndView.getSecond().setAbsoluteX(imageAndView.getFirst().positionX);
                 imageAndView.getSecond().setAbsoluteY(imageAndView.getFirst().positionY);
-
-                if (imageAndView.getFirst().image == null) {
-                    Log.e(DaemonUtils.tag(), imageAndView.getSecond().getName() + " image == NULL");
-                }
-
                 imageAndView.getSecond().setImage(imageAndView.getFirst().image);
             });
         }
