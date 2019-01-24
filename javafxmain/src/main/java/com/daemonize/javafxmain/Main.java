@@ -42,7 +42,7 @@ public class Main extends Application {
         Canvas canvas = new Canvas(borderX, borderY);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Renderer2D renderer = new JavaFXRenderer(gc);
+        Renderer2D renderer = new JavaFXRenderer(gc, borderX, borderY);
         ImageLoader imageLoader = new JavaFxImageLoader("javafxmain/assets/");
 
         try {
