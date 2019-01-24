@@ -52,7 +52,7 @@ public class Game {
     private DaemonConsumer gameConsumer;
 
     //image loader
-    ImageLoader imageLoader;
+    private ImageLoader imageLoader;
 
     //state holder
     private DaemonChainScript chain = new DaemonChainScript();
