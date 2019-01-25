@@ -40,6 +40,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 
@@ -349,7 +350,7 @@ public class Game {
                 int height = width; //160
 
                 fieldImage = imageLoader.loadImageFromAssets("greenOctagon.png", width, height);
-                fieldImageTower = imageLoader.loadImageFromAssets("Exceptione.png", width, height);
+                fieldImageTower = imageLoader.loadImageFromAssets("blueOctagon.png", width, height);
                 fieldImageTowerDen = imageLoader.loadImageFromAssets("redOctagon.png", width, height);
 
                 if (loaderBar.hasNext()) {
@@ -762,7 +763,6 @@ public class Game {
 
         }).addState(()-> { //view populating
 
-
             //add background to scene
             backgroundView = scene.addImageView(new ImageViewImpl("Background").setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
 
@@ -1063,9 +1063,9 @@ public class Game {
             //init rockets and fill rocket repo
             for (int i = 0; i < maxRockets; ++i) {
 
-                String bulletName = "Bullet instance no. " + i;
+                String rocketName = "Rocket instance no. " + i;
 
-                BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
+                BulletDoubleDaemon rocketDoubleDaemon = new BulletDoubleDaemon(
                         gameConsumer,
                         renderer,
                         new Bullet(
@@ -1073,22 +1073,22 @@ public class Game {
                                 0,
                                 Pair.create((float) 0, (float) 0),
                                 bulletDamage
-                        ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
-                                .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
-                                .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
-                ).setName(bulletName);
+                        ).setView(scene.addImageView(new ImageViewImpl(rocketName + " View 1").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                        .setView2(scene.addImageView(new ImageViewImpl(rocketName + " View 2").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                        .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                ).setName(rocketName);
 
-                bulletDoubleDaemon.getPrototype().setBorders(
+                rocketDoubleDaemon.getPrototype().setBorders(
                         - 50,//grid.getStartingX(),//TODO fix offset
                         (grid.getStartingX() + grid.getGridWidth()),
                         - 50,  //grid.getStartingY(),
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-                bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()-> rocketRepo.add(bulletDoubleDaemon));
-                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
+                rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()-> rocketRepo.add(rocketDoubleDaemon));
+                rocketDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
-                rocketRepo.getStructure().push(bulletDoubleDaemon);
+                rocketRepo.getStructure().push(rocketDoubleDaemon);
             }
 
             scene.addImageViews(laserViews);
@@ -1134,7 +1134,6 @@ public class Game {
 
             });
 
-//            renderer.stop();
             renderer.setScene(scene).start();
 
             chain.next();
@@ -1220,16 +1219,19 @@ public class Game {
                                 }
 
                                 ImageView currentFieldView = gridViewMatrix[current.getRow()][current.getColumn()];
-                                //show enemy progress on grid
-                                renderer.consume(()->currentFieldView.show());
+
 
                                 //if enemy reaches last field
                                 if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     if (score > 0)
                                         renderer.consume(()-> infoScore.setNumbers(--score));
+                                    renderer.consume(()->currentFieldView.setImage(fieldImageTowerDen).show());
                                     enemyRepo.add(enemyDoubleDaemon);
                                     return;
                                 }
+
+                                //show enemy progress on grid
+                                renderer.consume(()->currentFieldView.show());
 
                                 //go to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
@@ -1248,8 +1250,45 @@ public class Game {
                 );
             });
 
-            //start enemy generatorh
+            //start enemy generator
             enemyGenerator.setName("Enemy Generator").start();
+
+            ImageView firstFieldView = gridViewMatrix[0][0];
+            ImageView lastFieldView = gridViewMatrix[rows - 1][columns - 1];
+
+            AtomicInteger markerCnt = new AtomicInteger(0);
+
+            DummyDaemon startEndMarker = new DummyDaemon(renderer, 300);
+            startEndMarker.setClosure(aVoid->{
+
+                if (firstFieldView.isShowing())
+                    firstFieldView.hide();
+                else
+                    firstFieldView.show();
+
+                if (markerCnt.intValue() == 6) {
+                    firstFieldView.hide();
+                    markerCnt.set(0);
+                    startEndMarker.setClosure(aVoid1->{
+
+                        if (lastFieldView.isShowing())
+                            lastFieldView.hide();
+                        else
+                            lastFieldView.setImage(fieldImageTowerDen).show();
+
+                        if (markerCnt.intValue() == 6) {
+                            lastFieldView.setImage(fieldImage).hide();
+                            startEndMarker.stop();
+                        }
+
+                        markerCnt.incrementAndGet();
+                    });
+                }
+
+                markerCnt.incrementAndGet();
+
+            }).setName("Start End field marker").start();
+
 
         });
     }
