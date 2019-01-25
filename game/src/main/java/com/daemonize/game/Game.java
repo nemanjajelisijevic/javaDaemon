@@ -320,7 +320,6 @@ public class Game {
 
                 int step = (endX - startX) / laserViewNo;
 
-
                 for (int i = 0; i < laserViewNo; ++i) {
                     int currX = startX + (i * step);
                     laserViews.add(new ImageViewImpl("laser View " + i).setImage(loadingSprite[0]).hide().setAbsoluteX(currX).setAbsoluteY(borderY * 3 / 4).setZindex(1));
@@ -329,7 +328,15 @@ public class Game {
                 Iterator<ImageView> loaderBar = laserViews.iterator();
 
                 Scene2D loadingScene = new Scene2D();
-                loadingScene.addImageView(new ImageViewImpl("Loading background").setAbsoluteX(borderX /2).setAbsoluteY(borderY /2).setImage(backgroundImage).setZindex(0).show());
+                loadingScene.addImageView(
+                        new ImageViewImpl("Loading background View")
+                                .setAbsoluteX(borderX /2)
+                                .setAbsoluteY(borderY /2)
+                                .setImage(backgroundImage)
+                                .setZindex(0)
+                                .show()
+                );
+
                 //loadingScene.addImageView(new ImageViewImpl("Daemonize View").setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2).setZindex(1).setImage(daemonize).show());
                 loadingScene.addImageViews(laserViews);
                 renderer.drawScene(loadingScene.lockViews());
@@ -746,7 +753,6 @@ public class Game {
 
                 for(ImageView view: laserViews)
                     view.hide();
-
 
                 laserSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png",  width / 15, width / 15)};
 
