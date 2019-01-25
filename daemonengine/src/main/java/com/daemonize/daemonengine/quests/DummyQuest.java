@@ -30,9 +30,9 @@ public class DummyQuest extends Quest<Void> {
     @Override
     public void run(){
         try {
-            setResultAndUpdate(null);
             if (sleepInterval > 0)
                 Thread.sleep(sleepInterval);
+            setResultAndUpdate(null);
         } catch (InterruptedException ex) {
             //System.out.println(DaemonUtils.tag() + description + " interrupted.");
         }

@@ -27,9 +27,8 @@ public class DaemonSemaphore {
         public void await() throws InterruptedException {
             lock.lock();
             try {
-                while(!flag) {
+                while(!flag)
                     condition.await();
-                }
             } finally {
                 lock.unlock();
             }
