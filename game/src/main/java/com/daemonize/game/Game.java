@@ -283,19 +283,17 @@ public class Game {
 
     public Game onTouch(float x, float y) {
         gameConsumer.consume(()->{
-            if (towerUpgradeDialogue.getTowerUpgrade().isShowing()){
+            if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
                 towerUpgradeDialogue.getTowerUpgrade().checkCoordinates(x, y);
-            } else {
+            else {
 
-                if (selectTowerDialogue.getSelectTowerDialogue().isShowing()){
+                if (selectTowerDialogue.getSelectTowerDialogue().isShowing())
                    selectTowerDialogue.getSelectTowerDialogue().checkCoordinates(x,y);
-                }
 
-                if (towerSelect == null ){
+                if (towerSelect == null )
                     System.out.println("Select" + "please select tower");
-                } else {
+                else
                     setTower(x, y);
-                }
             }
         });
         return this;
@@ -920,8 +918,8 @@ public class Game {
                     gridViewMatrix[j][i] = scene.addImageView(
                             new ImageViewImpl("Gird [" + j + "][" + i +"]")
                                     .hide()
-                                    .setAbsoluteX(0).
-                                    setAbsoluteY(0)
+                                    .setAbsoluteX(0)
+                                    .setAbsoluteY(0)
                                     .setZindex(3)
                     );
             }
@@ -1259,6 +1257,7 @@ public class Game {
             //start enemy generator
             enemyGenerator.setName("Enemy Generator").start();
 
+            //marking start and end field
             ImageView firstFieldView = gridViewMatrix[0][0];
             ImageView lastFieldView = gridViewMatrix[rows - 1][columns - 1];
 
@@ -1572,9 +1571,9 @@ public class Game {
     public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, long duration) {
         laser.desintegrateTarget(source, enemy, duration, renderer/*drawConsumer*/, ret->{
             int newHp = enemy.getHp() - laser.getDamage();
-            if (newHp > 0) {
+            if (newHp > 0)
                 enemy.setHp(newHp);
-            } else {
+            else {
                 renderer.consume(()->infoScore.setNumbers(++score));
                 enemyRepo.add(enemy);
             }
