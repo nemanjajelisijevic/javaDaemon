@@ -917,7 +917,13 @@ public class Game {
 
             for (int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i)
-                    gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl("Gird [" + j + "][" + i +"]").hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3));
+                    gridViewMatrix[j][i] = scene.addImageView(
+                            new ImageViewImpl("Gird [" + j + "][" + i +"]")
+                                    .hide()
+                                    .setAbsoluteX(0).
+                                    setAbsoluteY(0)
+                                    .setZindex(3)
+                    );
             }
 
             //enemy repo init
@@ -1126,8 +1132,8 @@ public class Game {
             scene.lockViews();
 
             scene.forEach(view->{
-                System.out.println(DaemonUtils.tag() +  view.getName());
-                System.out.println(DaemonUtils.tag() +  "X: " + view.getAbsoluteX());
+                System.out.println(DaemonUtils.tag() + view.getName());
+                System.out.println(DaemonUtils.tag() + "X: " + view.getAbsoluteX());
                 System.out.println(DaemonUtils.tag() + "Y: " + view.getAbsoluteY());
                 System.out.println(DaemonUtils.tag() + "Image: "  + view.getImage().toString());
                 System.out.println(DaemonUtils.tag() + "Image imp: " + view.getImage().getImageImp().toString());
