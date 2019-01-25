@@ -133,6 +133,7 @@ public class Game {
 
     //explosions
     private Image[] explodeSprite;
+    private Image[] rocketExplodeSprite;
     private Image[] miniExplodeSprite;
 
     //bullets
@@ -453,17 +454,60 @@ public class Game {
                 explodeSprite[28] = imageLoader.loadImageFromAssets("Explosion29.png", width, height);
                 explodeSprite[29] = imageLoader.loadImageFromAssets("Explosion30.png", width, height);
 
+                explodeSprite[30] = imageLoader.loadImageFromAssets("Explosion31.png", width, height);
+                explodeSprite[31] = imageLoader.loadImageFromAssets("Explosion32.png", width, height);
+                explodeSprite[32] = imageLoader.loadImageFromAssets("Explosion33.png", width, height);
+
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene(loadingScene);
                 }
 
-                explodeSprite[30] = imageLoader.loadImageFromAssets("Explosion31.png", width, height);
-                explodeSprite[31] = imageLoader.loadImageFromAssets("Explosion32.png", width, height);
-                explodeSprite[32] = imageLoader.loadImageFromAssets("Explosion33.png", width, height);
-
                 int miniWidth = width / 3;
                 int miniHeight = height / 3;
+
+                rocketExplodeSprite = new Image[33];
+                rocketExplodeSprite[0] = imageLoader.loadImageFromAssets("Explosion1.png", miniWidth, miniHeight);
+                rocketExplodeSprite[1] = imageLoader.loadImageFromAssets("Explosion2.png", miniWidth, miniHeight);
+                rocketExplodeSprite[2] = imageLoader.loadImageFromAssets("Explosion3.png", miniWidth, miniHeight);
+                rocketExplodeSprite[3] = imageLoader.loadImageFromAssets("Explosion4.png", miniWidth, miniHeight);
+                rocketExplodeSprite[4] = imageLoader.loadImageFromAssets("Explosion5.png", miniWidth, miniHeight);
+                rocketExplodeSprite[5] = imageLoader.loadImageFromAssets("Explosion6.png", miniWidth, miniHeight);
+                rocketExplodeSprite[6] = imageLoader.loadImageFromAssets("Explosion7.png", miniWidth, miniHeight);
+                rocketExplodeSprite[7] = imageLoader.loadImageFromAssets("Explosion8.png", miniWidth, miniHeight);
+                rocketExplodeSprite[8] = imageLoader.loadImageFromAssets("Explosion9.png", miniWidth, miniHeight);
+                rocketExplodeSprite[9] = imageLoader.loadImageFromAssets("Explosion10.png", miniWidth, miniHeight);
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene(loadingScene);
+                }
+
+                rocketExplodeSprite[10] = imageLoader.loadImageFromAssets("Explosion11.png", miniWidth, miniHeight);
+                rocketExplodeSprite[11] = imageLoader.loadImageFromAssets("Explosion12.png", miniWidth, miniHeight);
+                rocketExplodeSprite[12] = imageLoader.loadImageFromAssets("Explosion13.png", miniWidth, miniHeight);
+                rocketExplodeSprite[13] = imageLoader.loadImageFromAssets("Explosion14.png", miniWidth, miniHeight);
+                rocketExplodeSprite[14] = imageLoader.loadImageFromAssets("Explosion15.png", miniWidth, miniHeight);
+                rocketExplodeSprite[15] = imageLoader.loadImageFromAssets("Explosion16.png", miniWidth, miniHeight);
+                rocketExplodeSprite[16] = imageLoader.loadImageFromAssets("Explosion17.png", miniWidth, miniHeight);
+                rocketExplodeSprite[17] = imageLoader.loadImageFromAssets("Explosion18.png", miniWidth, miniHeight);
+                rocketExplodeSprite[18] = imageLoader.loadImageFromAssets("Explosion19.png", miniWidth, miniHeight);
+                rocketExplodeSprite[19] = imageLoader.loadImageFromAssets("Explosion20.png", miniWidth, miniHeight);
+
+                rocketExplodeSprite[20] = imageLoader.loadImageFromAssets("Explosion21.png", miniWidth, miniHeight);
+                rocketExplodeSprite[21] = imageLoader.loadImageFromAssets("Explosion22.png", miniWidth, miniHeight);
+                rocketExplodeSprite[22] = imageLoader.loadImageFromAssets("Explosion23.png", miniWidth, miniHeight);
+                rocketExplodeSprite[23] = imageLoader.loadImageFromAssets("Explosion24.png", miniWidth, miniHeight);
+                rocketExplodeSprite[24] = imageLoader.loadImageFromAssets("Explosion25.png", miniWidth, miniHeight);
+                rocketExplodeSprite[25] = imageLoader.loadImageFromAssets("Explosion26.png", miniWidth, miniHeight);
+                rocketExplodeSprite[26] = imageLoader.loadImageFromAssets("Explosion27.png", miniWidth, miniHeight);
+                rocketExplodeSprite[27] = imageLoader.loadImageFromAssets("Explosion28.png", miniWidth, miniHeight);
+                rocketExplodeSprite[28] = imageLoader.loadImageFromAssets("Explosion29.png", miniWidth, miniHeight);
+                rocketExplodeSprite[29] = imageLoader.loadImageFromAssets("Explosion30.png", miniWidth, miniHeight);
+
+                rocketExplodeSprite[30] = imageLoader.loadImageFromAssets("Explosion31.png", miniWidth, miniHeight);
+                rocketExplodeSprite[31] = imageLoader.loadImageFromAssets("Explosion32.png", miniWidth, miniHeight);
+                rocketExplodeSprite[32] = imageLoader.loadImageFromAssets("Explosion33.png", miniWidth, miniHeight);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -1475,7 +1519,7 @@ public class Game {
                             enemyRepo.add(enemy);
                         }
 
-                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, ()->rocketRepo.add(rocketDoubleDaemon));
+                        rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, ()->rocketRepo.add(rocketDoubleDaemon));
                     });
         });
     }
