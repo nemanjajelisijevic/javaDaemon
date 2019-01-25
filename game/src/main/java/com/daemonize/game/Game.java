@@ -1,6 +1,7 @@
 package com.daemonize.game;
 
 import com.daemonize.daemonengine.Daemon;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
@@ -295,6 +296,8 @@ public class Game {
         return this;
     }
 
+
+
     {
         //init state
         chain.addState(()-> { //image loading State
@@ -303,15 +306,21 @@ public class Game {
 
                 backgroundImage = imageLoader.loadImageFromAssets("maphi.jpg", borderX, borderY);
 
+                //Image daemonize = imageLoader.loadImageFromAssets("@Daemonize.png", borderX /3, borderY / 5);
+
                 //laser views init
                 laserViews = new ArrayList<>(laserViewNo);
 
                 Image[] loadingSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png", borderX / 150, borderX / 150)};
 
-                int step = borderX / laserViewNo;
+                int startX = borderX / 5;
+                int endX = borderX * 4 / 5;
+
+                int step = (endX - startX) / laserViewNo;
+
 
                 for (int i = 0; i < laserViewNo; ++i) {
-                    int currX = i * step;
+                    int currX = startX + (i * step);
                     laserViews.add(new ImageViewImpl("laser View " + i).setImage(loadingSprite[0]).hide().setAbsoluteX(currX).setAbsoluteY(borderY * 3 / 4).setZindex(1));
                 }
 
@@ -319,6 +328,7 @@ public class Game {
 
                 Scene2D loadingScene = new Scene2D();
                 loadingScene.addImageView(new ImageViewImpl("Loading background").setAbsoluteX(borderX /2).setAbsoluteY(borderY /2).setImage(backgroundImage).setZindex(0).show());
+                //loadingScene.addImageView(new ImageViewImpl("Daemonize View").setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2).setZindex(1).setImage(daemonize).show());
                 loadingScene.addImageViews(laserViews);
                 renderer.drawScene(loadingScene.lockViews());
 
@@ -335,9 +345,9 @@ public class Game {
                 int width = gridWidth/columns;
                 int height = width; //160
 
-                fieldImage = imageLoader.loadImageFromAssets("green.png", width, height);
+                fieldImage = imageLoader.loadImageFromAssets("greenOctagon.png", width, height);
                 fieldImageTower = imageLoader.loadImageFromAssets("Exceptione.png", width, height);
-                fieldImageTowerDen = imageLoader.loadImageFromAssets("red.png", width, height);
+                fieldImageTowerDen = imageLoader.loadImageFromAssets("redOctagon.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -354,8 +364,8 @@ public class Game {
                 closeButtonImage = imageLoader.loadImageFromAssets("ButtonX.png",borderX / 20,borderY /  10);
                 saleButtonImage = imageLoader.loadImageFromAssets("ButtonSale.png",borderX / 6,borderY / 10);
 
-                selection = imageLoader.loadImageFromAssets("green.png", selectionWidth, selectionWidth);
-                deselection = imageLoader.loadImageFromAssets("red.png", selectionWidth, selectionWidth);
+                selection = imageLoader.loadImageFromAssets("greenOctagon.png", selectionWidth, selectionWidth);
+                deselection = imageLoader.loadImageFromAssets("redOctagon.png", selectionWidth, selectionWidth);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -982,7 +992,6 @@ public class Game {
                 bulletRepo.getStructure().push(bulletDoubleDaemon);
             }
 
-
             scene.addImageViews(laserViews);
 
             //laser init
@@ -1200,7 +1209,16 @@ public class Game {
 
             //check if selected field is on the last remaining path
             if (!grid.setTower(field.getRow(), field.getColumn())){
+
                 renderer.consume(()->fieldView.setImage(fieldImageTowerDen).show());
+
+                DummyDaemon fieldCleaner = new DummyDaemon(renderer, 1000);
+                fieldCleaner.setClosure(aVoid->{
+                    fieldView.setImage(fieldImage).hide();
+                    fieldCleaner.stop();
+                }).start();
+
+
             } else {
 
                 renderer.consume(()->fieldView.setImage(currentTowerSprite[0]).show());

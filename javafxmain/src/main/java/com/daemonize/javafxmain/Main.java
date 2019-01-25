@@ -17,6 +17,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 
 public class Main extends Application {
@@ -55,19 +56,21 @@ public class Main extends Application {
         primaryStage.setTitle("Tower Defense");
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
+        primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
 
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> game.onTouch((float) event.getSceneX(), (float) event.getSceneY()));
 
-//            scene.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
-//                if (game.isPaused())
-//                    game.cont();
-//            });
-//
-//            scene.addEventFilter(MouseEvent.MOUSE_EXITED, event -> {
-//                if (!game.isPaused())
-//                    game.pause();
-//            });
+            scene.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+                if (game.isPaused())
+                    game.cont();
+            });
+
+            scene.addEventFilter(MouseEvent.MOUSE_EXITED, event -> {
+                if (!game.isPaused())
+                    game.pause();
+            });
 
         if(!game.isRunning())
             game.run();
