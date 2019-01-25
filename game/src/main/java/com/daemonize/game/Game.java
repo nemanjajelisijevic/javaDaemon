@@ -142,8 +142,11 @@ public class Game {
     private int bulletDamage = 2;
     private int rocketExplosionRange = 200;
 
-    private int maxBullets = 100;
+    private int maxBullets = 80;
     private EntityRepo<Stack<BulletDoubleDaemon>, BulletDoubleDaemon> bulletRepo;
+
+    private int maxRockets = 80;
+    private EntityRepo<Stack<BulletDoubleDaemon>, BulletDoubleDaemon> rocketRepo;
 
     //laser
     private LaserBulletDaemon laser;
@@ -797,7 +800,7 @@ public class Game {
                 //remove tower from grid and recalculate path
                 if (grid.destroyTower(field.getRow(), field.getColumn())) {
                     renderer.consume(() -> {
-                        gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).show();
+                        gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide();
                         towerUpgradeDialogue.getTowerUpgrade().hide();
                         infoScore.setNumbers(++score);
                     });
@@ -931,6 +934,28 @@ public class Game {
                 }
             };
 
+            //rocket repo init
+            rocketRepo = new StackedEntityRepo<BulletDoubleDaemon>() {
+                @Override
+                public void onAdd(BulletDoubleDaemon bullet) {
+                    renderer.consume(() -> {
+                        for (ImageView view : bullet.getViews())
+                            view.hide();
+                    });
+                    bullet.setVelocity(0);
+                    bullet.pause();
+                }
+
+                @Override
+                public void onGet(BulletDoubleDaemon bullet) {
+                    System.out.println(DaemonUtils.tag() + "Rocket get state: " + bullet.getState());
+                    renderer.consume(()->{
+                        for (ImageView view : bullet.getViews())
+                            view.show();
+                    });
+                }
+            };
+
             //init enemies and fill enemy repo
             for (int i = 0; i < maxEnemies; ++i) {
 
@@ -970,13 +995,13 @@ public class Game {
                         gameConsumer,
                         renderer,
                         new Bullet(
-                                /*bulletSprite,*/bulletSpriteRocket,
+                                bulletSprite,
                                 0,
                                 Pair.create((float) 0, (float) 0),
                                 bulletDamage
-                        ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
-                        .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
-                        .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
+                        ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
+                        .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
+                        .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                 ).setName(bulletName);
 
                 bulletDoubleDaemon.getPrototype().setBorders(
@@ -990,6 +1015,37 @@ public class Game {
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 bulletRepo.getStructure().push(bulletDoubleDaemon);
+            }
+
+            //init rockets and fill rocket repo
+            for (int i = 0; i < maxRockets; ++i) {
+
+                String bulletName = "Bullet instance no. " + i;
+
+                BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
+                        gameConsumer,
+                        renderer,
+                        new Bullet(
+                                bulletSpriteRocket,
+                                0,
+                                Pair.create((float) 0, (float) 0),
+                                bulletDamage
+                        ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                                .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                                .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                ).setName(bulletName);
+
+                bulletDoubleDaemon.getPrototype().setBorders(
+                        - 50,//grid.getStartingX(),//TODO fix offset
+                        (grid.getStartingX() + grid.getGridWidth()),
+                        - 50,  //grid.getStartingY(),
+                        (grid.getStartingY() + grid.getGridHeight())
+                );
+
+                bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()-> rocketRepo.add(bulletDoubleDaemon));
+                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
+
+                rocketRepo.getStructure().push(bulletDoubleDaemon);
             }
 
             scene.addImageViews(laserViews);
@@ -1210,13 +1266,17 @@ public class Game {
             //check if selected field is on the last remaining path
             if (!grid.setTower(field.getRow(), field.getColumn())){
 
+                boolean isGeenFieldShown = fieldView.isShowing() && fieldView.getImage().equals(fieldImage);
+
                 renderer.consume(()->fieldView.setImage(fieldImageTowerDen).show());
 
                 DummyDaemon fieldCleaner = new DummyDaemon(renderer, 1000);
                 fieldCleaner.setClosure(aVoid->{
-                    fieldView.setImage(fieldImage).hide();
+                    if (!isGeenFieldShown)
+                        fieldView.hide();
+                    fieldView.setImage(fieldImage);
                     fieldCleaner.stop();
-                }).start();
+                }).setName("Field cleaner").start();
 
 
             } else {
@@ -1349,9 +1409,9 @@ public class Game {
             int bulletDamage,
             int noOfBulletsFired
     ) {
-        System.out.println(DaemonUtils.tag() + "Bullet stack size: " + bulletRepo.size());
+        System.out.println(DaemonUtils.tag() + "Rocket stack size: " + rocketRepo.size());
 
-        BulletDoubleDaemon rocketDoubleDaemon = bulletRepo.configureAndGet(rocket->{
+        BulletDoubleDaemon rocketDoubleDaemon = rocketRepo.configureAndGet(rocket->{
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
             rocket.setLevel(noOfBulletsFired);
             rocket.setDamage(bulletDamage);
@@ -1376,7 +1436,7 @@ public class Game {
         rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, () -> {
 
             if (!enemy.isShootable()) {
-                bulletRepo.add(rocketDoubleDaemon);
+                rocketRepo.add(rocketDoubleDaemon);
                 return;
             }
 
@@ -1395,7 +1455,7 @@ public class Game {
                     ()->{
 
                         if (!enemy.isShootable()){
-                            bulletRepo.add(rocketDoubleDaemon);
+                            rocketRepo.add(rocketDoubleDaemon);
                             return;
                         }
 
@@ -1416,7 +1476,7 @@ public class Game {
                             enemyRepo.add(enemy);
                         }
 
-                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, ()->bulletRepo.add(rocketDoubleDaemon));
+                        rocketDoubleDaemon.pushSprite(miniExplodeSprite, 0, ()->rocketRepo.add(rocketDoubleDaemon));
                     });
         });
     }
