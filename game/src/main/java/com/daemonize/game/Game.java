@@ -1329,7 +1329,7 @@ public class Game {
                 }
 
                 //show upgrade dialog
-                boolean consumed = renderer.consume(()->{
+                renderer.consume(()->{
 
                     towerUpgradeDialogue.getTowerUpgrade()
                             .setAbsoluteX(borderX / 2)
