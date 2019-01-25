@@ -300,7 +300,6 @@ public class Game {
     }
 
 
-
     {
         //init state
         chain.addState(()-> { //image loading State
@@ -1176,8 +1175,9 @@ public class Game {
                                         neighbour.getTower().addTarget(enemyDoubleDaemon);
                                 }
 
+                                ImageView currentFieldView = gridViewMatrix[current.getRow()][current.getColumn()];
                                 //show enemy progress on grid
-                                renderer.consume(()->gridViewMatrix[current.getRow()][current.getColumn()].show());
+                                renderer.consume(()->currentFieldView.show());
 
                                 //if enemy reaches last field
                                 if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
@@ -1207,7 +1207,6 @@ public class Game {
             //start enemy generatorh
             enemyGenerator.setName("Enemy Generator").start();
 
-//            backgroundMover.start();
         });
     }
 
