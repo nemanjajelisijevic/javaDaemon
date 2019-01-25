@@ -11,11 +11,13 @@ import java.io.IOException;
 
 import javafx.application.Application;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -31,7 +33,10 @@ public class Main extends Application {
         //                                GAME INITIALIZATION                                    //
         ///////////////////////////////////////////////////////////////////////////////////////////
 
-        int borderX = 1200;
+
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+
+        int borderX = (int) primaryScreenBounds.getWidth() / 2;
         //int borderY = 200;
 
         int rows = 6;
