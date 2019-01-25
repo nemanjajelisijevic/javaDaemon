@@ -306,7 +306,7 @@ public class Game {
                 //laser views init
                 laserViews = new ArrayList<>(laserViewNo);
 
-                Image[] loadingSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png", 15, 15)};
+                Image[] loadingSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png", borderX / 150, borderX / 150)};
 
                 int step = borderX / laserViewNo;
 
@@ -327,7 +327,6 @@ public class Game {
                     renderer.drawScene(loadingScene);
                 }
 
-
                 int gridWidth = (borderX * 70) / 100;
 
                 int rows = 6;
@@ -345,21 +344,27 @@ public class Game {
                     renderer.drawScene(loadingScene);
                 }
 
-                upgradeButtonImage = imageLoader.loadImageFromAssets("ButtonUpgrade.png",350,90);
-                closeButtonImage = imageLoader.loadImageFromAssets("ButtonX.png",110,120);
-                saleButtonImage = imageLoader.loadImageFromAssets("ButtonSale.png",250,90);
+                int scoreWidth = borderX / 5;
+                int selectionWidth = borderX / 10;
 
-                selection = imageLoader.loadImageFromAssets("green.png", 200, 200);
-                deselection = imageLoader.loadImageFromAssets("red.png", 200, 200);
+                int scoreHeight = borderY / 5;
+                int selectionHeight = borderY / 2;
+
+                upgradeButtonImage = imageLoader.loadImageFromAssets("ButtonUpgrade.png",borderX / 6,borderY / 10);
+                closeButtonImage = imageLoader.loadImageFromAssets("ButtonX.png",borderX / 20,borderY /  10);
+                saleButtonImage = imageLoader.loadImageFromAssets("ButtonSale.png",borderX / 6,borderY / 10);
+
+                selection = imageLoader.loadImageFromAssets("green.png", selectionWidth, selectionWidth);
+                deselection = imageLoader.loadImageFromAssets("red.png", selectionWidth, selectionWidth);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene(loadingScene);
                 }
 
-                scoreBackGrImage = imageLoader.loadImageFromAssets("SmallBox.png", 300, 150);
+                scoreBackGrImage = imageLoader.loadImageFromAssets("SmallBox.png", scoreWidth, scoreHeight);
 
-                laserSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png", 10, 10)};
+                laserSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png",  width / 10, width / 10)};
 
                 //init enemy sprite
                 enemySprite = new Image[36];
@@ -639,21 +644,24 @@ public class Game {
                     renderer.drawScene(loadingScene);
                 }
 
+                int upgradeDialogBackrgoundImageWidth = borderX / 3;
+                int upgradeDialogBackgroundImageHeight = (borderY * 16 / 50);
+
                 Image[] dialogUpgradeTower1 = new Image[3];
 
-                dialogUpgradeTower1[0] = imageLoader.loadImageFromAssets("mgleve2.png", 800, 530);
-                dialogUpgradeTower1[1] = imageLoader.loadImageFromAssets("mgleve3.png", 800, 530);
-                dialogUpgradeTower1[2] = imageLoader.loadImageFromAssets("mgleveTOP.png", 800, 530);
+                dialogUpgradeTower1[0] = imageLoader.loadImageFromAssets("mgleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower1[1] = imageLoader.loadImageFromAssets("mgleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower1[2] = imageLoader.loadImageFromAssets("mgleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
 
                 Image[] dialogUpgradeTower2 = new Image[3];
-                dialogUpgradeTower2[0] = imageLoader.loadImageFromAssets("rcleve2.png", 800, 530);
-                dialogUpgradeTower2[1] = imageLoader.loadImageFromAssets("rcleve3.png", 800, 530);
-                dialogUpgradeTower2[2] = imageLoader.loadImageFromAssets("rcleveTOP.png", 800, 530);
+                dialogUpgradeTower2[0] = imageLoader.loadImageFromAssets("rcleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower2[1] = imageLoader.loadImageFromAssets("rcleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower2[2] = imageLoader.loadImageFromAssets("rcleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
 
                 Image[] dialogUpgradeTower3 = new Image[3];
-                dialogUpgradeTower3[0] = imageLoader.loadImageFromAssets("lsleve2.png", 800, 530);
-                dialogUpgradeTower3[1] = imageLoader.loadImageFromAssets("lsleve3.png", 800, 530);
-                dialogUpgradeTower3[2] = imageLoader.loadImageFromAssets("lsleveTOP.png", 800, 530);
+                dialogUpgradeTower3[0] = imageLoader.loadImageFromAssets("lsleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower3[1] = imageLoader.loadImageFromAssets("lsleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower3[2] = imageLoader.loadImageFromAssets("lsleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -684,6 +692,8 @@ public class Game {
                 for(ImageView view: laserViews)
                     view.hide();
 
+
+                laserSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png",  width / 15, width / 15)};
 
                 renderer.drawScene(loadingScene);
 
@@ -785,14 +795,14 @@ public class Game {
             });
 
             towerUpgradeDialogue = new TowerUpgradeDialog(
-                    700,
-                    500,
+                    borderX / 3,
+                    borderY / 2,
                     dialogueImageTowerUpgrade[0],
                     upgradeButton,
                     closeButton,
                     saleButton,
-                    810,
-                    750
+                    borderX / 3,
+                    borderY / 2
             );
 
             Button tow1 = new Button("TowerType1",0,0,redTower.get(0)[0]).onClick(()->{
@@ -827,9 +837,10 @@ public class Game {
             });
 
             selectTowerDialogue = new TowerSelectDialogue(
-                    borderX - 300,
-                    700,
-                    200, 600,
+                    borderX * 85 / 100,
+                    borderY * 65 / 100,
+                    deselection.getWidth(),
+                    deselection.getHeight() * 3,
                     deselection,
                     tow1,
                     tow2,
@@ -1025,11 +1036,11 @@ public class Game {
             //laser start
             laser.start();
 
-            //hide the grid at start and draw the score keeping dialogue
+            //draw the score keeping dialogue
             renderer.consume(()->{
                 infoScore = new InfoTable(
-                        borderX - scoreBackGrImage.getWidth(),
-                        250,
+                        borderX * 85 / 100,
+                        borderY / 5,
                         scoreBackGrView,
                         scoreTitleView,
                         viewsNum,
