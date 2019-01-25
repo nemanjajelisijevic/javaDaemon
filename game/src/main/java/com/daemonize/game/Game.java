@@ -1484,9 +1484,9 @@ public class Game {
             }
 
             int newHp = enemy.getHp() - bulletDoubleDaemon.getPrototype().getDamage();
-            if (newHp > 0) {
+            if (newHp > 0)
                 enemy.setHp(newHp);
-            } else {
+            else {
                 renderer.consume(()->infoScore.setNumbers(++score));
                 enemyRepo.add(enemy);
             }
@@ -1562,9 +1562,9 @@ public class Game {
 
                         int newHp = enemy.getHp() - rocketDoubleDaemon.getDamage();
 
-                        if (newHp > 0) {
+                        if (newHp > 0)
                             enemy.setHp(newHp);
-                        } else {
+                        else {
                             renderer.consume(()->infoScore.setNumbers(++score));
                             enemyRepo.add(enemy);
                         }
