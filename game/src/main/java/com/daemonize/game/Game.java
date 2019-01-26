@@ -1304,6 +1304,8 @@ public class Game {
         });
     }
 
+    private boolean deny;
+
     private void setTower(float x, float y) {
 
         //check if correct field
@@ -1359,19 +1361,37 @@ public class Game {
             //check if selected field is on the last remaining path
             if (!grid.setTower(field.getRow(), field.getColumn())){
 
-                boolean isGeenFieldShown = fieldView.isShowing() && fieldView.getImage().equals(fieldImage);
+                if (!deny) {
 
-                renderer.consume(()->fieldView.setImage(fieldImageTowerDen).show());
+                    deny = true;
 
-                DummyDaemon fieldCleaner = new DummyDaemon(renderer, 1000);
-                fieldCleaner.setClosure(aVoid->{
-                    if (!isGeenFieldShown)
-                        fieldView.hide();
-                    fieldView.setImage(fieldImage);
-                    fieldCleaner.stop();
-                }).setName("Field cleaner").start();
+                    boolean isGeenFieldShown = fieldView.isShowing() && fieldView.getImage().equals(fieldImage);
+                    renderer.consume(() -> fieldView.setImage(fieldImageTowerDen).show());
 
+                    AtomicInteger markerCnt = new AtomicInteger(0);
 
+                    DummyDaemon deniedMarker = new DummyDaemon(renderer, 300);
+                    deniedMarker.setClosure(aVoid -> {
+
+                        if (fieldView.isShowing())
+                            fieldView.hide();
+                        else
+                            fieldView.show();
+
+                        if (markerCnt.intValue() == 6) {
+                            fieldView.setImage(fieldImage);
+                            if (isGeenFieldShown)
+                                fieldView.show();
+                            else
+                                fieldView.hide();
+                            deniedMarker.stop();
+                            deny = false;
+                        }
+
+                        markerCnt.incrementAndGet();
+
+                    }).setName("Denied marker").start();
+                }
             } else {
 
                 renderer.consume(()->fieldView.setImage(currentTowerSprite[0]).show());

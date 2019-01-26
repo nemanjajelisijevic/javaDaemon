@@ -1,13 +1,34 @@
-apply plugin: 'java'
-apply plugin: 'idea'
 
-apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin"
+buildscript {
+    dependencies {
+        classpath group: 'de.dynamicfiles.projects.gradle.plugins', name: 'javafx-gradle-plugin', version: '8.8.2'
+    }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+
+    }
+}
+apply plugin: 'java'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+apply plugin: 'javafx-gradle-plugin'
+
+
+jfx {
+    // minimal requirement for jfxJar-task
+    mainClass = 'com.daemonize.javafxmain.Main'
+
+    // minimal requirement for jfxNative-task
+    vendor = '@Daemonize'
+}
 
 dependencies {
     implementation project(':daemonengine')
-    implementation project (':game')
+    implementation project(':game')
 }
 
-javafx {
-    mainClass = 'com.daemonize.javafxmain.Main'
-}
