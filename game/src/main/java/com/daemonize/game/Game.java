@@ -1230,7 +1230,6 @@ public class Game {
 
                                 ImageView currentFieldView = gridViewMatrix[current.getRow()][current.getColumn()];
 
-
                                 //if enemy reaches last field
                                 if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     if (score > 0)
