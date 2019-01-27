@@ -108,9 +108,11 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
     public TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods) {
 
+        daemonClassName = ClassName.get(packageName, daemonSimpleName);
+
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
                 .addModifiers(Modifier.PUBLIC)
-                .addSuperinterface(daemonInterface);
+                .addSuperinterface(ParameterizedTypeName.get(daemonInterface, daemonClassName));
 
         if (consumerDaemon)
             daemonClassBuilder.addSuperinterface(consumerInterface);

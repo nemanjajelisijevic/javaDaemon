@@ -7,7 +7,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public abstract class BaseDaemonEngine implements Daemon {
+public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
 
   private volatile DaemonState state = DaemonState.STOPPED;
   private Consumer consumer;
@@ -15,10 +15,9 @@ public abstract class BaseDaemonEngine implements Daemon {
 
   protected Thread daemonThread;
 
-  @SuppressWarnings("unchecked")
-  public <K extends Daemon> K setName(String name) {
+  public D setName(String name) {
     this.name = name;
-    return (K) this;
+    return (D) this;
   }
 
   @Override
@@ -26,11 +25,10 @@ public abstract class BaseDaemonEngine implements Daemon {
     return this.name;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public BaseDaemonEngine setConsumer(Consumer consumer) {
+  public D setConsumer(Consumer consumer) {
     this.consumer = consumer;
-    return this;
+    return (D) this;
   }
 
   protected BaseDaemonEngine(Consumer consumer) {
@@ -74,7 +72,7 @@ public abstract class BaseDaemonEngine implements Daemon {
   }
 
   @Override
-  public void start() {
+  public D start() {
     DaemonState initState = getState();
     if (initState.equals(DaemonState.STOPPED)) {
       daemonThread = new Thread(new Runnable() {
@@ -87,6 +85,7 @@ public abstract class BaseDaemonEngine implements Daemon {
       setState(DaemonState.INITIALIZING);
       daemonThread.start();
     }
+    return (D) this;
   }
 
   @Override
@@ -102,7 +101,7 @@ public abstract class BaseDaemonEngine implements Daemon {
   }
 
   @Override
-  public void queueStop() {
+  public D queueStop() {
     throw new IllegalStateException("This method can only be called from MainQuestDaemonEngine");
   }
 

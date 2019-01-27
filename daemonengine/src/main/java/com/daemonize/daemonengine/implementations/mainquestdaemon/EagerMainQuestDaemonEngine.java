@@ -26,6 +26,12 @@ public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine {
   }
 
   @Override
+  public EagerMainQuestDaemonEngine setName(String name) {
+    super.setName(name);
+    return this;
+  }
+
+  @Override
   protected Quest getQuest() {
 
     Quest ret = null;

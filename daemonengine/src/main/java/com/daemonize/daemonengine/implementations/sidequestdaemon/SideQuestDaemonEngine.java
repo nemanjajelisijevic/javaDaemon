@@ -6,7 +6,7 @@ import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.Quest;
 
-public class SideQuestDaemonEngine extends BaseDaemonEngine implements SideQuestDaemon {
+public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon {
 
   private SideQuest sideQuest;
 

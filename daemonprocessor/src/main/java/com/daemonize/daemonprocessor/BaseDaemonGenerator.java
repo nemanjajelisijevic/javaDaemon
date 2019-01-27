@@ -31,6 +31,7 @@ import static javax.lang.model.type.TypeKind.VOID;
 
 public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
+    protected ClassName daemonClassName;
 
     protected boolean autoGenerateApiMethods = true;
 
@@ -213,8 +214,9 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         return MethodSpec.methodBuilder("start")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(void.class)
+                .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".start()")
+                .addStatement("return this")
                 .build();
     }
 
@@ -231,8 +233,10 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         return MethodSpec.methodBuilder("queueStop")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(void.class)
+                //.returns(void.class)
+                .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".queueStop()")
+                .addStatement("return this")
                 .build();
     }
 
@@ -406,7 +410,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
         return builder;
     }
-
 
     protected static MethodSpec.Builder addTypeParameters(
             ExecutableElement methodElement,

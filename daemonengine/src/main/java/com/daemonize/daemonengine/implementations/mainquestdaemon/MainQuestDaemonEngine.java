@@ -1,6 +1,7 @@
 package com.daemonize.daemonengine.implementations.mainquestdaemon;
 
 
+import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -14,7 +15,7 @@ import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MainQuestDaemonEngine extends BaseDaemonEngine {
+public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngine> {
 
   protected Queue<MainQuest> mainQuestQueue = new LinkedList<>();
   protected final Lock mainQuestLock = new ReentrantLock();
@@ -52,7 +53,8 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine {
   }
 
   @Override
-  public void queueStop() {
+  public MainQuestDaemonEngine queueStop() {
     addMainQuest(new StopMainQuest(this));
+    return this;
   }
 }

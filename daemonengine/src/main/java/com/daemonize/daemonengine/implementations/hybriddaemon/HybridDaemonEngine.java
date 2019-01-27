@@ -1,5 +1,6 @@
 package com.daemonize.daemonengine.implementations.hybriddaemon;
 
+import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.mainquestdaemon.MainQuestDaemonEngine;
@@ -29,6 +30,12 @@ public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQue
       daemonThread.interrupt();
     }
     return ret;
+  }
+
+  @Override
+  public HybridDaemonEngine setName(String name) {
+    super.setName(name);
+    return this;
   }
 
   @Override

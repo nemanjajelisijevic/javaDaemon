@@ -6,7 +6,7 @@ import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.DummyQuest;
 import com.daemonize.daemonengine.quests.Quest;
 
-public class DummyDaemon extends BaseDaemonEngine {
+public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
 
     private DummyQuest dummyQuest;
 

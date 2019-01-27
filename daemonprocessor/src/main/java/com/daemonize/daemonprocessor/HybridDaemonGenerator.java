@@ -7,6 +7,7 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
@@ -45,10 +46,12 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
     @Override
     public TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods) {
 
+        daemonClassName = ClassName.get(packageName, daemonSimpleName);
+
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
                 .addModifiers(
                         Modifier.PUBLIC
-                ).addSuperinterface(daemonInterface);
+                ).addSuperinterface(ParameterizedTypeName.get(daemonInterface, daemonClassName));
 
         if (mainGenerator.isConsumer())
             daemonClassBuilder.addSuperinterface(consumerInterface);

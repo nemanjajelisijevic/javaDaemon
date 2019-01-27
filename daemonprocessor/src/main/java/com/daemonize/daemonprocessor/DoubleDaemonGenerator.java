@@ -6,6 +6,7 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
@@ -43,9 +44,11 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
     @Override
     public TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods) {
 
+        daemonClassName = ClassName.get(packageName, daemonSimpleName);
+
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
                 .addModifiers(Modifier.PUBLIC)
-                .addSuperinterface(daemonInterface);
+                .addSuperinterface(ParameterizedTypeName.get(daemonInterface, daemonClassName));
 
         if (mainGenerator.isConsumer())
             daemonClassBuilder.addSuperinterface(consumerInterface);
@@ -223,13 +226,15 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("queueStop")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(void.class)
+                .returns(daemonClassName)
                 .addStatement(mainGenerator.getDaemonEngineString() + ".queueStop()")
                 .addStatement(sideGenerator.getDaemonEngineString() + ".stop()");
 
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
             builder.addStatement( entry.getValue().getFirst() + ".queueStop()");
         }
+
+        builder.addStatement("return this");
 
         return builder.build();
     }

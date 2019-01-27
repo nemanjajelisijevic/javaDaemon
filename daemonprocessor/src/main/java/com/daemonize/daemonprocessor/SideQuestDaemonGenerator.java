@@ -34,6 +34,9 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     }
 
     public TypeSpec generateDaemon(List<ExecutableElement> sideQuestPrototypeMethods) {
+
+        daemonClassName = ClassName.get(packageName, daemonSimpleName);
+
         List<Pair<TypeSpec, MethodSpec>> sideQuestInitializedFields = new ArrayList<>();
 
         for (ExecutableElement method : sideQuestPrototypeMethods) {
@@ -50,7 +53,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
                 .addModifiers(
                         Modifier.PUBLIC
-                ).addSuperinterface(daemonInterface);
+                ).addSuperinterface(ParameterizedTypeName.get(daemonInterface, daemonClassName));
 
         daemonClassBuilder = addTypeParameters(classElement, daemonClassBuilder);
 

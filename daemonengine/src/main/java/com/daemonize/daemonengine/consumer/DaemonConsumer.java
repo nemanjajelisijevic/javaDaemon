@@ -12,12 +12,12 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DaemonConsumer implements Consumer, Daemon {
+public class DaemonConsumer implements Consumer, Daemon<DaemonConsumer> {
 
     private volatile DaemonState state = DaemonState.STOPPED;
     private Queue<Runnable> closureQueue = new LinkedList<>();
     private final Lock closureLock = new ReentrantLock();
-    private Condition closureAvailable = closureLock.newCondition();
+    private final Condition closureAvailable = closureLock.newCondition();
     private String name;
     private Thread looperThread;
 
@@ -64,7 +64,7 @@ public class DaemonConsumer implements Consumer, Daemon {
     }
 
     @Override
-    public void start() {
+    public DaemonConsumer start() {
         DaemonState initState = getState();
         if (initState.equals(DaemonState.STOPPED)) {
             looperThread = new Thread(new Runnable() {
@@ -77,6 +77,7 @@ public class DaemonConsumer implements Consumer, Daemon {
             state = DaemonState.INITIALIZING;
             looperThread.start();
         }
+        return this;
     }
 
     @Override
@@ -88,8 +89,9 @@ public class DaemonConsumer implements Consumer, Daemon {
     }
 
     @Override
-    public void queueStop() {
+    public DaemonConsumer queueStop() {
         stop();
+        return this;
     }
 
     @Override
@@ -110,7 +112,7 @@ public class DaemonConsumer implements Consumer, Daemon {
     }
 
     @Override
-    public <K extends Daemon> K setConsumer(Consumer consumer) {
+    public DaemonConsumer setConsumer(Consumer consumer) {
         throw new IllegalStateException("This object already encapsulates a consumer thread. This operation is not permitted!");
     }
 
