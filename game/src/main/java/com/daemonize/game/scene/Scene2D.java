@@ -4,6 +4,7 @@ import com.daemonize.game.view.ImageView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -16,6 +17,8 @@ public class Scene2D {
 
     private volatile List<ImageView> views = new ArrayList<>();
     private volatile boolean locked = false;
+
+    private Hashtable<String, ImageView> viewNameTable = new Hashtable<>();
 
     public Scene2D lockViews() {
         Collections.sort(views);
@@ -36,8 +39,10 @@ public class Scene2D {
         if (locked)
             throw new IllegalStateException("Scene locked. Can not add view!");
         views.add(view);
+        viewNameTable.put(view.getName(), view);
         return view;
     }
+
     public void addImageViews(List<ImageView> listOfViews) {
         if (locked)
             throw new IllegalStateException("Scene locked. Can not add view!");
@@ -46,6 +51,10 @@ public class Scene2D {
 
     public List<ImageView> getViews() {
         return views;
+    }
+
+    public ImageView getViewByName(String name) {
+        return viewNameTable.get(name);
     }
 
     public int viewsSize() {
