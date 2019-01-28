@@ -934,33 +934,24 @@ public class Game {
             enemyRepo = new QueuedEntityRepo<EnemyDoubleDaemon>() {
                 @Override
                 public void onAdd(EnemyDoubleDaemon enemy) {
-                    enemy.setShootable(false);
                     renderer.consume(enemy.getHpView()::hide);
-                    enemy.setVelocity(0);
-                    activeEnemies.remove(enemy);
-                    enemy.pushSprite(explodeSprite, 0, () -> {
+                    enemy.setShootable(false).setVelocity(0).pushSprite(explodeSprite, 0, () -> {
                         renderer.consume(enemy.getView()::hide);
                         enemy.stop();
                         enemy.setCoordinates(grid.getStartingX(), grid.getStartingY());
                     });
+                    activeEnemies.remove(enemy);
                 }
 
                 @Override
                 public void onGet(EnemyDoubleDaemon enemy) {
-                    enemy.setShootable(true);
-                    enemy.setCoordinates(grid.getStartingX(), grid.getStartingY());
-                    enemy.setVelocity(
-                            new ImageMover.Velocity(
-                                    enemyVelocity,
-                                    new ImageMover.Direction(1, 0)
-                            )
-                    );
-
+                    enemy.setShootable(true)
+                            .setCoordinates(grid.getStartingX(), grid.getStartingY())
+                            .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1, 0)));
                     renderer.consume(()->{
                         enemy.getView().show();
                         enemy.getHpView().show();
                     });
-
                     activeEnemies.add(enemy);
                 }
             };
@@ -973,8 +964,7 @@ public class Game {
                         for (ImageView view : bullet.getViews())
                             view.hide();
                     });
-                    bullet.setVelocity(0);
-                    bullet.pause();
+                    bullet.setVelocity(0).pause();
                 }
 
                 @Override
@@ -995,8 +985,7 @@ public class Game {
                         for (ImageView view : bullet.getViews())
                             view.hide();
                     });
-                    bullet.setVelocity(0);
-                    bullet.pause();
+                    bullet.setVelocity(0).pause();
                 }
 
                 @Override
@@ -1195,10 +1184,7 @@ public class Game {
                 if (enemyCounter % 20 == 0 && bulletDamage < 10)
                     bulletDamage += 1;
 
-                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy->{
-                    enemy.setMaxHp(enemyHp);
-                    enemy.setHp(enemyHp);
-                });
+                EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy->enemy.setMaxHp(enemyHp).setHp(enemyHp));
 
                 System.out.println(DaemonUtils.tag() + "Enemy counter: " + enemyCounter);
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());
@@ -1211,11 +1197,9 @@ public class Game {
                         firstField.getCenterY()
                 );
 
-                enemyDoubleDaemon.start();
-
-                enemyDoubleDaemon.rotate(angle);
-
-                enemyDoubleDaemon.goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
+                enemyDoubleDaemon.start()
+                        .rotate(angle)
+                        .goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
                         new Runnable() {// gameConsumer
                             @Override
                             public void run() {
@@ -1341,7 +1325,8 @@ public class Game {
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2);
 
-                    towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView")
+                    towerUpgradeDialogue.getTowerUpgrade()
+                            .getViewByName("TowerView")
                             .setImage(dialogueImageTowerUpgrade[currLvl.currentLevel - 1]);
 
                     towerUpgradeDialogue.getTowerUpgrade().show();
@@ -1484,10 +1469,10 @@ public class Game {
         System.out.println(DaemonUtils.tag() + "Bullet queue size: " + bulletRepo.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet -> {
-            bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
-            bullet.setLevel(noOfBulletsFired);
-            bullet.setDamage(bulletDamage);
-            bullet.setSprite(bulletSprite);
+            bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
+                    .setLevel(noOfBulletsFired)
+                    .setDamage(bulletDamage)
+                    .setSprite(bulletSprite);
         });
 
         if (bulletDoubleDaemon.getState().equals(DaemonState.STOPPED))
@@ -1524,10 +1509,10 @@ public class Game {
         System.out.println(DaemonUtils.tag() + "Rocket stack size: " + rocketRepo.size());
 
         BulletDoubleDaemon rocketDoubleDaemon = rocketRepo.configureAndGet(rocket->{
-            rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond());
-            rocket.setLevel(noOfBulletsFired);
-            rocket.setDamage(bulletDamage);
-            rocket.setSprite(bulletSpriteRocket);
+            rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
+                    .setLevel(noOfBulletsFired)
+                    .setDamage(bulletDamage)
+                    .setSprite(bulletSpriteRocket);
         });
 
         int launchX = getRandomInt((int)(sourceCoord.getFirst() - 50), (int)(sourceCoord.getFirst() + 50));
