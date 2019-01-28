@@ -32,7 +32,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
     private Set<String> overloadedPrototypeMethods = new TreeSet<>();
     private String currentMainQuestName = "";
-    private boolean returnInstance;
+    //private boolean returnInstance;
 
     private final String VOID_QUEST_TYPE_NAME = "VoidMainQuest";
 
@@ -79,7 +79,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonEngineSimpleName = "EagerMainQuestDaemonEngine";
         }
 
-        this.returnInstance = returnInstance;
+        //this.returnInstance = returnInstance;
 
         this.daemonEngineClass = ClassName.get(daemonPackage, daemonEngineSimpleName);
         this.dedicatedThreadEngines = new HashMap<>();
@@ -358,12 +358,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 );
         }
 
-        if (returnInstance) {
-            apiMethodBuilder.addStatement("return this");
-            apiMethodBuilder.returns(ClassName.get(packageName, daemonSimpleName));
-        } else {
-            apiMethodBuilder.returns(void.class);
-        }
+        apiMethodBuilder.addStatement("return this");
+        apiMethodBuilder.returns(ClassName.get(packageName, daemonSimpleName));
 
         return apiMethodBuilder.build();
     }
@@ -373,7 +369,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         PrototypeMethodData methodData = new PrototypeMethodData(prototypeMethod);
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(
                 prototypeMethod.getSimpleName().toString()
-        ).addModifiers(Modifier.PUBLIC).returns(TypeName.get(prototypeMethod.getReturnType()));
+        ).addModifiers(Modifier.PUBLIC);
 
         methodBuilder = BaseDaemonGenerator.addTypeParameters(prototypeMethod, methodBuilder);
 
@@ -385,13 +381,20 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             methodBuilder.addException(TypeName.get(exception));
         }
 
-        return methodBuilder.addStatement(
-                (methodData.isVoid() ? "" : "return ")
-                                + "prototype."
-                                + prototypeMethod.getSimpleName().toString()
-                                + "(" + methodData.getArguments()
-                                + ")"
-        ).build();
+
+        if (methodData.isVoid())
+            methodBuilder.returns(ClassName.get(packageName, daemonSimpleName)).addStatement("prototype."
+                    + prototypeMethod.getSimpleName().toString()
+                    + "(" + methodData.getArguments()
+                    + ")").addStatement("return this");
+        else
+            methodBuilder.returns(TypeName.get(prototypeMethod.getReturnType())).addStatement(
+                    "return prototype."
+                        + prototypeMethod.getSimpleName().toString()
+                        + "(" + methodData.getArguments()
+                        + ")");
+
+        return methodBuilder.build();
     }
 
     public MethodSpec generateDedicatedEnginesStopDaemonApiMethod() {
