@@ -1,30 +1,8 @@
-
-buildscript {
-    dependencies {
-        classpath group: 'de.dynamicfiles.projects.gradle.plugins', name: 'javafx-gradle-plugin', version: '8.8.2'
-    }
-    repositories {
-        mavenLocal()
-        mavenCentral()
-
-    }
-}
 apply plugin: 'java'
+apply plugin: 'application'
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
-apply plugin: 'javafx-gradle-plugin'
-
-
-jfx {
-    // minimal requirement for jfxJar-task
-    mainClass = 'com.daemonize.javafxmain.Main'
-
-    // minimal requirement for jfxNative-task
-    vendor = '@Daemonize'
+application {
+    mainClassName = 'com.daemonize.javafxmain.Main'
 }
 
 dependencies {

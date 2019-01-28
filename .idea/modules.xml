@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/androidconsumer/androidconsumer.iml" filepath="$PROJECT_DIR$/androidconsumer/androidconsumer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonengine/daemonengine.iml" filepath="$PROJECT_DIR$/daemonengine/daemonengine.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" filepath="$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" />
