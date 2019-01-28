@@ -1235,9 +1235,7 @@ public class Game {
                                                 next.getCenterX(),
                                                 next.getCenterY()
                                         )
-                                );
-
-                                enemyDoubleDaemon.goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this::run);
+                                ).goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this::run);
                             }
                         }
                 );
@@ -1282,8 +1280,6 @@ public class Game {
                 markerCnt.incrementAndGet();
 
             }).setName("Start End field marker").start();
-
-
         });
     }
 
