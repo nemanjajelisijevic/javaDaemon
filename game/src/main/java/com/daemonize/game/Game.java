@@ -1151,7 +1151,7 @@ public class Game {
                         scoreTitleView,
                         viewsNum,
                         scorenumbersImages
-                ).setNumbers(0);
+                ).setNumbers(80085);
             });
 
             //get grids first field
