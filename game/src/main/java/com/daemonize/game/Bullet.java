@@ -28,11 +28,14 @@ public class Bullet extends CoordinatedImageTranslationMover {
     private int level = 1;
     private volatile int damage;
 
+    private int spaceBetweenBullets;
+
     private RotatingSpriteImageMover rotationMover;
 
-    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos, int damage) {
+    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos, int damage, int spaceBetweenBullets) {
         super(Arrays.copyOf(sprite, 1), velocity, startingPos);
         this.damage = damage;
+        this.spaceBetweenBullets = spaceBetweenBullets;
         this.rotationMover = new RotatingSpriteImageMover(sprite, velocity, startingPos);
     }
 
@@ -211,9 +214,9 @@ public class Bullet extends CoordinatedImageTranslationMover {
             case 1:
                 return new GenericNode<>(Pair.create(posImage, view));
             case 2:
-                return calculateOffsetImage(posImage,movingDirection,40);
+                return calculateOffsetImage(posImage,movingDirection,spaceBetweenBullets);
             case 3:
-                GenericNode<Pair<PositionedImage,ImageView>> root = calculateOffsetImage(posImage,movingDirection,40);
+                GenericNode<Pair<PositionedImage,ImageView>> root = calculateOffsetImage(posImage,movingDirection,spaceBetweenBullets);
                 root.addChild(new GenericNode<>(Pair.create(posImage,view3)));
                 return root;
             default:

@@ -75,7 +75,7 @@ public class LaserBullet extends Bullet {
             Pair<Float, Float> startingPos,
             int damage
     ) {
-        super(sprite, velocity, startingPos, damage);
+        super(sprite, velocity, startingPos, damage, 0);
         this.phaseLock = new DaemonCountingSemaphore();
         this.phaseLock.subscribe();
     }

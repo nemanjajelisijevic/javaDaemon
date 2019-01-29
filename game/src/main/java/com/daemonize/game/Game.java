@@ -1040,7 +1040,8 @@ public class Game {
                                 bulletSprite,
                                 0,
                                 Pair.create((float) 0, (float) 0),
-                                bulletDamage
+                                bulletDamage,
+                                bulletSprite[0].getWidth()
                         ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                         .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                         .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
@@ -1071,7 +1072,8 @@ public class Game {
                                 bulletSpriteRocket,
                                 0,
                                 Pair.create((float) 0, (float) 0),
-                                bulletDamage
+                                bulletDamage,
+                                bulletSpriteRocket[0].getWidth()
                         ).setView(scene.addImageView(new ImageViewImpl(rocketName + " View 1").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                         .setView2(scene.addImageView(new ImageViewImpl(rocketName + " View 2").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                         .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
@@ -1171,11 +1173,11 @@ public class Game {
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
 
-                    if (enemyCounter % 15 == 0 && waveInterval > 2000) //TODO fix this!
+                    if (enemyCounter % 15 == 0 && waveInterval > 2000)
                         waveInterval -= 2000;
 
                     enemyHp++;
-                    enemyGenerator.setSleepInterval(waveInterval);//TODO set long as param in DaemonGenerators
+                    enemyGenerator.setSleepInterval(waveInterval);
 
                 } else {
                     enemyGenerator.setSleepInterval(enemyGenerateinterval);
@@ -1378,7 +1380,6 @@ public class Game {
 
                 TowerDaemon towerDaemon = new TowerDaemon(
                         gameConsumer,
-                        //drawConsumer,
                         renderer,
                         new Tower(
                                 currentTowerSprite,
@@ -1386,17 +1387,14 @@ public class Game {
                                 range,
                                 towerSelect
                         )
-                ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]");
-
-                towerDaemon.setView(fieldView);
+                ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]").setView(fieldView);
 
                 towers.add(towerDaemon);
                 field.setTower(towerDaemon);
 
                 towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(fieldView)::onReturn);
-                towerDaemon.start();
 
-                towerDaemon.scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
+                towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
                     @Override
                     public void onReturn(Return<Pair<Tower.TowerType, EnemyDoubleDaemon>> towerTypeAndEnemy) {
 
@@ -1511,8 +1509,8 @@ public class Game {
                     .setSprite(bulletSpriteRocket);
         });
 
-        int launchX = getRandomInt((int)(sourceCoord.getFirst() - 50), (int)(sourceCoord.getFirst() + 50));
-        int launchY = getRandomInt((int)(sourceCoord.getSecond() - 50), (int)(sourceCoord.getSecond() + 50));
+        int launchX = getRandomInt((int)(sourceCoord.getFirst() - fieldImage.getWidth() / 2), (int)(sourceCoord.getFirst() + fieldImage.getWidth() / 2));
+        int launchY = getRandomInt((int)(sourceCoord.getSecond() - fieldImage.getWidth() / 2), (int)(sourceCoord.getSecond() + fieldImage.getWidth() / 2));
 
         int angle = (int) RotatingSpriteImageMover.getAngle(
                 sourceCoord.getFirst(),
