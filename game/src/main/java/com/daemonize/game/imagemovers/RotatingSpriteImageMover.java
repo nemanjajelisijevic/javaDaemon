@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
-    private volatile AngleToBitmapArray spriteBuffer;
+    protected volatile AngleToBitmapArray spriteBuffer;
     private volatile Image[] currentRotationSprite;
     private volatile int size;
 

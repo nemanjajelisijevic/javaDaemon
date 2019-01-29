@@ -125,11 +125,10 @@ public class Bullet extends CoordinatedImageTranslationMover {
     }
 
     @CallingThread
-    public Bullet setLevel(int level) {
-        if (level >=1 &&  level <= 3){
+    public void setLevel(int level) {
+        if (level >=1 &&  level <= 3) {
             this.level = level;
         }
-        return this;
     }
 
     @GenerateRunnable
