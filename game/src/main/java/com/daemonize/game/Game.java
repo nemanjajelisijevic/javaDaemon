@@ -10,7 +10,6 @@ import com.daemonize.game.images.Image;
 import com.daemonize.game.images.imageloader.ImageLoader;
 import com.daemonize.game.renderer.DrawConsumer;
 import com.daemonize.game.renderer.Renderer2D;
-import com.daemonize.game.repo.EntityRepo;
 import com.daemonize.game.repo.QueuedEntityRepo;
 import com.daemonize.game.repo.StackedEntityRepo;
 import com.daemonize.game.scene.Scene2D;
@@ -50,7 +49,7 @@ public class Game {
     //pause flag
     private volatile boolean paused;
 
-    //game threads
+    //game consumer threads
     private Renderer2D renderer;
     private DaemonConsumer gameConsumer;
 
@@ -130,7 +129,7 @@ public class Game {
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
     private int maxEnemies = 40;
-    private EntityRepo<Queue<EnemyDoubleDaemon>, EnemyDoubleDaemon> enemyRepo;
+    private QueuedEntityRepo<EnemyDoubleDaemon> enemyRepo;
 
     //explosions
     private Image[] explodeSprite;
@@ -145,10 +144,10 @@ public class Game {
     private int rocketExplosionRange = 200;
 
     private int maxBullets = 80;
-    private EntityRepo<Stack<BulletDoubleDaemon>, BulletDoubleDaemon> bulletRepo;
+    private StackedEntityRepo<BulletDoubleDaemon> bulletRepo;
 
     private int maxRockets = 80;
-    private EntityRepo<Stack<BulletDoubleDaemon>, BulletDoubleDaemon> rocketRepo;
+    private StackedEntityRepo<BulletDoubleDaemon> rocketRepo;
 
     //laser
     private LaserBulletDaemon laser;
