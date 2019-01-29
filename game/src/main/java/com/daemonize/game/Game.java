@@ -1158,7 +1158,7 @@ public class Game {
             Field firstField = grid.getField(0, 0);
 
             //init enemy generator
-            enemyGenerator = DummyDaemon.create(gameConsumer, enemyGenerateinterval).setClosure(ret->{
+            enemyGenerator = DummyDaemon.create(gameConsumer, enemyGenerateinterval).setClosure(()->{
 
                 enemyCounter++;
 
@@ -1251,7 +1251,7 @@ public class Game {
             AtomicInteger markerCnt = new AtomicInteger(0);
 
             DummyDaemon startEndMarker = new DummyDaemon(renderer, 300);
-            startEndMarker.setClosure(aVoid->{
+            startEndMarker.setClosure(()->{
 
                 if (firstFieldView.isShowing())
                     firstFieldView.hide();
@@ -1261,7 +1261,7 @@ public class Game {
                 if (markerCnt.intValue() == 6) {
                     firstFieldView.hide();
                     markerCnt.set(0);
-                    startEndMarker.setClosure(aVoid1->{
+                    startEndMarker.setClosure(()->{
 
                         if (lastFieldView.isShowing())
                             lastFieldView.hide();
@@ -1351,7 +1351,7 @@ public class Game {
                     AtomicInteger markerCnt = new AtomicInteger(0);
 
                     DummyDaemon deniedMarker = new DummyDaemon(renderer, 300);
-                    deniedMarker.setClosure(aVoid -> {
+                    deniedMarker.setClosure(() -> {
 
                         if (fieldView.isShowing())
                             fieldView.hide();

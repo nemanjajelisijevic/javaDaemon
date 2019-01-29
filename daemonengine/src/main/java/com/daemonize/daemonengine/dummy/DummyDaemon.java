@@ -30,7 +30,7 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
         return this;
     }
 
-    public DummyDaemon setClosure(Closure<Void> closure) {
+    public DummyDaemon setClosure(Runnable closure) {
         dummyQuest.setClosure(closure);
         return this;
     }
