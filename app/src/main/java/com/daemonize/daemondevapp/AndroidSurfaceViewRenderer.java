@@ -121,12 +121,12 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
                 dirtyFlag = false;
                 dirtyLock.unlock();
             }
-            drawScene(scene);
+            drawScene();
         }
     }
 
     @Override
-    public AndroidSurfaceViewRenderer drawScene(Scene2D scene) {
+    public AndroidSurfaceViewRenderer drawScene() {
         if (surfaceHolder.getSurface().isValid()) {
             canvas = surfaceHolder.lockCanvas();
             for (ImageView view : scene.getViews()) {

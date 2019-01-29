@@ -338,11 +338,12 @@ public class Game {
 
                 //loadingScene.addImageView(new ImageViewImpl("Daemonize View").setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2).setZindex(1).setImage(daemonize).show());
                 loadingScene.addImageViews(laserViews);
-                renderer.drawScene(loadingScene.lockViews());
+                loadingScene.lockViews();
+                renderer.setScene(loadingScene).drawScene();
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 int gridWidth = (borderX * 70) / 100;
@@ -359,7 +360,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 int scoreWidth = borderX / 5;
@@ -377,7 +378,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 scoreBackGrImage = imageLoader.loadImageFromAssets("SmallBox.png", scoreWidth, scoreHeight);
@@ -389,7 +390,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 for (int i = 0; i < 36; i++)
@@ -397,7 +398,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 //bullet sprite
@@ -416,7 +417,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 //explosion sprite
@@ -434,7 +435,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 explodeSprite[10] = imageLoader.loadImageFromAssets("Explosion11.png", width, height);
@@ -465,7 +466,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 int miniWidth = width / 3;
@@ -485,7 +486,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 rocketExplodeSprite[10] = imageLoader.loadImageFromAssets("Explosion11.png", miniWidth, miniHeight);
@@ -516,7 +517,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 miniExplodeSprite = new Image[20];
@@ -533,7 +534,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 miniExplodeSprite[10] = imageLoader.loadImageFromAssets("Bild-000011.png", miniWidth, miniHeight);
@@ -549,7 +550,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 // blue tower
@@ -567,7 +568,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 blueTower = new ArrayList<>(3);
@@ -577,7 +578,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 //green tower
@@ -587,7 +588,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 Image[] greenTowerII = new Image[36];
@@ -596,7 +597,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 Image[] greenTowerIII = new Image[36];
@@ -605,7 +606,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 greenTower = new ArrayList<>(3);
@@ -615,7 +616,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 //red tower
@@ -625,7 +626,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 Image[] redTowerII = new Image[36];
@@ -634,7 +635,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 Image[] redTowerIII = new Image[36];
@@ -643,7 +644,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 redTower = new ArrayList<>(3);
@@ -653,7 +654,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 int width_hp = (width * 3) / 4; //120;
@@ -673,7 +674,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 Image score = imageLoader.loadImageFromAssets("SmallBox.png", 300, 150);
@@ -684,7 +685,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 scorenumbersImages = new Image[10];
@@ -702,7 +703,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 int upgradeDialogBackrgoundImageWidth = borderX / 3;
@@ -726,7 +727,7 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 redTowerUpgSprite = dialogUpgradeTower1;
@@ -736,12 +737,12 @@ public class Game {
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
                 }
 
                 while (loaderBar.hasNext()){
                     loaderBar.next().show();
-                    renderer.drawScene(loadingScene);
+                    renderer.drawScene();
 
                     try {
                         Thread.sleep(50);
@@ -755,7 +756,7 @@ public class Game {
 
                 laserSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png",  width / 15, width / 15)};
 
-                renderer.drawScene(loadingScene);
+                renderer.drawScene();
 
                 chain.next();
 
