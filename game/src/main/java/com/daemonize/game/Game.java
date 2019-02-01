@@ -1114,12 +1114,7 @@ public class Game {
             laser = new LaserBulletDaemon(
                     gameConsumer,
                     renderer,
-                    new LaserBullet(
-                            laserSprite,
-                            40,
-                            Pair.create(0F, 0F),
-                            bulletDamage
-                    )
+                    new LaserBullet(laserSprite, 40, Pair.create(0F, 0F), bulletDamage)
             );
 
             laser.setViews(laserViews);
@@ -1596,51 +1591,52 @@ public class Game {
                         4,
                         ()-> rocketRepo.add(rocketDoubleDaemon)
                 );
-                return;
+
+            } else {
+
+                int targetAngle1 = (int) RotatingSpriteImageMover.getAngle(
+                        rocketDoubleDaemon.getLastCoordinates().getFirst(),
+                        rocketDoubleDaemon.getLastCoordinates().getSecond(),
+                        enemy.getLastCoordinates().getFirst(),
+                        enemy.getLastCoordinates().getSecond()
+                );
+
+                rocketDoubleDaemon.rotateAndGoTo(
+                        targetAngle1,
+                        enemy.getLastCoordinates().getFirst(),
+                        enemy.getLastCoordinates().getSecond(),
+                        velocity,
+                        () -> {
+
+                            if (!enemy.isShootable()) {
+                                rocketRepo.add(rocketDoubleDaemon);
+                                return;
+                            }
+
+                            float bulletX = rocketDoubleDaemon.getLastCoordinates().getFirst();
+                            float bulletY = rocketDoubleDaemon.getLastCoordinates().getSecond();
+
+                            if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) > rocketExplosionRange
+                                    && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) > rocketExplosionRange) {
+                                return;
+                            }
+
+                            int newHp = enemy.getHp() - rocketDoubleDaemon.getDamage();
+
+                            if (newHp > 0)
+                                enemy.setHp(newHp);
+                            else {
+                                renderer.consume(() -> infoScore.setNumbers(++score));
+                                enemyRepo.add(enemy);
+                            }
+
+                            rocketDoubleDaemon.pushSprite(
+                                    rocketExplodeSprite,
+                                    0,
+                                    () -> rocketRepo.add(rocketDoubleDaemon)
+                            );
+                        });
             }
-
-            int targetAngle1 = (int) RotatingSpriteImageMover.getAngle(
-                    rocketDoubleDaemon.getLastCoordinates().getFirst(),
-                    rocketDoubleDaemon.getLastCoordinates().getSecond(),
-                    enemy.getLastCoordinates().getFirst(),
-                    enemy.getLastCoordinates().getSecond()
-            );
-
-            rocketDoubleDaemon.rotateAndGoTo(
-                    targetAngle1,
-                    enemy.getLastCoordinates().getFirst(),
-                    enemy.getLastCoordinates().getSecond(),
-                    velocity,
-                    ()->{
-
-                        if (!enemy.isShootable()) {
-                            rocketRepo.add(rocketDoubleDaemon);
-                            return;
-                        }
-
-                        float bulletX = rocketDoubleDaemon.getLastCoordinates().getFirst();
-                        float bulletY = rocketDoubleDaemon.getLastCoordinates().getSecond();
-
-                        if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) > rocketExplosionRange
-                                && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) > rocketExplosionRange) {
-                            return;
-                        }
-
-                        int newHp = enemy.getHp() - rocketDoubleDaemon.getDamage();
-
-                        if (newHp > 0)
-                            enemy.setHp(newHp);
-                        else {
-                            renderer.consume(()->infoScore.setNumbers(++score));
-                            enemyRepo.add(enemy);
-                        }
-
-                        rocketDoubleDaemon.pushSprite(
-                                rocketExplodeSprite,
-                                0,
-                                ()->rocketRepo.add(rocketDoubleDaemon)
-                        );
-                    });
         });
     }
 
