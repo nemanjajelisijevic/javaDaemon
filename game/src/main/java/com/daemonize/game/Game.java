@@ -1,14 +1,11 @@
 package com.daemonize.game;
 
-import com.daemonize.daemonengine.Daemon;
-import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
 import com.daemonize.game.images.Image;
 
 import com.daemonize.game.images.imageloader.ImageLoader;
-import com.daemonize.game.renderer.DrawConsumer;
 import com.daemonize.game.renderer.Renderer2D;
 import com.daemonize.game.repo.QueuedEntityRepo;
 import com.daemonize.game.repo.StackedEntityRepo;
@@ -35,10 +32,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
@@ -75,6 +70,13 @@ public class Game {
     private int rows;
     private int columns;
     private ImageView[][] gridViewMatrix;
+    private ImageView[][] diagonalMatrix;
+
+    private Image fieldImage;
+    private Image fieldImageTower;
+    private Image fieldImageTowerDen;
+
+    private Image fieldGreenDiagonal;
 
     //score
     private int score = 0;
@@ -83,9 +85,7 @@ public class Game {
     private ImageView[] viewsNum;
     private InfoTable infoScore;
 
-    private Image fieldImage;
-    private Image fieldImageTower;
-    private Image fieldImageTowerDen;
+
     private Image[] dialogueImageTowerUpgrade;
     private Image upgradeButtonImage;
     private Image saleButtonImage;
@@ -357,6 +357,8 @@ public class Game {
                 fieldImage = imageLoader.loadImageFromAssets("greenOctagon.png", width, height);
                 fieldImageTower = imageLoader.loadImageFromAssets("blueOctagon.png", width, height);
                 fieldImageTowerDen = imageLoader.loadImageFromAssets("redOctagon.png", width, height);
+
+                fieldGreenDiagonal = imageLoader.loadImageFromAssets("greenDiagonal.png", width * 2 / 3, height * 2 / 3);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -923,11 +925,25 @@ public class Game {
                 for (int i = 0; i < columns; ++i)
                     gridViewMatrix[j][i] = scene.addImageView(
                             new ImageViewImpl("Gird [" + j + "][" + i +"]")
-                                    .hide()
-                                    .setAbsoluteX(0)
-                                    .setAbsoluteY(0)
-                                    .setZindex(3)
-                    );
+                    ).setAbsoluteX(grid.getGrid()[j][i].getCenterX())
+                     .setAbsoluteY(grid.getGrid()[j][i].getCenterY())
+                     .setImage(grid.getField(j, i).isWalkable() ? fieldImage : fieldImageTower)
+                     .setZindex(3)
+                     .hide();
+            }
+
+            //diagonal views
+            diagonalMatrix = new ImageView[rows - 1][columns - 1];
+
+            for (int j = 0; j < rows - 1; ++j ) {
+                for (int i = 0; i < columns - 1; ++i)
+                    diagonalMatrix[j][i] = scene.addImageView(
+                            new ImageViewImpl("Gird [" + j + "][" + i +"]")
+                    ).setAbsoluteX(grid.getGrid()[j][i].getCenterX() + gridViewMatrix[j][i].getImage().getWidth() / 2)
+                     .setAbsoluteY(grid.getGrid()[j][i].getCenterY() + gridViewMatrix[j][i].getImage().getHeight() / 2)
+                     .setImage(fieldGreenDiagonal)
+                     .setZindex(3)
+                     .hide();
             }
 
             //enemy repo init
@@ -1109,19 +1125,12 @@ public class Game {
             laser.setViews(laserViews);
             laser.setAnimateLaserSideQuest().setClosure(ret->{
                 for (Pair<ImageView, ImageMover.PositionedImage> viewAndImage : ret.runtimeCheckAndGet()) {
-                    viewAndImage.getFirst().setAbsoluteX(viewAndImage.getSecond().positionX);
-                    viewAndImage.getFirst().setAbsoluteY(viewAndImage.getSecond().positionY);
-                    viewAndImage.getFirst().setImage(viewAndImage.getSecond().image);
+                    viewAndImage.getFirst()
+                            .setAbsoluteX(viewAndImage.getSecond().positionX)
+                            .setAbsoluteY(viewAndImage.getSecond().positionY)
+                            .setImage(viewAndImage.getSecond().image);
                 }
             });
-
-            //draw grid
-            for(int j = 0; j < rows; ++j )
-                for (int i = 0; i < columns; ++i) {
-                    gridViewMatrix[j][i].setAbsoluteX(grid.getGrid()[j][i].getCenterX());
-                    gridViewMatrix[j][i].setAbsoluteY(grid.getGrid()[j][i].getCenterY());
-                    gridViewMatrix[j][i].setImage(grid.getField(j, i).isWalkable() ? fieldImage : fieldImageTower).hide();
-                }
 
             //prepare the scene and start the renderer
             scene.lockViews();
@@ -1226,7 +1235,24 @@ public class Game {
                                 }
 
                                 //show enemy progress on grid
-                                renderer.consume(()->currentFieldView.show());
+                                Pair<Integer, Integer> previousFieldRowColumn = enemyDoubleDaemon.getPreviousField();
+
+                                if (previousFieldRowColumn != null) {
+
+                                    int previousRow = previousFieldRowColumn.getFirst();
+                                    int previousColumn = previousFieldRowColumn.getSecond();
+
+                                    int currentRow = current.getRow();
+                                    int currentColumn = current.getColumn();
+
+                                    if ((currentRow != previousRow) && (currentColumn != previousColumn))
+                                        renderer.consume(diagonalMatrix[Math.min(currentRow, previousRow)][Math.min(currentColumn, previousColumn)]::show);
+
+                                }
+
+                                renderer.consume(currentFieldView::show);
+
+                                enemyDoubleDaemon.setPreviousField(Pair.create(current.getRow(), current.getColumn()));
 
                                 //go to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
@@ -1376,7 +1402,33 @@ public class Game {
                 }
             } else {
 
-                renderer.consume(()->fieldView.setImage(currentTowerSprite[0]).show());
+
+
+                {
+                    renderer.consume(()->fieldView.setImage(currentTowerSprite[0]).show());
+
+                    //hide diagonal views
+                    int fieldRow = field.getRow();
+                    int fieldColumn = field.getColumn();
+
+                    System.out.println(DaemonUtils.tag() + "FIELD ROW: " + fieldRow + ", FIELD COLUMN: " + fieldColumn);
+
+                    //upper left diagonal
+                    if (fieldRow - 1 >= 0 && fieldColumn - 1 >= 0)
+                        renderer.consume(diagonalMatrix[fieldRow - 1][fieldColumn - 1]::hide);
+
+                    //upper right diagonal
+                    if (fieldRow - 1 >= 0 && fieldColumn < columns - 1)
+                        renderer.consume(diagonalMatrix[fieldRow - 1][fieldColumn]::hide);
+
+                    //down left diagonal
+                    if (fieldRow < rows - 1 && fieldColumn - 1 >= 0)
+                        renderer.consume(diagonalMatrix[fieldRow][fieldColumn - 1]::hide);
+
+                    //down right diagonal
+                    if (fieldRow < rows - 1 && fieldColumn < columns - 1)
+                        renderer.consume(diagonalMatrix[fieldRow][fieldColumn]::hide);
+                }
 
                 TowerDaemon towerDaemon = new TowerDaemon(
                         gameConsumer,
@@ -1509,8 +1561,15 @@ public class Game {
                     .setSprite(bulletSpriteRocket);
         });
 
-        int launchX = getRandomInt((int)(sourceCoord.getFirst() - fieldImage.getWidth() / 2), (int)(sourceCoord.getFirst() + fieldImage.getWidth() / 2));
-        int launchY = getRandomInt((int)(sourceCoord.getSecond() - fieldImage.getWidth() / 2), (int)(sourceCoord.getSecond() + fieldImage.getWidth() / 2));
+        int launchX = getRandomInt(
+                (int)(sourceCoord.getFirst() - fieldImage.getWidth() / 2),
+                (int)(sourceCoord.getFirst() + fieldImage.getWidth() / 2)
+        );
+
+        int launchY = getRandomInt(
+                (int)(sourceCoord.getSecond() - fieldImage.getWidth() / 2),
+                (int)(sourceCoord.getSecond() + fieldImage.getWidth() / 2)
+        );
 
         int angle = (int) RotatingSpriteImageMover.getAngle(
                 sourceCoord.getFirst(),
@@ -1527,7 +1586,18 @@ public class Game {
         rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, () -> {
 
             if (!enemy.isShootable()) {
-                rocketRepo.add(rocketDoubleDaemon);
+                rocketDoubleDaemon.rotateAndGoTo(
+                        (int) RotatingSpriteImageMover.getAngle(
+                                launchX,
+                                launchY,
+                                sourceCoord.getFirst(),
+                                sourceCoord.getSecond()
+                        ),
+                        sourceCoord.getFirst(),
+                        sourceCoord.getSecond(),
+                        4,
+                        ()-> rocketRepo.add(rocketDoubleDaemon)
+                );
                 return;
             }
 
@@ -1545,7 +1615,7 @@ public class Game {
                     velocity,
                     ()->{
 
-                        if (!enemy.isShootable()){
+                        if (!enemy.isShootable()) {
                             rocketRepo.add(rocketDoubleDaemon);
                             return;
                         }
@@ -1567,7 +1637,11 @@ public class Game {
                             enemyRepo.add(enemy);
                         }
 
-                        rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, ()->rocketRepo.add(rocketDoubleDaemon));
+                        rocketDoubleDaemon.pushSprite(
+                                rocketExplodeSprite,
+                                0,
+                                ()->rocketRepo.add(rocketDoubleDaemon)
+                        );
                     });
         });
     }

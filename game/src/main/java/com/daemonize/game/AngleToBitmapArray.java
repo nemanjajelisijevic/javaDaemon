@@ -13,7 +13,7 @@ public class AngleToBitmapArray {
 
     public void setCurrentAngle(int degrees) {
         if (degrees < 0 || degrees > 359) {
-            throw new IllegalArgumentException("Arg degrees must be > 0 && < 360");
+            throw new IllegalArgumentException("Arg degrees must be > 0 && < 360, set: " + degrees);
         }
         pointer = degrees;
     }

@@ -105,4 +105,8 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         }
     }
 
+    public static double getAbsoluteAngle(double angle) {
+        return angle >= 0 ? angle : 360 + angle;
+    }
+
 }

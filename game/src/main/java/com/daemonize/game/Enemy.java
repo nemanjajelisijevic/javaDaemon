@@ -23,6 +23,18 @@ public class Enemy extends CoordinatedImageTranslationMover {
     private volatile boolean shootable = true;
     private Image[] spriteHealthBarImage;
 
+    private Pair<Integer, Integer> previousField;
+
+    @CallingThread
+    public Pair<Integer, Integer> getPreviousField() {
+        return previousField;
+    }
+
+    @CallingThread
+    public void setPreviousField(Pair<Integer, Integer> previousField) {
+        this.previousField = previousField;
+    }
+
     private RotatingSpriteImageMover rotationMover;
 
     public Enemy setHealthBarImage(Image[] healthBarImage) {
