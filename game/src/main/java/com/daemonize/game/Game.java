@@ -1402,8 +1402,6 @@ public class Game {
                 }
             } else {
 
-
-
                 {
                     renderer.consume(()->fieldView.setImage(currentTowerSprite[0]).show());
 
