@@ -1220,15 +1220,6 @@ public class Game {
 
                                 ImageView currentFieldView = gridViewMatrix[current.getRow()][current.getColumn()];
 
-                                //if enemy reaches last field
-                                if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
-                                    if (score > 0)
-                                        renderer.consume(()-> infoScore.setNumbers(--score));
-                                    renderer.consume(()->currentFieldView.setImage(fieldImageTowerDen).show());
-                                    enemyRepo.add(enemyDoubleDaemon);
-                                    return;
-                                }
-
                                 //show enemy progress on grid
                                 Pair<Integer, Integer> previousFieldRowColumn = enemyDoubleDaemon.getPreviousField();
 
@@ -1248,6 +1239,15 @@ public class Game {
                                 renderer.consume(currentFieldView::show);
 
                                 enemyDoubleDaemon.setPreviousField(Pair.create(current.getRow(), current.getColumn()));
+
+                                //if enemy reaches last field
+                                if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
+                                    if (score > 0)
+                                        renderer.consume(()-> infoScore.setNumbers(--score));
+                                    renderer.consume(()->currentFieldView.setImage(fieldImageTowerDen).show());
+                                    enemyRepo.add(enemyDoubleDaemon);
+                                    return;
+                                }
 
                                 //go to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
