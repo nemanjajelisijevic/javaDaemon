@@ -33,11 +33,11 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
   }
 
   public boolean pursueQuest(MainQuest quest) {
-    boolean ret = addMainQuest(quest);
-    if (getState().equals(DaemonState.STOPPED)) {
-      start();
-    }
-    return ret;
+   return addMainQuest(quest);
+//    if (getState().equals(DaemonState.STOPPED)) {
+//      start();
+//    }
+//    return ret;
   }
 
   //returns null

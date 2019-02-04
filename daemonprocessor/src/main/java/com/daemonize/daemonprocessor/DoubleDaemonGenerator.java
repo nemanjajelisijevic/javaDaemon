@@ -2,6 +2,7 @@ package com.daemonize.daemonprocessor;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -177,7 +178,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
 
         apiMethods.add(generateGetPrototypeDaemonApiMethod());
         apiMethods.add(generateSetPrototypeDaemonApiMethod());
-        apiMethods.add(sideGenerator.generateStartDaemonApiMethod());
+        apiMethods.add(generateStartDaemonApiMethod());
         apiMethods.add(generateStopDaemonApiMethod());
         apiMethods.add(generateQueueStopDaemonApiMethod());//TODO override !!!!!!!!!!!!!!!!!!!!!!!!!!
         apiMethods.add(sideGenerator.generateGetStateDaemonApiMethod());
@@ -201,6 +202,23 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
 
         return daemonClassBuilder.build();
 
+    }
+
+
+    @Override
+    public MethodSpec generateStartDaemonApiMethod() {
+        MethodSpec.Builder methodSpecBuilder =  MethodSpec.methodBuilder("start")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement(MAIN_DAEMON_ENGINE_STRING + ".start()");
+
+        for (Pair<String, FieldSpec> dedicatedEngine : mainGenerator.getDedicatedThreadEngines().values())
+            methodSpecBuilder.addStatement(dedicatedEngine.getFirst() + ".start()");
+
+        methodSpecBuilder.addStatement(SIDE_DAEMON_ENGINE_STRING + ".start()")
+                .addStatement("return this");
+        return methodSpecBuilder.build();
     }
 
     @Override

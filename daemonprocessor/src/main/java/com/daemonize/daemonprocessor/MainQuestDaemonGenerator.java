@@ -397,6 +397,20 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return methodBuilder.build();
     }
 
+    @Override
+    public MethodSpec generateStartDaemonApiMethod() {
+        MethodSpec.Builder methodSpecBuilder =  MethodSpec.methodBuilder("start")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement(daemonEngineString + ".start()");
+
+        for (Pair<String, FieldSpec> dedicatedEngine : getDedicatedThreadEngines().values())
+            methodSpecBuilder.addStatement(dedicatedEngine.getFirst() + ".start()");
+
+        return methodSpecBuilder.addStatement("return this").build();
+    }
+
     public MethodSpec generateDedicatedEnginesStopDaemonApiMethod() {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("stop")
                 .addAnnotation(Override.class)
