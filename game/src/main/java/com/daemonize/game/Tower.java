@@ -179,15 +179,18 @@ public class Tower extends RotatingSpriteImageMover {
             targetLock.unlock();
         }
 
-        animateSemaphore.go();
+        if (target.isShootable()) {
 
-        try {
-            rotateTowards(
-                    target.getLastCoordinates().getFirst(),
-                    target.getLastCoordinates().getSecond()
-            );
-        } finally {
-            animateSemaphore.stop();
+            animateSemaphore.go();
+
+            try {
+                rotateTowards(
+                        target.getLastCoordinates().getFirst(),
+                        target.getLastCoordinates().getSecond()
+                );
+            } finally {
+                animateSemaphore.stop();
+            }
         }
 
         return scanRet;
