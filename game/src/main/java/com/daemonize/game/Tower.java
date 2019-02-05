@@ -124,6 +124,7 @@ public class Tower extends RotatingSpriteImageMover {
         this.targetQueue = new LinkedList<>();
         this.targetLock = new ReentrantLock();
         this.targetCondition = targetLock.newCondition();
+        this.animateSemaphore.stop();
     }
 
     @GenerateRunnable
