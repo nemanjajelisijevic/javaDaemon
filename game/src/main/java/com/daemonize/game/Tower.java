@@ -1,6 +1,7 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
 import com.daemonize.game.view.ImageView;
@@ -49,6 +50,8 @@ public class Tower extends RotatingSpriteImageMover {
     private volatile Queue<EnemyDoubleDaemon> targetQueue;
     private Lock targetLock;
     private Condition targetCondition;
+
+    private DaemonSemaphore animateSemaphore = new DaemonSemaphore();
 
     @CallingThread
     public boolean addTarget(EnemyDoubleDaemon target) {
@@ -176,10 +179,16 @@ public class Tower extends RotatingSpriteImageMover {
             targetLock.unlock();
         }
 
-        rotateTowards(
-                target.getLastCoordinates().getFirst(),
-                target.getLastCoordinates().getSecond()
-        );
+        animateSemaphore.go();
+
+        try {
+            rotateTowards(
+                    target.getLastCoordinates().getFirst(),
+                    target.getLastCoordinates().getSecond()
+            );
+        } finally {
+            animateSemaphore.stop();
+        }
 
         return scanRet;
     }
@@ -231,16 +240,7 @@ public class Tower extends RotatingSpriteImageMover {
     @Override
     public PositionedImage animate() {
         try {
-            pauseSemaphore.await();
-
-            targetLock.lock();
-            try {
-                while(targetQueue.isEmpty())
-                    targetCondition.await();
-            } finally {
-                targetLock.unlock();
-            }
-
+            animateSemaphore.await();
             return updateSprite();
         } catch (InterruptedException ex) {
             return null;
