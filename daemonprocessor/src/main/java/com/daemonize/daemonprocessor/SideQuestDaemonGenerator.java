@@ -21,6 +21,7 @@ import javax.lang.model.element.TypeElement;
 public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
 
     private Set<String> overloadedSideQuestPrototypeMethods = new TreeSet<>();
+    private final String SIDE_QUEST_SLEEP = "SleepSideQuest";
 
     {
         QUEST_TYPE_NAME = "SideQuest";
@@ -106,7 +107,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return daemonClassBuilder.build();
     }
 
-    private TypeSpec createSideQuest(ExecutableElement prototypeSideQuestMethod) {
+    private TypeSpec createSideQuest(ExecutableElement prototypeSideQuestMethod, long sleep) {
 
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeSideQuestMethod);
 
@@ -119,7 +120,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         }
 
         //build sideQuestQuest
-        ClassName sideQuestClassName = ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME);
+        ClassName sideQuestClassName = sleep > 0 ? ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP) : ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME);
         TypeName sideQuestOfRet = ParameterizedTypeName.get(
                 sideQuestClassName,
                 prototypeMethodData.getMethodRetTypeName()
@@ -168,26 +169,41 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     public Pair<TypeSpec, MethodSpec> createSideQuest(Pair<ExecutableElement, SideQuest> sideQuestMethod) {
 
         String methodName = sideQuestMethod.getFirst().getSimpleName().toString();
-        int sleep = sideQuestMethod.getSecond().SLEEP();
-        TypeSpec sideQuest = createSideQuest(sideQuestMethod.getFirst());
+        long sleep = sideQuestMethod.getSecond().SLEEP();
+
+        if (sleep < 0)
+            throw new IllegalStateException("Sleep annotation parameter on method: " + methodName + " can not be less than 0 ms.");
+
+        TypeSpec sideQuest = createSideQuest(sideQuestMethod.getFirst(), sleep);
 
         //TODO DRY
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(sideQuestMethod.getFirst());
-        TypeName sideQuestOfRet = ParameterizedTypeName.get(
-                ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME),
+        TypeName sideQuestOfRet = sleep == 0 ?
+                ParameterizedTypeName.get(
+                        ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME),
+                        prototypeMethodData.getMethodRetTypeName()
+                )
+        : ParameterizedTypeName.get(
+                ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP),
                 prototypeMethodData.getMethodRetTypeName()
         );
 
-        MethodSpec sideQuestSetter = MethodSpec.methodBuilder("set" + Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1) + "SideQuest")
+
+
+        MethodSpec.Builder sideQuestSetter = MethodSpec.methodBuilder("set" + Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1) + "SideQuest")
                 .addModifiers(Modifier.PUBLIC)
                 .addJavadoc("Prototype method {@link $N#$N}", sideQuestMethod.getFirst().getEnclosingElement().getSimpleName(), sideQuestMethod.getFirst().getSimpleName())
                 .returns(sideQuestOfRet)
-                .addStatement("$T sideQuest = new $N()", sideQuestOfRet, sideQuest)
-                .addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L))", sleep)
-                .addStatement("return sideQuest")
-                .build();
+                .addStatement("$T sideQuest = new $N()", sideQuestOfRet, sideQuest);
 
-        return Pair.create(sideQuest, sideQuestSetter);
+        if (sleep > 0)
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L))", sleep);
+        else
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest)");
+
+        sideQuestSetter.addStatement("return sideQuest");
+
+        return Pair.create(sideQuest, sideQuestSetter.build());
     }
 
     public MethodSpec generateCurrentSideQuestGetter() {
