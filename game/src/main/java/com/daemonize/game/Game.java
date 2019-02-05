@@ -103,7 +103,7 @@ public class Game {
     private List<Image[]> greenTower;
 
     private Set<TowerDaemon> towers = new HashSet<>();
-    private int range = 250;
+    private int range;
     private Tower.TowerType towerSelect;
 
     private Image[] currentTowerSprite;
@@ -924,7 +924,7 @@ public class Game {
             for (int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i)
                     gridViewMatrix[j][i] = scene.addImageView(
-                            new ImageViewImpl("Gird [" + j + "][" + i +"]")
+                            new ImageViewImpl("Grid [" + j + "][" + i +"]")
                     ).setAbsoluteX(grid.getGrid()[j][i].getCenterX())
                      .setAbsoluteY(grid.getGrid()[j][i].getCenterY())
                      .setImage(grid.getField(j, i).isWalkable() ? fieldImage : fieldImageTower)
@@ -938,7 +938,7 @@ public class Game {
             for (int j = 0; j < rows - 1; ++j ) {
                 for (int i = 0; i < columns - 1; ++i)
                     diagonalMatrix[j][i] = scene.addImageView(
-                            new ImageViewImpl("Gird [" + j + "][" + i +"]")
+                            new ImageViewImpl("Grid [" + j + "][" + i +"]")
                     ).setAbsoluteX(grid.getGrid()[j][i].getCenterX() + gridViewMatrix[j][i].getImage().getWidth() / 2)
                      .setAbsoluteY(grid.getGrid()[j][i].getCenterY() + gridViewMatrix[j][i].getImage().getHeight() / 2)
                      .setImage(fieldGreenDiagonal)
@@ -953,8 +953,7 @@ public class Game {
                     renderer.consume(enemy.getHpView()::hide);
                     enemy.setShootable(false).setVelocity(0).pushSprite(explodeSprite, 0, () -> {
                         renderer.consume(enemy.getView()::hide);
-                        enemy.stop();
-                        enemy.setCoordinates(grid.getStartingX(), grid.getStartingY());
+                        enemy.setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
                     });
                     activeEnemies.remove(enemy);
                 }
@@ -963,7 +962,7 @@ public class Game {
                 public void onGet(EnemyDoubleDaemon enemy) {
                     enemy.setShootable(true)
                             .setCoordinates(grid.getStartingX(), grid.getStartingY())
-                            .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1, 0)));
+                            .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(0.5F, 0.5F)));
                     renderer.consume(()->{
                         enemy.getView().show();
                         enemy.getHpView().show();
@@ -1160,6 +1159,9 @@ public class Game {
                 ).setNumbers(80085);
             });
 
+            //set tower range
+            range = 2 * fieldImage.getWidth();
+
             //get grids first field
             Field firstField = grid.getField(0, 0);
 
@@ -1203,8 +1205,7 @@ public class Game {
                         firstField.getCenterY()
                 );
 
-                enemyDoubleDaemon.start()
-                        .rotate(angle)
+                enemyDoubleDaemon.rotate(angle)
                         .goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
                         new Runnable() {// gameConsumer
                             @Override
@@ -1261,7 +1262,7 @@ public class Game {
                                 ).goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this::run);
                             }
                         }
-                );
+                ).start();
             });
 
             //start enemy generator
@@ -1273,7 +1274,7 @@ public class Game {
 
             AtomicInteger markerCnt = new AtomicInteger(0);
 
-            DummyDaemon startEndMarker = new DummyDaemon(renderer, 300);
+            DummyDaemon startEndMarker = DummyDaemon.create(renderer, 300);
             startEndMarker.setClosure(()->{
 
                 if (firstFieldView.isShowing())
@@ -1472,7 +1473,6 @@ public class Game {
                                     );
                                     break;
                                 case TYPE3:
-
                                     double angle = RotatingSpriteImageMover.getAngle(
                                             towerDaemon.getLastCoordinates().getFirst(),
                                             towerDaemon.getLastCoordinates().getSecond(),
