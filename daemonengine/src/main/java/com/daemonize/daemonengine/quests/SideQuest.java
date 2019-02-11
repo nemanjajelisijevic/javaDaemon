@@ -7,9 +7,7 @@ import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
-public abstract class SideQuest<T> extends Quest<T> {
-
-
+public abstract class SideQuest<T> extends Quest<T, SideQuest<T>> {
 
   public SideQuest() {
     super();

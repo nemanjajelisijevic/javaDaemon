@@ -31,6 +31,10 @@ public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
     return (D) this;
   }
 
+  public Consumer getConsumer() {
+    return consumer;
+  }
+
   protected BaseDaemonEngine(Consumer consumer) {
     this.consumer = consumer;
   }
@@ -63,7 +67,7 @@ public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
       }
 
       setState(currentQuest.getState());
-      currentQuest.setConsumer(consumer).run();
+      currentQuest.run();
     }
 
     System.out.println(DaemonUtils.tag() + "Daemon stopped!");

@@ -21,7 +21,7 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
 
     public DummyDaemon(Consumer consumer, long sleepInMillis) {
         super(consumer);
-        dummyQuest = new DummyQuest().setSleepInterval(sleepInMillis);
+        dummyQuest = new DummyQuest().setConsumer(consumer).setSleepInterval(sleepInMillis);
     }
 
     @Override

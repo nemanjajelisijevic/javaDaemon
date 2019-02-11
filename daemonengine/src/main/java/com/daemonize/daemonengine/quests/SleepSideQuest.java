@@ -3,6 +3,7 @@ package com.daemonize.daemonengine.quests;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
+import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class SleepSideQuest<T> extends SideQuest<T> {

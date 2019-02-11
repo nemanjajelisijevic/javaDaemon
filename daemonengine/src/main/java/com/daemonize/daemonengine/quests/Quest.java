@@ -4,7 +4,7 @@ import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 
-public abstract class Quest<T> implements Runnable {
+public abstract class Quest<T, Q extends Quest<T, Q>> implements Runnable {
 
   protected DaemonState state;
   protected String description = "";
@@ -29,9 +29,9 @@ public abstract class Quest<T> implements Runnable {
     return returnRunnable;
   }
 
-  public Quest<T> setConsumer(Consumer consumer) {
+  public Q setConsumer(Consumer consumer) {
     this.consumer = consumer;
-    return this;
+    return (Q) this;
   }
 
   public Consumer getConsumer() {

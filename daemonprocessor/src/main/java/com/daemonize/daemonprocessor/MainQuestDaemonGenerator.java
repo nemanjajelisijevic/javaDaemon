@@ -2,6 +2,7 @@ package com.daemonize.daemonprocessor;
 
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
+import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
@@ -309,7 +310,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         MethodSpec.Builder apiMethodBuilder = MethodSpec.methodBuilder(prototypeMethodData.getMethodName())
                 .addModifiers(Modifier.PUBLIC)
                 .addJavadoc(
-                        "Prototype mapped method {@link $N#$N}",
+                        "Prototype method {@link $N#$N}",
                         classElement.getNestingKind().equals(NestingKind.MEMBER)
                                 ? prototypeMethod.getEnclosingElement().toString()
                                 : prototypeMethod.getEnclosingElement().getSimpleName(),
@@ -317,6 +318,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 );
 
         boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
+        boolean consumerArg = prototypeMethod.getAnnotation(ConsumerArg.class) != null;
 
         apiMethodBuilder = addTypeParameters(prototypeMethod, apiMethodBuilder);
 
@@ -324,20 +326,21 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             apiMethodBuilder.addParameter(field.getFirst(), field.getSecond());
         }
 
-        if (!prototypeMethodData.isVoid()) {
+        //add consumer argument
+        if (consumerArg) {
+            apiMethodBuilder.addParameter(consumer,"consumer");
+        }
 
-            //add consumer argument
-            if (dedicatedThreadEngines.containsKey(prototypeMethod) && prototypeMethod.getAnnotation(DedicatedThread.class).consumerArg()) {
-                apiMethodBuilder.addParameter(consumer,"consumer");
-                apiMethodBuilder.addStatement(dedicatedThreadEngines.get(prototypeMethod).getFirst() + ".setConsumer(consumer)");
-            }
+        if (!prototypeMethodData.isVoid()) {
 
             apiMethodBuilder.addParameter(prototypeMethodData.getClosureOfRet(),"closure");
             apiMethodBuilder.addStatement(
                     daemonEngineString + ".pursueQuest(new "
                             + currentMainQuestName + QUEST_TYPE_NAME + "("
                             + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ")
-                            + "closure))"
+                            + "closure)"
+                            + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer()))")
+
             );
         } else {
 
@@ -348,13 +351,15 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 apiMethodBuilder.addStatement(
                         daemonEngineString + ".pursueQuest(new "
                                 + currentMainQuestName + QUEST_TYPE_NAME + "("
-                                + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ") + "retRun))"
+                                + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ") + "retRun)"
+                                + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer()))")
                 );
             } else
                 apiMethodBuilder.addStatement(
                         daemonEngineString + ".pursueQuest(new "
                                 + currentMainQuestName + QUEST_TYPE_NAME + "("
-                                + prototypeMethodData.getArguments() + "))"
+                                + prototypeMethodData.getArguments() + ")"
+                                + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer()))")
                 );
         }
 

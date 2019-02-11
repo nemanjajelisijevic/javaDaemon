@@ -6,7 +6,7 @@ import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public abstract class MainQuest<T> extends Quest<T> {
+public abstract class MainQuest<T> extends Quest<T, MainQuest<T>> {
 
   protected Closure<T> closure;
 
