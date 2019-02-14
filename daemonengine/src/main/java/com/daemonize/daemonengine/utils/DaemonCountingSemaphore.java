@@ -5,8 +5,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DaemonCountingSemaphore {
 
-    private ReentrantLock lock = new ReentrantLock();
-    private Condition condition = lock.newCondition();
+    private final ReentrantLock lock = new ReentrantLock();
+    private final Condition condition = lock.newCondition();
     private volatile int counter = 0;
 
     public void subscribe() {

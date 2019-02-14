@@ -34,7 +34,6 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         this.mainGenerator = new MainQuestDaemonGenerator(
                 classElement,
                 false,
-                classElement.getAnnotation(Daemonize.class).returnDaemonInstance(),
                 classElement.getAnnotation(Daemonize.class).consumer()
         );
         this.sideGenerator = new SideQuestDaemonGenerator(classElement);

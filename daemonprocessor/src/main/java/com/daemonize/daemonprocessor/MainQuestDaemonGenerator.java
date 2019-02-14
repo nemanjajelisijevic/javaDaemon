@@ -63,7 +63,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         this(
                 classElement,
                 classElement.getAnnotation(Daemonize.class).eager(),
-                classElement.getAnnotation(Daemonize.class).returnDaemonInstance(),
                 classElement.getAnnotation(Daemonize.class).consumer()
         );
     }
@@ -71,7 +70,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     public MainQuestDaemonGenerator(
             TypeElement classElement,
             boolean eager,
-            boolean returnInstance,
             boolean consumer
     ) {
         super(classElement);
@@ -79,8 +77,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         if(eager) {
             daemonEngineSimpleName = "EagerMainQuestDaemonEngine";
         }
-
-        //this.returnInstance = returnInstance;
 
         this.daemonEngineClass = ClassName.get(daemonPackage, daemonEngineSimpleName);
         this.dedicatedThreadEngines = new HashMap<>();
@@ -90,7 +86,12 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         for (Pair<ExecutableElement, DedicatedThread> dedicatedThreadMethod : dedicatedThreadMethods) {
 
-            String daemonEngineDedicatedString = dedicatedThreadMethod.getFirst().getSimpleName().toString() + daemonConcatEngineString;
+            String daemonEngineDedicatedString =
+                    dedicatedThreadMethod.getFirst().getSimpleName().toString() + daemonConcatEngineString;
+
+//            String daemonEngineDedicatedString = dedicatedThreadMethod.getSecond().NAME().isEmpty() ?
+//                    dedicatedThreadMethod.getFirst().getSimpleName().toString() + daemonConcatEngineString :
+//                    dedicatedThreadMethod.getSecond().NAME() + daemonConcatEngineString;
 
             dedicatedThreadEngines.put(
                     dedicatedThreadMethod.getFirst(),
@@ -435,13 +436,15 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         MethodSpec.Builder builder = MethodSpec.methodBuilder("queueStop")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .returns(void.class)
+                .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".queueStop()");
 
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : dedicatedThreadEngines.entrySet()) {
             builder.addStatement( entry.getValue().getFirst() + ".queueStop()");
 
         }
+
+        builder.addStatement("return this");
 
         return builder.build();
     }

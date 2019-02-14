@@ -32,7 +32,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         this.mainGenerator = new MainQuestDaemonGenerator(
                 classElement,
                 true,
-                classElement.getAnnotation(Daemonize.class).returnDaemonInstance(),
                 classElement.getAnnotation(Daemonize.class).consumer()
         );
         this.sideGenerator = new SideQuestDaemonGenerator(classElement);

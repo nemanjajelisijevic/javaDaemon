@@ -7,4 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-public @interface DedicatedThread {}
+public @interface DedicatedThread {
+    String NAME() default "";
+}

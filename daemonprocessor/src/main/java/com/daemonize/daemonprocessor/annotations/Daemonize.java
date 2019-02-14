@@ -10,7 +10,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Daemonize {
     boolean eager() default false;
-    boolean returnDaemonInstance() default false;
     boolean doubleDaemonize() default false;
     String className() default "";
     boolean consumer() default false;
