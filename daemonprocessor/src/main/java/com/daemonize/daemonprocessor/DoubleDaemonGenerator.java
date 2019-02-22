@@ -244,12 +244,12 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(daemonClassName)
-                .addStatement(mainGenerator.getDaemonEngineString() + ".queueStop()")
-                .addStatement(sideGenerator.getDaemonEngineString() + ".stop()");
+                .addStatement(mainGenerator.getDaemonEngineString() + ".queueStop(this)");
+                //.addStatement(sideGenerator.getDaemonEngineString() + ".stop()");
 
-        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
-            builder.addStatement( entry.getValue().getFirst() + ".queueStop()");
-        }
+//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
+//            builder.addStatement( entry.getValue().getFirst() + ".stop()");
+//        }
 
         builder.addStatement("return this");
 

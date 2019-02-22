@@ -51,8 +51,6 @@ public class Tower extends RotatingSpriteImageMover {
     private Lock targetLock;
     private Condition targetCondition;
 
-    private DaemonSemaphore animateSemaphore = new DaemonSemaphore();
-
     @CallingThread
     public boolean addTarget(EnemyDoubleDaemon target) {
         boolean ret = false;
@@ -117,8 +115,8 @@ public class Tower extends RotatingSpriteImageMover {
         this.view = view;
     }
 
-    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, TowerType type) {
-        super(rotationSprite, 0, startingPos);
+    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, TowerType type, float dXY) {
+        super(rotationSprite, 0, startingPos, dXY);
         this.range = range;
         this.towertype = type;
         this.targetQueue = new LinkedList<>();
@@ -169,8 +167,8 @@ public class Tower extends RotatingSpriteImageMover {
             target = targetQueue.peek();
 
             if (target.isShootable()
-                    && (Math.abs(target.getLastCoordinates().getFirst() - lastX) < range
-                    && Math.abs(target.getLastCoordinates().getSecond() - lastY) < range)
+                    && (Math.abs(target.getLastCoordinates().getFirst() - getLastCoordinates().getFirst()) < range
+                    && Math.abs(target.getLastCoordinates().getSecond() - getLastCoordinates().getSecond()) < range)
             )
                 scanRet = Pair.create(towertype, target);
             else
@@ -182,7 +180,7 @@ public class Tower extends RotatingSpriteImageMover {
 
         if (target.isShootable()) {
 
-            animateSemaphore.go();
+            animateSemaphore.subscribe();
 
             try {
                 rotateTowards(
@@ -190,7 +188,7 @@ public class Tower extends RotatingSpriteImageMover {
                         target.getLastCoordinates().getSecond()
                 );
             } finally {
-                animateSemaphore.stop();
+                animateSemaphore.unsubscribe();
             }
         }
 
@@ -234,21 +232,23 @@ public class Tower extends RotatingSpriteImageMover {
     private volatile PositionedImage ret = new PositionedImage();
 
     public PositionedImage updateSprite() {//hack but improves performance
+        Pair<Float, Float> lastCoord = getLastCoordinates();
         ret.image = iterateSprite();
-        ret.positionX = lastX;
-        ret.positionY = lastY;
+        ret.positionX = lastCoord.getFirst();
+        ret.positionY = lastCoord.getSecond();
         return ret;
     }
 
     @SideQuest(SLEEP = 25)
     @Override
-    public PositionedImage animate() {
+    public PositionedImage animate() throws InterruptedException {
         try {
             animateSemaphore.await();
             return updateSprite();
         } catch (InterruptedException ex) {
             return null;
         }
+        //return super.animate();
     }
 
     @CallingThread

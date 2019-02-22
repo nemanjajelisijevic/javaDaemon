@@ -244,6 +244,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         while (overloadedPrototypeMethods.contains(mainQuestName)) {
             mainQuestName += "I";
         }
+
         currentMainQuestName = mainQuestName;
         overloadedPrototypeMethods.add(mainQuestName);
 
@@ -263,7 +264,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             mainQuestConstructorBuilder.addParameter(parameter.getFirst(), parameter.getSecond());
 
         }
-
 
         if(!prototypeMethodData.isVoid()) {
             mainQuestConstructorBuilder.addParameter(
@@ -437,12 +437,12 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
-                .addStatement(daemonEngineString + ".queueStop()");
+                .addStatement(daemonEngineString + ".queueStop(this)");
 
-        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : dedicatedThreadEngines.entrySet()) {
-            builder.addStatement( entry.getValue().getFirst() + ".queueStop()");
-
-        }
+//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : dedicatedThreadEngines.entrySet()) {
+//            builder.addStatement( entry.getValue().getFirst() + ".stop()");
+//
+//        }
 
         builder.addStatement("return this");
 

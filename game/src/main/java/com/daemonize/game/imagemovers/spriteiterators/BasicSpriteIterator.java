@@ -1,7 +1,6 @@
 package com.daemonize.game.imagemovers.spriteiterators;
 
 import com.daemonize.game.images.Image;
-import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;

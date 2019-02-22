@@ -1,8 +1,10 @@
 package com.daemonize.game.tabel;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.game.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -201,8 +203,11 @@ public class Grid {
         return getMinWeightOfNeighbors(field.getRow(), field.getColumn());
     }
 
+    private List<Field> neighbors = new ArrayList<>(8);
+
     public Field getMinWeightOfNeighbors(int row, int column) {
-        List<Field> neighbors = new ArrayList<>();
+        //List<Field> neighbors = new ArrayList<>(8);
+        neighbors.clear();
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if (i == 0 && j == 0) {
@@ -216,22 +221,29 @@ public class Grid {
                 }
             }
         }
-        Field currentMinField = neighbors.get(0);
-        for (Field field : neighbors) {
-            if (field.isWalkable()) {
-                if (currentMinField.fCost() >= field.fCost()) {
-                    if (currentMinField.fCost() == field.fCost()) {
-                        //they are same, we choose random one
-                        int randomNum = (int) (Math.random() * 101);
-                        currentMinField = (randomNum < 50 ? currentMinField : field);
-                    } else {
-                        currentMinField = field;
-                    }
-                }
-            }
-        }
 
-        return currentMinField;
+        Collections.sort(neighbors);
+
+        return neighbors.get(0);
+
+//        Field currentMinField = neighbors.get(0);
+//        for (Field field : neighbors) {
+//            if (field.isWalkable()) {
+//                if (currentMinField.fCost() >= field.fCost()) {
+//                    if (currentMinField.fCost() == field.fCost()) {
+//                        //they are same, we choose random one
+//                        int randomNum = (int) (Math.random() * 101);
+//                        currentMinField = (randomNum < 50 ? currentMinField : field);
+//                    } else {
+//                        currentMinField = field;
+//                    }
+//                }
+//            }
+//        }
+
+//        return currentMinField;
+
+
     }
 
     public StringBuilder gridToString() {

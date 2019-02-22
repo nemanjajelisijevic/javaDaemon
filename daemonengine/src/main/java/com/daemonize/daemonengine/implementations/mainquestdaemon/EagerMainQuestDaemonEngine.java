@@ -9,7 +9,7 @@ import java.util.concurrent.locks.Condition;
 
 public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine {
 
-  private Condition mainQuestAvailable = mainQuestLock.newCondition();
+  private final Condition mainQuestAvailable = mainQuestLock.newCondition();
 
   public EagerMainQuestDaemonEngine(Consumer consumer) {
     super(consumer);

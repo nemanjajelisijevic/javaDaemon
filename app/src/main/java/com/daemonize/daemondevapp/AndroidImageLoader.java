@@ -20,6 +20,8 @@ public class AndroidImageLoader implements ImageLoader {
 
     @Override
     public Image loadImageFromAssets(String name, int width, int height) throws IOException {
-        return new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(context.getAssets().open(name)), width, height, false));
+
+        return new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(getClass().getResource("/" + name).openStream()), width, height, false));
+        //return new AndroidBitmapImage(Bitmap.createScaledBitmap(BitmapFactory.decodeStream(context.getAssets().open(name)), width, height, false));
     }
 }

@@ -1,5 +1,7 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.Daemon;
+import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
@@ -85,6 +87,9 @@ public class Game {
     private ImageView[] viewsNum;
     private InfoTable infoScore;
 
+    private Image dollarSign;
+    private Pair<ImageView, ImageView> moneyView;
+    private MoneyHandlerDaemon moneyDaemon;
 
     private Image[] dialogueImageTowerUpgrade;
     private Image upgradeButtonImage;
@@ -92,6 +97,7 @@ public class Game {
     private Image closeButtonImage;
     private Image scoreBackGrImage;
     private Image[] scorenumbersImages;
+    private Image[] moneyNumbersImages;
 
     //towers
     private Image[] redTowerUpgSprite;
@@ -128,7 +134,7 @@ public class Game {
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
-    private int maxEnemies = 40;
+    private int maxEnemies = 10;//40;
     private QueuedEntityRepo<EnemyDoubleDaemon> enemyRepo;
 
     //explosions
@@ -141,7 +147,7 @@ public class Game {
     private Image[] bulletSpriteRocket;
 
     private int bulletDamage = 2;
-    private int rocketExplosionRange = 200;
+    private int rocketExplosionRange;
 
     private int maxBullets = 80;
     private StackedEntityRepo<BulletDoubleDaemon> bulletRepo;
@@ -161,6 +167,8 @@ public class Game {
     private int getRandomInt(int min, int max) {
         return random.nextInt((max - min) + 1) + min;
     }
+
+    private float dXY;
 
     //closures
     private static class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
@@ -221,6 +229,8 @@ public class Game {
                 gridY,
                 ((borderX * 70) / 100) / columns
         );
+
+        this.dXY = ((float) borderX) / 1000;
     }
 
     public boolean isPaused() {
@@ -268,6 +278,7 @@ public class Game {
 
     public Game stop(){
         gameConsumer.consume(()-> {
+            moneyDaemon.stop();
             enemyGenerator.stop();
             for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
             for (TowerDaemon tower : towers) tower.stop();
@@ -276,6 +287,7 @@ public class Game {
             renderer.stop();
             this.running = false;
             gameConsumer.stop();
+            System.exit(0);
         });
         return this;
     }
@@ -679,6 +691,7 @@ public class Game {
                     renderer.drawScene();
                 }
 
+
                 Image score = imageLoader.loadImageFromAssets("SmallBox.png", 300, 150);
                 Image titleScore = imageLoader.loadImageFromAssets("HealthBar.png", 300, 70);
 
@@ -689,6 +702,8 @@ public class Game {
                     loaderBar.next().show();
                     renderer.drawScene();
                 }
+
+                dollarSign = imageLoader.loadImageFromAssets("money.png", numWidth / 2, numHeight / 2);
 
                 scorenumbersImages = new Image[10];
 
@@ -708,8 +723,26 @@ public class Game {
                     renderer.drawScene();
                 }
 
+                moneyNumbersImages = new Image[10];
+
+                moneyNumbersImages[0] = imageLoader.loadImageFromAssets("0.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[1] = imageLoader.loadImageFromAssets("1.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[2] = imageLoader.loadImageFromAssets("2.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[3] = imageLoader.loadImageFromAssets("3.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[4] = imageLoader.loadImageFromAssets("4.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[5] = imageLoader.loadImageFromAssets("5.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[6] = imageLoader.loadImageFromAssets("6.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[7] = imageLoader.loadImageFromAssets("7.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[8] = imageLoader.loadImageFromAssets("8.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[9] = imageLoader.loadImageFromAssets("9.png", numWidth / 2, numHeight / 2);
+
                 int upgradeDialogBackrgoundImageWidth = borderX / 3;
                 int upgradeDialogBackgroundImageHeight = (borderY * 16 / 50);
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene();
+                }
 
                 Image[] dialogUpgradeTower1 = new Image[3];
 
@@ -762,6 +795,8 @@ public class Game {
 
                 chain.next();
 
+
+
             } catch (IOException ex) {
                 System.err.println(DaemonUtils.tag() + "Could not init game!");
                 ex.printStackTrace();
@@ -782,6 +817,12 @@ public class Game {
             viewsNum[2] = new ImageViewImpl("Score 3. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
             viewsNum[3] = new ImageViewImpl("Score 4. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
             viewsNum[4] = new ImageViewImpl("Score 5. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+
+            //money views
+            moneyView = Pair.create(
+                    scene.addImageView(new ImageViewImpl("Money Amount").setZindex(10).setImage(scorenumbersImages[0]).hide()),
+                    scene.addImageView(new ImageViewImpl("Dollar Sign").setZindex(10).setImage(dollarSign).hide())
+            );
 
             Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
 
@@ -937,9 +978,8 @@ public class Game {
 
             for (int j = 0; j < rows - 1; ++j ) {
                 for (int i = 0; i < columns - 1; ++i)
-                    diagonalMatrix[j][i] = scene.addImageView(
-                            new ImageViewImpl("Grid [" + j + "][" + i +"]")
-                    ).setAbsoluteX(grid.getGrid()[j][i].getCenterX() + gridViewMatrix[j][i].getImage().getWidth() / 2)
+                    diagonalMatrix[j][i] = scene.addImageView(new ImageViewImpl("Grid [" + j + "][" + i +"]"))
+                     .setAbsoluteX(grid.getGrid()[j][i].getCenterX() + gridViewMatrix[j][i].getImage().getWidth() / 2)
                      .setAbsoluteY(grid.getGrid()[j][i].getCenterY() + gridViewMatrix[j][i].getImage().getHeight() / 2)
                      .setImage(fieldGreenDiagonal)
                      .setZindex(3)
@@ -950,10 +990,11 @@ public class Game {
             enemyRepo = new QueuedEntityRepo<EnemyDoubleDaemon>() {
                 @Override
                 public void onAdd(EnemyDoubleDaemon enemy) {
+                    System.out.println(DaemonUtils.timedTag() + enemy.getName() + " ENEMY ADDED TO REPO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     renderer.consume(enemy.getHpView()::hide);
-                    enemy.setShootable(false).setVelocity(0).pushSprite(explodeSprite, 0, () -> {
+                    enemy.setShootable(false).setVelocity(0).pushSprite(explodeSprite, 0, ()->{
                         renderer.consume(enemy.getView()::hide);
-                        enemy.setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
+                        enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
                     });
                     activeEnemies.remove(enemy);
                 }
@@ -961,8 +1002,9 @@ public class Game {
                 @Override
                 public void onGet(EnemyDoubleDaemon enemy) {
                     enemy.setShootable(true)
-                            .setCoordinates(grid.getStartingX(), grid.getStartingY())
-                            .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(0.5F, 0.5F)));
+                            //.setCoordinates(grid.getStartingX(), grid.getStartingY())
+                            .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(0.5F, 0.5F)))
+                            .setCoordinates(grid.getStartingX(), grid.getStartingY());
                     renderer.consume(()->{
                         enemy.getView().show();
                         enemy.getHpView().show();
@@ -975,8 +1017,9 @@ public class Game {
             bulletRepo = new StackedEntityRepo<BulletDoubleDaemon>() {
                 @Override
                 public void onAdd(BulletDoubleDaemon bullet) {
+                    System.out.println(DaemonUtils.timedTag() + bullet.getName() + " BULLET ADDED TO REPO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     renderer.consume(() -> {
-                        for (ImageView view : bullet.getViews())
+                            for (ImageView view : bullet.getViews())
                             view.hide();
                     });
                     bullet.setVelocity(0).pause();
@@ -995,19 +1038,20 @@ public class Game {
             //rocket repo init
             rocketRepo = new StackedEntityRepo<BulletDoubleDaemon>() {
                 @Override
-                public void onAdd(BulletDoubleDaemon bullet) {
+                public void onAdd(BulletDoubleDaemon rocket) {
+                    System.out.println(DaemonUtils.timedTag() + rocket.getName() + " ROCKET ADDED TO REPO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     renderer.consume(() -> {
-                        for (ImageView view : bullet.getViews())
+                        for (ImageView view : rocket.getViews())
                             view.hide();
                     });
-                    bullet.setVelocity(0).pause();
+                    rocket.setVelocity(0).pause();
                 }
 
                 @Override
-                public void onGet(BulletDoubleDaemon bullet) {
-                    System.out.println(DaemonUtils.tag() + "Rocket get state: " + bullet.getState());
+                public void onGet(BulletDoubleDaemon rocket) {
+                    System.out.println(DaemonUtils.tag() + "Rocket get state: " + rocket.getState());
                     renderer.consume(()->{
-                        for (ImageView view : bullet.getViews())
+                        for (ImageView view : rocket.getViews())
                             view.show();
                     });
                 }
@@ -1025,20 +1069,27 @@ public class Game {
                                 enemySprite,
                                 enemyVelocity,
                                 enemyHp,
-                                Pair.create(grid.getStartingX(), grid.getStartingY())
+                                Pair.create(grid.getStartingX(), grid.getStartingY()),
+                                dXY
                         ).setView(scene.addImageView(new ImageViewImpl(enemyName + " View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
                         .setHpView(scene.addImageView(new ImageViewImpl(enemyName + " HP View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
                         .setHealthBarImage(healthBarSprite)
                 ).setName(enemyName);
 
                 enemy.getPrototype().setBorders(
-                        grid.getStartingX(),
+                        0,
                         (grid.getStartingX() + grid.getGridWidth()),
-                        grid.getStartingY(),
+                        0,
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-                enemy.setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
+                enemy.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
+                            System.err.println(DaemonUtils.timedTag() + enemy.getName() +  " ENEMY OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!12345");
+                            //throw new IllegalStateException(enemy.getName() + "OUT OF BORDERS!!!!");
+                            enemyRepo.add(enemy);
+                        })
+                        .setAnimateEnemySideQuest()
+                        .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 enemyRepo.getStructure().add(enemy);
             }
@@ -1056,20 +1107,26 @@ public class Game {
                                 0,
                                 Pair.create((float) 0, (float) 0),
                                 bulletDamage,
-                                bulletSprite[0].getWidth()
+                                bulletSprite[0].getWidth(),
+                                dXY
                         ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                         .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                         .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
                 ).setName(bulletName);
 
                 bulletDoubleDaemon.getPrototype().setBorders(
-                        - 50,//grid.getStartingX(),//TODO fix offset
+                        grid.getStartingX(),//TODO fix offset
                         (grid.getStartingX() + grid.getGridWidth()),
-                        - 50,  //grid.getStartingY(),
+                        grid.getStartingY(),
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-                bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()-> bulletRepo.add(bulletDoubleDaemon));
+                bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
+                    System.err.println(DaemonUtils.timedTag() + bulletDoubleDaemon.getName() + " BULLET OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    bulletRepo.add(bulletDoubleDaemon);
+                    bulletDoubleDaemon.stop();
+                });
+
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 bulletRepo.getStructure().push(bulletDoubleDaemon);
@@ -1088,24 +1145,30 @@ public class Game {
                                 0,
                                 Pair.create((float) 0, (float) 0),
                                 bulletDamage,
-                                bulletSpriteRocket[0].getWidth()
+                                bulletSpriteRocket[0].getWidth(),
+                                dXY
                         ).setView(scene.addImageView(new ImageViewImpl(rocketName + " View 1").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                         .setView2(scene.addImageView(new ImageViewImpl(rocketName + " View 2").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                         .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                 ).setName(rocketName);
 
                 rocketDoubleDaemon.getPrototype().setBorders(
-                        - 50,//grid.getStartingX(),//TODO fix offset
+                        grid.getStartingX(),//TODO fix offset
                         (grid.getStartingX() + grid.getGridWidth()),
-                        - 50,  //grid.getStartingY(),
+                        grid.getStartingY(),
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-                rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()-> rocketRepo.add(rocketDoubleDaemon));
+                rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
+                    System.err.println(DaemonUtils.timedTag() + rocketDoubleDaemon.getName() + " ROCKET OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    rocketRepo.add(rocketDoubleDaemon);
+                });
                 rocketDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 rocketRepo.getStructure().push(rocketDoubleDaemon);
             }
+
+            rocketExplosionRange = fieldImage.getWidth();
 
             scene.addImageViews(laserViews);
 
@@ -1113,29 +1176,45 @@ public class Game {
             laser = new LaserBulletDaemon(
                     gameConsumer,
                     renderer,
-                    new LaserBullet(laserSprite, 40, Pair.create(0F, 0F), bulletDamage)
-            );
+                    new LaserBullet(laserSprite, 40, Pair.create(0F, 0F), bulletDamage, dXY)
+            ).setViews(laserViews);
 
-            laser.setViews(laserViews);
             laser.setAnimateLaserSideQuest().setClosure(ret->{
-                for (Pair<ImageView, ImageMover.PositionedImage> viewAndImage : ret.runtimeCheckAndGet()) {
+                for (Pair<ImageView, ImageMover.PositionedImage> viewAndImage : ret.runtimeCheckAndGet())
                     viewAndImage.getFirst()
                             .setAbsoluteX(viewAndImage.getSecond().positionX)
                             .setAbsoluteY(viewAndImage.getSecond().positionY)
                             .setImage(viewAndImage.getSecond().image);
-                }
+            });
+
+
+            //init moneyDaemon
+            moneyDaemon = new MoneyHandlerDaemon(
+                    gameConsumer,
+                    renderer,
+                    (MoneyHandler) new MoneyHandler(moneyNumbersImages, dollarSign, dXY).setBorders(0, borderX, 0, borderY)
+            ).setName("Money handler Daemon")
+                    .setAmount(0)
+                    .setOutOfBordersConsumer(renderer)
+                    .setOutOfBordersClosure(()->{
+                        moneyView.getFirst().hide();
+                        moneyView.getSecond().hide();
+                    });
+
+            moneyDaemon.setAnimateMoneySideQuest().setClosure(ret ->{
+                Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> result = ret.runtimeCheckAndGet();
+                moneyView.getFirst().setImage(result.getFirst().image).setAbsoluteX(result.getFirst().positionX).setAbsoluteY(result.getFirst().positionY);
+                moneyView.getSecond().setImage(result.getSecond().image).setAbsoluteX(result.getSecond().positionX).setAbsoluteY(result.getSecond().positionY);
             });
 
             //prepare the scene and start the renderer
             scene.lockViews();
-
             scene.forEach(view->{
                 System.out.println(DaemonUtils.tag() + view.getName());
                 System.out.println(DaemonUtils.tag() + "X: " + view.getAbsoluteX());
                 System.out.println(DaemonUtils.tag() + "Y: " + view.getAbsoluteY());
                 System.out.println(DaemonUtils.tag() + "Image: "  + view.getImage().toString());
                 System.out.println(DaemonUtils.tag() + "Image imp: " + view.getImage().getImageImp().toString());
-
             });
 
             renderer.setScene(scene).start();
@@ -1144,11 +1223,19 @@ public class Game {
 
         }).addState(()->{//gameState
 
+
+
             //laser start
+            for (ImageView laserView : laserViews)
+                laserView.setAbsoluteX(-100).setAbsoluteY(-100);
+
             laser.start();
 
+            //money handler start
+            moneyDaemon.start();
+
             //draw the score keeping dialogue
-            renderer.consume(()->{
+            renderer.consume(()->
                 infoScore = new InfoTable(
                         borderX * 85 / 100,
                         borderY / 5,
@@ -1156,8 +1243,8 @@ public class Game {
                         scoreTitleView,
                         viewsNum,
                         scorenumbersImages
-                ).setNumbers(80085);
-            });
+                ).setNumbers(80085)
+            );
 
             //set tower range
             range = 2 * fieldImage.getWidth();
@@ -1185,9 +1272,9 @@ public class Game {
                     enemyHp++;
                     enemyGenerator.setSleepInterval(waveInterval);
 
-                } else {
+                } else
                     enemyGenerator.setSleepInterval(enemyGenerateinterval);
-                }
+
 
                 if (enemyCounter % 20 == 0 && bulletDamage < 10)
                     bulletDamage += 1;
@@ -1205,7 +1292,7 @@ public class Game {
                         firstField.getCenterY()
                 );
 
-                enemyDoubleDaemon.rotate(angle)
+                enemyDoubleDaemon.start().rotate(angle)
                         .goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
                         new Runnable() {// gameConsumer
                             @Override
@@ -1252,17 +1339,18 @@ public class Game {
 
                                 //go to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
-                                enemyDoubleDaemon.rotate(
+
+                                enemyDoubleDaemon.cont().rotate(
                                         (int) RotatingSpriteImageMover.getAngle(
                                                 current.getCenterX(),
                                                 current.getCenterY(),
                                                 next.getCenterX(),
                                                 next.getCenterY()
                                         )
-                                ).goTo(next.getCenterX(), next.getCenterY(), enemyVelocity, this::run);
+                                ).goTo(next.getCenterX(), next.getCenterY(), enemyDoubleDaemon.getVelocity().intensity, this::run);
                             }
                         }
-                ).start();
+                );
             });
 
             //start enemy generator
@@ -1304,6 +1392,38 @@ public class Game {
                 markerCnt.incrementAndGet();
 
             }).setName("Start End field marker").start();
+
+            System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
+
+//            DummyDaemon.create(gameConsumer, 5000).start().setClosure(()->{
+//
+//                System.out.println("*************************************************************");
+//                System.out.println("ENEMY REPO STATE (" + enemyRepo.size() + "):");
+//
+//                for(EnemyDoubleDaemon enemyDoubleDaemon : enemyRepo.getStructure())
+//                    System.out.println(enemyDoubleDaemon.getName() + " - STATE: " + enemyDoubleDaemon.getState());
+//
+//                System.out.println("*************************************************************");
+//                System.out.println("ACTIVE ENEMIES STATE(" + activeEnemies.size() + "):");
+//
+//                for(EnemyDoubleDaemon enemyDoubleDaemon : activeEnemies)
+//                    System.out.println(enemyDoubleDaemon.getName() + " - STATE: " + enemyDoubleDaemon.getState());
+//
+//                System.out.println("*************************************************************");
+//                System.out.println("BULLET REPO STATE(" + bulletRepo.size() + "):");
+//
+//                for(BulletDoubleDaemon bulletDoubleDaemon : bulletRepo.getStructure())
+//                    System.out.println(bulletDoubleDaemon.getName() + " - STATE: " + bulletDoubleDaemon.getState());
+//
+//                System.out.println("*************************************************************");
+//                System.out.println("ROCKET REPO STATE(" + rocketRepo.size() + "):");
+//
+//                for(BulletDoubleDaemon rocketDoubleDaemon : rocketRepo.getStructure())
+//                    System.out.println(rocketDoubleDaemon.getName() + " - STATE: " + rocketDoubleDaemon.getState());
+//
+//                System.out.println("*************************************************************");
+//            });
+
         });
     }
 
@@ -1431,7 +1551,8 @@ public class Game {
                                 currentTowerSprite,
                                 Pair.create(field.getCenterX(), field.getCenterY()),
                                 range,
-                                towerSelect
+                                towerSelect,
+                                dXY
                         )
                 ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]").setView(fieldView);
 
@@ -1454,14 +1575,27 @@ public class Game {
 
                             switch (towerType) {
                                 case TYPE1:
-                                    fireBullet(
-                                            towerDaemon.getLastCoordinates(),
-                                            enemy.getLastCoordinates(),
-                                            enemy,
-                                            25,
-                                            towerDaemon.getTowerLevel().bulletDamage,
-                                            towerDaemon.getTowerLevel().currentLevel
-                                    );
+
+                                    if (towerDaemon.getName().contains("[2][2]")) {
+                                        fireBullet(
+                                                towerDaemon.getLastCoordinates(),
+                                                Pair.create((float)borderX / 2 , (float)borderY),
+                                                enemy,
+                                                25,
+                                                towerDaemon.getTowerLevel().bulletDamage,
+                                                towerDaemon.getTowerLevel().currentLevel
+                                        );
+                                    } else {
+
+                                        fireBullet(
+                                                towerDaemon.getLastCoordinates(),
+                                                enemy.getLastCoordinates(),
+                                                enemy,
+                                                25,
+                                                towerDaemon.getTowerLevel().bulletDamage,
+                                                towerDaemon.getTowerLevel().currentLevel
+                                        );
+                                    }
                                     break;
                                 case TYPE2:
                                     fireRocketBullet(
@@ -1483,7 +1617,7 @@ public class Game {
                                     towerDaemon.setCurrentAngle((int) angle);
 
                                     fireLaser(towerDaemon.getLastCoordinates(), enemy, 300);
-                                    reloadInterval = 1000;
+                                    reloadInterval = 5000;
                                     break;
                                 default:
                                     throw new IllegalStateException("Tower type does not exist!");
@@ -1507,12 +1641,12 @@ public class Game {
     ) {
         System.out.println(DaemonUtils.tag() + "Bullet queue size: " + bulletRepo.size());
 
-        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet -> {
+        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet ->
             bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage)
-                    .setSprite(bulletSprite);
-        });
+                    .setSprite(bulletSprite)
+        );
 
         if (bulletDoubleDaemon.getState().equals(DaemonState.STOPPED))
             bulletDoubleDaemon.start();
@@ -1520,7 +1654,6 @@ public class Game {
             bulletDoubleDaemon.cont();
 
         bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, () -> {
-
             if (!enemy.isShootable()) {
                 bulletRepo.add(bulletDoubleDaemon);
                 return;
@@ -1530,8 +1663,25 @@ public class Game {
             if (newHp > 0)
                 enemy.setHp(newHp);
             else {
-                renderer.consume(()->infoScore.setNumbers(++score));
+
                 enemyRepo.add(enemy);
+
+                moneyDaemon.setAmount(1)
+                        .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
+                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, ()->{
+                            renderer.consume(()->{
+                                moneyView.getFirst().hide();
+                                moneyView.getSecond().hide();
+                            });
+
+                            renderer.consume(()->infoScore.setNumbers(++score));
+                        });
+
+                renderer.consume(()->{
+                    moneyView.getFirst().show();
+                    moneyView.getSecond().show();
+                });
+
             }
 
             bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
@@ -1547,12 +1697,12 @@ public class Game {
     ) {
         System.out.println(DaemonUtils.tag() + "Rocket stack size: " + rocketRepo.size());
 
-        BulletDoubleDaemon rocketDoubleDaemon = rocketRepo.configureAndGet(rocket->{
+        BulletDoubleDaemon rocketDoubleDaemon = rocketRepo.configureAndGet(rocket->
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage)
-                    .setSprite(bulletSpriteRocket);
-        });
+                    .setSprite(bulletSpriteRocket)
+        );
 
         int launchX = getRandomInt(
                 (int)(sourceCoord.getFirst() - fieldImage.getWidth() / 2),
@@ -1576,6 +1726,7 @@ public class Game {
         else
             rocketDoubleDaemon.cont();
 
+
         rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, () -> {
 
             if (!enemy.isShootable()) {
@@ -1589,10 +1740,11 @@ public class Game {
                         sourceCoord.getFirst(),
                         sourceCoord.getSecond(),
                         4,
-                        ()-> rocketRepo.add(rocketDoubleDaemon)
+                        ()->rocketRepo.add(rocketDoubleDaemon)
                 );
-
             } else {
+
+                Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
 
                 int targetAngle1 = (int) RotatingSpriteImageMover.getAngle(
                         rocketDoubleDaemon.getLastCoordinates().getFirst(),
@@ -1606,7 +1758,7 @@ public class Game {
                         enemy.getLastCoordinates().getFirst(),
                         enemy.getLastCoordinates().getSecond(),
                         velocity,
-                        () -> {
+                        ()->{
 
                             if (!enemy.isShootable()) {
                                 rocketRepo.add(rocketDoubleDaemon);
@@ -1616,38 +1768,75 @@ public class Game {
                             float bulletX = rocketDoubleDaemon.getLastCoordinates().getFirst();
                             float bulletY = rocketDoubleDaemon.getLastCoordinates().getSecond();
 
-                            if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) > rocketExplosionRange
-                                    && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) > rocketExplosionRange) {
-                                return;
+                            if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) < rocketExplosionRange
+                                    && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) < rocketExplosionRange) {
+
+                                int newHp = enemy.getHp() - rocketDoubleDaemon.getDamage();
+
+                                if (newHp > 0)
+                                    enemy.setHp(newHp);
+                                else {
+
+                                    enemyRepo.add(enemy);
+
+                                    moneyDaemon.setAmount(1).setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
+                                            .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, ()->{
+                                                renderer.consume(()->{
+                                                    moneyView.getFirst().hide();
+                                                    moneyView.getSecond().hide();
+                                                });
+
+                                                renderer.consume(()->infoScore.setNumbers(++score));
+                                            });
+
+                                    renderer.consume(()->{
+                                        moneyView.getFirst().show();
+                                        moneyView.getSecond().show();
+                                    });
+                                }
                             }
 
-                            int newHp = enemy.getHp() - rocketDoubleDaemon.getDamage();
-
-                            if (newHp > 0)
-                                enemy.setHp(newHp);
-                            else {
-                                renderer.consume(() -> infoScore.setNumbers(++score));
-                                enemyRepo.add(enemy);
-                            }
-
-                            rocketDoubleDaemon.pushSprite(
-                                    rocketExplodeSprite,
-                                    0,
-                                    () -> rocketRepo.add(rocketDoubleDaemon)
-                            );
+                            rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, ()->rocketRepo.add(rocketDoubleDaemon));
                         });
             }
         });
     }
 
     public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, long duration) {
-        laser.desintegrateTarget(source, enemy, duration, renderer/*drawConsumer*/, ret->{
+
+        laser.desintegrateTarget(source, enemy, duration, renderer, ret->{
             int newHp = enemy.getHp() - laser.getDamage();
-            if (newHp > 0)
-                enemy.setHp(newHp);
-            else {
-                renderer.consume(()->infoScore.setNumbers(++score));
+            if (newHp > 0) {
+
+                float enemyVelocity = enemy.getVelocity().intensity;
+                enemy.setHp(newHp).setVelocity(enemyVelocity / 4);
+
+                DummyDaemon enemyParalyizer = DummyDaemon.create(gameConsumer, 3000);
+                enemyParalyizer.setName("Enemy Paralyzer").start().setClosure(()->{
+                    if (enemy.isShootable())
+                        enemy.setVelocity(enemyVelocity);
+                    enemyParalyizer.stop();
+                });
+
+            } else {
+                Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
+
                 enemyRepo.add(enemy);
+
+                moneyDaemon.setAmount(1).setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
+                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, ()->{
+                            renderer.consume(()->{
+                                moneyView.getFirst().hide();
+                                moneyView.getSecond().hide();
+                            });
+
+                            renderer.consume(()->infoScore.setNumbers(++score));
+                        });
+
+                renderer.consume(()->{
+                    moneyView.getFirst().show();
+                    moneyView.getSecond().show();
+                });
             }
         });
     }

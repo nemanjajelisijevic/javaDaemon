@@ -1,24 +1,34 @@
 package com.daemonize.game.imagemovers;
 
+import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.utils.DaemonCountingLatch;
+import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.game.Pair;
 import com.daemonize.game.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.game.imagemovers.spriteiterators.SpriteIterator;
 import com.daemonize.game.images.Image;
-import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 
 
 public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
-    protected volatile float lastX;
-    protected volatile float lastY;
+    private volatile float lastX;
+    private volatile float lastY;
+
+    private float dXY;
+
+    public float getdXY() {
+        return dXY;
+    }
 
     protected SpriteIterator spriteIterator;
     protected float initVelocity;
 
     protected volatile Velocity velocity;
 
-    protected DaemonCountingSemaphore pauseSemaphore = new DaemonCountingSemaphore();
-
+    protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore();
+    private DaemonSemaphore pauseSemaphore = new DaemonSemaphore();
 
     public Image [] getSprite() {
         return spriteIterator.getSprite();
@@ -29,7 +39,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return spriteIterator.getSize();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ImageTranslationMover setSprite(Image[] sprite) {
         spriteIterator.setSprite(sprite);
@@ -47,7 +56,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     @Override
-    public void setCoordinates(float lastX, float lastY) {
+    public synchronized void setCoordinates(float lastX, float lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
     }
@@ -58,12 +67,14 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     protected float borderY1;
     protected float borderY2;
 
-    public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos) {
+    public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
         this.spriteIterator = new BasicSpriteIterator(sprite);
         this.initVelocity = velocity;
         this.velocity = new Velocity(velocity, new Direction(0, 0));
+        this.dXY = dXY;
         lastX = startingPos.getFirst();
         lastY = startingPos.getSecond();
+        animateSemaphore.stop();
     }
 
     public Image iterateSprite() {
@@ -83,8 +94,14 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     @Override
     public void setDirectionAndMove(float x, float y, float velocityInt) {
 
-        double dX = x - lastX;
-        double dY = y - lastY;
+        double dX;
+        double dY;
+
+        synchronized (this) {
+            dX = x - lastX;
+            dY = y - lastY;
+        }
+
         double hypotenuse = Math.sqrt(dX*dX + dY*dY);
 
         dX = (dX / hypotenuse);
@@ -112,40 +129,49 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     public void pause(){
-        pauseSemaphore.subscribe();
+        animateSemaphore.stop();
     }
 
     public void cont(){
-        pauseSemaphore.unsubscribe();
+        /*animateSemaphore.go();*/
     }
 
+    private Consumer consumer;
+    private Runnable outOfBordersClosure;
+
+    public void setOutOfBordersConsumer(Consumer consumer) {
+        this.consumer = consumer;
+    }
+
+    public void setOutOfBordersClosure(Runnable closure) {
+        this.outOfBordersClosure = closure;
+    }
 
     private PositionedImage ret = new PositionedImage();
 
     @Override
     public PositionedImage animate() throws InterruptedException {
 
-            pauseSemaphore.await();
-            ret.image = iterateSprite();
+        animateSemaphore.await();
+        //pauseSemaphore.await();
 
-            //check borders and recalculate
-            if (lastX <= borderX1) {
-                lastX = borderX1;
-            } else if (lastX >= borderX2) {
-                lastX = borderX2;
-            }
+        ret.image = iterateSprite();
 
-            if(lastY <= borderY1) {
-                lastY = borderY1;
-            } else if( lastY >= borderY2) {
-                lastY = borderY2;
-            }
+        if (lastX <= (borderX1 + velocity.intensity) ||
+                lastX >= (borderX2 - velocity.intensity)||
+                lastY <= (borderY1 + velocity.intensity) ||
+                lastY >= (borderY2 - velocity.intensity)) {
+            consumer.consume(outOfBordersClosure);
+            animateSemaphore.stop();
+            return null;
+        }
 
-            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX);
-            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY);
+        synchronized (this) {
+            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY);
+            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * dXY);
+        }
 
-            return ret;
-
+        return ret;
     }
 }
 

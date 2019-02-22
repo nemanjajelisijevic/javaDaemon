@@ -9,11 +9,13 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
     protected AwaitedArraySprite<Image> cache = new AwaitedArraySprite<>();
 
     public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
+        animateSemaphore.subscribe();
         this.velocity.intensity = velocity;
         cache.setSprite(sprite);
         setSprite(new Image[]{sprite[sprite.length - 1]});
         cache.await();
         cache.clearCache();
+        animateSemaphore.unsubscribe();
     }
 
     public void popSprite() {
@@ -28,7 +30,7 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
             return super.iterateSprite();
     }
 
-    public CachedArraySpriteImageMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos) {
-        super(sprite, velocity, startingPos);
+    public CachedArraySpriteImageMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
+        super(sprite, velocity, startingPos, dXY);
     }
 }

@@ -53,7 +53,7 @@ public class Main extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         Renderer2D renderer = new JavaFXRenderer(gc, borderX, borderY);
-        ImageLoader imageLoader = new JavaFxImageLoader("javafxmain/assets/");
+        ImageLoader imageLoader = new JavaFxImageLoader("");
 
         game = new Game(renderer, imageLoader, borderX, borderY, rows, columns,50,50);
 
@@ -62,7 +62,7 @@ public class Main extends Application {
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
-        primaryStage.initStyle(StageStyle.UNDECORATED);
+        //primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
 
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> game.onTouch((float) event.getSceneX(), (float) event.getSceneY()));

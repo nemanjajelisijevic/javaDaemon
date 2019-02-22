@@ -10,3 +10,23 @@ dependencies {
     implementation project(':game')
 }
 
+
+sourceSets {
+    main{
+        resources {
+            srcDirs "assets"
+        }
+    }
+}
+//
+//jar {
+//    manifest {
+//        attributes(
+//                //'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+//                'Main-Class': 'com.daemonize.javafxmain.Main'
+//        )
+//    }
+//    from {
+//        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+//    }
+//}

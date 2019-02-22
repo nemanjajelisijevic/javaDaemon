@@ -1,10 +1,19 @@
 package com.daemonize.daemonengine.utils;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class DaemonUtils {
 
     public static String tag() {
         return Thread.currentThread().getName() + ", Thread ID: " + Thread.currentThread().getId() + " - ";
+    }
+
+    public static String timedTag() {
+        Date date = new Date(System.currentTimeMillis());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd, hh:mm:ss:SSS");
+        return dateFormat.format(date) +  " " + tag();
     }
 
     public static String convertNanoTimeUnitsToString(long nanoTime, TimeUnits units) {

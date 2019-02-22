@@ -4,7 +4,7 @@ package com.daemonize.game;
 import com.daemonize.game.images.Image;
 import com.daemonize.game.view.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+import com.daemonize.daemonengine.utils.DaemonCountingLatch;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
@@ -22,7 +22,7 @@ public class LaserBullet extends Bullet {
     private float[] coefficients;
 
     private volatile boolean fire = false;
-    private DaemonCountingSemaphore phaseLock;
+    private DaemonCountingLatch phaseLock;
 
     @CallingThread
     @Override
@@ -52,12 +52,6 @@ public class LaserBullet extends Bullet {
         return super.getDamage();
     }
 
-//    @CallingThread
-//    @Override
-//    public void setStartingCoords(Pair<Float, Float> startingCoords) {
-//        super.setStartingCoords(startingCoords);
-//    }
-
     @CallingThread
     @Override
     public void setCoordinates(float lastX, float lastY) {
@@ -73,10 +67,11 @@ public class LaserBullet extends Bullet {
             Image[] sprite,
             float velocity,
             Pair<Float, Float> startingPos,
-            int damage
+            int damage,
+            float dXY
     ) {
-        super(sprite, velocity, startingPos, damage, 0);
-        this.phaseLock = new DaemonCountingSemaphore();
+        super(sprite, velocity, startingPos, damage, 0, dXY);
+        this.phaseLock = new DaemonCountingLatch();
         this.phaseLock.subscribe();
     }
 

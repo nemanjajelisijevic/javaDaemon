@@ -27,6 +27,11 @@ sourceSets {
     generated {
         java {
             srcDir "$buildDir$daemonsSource"
+            main {
+                resources {
+                    srcDirs "assets"
+                }
+            }
         }
     }
 }

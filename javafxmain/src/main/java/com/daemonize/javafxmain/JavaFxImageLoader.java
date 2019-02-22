@@ -15,6 +15,6 @@ public class JavaFxImageLoader implements ImageLoader {
 
     @Override
     public Image loadImageFromAssets(String name, int width, int height) throws IOException {
-        return new JavaFxImage(new javafx.scene.image.Image("file:" + pathToAssetsFromRoot + name, width, height, false, false));
+        return new JavaFxImage(new javafx.scene.image.Image(/*"file:" + */getClass().getResource("/" + name).toString(), width, height, false, false));
     }
 }

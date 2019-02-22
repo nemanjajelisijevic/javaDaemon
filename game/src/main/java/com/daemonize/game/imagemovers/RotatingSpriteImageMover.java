@@ -1,6 +1,8 @@
 package com.daemonize.game.imagemovers;
 
 
+import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.AngleToBitmapArray;
 import com.daemonize.game.Pair;
 import com.daemonize.game.images.Image;
@@ -28,13 +30,19 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         this.spriteBuffer.setCurrentAngle(currentAngle);
     }
 
-    public RotatingSpriteImageMover(Image[] rotationSprite, float velocity, Pair<Float, Float> startingPos) {
-        super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos);
+    public RotatingSpriteImageMover(Image[] rotationSprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
+        super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos, dXY);
         setRotationSprite(rotationSprite);
     }
 
+    public RotatingSpriteImageMover(Image[] rotationSprite, DaemonCountingSemaphore animateSemaphore, float velocity, Pair<Float, Float> startingPos, float dXY) {
+        super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos, dXY);
+        setRotationSprite(rotationSprite);
+        this.animateSemaphore = animateSemaphore;
+    }
+
     public void rotateTowards(float x, float y) throws InterruptedException {
-        int targetAngle = (int) getAngle(lastX, lastY, x, y);
+        int targetAngle = (int) getAngle(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y);
         rotate(targetAngle);
     }
 

@@ -1,12 +1,13 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.ImageTranslationMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
 import com.daemonize.game.view.ImageView;
-import com.daemonize.daemonengine.consumer.Consumer;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
@@ -15,10 +16,11 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 
-@Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon", returnDaemonInstance = true)
+@Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon")
 public class Bullet extends CoordinatedImageTranslationMover {
 
     private ImageView view;
@@ -32,11 +34,11 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     private RotatingSpriteImageMover rotationMover;
 
-    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos, int damage, int spaceBetweenBullets) {
-        super(Arrays.copyOf(sprite, 1), velocity, startingPos);
+    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos, int damage, int spaceBetweenBullets, float dXY) {
+        super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
         this.damage = damage;
         this.spaceBetweenBullets = spaceBetweenBullets;
-        this.rotationMover = new RotatingSpriteImageMover(sprite, velocity, startingPos);
+        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
     }
 
     @CallingThread
@@ -171,22 +173,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
         super.cont();
     }
 
-
-    private Consumer consumer;
-    private Runnable outOfBordersClosure;
-
-    @CallingThread
-    public Bullet setOutOfBordersConsumer(Consumer consumer) {
-        this.consumer = consumer;
-        return this;
-    }
-
-    @CallingThread
-    public Bullet setOutOfBordersClosure(Runnable outOfBordersClosure) {
-        this.outOfBordersClosure = outOfBordersClosure;
-        return this;
-    }
-
     @Override
     public Image iterateSprite() {
         return rotationMover.iterateSprite();
@@ -200,14 +186,13 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() throws InterruptedException {
 
-        if (lastX <= (borderX1 + velocity.intensity) ||
-                lastX >= (borderX2 - velocity.intensity)||
-                lastY <= (borderY1 + velocity.intensity) ||
-                lastY >= (borderY2 - velocity.intensity)) {
-            consumer.consume(outOfBordersClosure);
-        }
+        Pair<Float, Float> lastCoord = getLastCoordinates();
 
         PositionedImage posImage = super.animate();
+
+        if(posImage == null)
+            return null;
+
         Direction movingDirection = getVelocity().direction;
 
         switch (level){
@@ -253,5 +238,17 @@ public class Bullet extends CoordinatedImageTranslationMover {
         root.addChild(new GenericNode<>(Pair.create(posImage2,view2)));
        return root;
 
+    }
+
+    @CallingThread
+    @Override
+    public void setOutOfBordersConsumer(Consumer consumer) {
+        super.setOutOfBordersConsumer(consumer);
+    }
+
+    @CallingThread
+    @Override
+    public void setOutOfBordersClosure(Runnable outOfBordersClosure) {
+        super.setOutOfBordersClosure(outOfBordersClosure);
     }
 }

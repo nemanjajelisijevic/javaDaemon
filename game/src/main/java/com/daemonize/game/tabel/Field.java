@@ -2,7 +2,7 @@ package com.daemonize.game.tabel;
 
 import com.daemonize.game.TowerDaemon;
 
-public class Field implements  IHeapItem <Field> {
+public class Field implements  IHeapItem <Field>, Comparable<Field> {
     float centerX;
     float centerY;
 
@@ -133,7 +133,6 @@ public class Field implements  IHeapItem <Field> {
             }
         }
     }
-
 }
 
 

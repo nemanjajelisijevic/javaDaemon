@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngine> {
 
-  protected Queue<MainQuest> mainQuestQueue = new LinkedList<>();
+  protected final Queue<MainQuest> mainQuestQueue = new LinkedList<>();
   protected final Lock mainQuestLock = new ReentrantLock();
 
   public MainQuestDaemonEngine(Consumer consumer) {
@@ -33,11 +33,7 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
   }
 
   public boolean pursueQuest(MainQuest quest) {
-   return addMainQuest(quest);
-//    if (getState().equals(DaemonState.STOPPED)) {
-//      start();
-//    }
-//    return ret;
+    return addMainQuest(quest);
   }
 
   //returns null
@@ -52,9 +48,15 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
     return ret;
   }
 
-  @Override
-  public MainQuestDaemonEngine queueStop() {
-    addMainQuest(new StopMainQuest(this));
+  //@Override
+  public MainQuestDaemonEngine queueStop(Daemon daemon) {
+    addMainQuest(new StopMainQuest(daemon));
     return this;
+  }
+
+  @Override
+  public void stop() {
+    mainQuestQueue.clear();
+    super.stop();
   }
 }

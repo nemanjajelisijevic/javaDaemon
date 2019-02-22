@@ -235,7 +235,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 //.returns(void.class)
                 .returns(ClassName.get(packageName, daemonSimpleName))
-                .addStatement(daemonEngineString + ".queueStop()")
+                .addStatement(daemonEngineString + ".queueStop(this)")
                 .addStatement("return this")
                 .build();
     }
