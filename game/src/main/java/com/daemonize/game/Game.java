@@ -1125,6 +1125,7 @@ public class Game {
                     System.err.println(DaemonUtils.timedTag() + bulletDoubleDaemon.getName() + " BULLET OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     bulletRepo.add(bulletDoubleDaemon);
                     bulletDoubleDaemon.stop();
+
                 });
 
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
