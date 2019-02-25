@@ -1022,7 +1022,7 @@ public class Game {
                             for (ImageView view : bullet.getViews())
                             view.hide();
                     });
-                    bullet.setVelocity(0).pause();
+                    bullet.setVelocity(0).pause().clearAndInterrupt();
                 }
 
                 @Override
@@ -1044,7 +1044,7 @@ public class Game {
                         for (ImageView view : rocket.getViews())
                             view.hide();
                     });
-                    rocket.setVelocity(0).pause();
+                    rocket.setVelocity(0).clearAndInterrupt();
                 }
 
                 @Override
@@ -1124,8 +1124,6 @@ public class Game {
                 bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
                     System.err.println(DaemonUtils.timedTag() + bulletDoubleDaemon.getName() + " BULLET OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     bulletRepo.add(bulletDoubleDaemon);
-                    bulletDoubleDaemon.stop();
-
                 });
 
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
@@ -1576,27 +1574,14 @@ public class Game {
 
                             switch (towerType) {
                                 case TYPE1:
-
-                                    if (towerDaemon.getName().contains("[2][2]")) {
-                                        fireBullet(
-                                                towerDaemon.getLastCoordinates(),
-                                                Pair.create((float)borderX / 2 , (float)borderY),
-                                                enemy,
-                                                25,
-                                                towerDaemon.getTowerLevel().bulletDamage,
-                                                towerDaemon.getTowerLevel().currentLevel
-                                        );
-                                    } else {
-
-                                        fireBullet(
-                                                towerDaemon.getLastCoordinates(),
-                                                enemy.getLastCoordinates(),
-                                                enemy,
-                                                25,
-                                                towerDaemon.getTowerLevel().bulletDamage,
-                                                towerDaemon.getTowerLevel().currentLevel
-                                        );
-                                    }
+                                    fireBullet(
+                                            towerDaemon.getLastCoordinates(),
+                                            enemy.getLastCoordinates(),
+                                            enemy,
+                                            25,
+                                            towerDaemon.getTowerLevel().bulletDamage,
+                                            towerDaemon.getTowerLevel().currentLevel
+                                    );
                                     break;
                                 case TYPE2:
                                     fireRocketBullet(
