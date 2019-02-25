@@ -134,7 +134,7 @@ public class Game {
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
-    private int maxEnemies = 10;//40;
+    private int maxEnemies = 40;
     private QueuedEntityRepo<EnemyDoubleDaemon> enemyRepo;
 
     //explosions
