@@ -33,7 +33,11 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
     private Set<String> overloadedPrototypeMethods = new TreeSet<>();
     private String currentMainQuestName = "";
-    //private boolean returnInstance;
+    private boolean eager;
+
+    public boolean isEager() {
+        return eager;
+    }
 
     private final String VOID_QUEST_TYPE_NAME = "VoidMainQuest";
 
@@ -74,8 +78,14 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     ) {
         super(classElement);
 
-        if(eager) {
+        this.eager = eager;
+
+        if(this.eager) {
             daemonEngineSimpleName = "EagerMainQuestDaemonEngine";
+            daemonInterface = ClassName.get(
+                    DAEMON_ENGINE_PACKAGE_ROOT,
+                    "EagerDaemon"
+            );
         }
 
         this.daemonEngineClass = ClassName.get(daemonPackage, daemonEngineSimpleName);
@@ -214,6 +224,11 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         if (consumerDaemon)
             daemonApiMethods.add(generateConsumeMethod());
+
+        if (eager) {
+            daemonApiMethods.add(generateInterruptMethod());
+            daemonApiMethods.add(generateClearAndInterruptMethod());
+        }
 
         for (MethodSpec apiMethod : daemonApiMethods) {
             daemonClassBuilder.addMethod(apiMethod);
@@ -473,6 +488,34 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addModifiers(Modifier.PUBLIC)
                 .returns(boolean.class)
                 .addStatement("return " + daemonEngineString + ".pursueQuest(new $T(runnable))", ClassName.get(QUEST_PACKAGE, CONSUME_QUEST_TYPE_NAME))
+                .build();
+    }
+
+    public MethodSpec generateInterruptMethod(){
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("interrupt")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement(daemonEngineString + ".interrupt()");
+
+        for (Pair<String, FieldSpec> dedicatedEngine : getDedicatedThreadEngines().values())
+            builder.addStatement(dedicatedEngine.getFirst() + ".interrupt()");
+
+        return builder.addStatement("return this")
+                .build();
+    }
+
+    public MethodSpec generateClearAndInterruptMethod(){
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("clearAndInterrupt")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement(daemonEngineString + ".clearAndInterrupt()");
+
+        for (Pair<String, FieldSpec> dedicatedEngine : getDedicatedThreadEngines().values())
+            builder.addStatement(dedicatedEngine.getFirst() + ".clearAndInterrupt()");
+
+        return builder.addStatement("return this")
                 .build();
     }
 

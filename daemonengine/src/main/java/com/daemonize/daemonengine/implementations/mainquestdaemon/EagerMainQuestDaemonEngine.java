@@ -1,13 +1,14 @@
 package com.daemonize.daemonengine.implementations.mainquestdaemon;
 
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.Quest;
 
 import java.util.concurrent.locks.Condition;
 
-public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine {
+public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine implements EagerDaemon {
 
   private final Condition mainQuestAvailable = mainQuestLock.newCondition();
 
@@ -49,4 +50,24 @@ public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine {
     }
     return ret;
   }
+
+  @Override
+  public EagerMainQuestDaemonEngine interrupt() {
+    if (!state.equals(DaemonState.STOPPED) && !state.equals(DaemonState.IDLE)) {
+      if (daemonThread != null
+              && !Thread.currentThread().equals(daemonThread)
+              && daemonThread.isAlive()) {
+        daemonThread.interrupt();
+      }
+    }
+    return this;
+  }
+
+  @Override
+  public EagerMainQuestDaemonEngine clearAndInterrupt() {
+      mainQuestQueue.clear();
+      interrupt();
+      return this;
+  }
+
 }

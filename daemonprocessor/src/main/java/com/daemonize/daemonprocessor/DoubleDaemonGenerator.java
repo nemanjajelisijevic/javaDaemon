@@ -44,6 +44,11 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
     @Override
     public TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods) {
 
+        daemonInterface = ClassName.get(
+                DAEMON_ENGINE_PACKAGE_ROOT,
+                "EagerDaemon"
+        );
+
         daemonClassName = ClassName.get(packageName, daemonSimpleName);
 
         TypeSpec.Builder daemonClassBuilder = TypeSpec.classBuilder(daemonSimpleName)
@@ -186,6 +191,9 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(generateSetMainConsumerDaemonApiMethod());
         apiMethods.add(generateSetSideConsumerDaemonApiMethod());
         apiMethods.add(generateSetConsumerDaemonApiMethod());
+
+        apiMethods.add(mainGenerator.generateInterruptMethod());
+        apiMethods.add(mainGenerator.generateClearAndInterruptMethod());
 
         if (mainGenerator.isConsumer())
             apiMethods.add(mainGenerator.generateConsumeMethod());

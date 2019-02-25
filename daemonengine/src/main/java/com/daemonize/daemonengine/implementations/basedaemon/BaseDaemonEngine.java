@@ -9,7 +9,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
 
-  private volatile DaemonState state = DaemonState.STOPPED;
+  protected volatile DaemonState state = DaemonState.STOPPED;
   private Consumer consumer;
   private String name = this.getClass().getSimpleName();
 
