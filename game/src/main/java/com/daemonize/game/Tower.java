@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
 import com.daemonize.game.view.ImageView;
@@ -231,6 +232,7 @@ public class Tower extends RotatingSpriteImageMover {
 
     private volatile PositionedImage ret = new PositionedImage();
 
+    @ConsumerArg
     public PositionedImage updateSprite() {//hack but improves performance
         Pair<Float, Float> lastCoord = getLastCoordinates();
         ret.image = iterateSprite();

@@ -843,16 +843,14 @@ public class Game {
 
                 tow.setRotationSprite(currentSprite);
 
-                //renderer.consume(()->new ImageAnimateClosure(tow.getView()).onReturn(tow.updateSprite()));
-
-                tow.updateSprite(update-> renderer.consume(()->{
+                tow.updateSprite(renderer, update -> {
                     ImageMover.PositionedImage posBmp = update.runtimeCheckAndGet();
                     tow.getView().setAbsoluteX(posBmp.positionX);
                     tow.getView().setAbsoluteY(posBmp.positionY);
                     tow.getView().setImage(posBmp.image);
-                }));
+                });
 
-                tow.cont();
+                //tow.cont();
 
                 CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
 
@@ -1339,7 +1337,7 @@ public class Game {
                                 //go to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
 
-                                enemyDoubleDaemon.cont().rotate(
+                                enemyDoubleDaemon.rotate(
                                         (int) RotatingSpriteImageMover.getAngle(
                                                 current.getCenterX(),
                                                 current.getCenterY(),

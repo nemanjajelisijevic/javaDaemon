@@ -129,11 +129,11 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     public void pause(){
-        animateSemaphore.stop();
+        pauseSemaphore.stop();
     }
 
     public void cont(){
-        /*animateSemaphore.go();*/
+        pauseSemaphore.go();
     }
 
     private Consumer consumer;
@@ -152,8 +152,8 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     @Override
     public PositionedImage animate() throws InterruptedException {
 
+        pauseSemaphore.await();
         animateSemaphore.await();
-        //pauseSemaphore.await();
 
         ret.image = iterateSprite();
 
