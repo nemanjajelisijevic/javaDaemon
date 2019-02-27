@@ -131,10 +131,9 @@ public class Enemy extends CoordinatedImageTranslationMover {
     }
 
     @DedicatedThread
-    @GenerateRunnable
     @Override
-    public void goTo(float x, float y, float velocityInt) throws InterruptedException {
-        super.goTo(x, y, velocityInt);
+    public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
+        return super.goTo(x, y, velocityInt);
     }
 
     public void rotate(int angle) throws InterruptedException {

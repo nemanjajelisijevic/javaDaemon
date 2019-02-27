@@ -16,6 +16,9 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     private volatile float lastX;
     private volatile float lastY;
 
+    private double dX = 0;
+    private double dY = 0;
+
     private float dXY;
 
     public float getdXY() {
@@ -92,10 +95,10 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     @Override
-    public void setDirectionAndMove(float x, float y, float velocityInt) {
+    public boolean setDirectionAndMove(float x, float y, float velocityInt) {
 
-        double dX;
-        double dY;
+        if (x - lastX == 0 || y - lastY == 0)
+            return false;
 
         synchronized (this) {
             dX = x - lastX;
@@ -104,13 +107,18 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
         double hypotenuse = Math.sqrt(dX*dX + dY*dY);
 
-        dX = (dX / hypotenuse);
-        dY = (dY / hypotenuse);
+        dX = dX / hypotenuse;
+        dY = dY / hypotenuse;
+
+        if (Double.valueOf(dX).isNaN() || Double.valueOf(dY).isNaN()) {//TODO DEBUG
+            throw new IllegalStateException("SET DIRECTION COORDINATES NaN Value! INPUT X: " + x + ", Y: " + y + ", LAST X: " + lastX + ", LAST Y: " + lastY);
+        }
 
         velocity.intensity = velocityInt;
         velocity.direction.coeficientX = (float) dX;
         velocity.direction.coeficientY = (float) dY;
 
+        return true;
     }
 
     @SuppressWarnings("unchecked")

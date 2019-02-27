@@ -35,10 +35,9 @@ public class MoneyHandler extends CoordinatedImageTranslationMover  {
         super.setCoordinates(lastX, lastY);
     }
 
-    @GenerateRunnable
     @Override
-    public void goTo(float x, float y, float velocityInt) throws InterruptedException {
-        super.goTo(x, y, velocityInt);
+    public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
+        return super.goTo(x, y, velocityInt);
     }
 
     @Override

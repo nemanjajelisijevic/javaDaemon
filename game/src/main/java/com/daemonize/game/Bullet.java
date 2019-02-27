@@ -23,6 +23,37 @@ import java.util.List;
 @Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon")
 public class Bullet extends CoordinatedImageTranslationMover {
 
+    public enum STATUS {
+        OUT_OF_REPO,
+        LAUNCHED,
+        AT_LAUNCH_COORD,
+        LAUNCH_FAILED,
+        RETURNED_TO_SOURCE,
+        AT_ENEMY_COORDS,
+        ENEMY_NOT_SHOOTABLE,
+        EXPLOADED,
+        RETURNED_TO_REPO
+    }
+
+
+    private List<STATUS> statusList = new LinkedList<>();
+
+    {
+        statusList.add(STATUS.RETURNED_TO_REPO);
+    }
+
+    @CallingThread
+    public List<STATUS> getStatusList() {
+        return statusList;
+    }
+
+    @CallingThread
+    public void addStatus(STATUS status) {
+        if (status.equals(STATUS.RETURNED_TO_REPO))
+            statusList.clear();
+        statusList.add(status);
+    }
+
     private ImageView view;
     private ImageView view2;
     private ImageView view3;
@@ -76,6 +107,12 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @Override
     public Pair<Float, Float> getLastCoordinates() {
         return super.getLastCoordinates();
+    }
+
+    @CallingThread
+    @Override
+    public Pair<Float, Float> getTargetCoordinates() {
+        return super.getTargetCoordinates();
     }
 
     @CallingThread
@@ -138,8 +175,8 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     @GenerateRunnable
     @Override
-    public void goTo(float x, float y, float velocityInt) throws InterruptedException {
-        super.goTo(x, y, velocityInt);
+    public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
+        return super.goTo(x, y, velocityInt);
     }
 
     @GenerateRunnable
@@ -149,16 +186,21 @@ public class Bullet extends CoordinatedImageTranslationMover {
         rotationMover.pushSprite(sprite, velocity);
     }
 
+    @CallingThread
+    @Override
+    public void popSprite() {
+        rotationMover.popSprite();
+    }
+
     @GenerateRunnable
     public void rotate(int angle) throws InterruptedException {
         rotationMover.rotate(angle);
     }
 
-    @GenerateRunnable
-    public void rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
+    public boolean rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
         setVelocity(0);
         rotationMover.rotate(angle);
-        goTo(x, y, velocityInt);
+        return goTo(x, y, velocityInt);
     }
 
     @CallingThread
@@ -199,10 +241,10 @@ public class Bullet extends CoordinatedImageTranslationMover {
             case 1:
                 return new GenericNode<>(Pair.create(posImage, view));
             case 2:
-                return calculateOffsetImage(posImage,movingDirection,spaceBetweenBullets);
+                return calculateOffsetImage(posImage, movingDirection, spaceBetweenBullets);
             case 3:
-                GenericNode<Pair<PositionedImage,ImageView>> root = calculateOffsetImage(posImage,movingDirection,spaceBetweenBullets);
-                root.addChild(new GenericNode<>(Pair.create(posImage,view3)));
+                GenericNode<Pair<PositionedImage,ImageView>> root = calculateOffsetImage(posImage, movingDirection, spaceBetweenBullets);
+                root.addChild(new GenericNode<>(Pair.create(posImage, view3)));
                 return root;
             default:
                 return null;

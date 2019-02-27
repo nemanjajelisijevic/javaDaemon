@@ -8,7 +8,7 @@ import com.daemonize.game.images.Image;
 //import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 
-//@Daemonize(returnDaemonInstance = true)
+//@Daemonize
 public interface ImageMover {
 
     class Velocity {
@@ -65,7 +65,7 @@ public interface ImageMover {
 
     void setVelocity(Velocity velocity);
 
-    void setDirectionAndMove(float x, float y, float velocityInt);
+    boolean setDirectionAndMove(float x, float y, float velocityInt);
 
     void setVelocity(float velocity);
 

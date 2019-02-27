@@ -34,9 +34,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Game {
 
@@ -149,11 +151,14 @@ public class Game {
     private int bulletDamage = 2;
     private int rocketExplosionRange;
 
-    private int maxBullets = 80;
+    private int maxBullets = 120;
     private StackedEntityRepo<BulletDoubleDaemon> bulletRepo;
+    private Set<BulletDoubleDaemon> activeBullets = new HashSet<>();
 
-    private int maxRockets = 80;
+    private int maxRockets = 120;
     private StackedEntityRepo<BulletDoubleDaemon> rocketRepo;
+
+    private Set<BulletDoubleDaemon> activeRockets = new HashSet<>();
 
     //laser
     private LaserBulletDaemon laser;
@@ -850,7 +855,7 @@ public class Game {
                     tow.getView().setImage(posBmp.image);
                 });
 
-                //tow.cont();
+                tow.cont();
 
                 CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
 
@@ -962,9 +967,8 @@ public class Game {
 
             for (int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i)
-                    gridViewMatrix[j][i] = scene.addImageView(
-                            new ImageViewImpl("Grid [" + j + "][" + i +"]")
-                    ).setAbsoluteX(grid.getGrid()[j][i].getCenterX())
+                    gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl("Grid [" + j + "][" + i +"]"))
+                     .setAbsoluteX(grid.getGrid()[j][i].getCenterX())
                      .setAbsoluteY(grid.getGrid()[j][i].getCenterY())
                      .setImage(grid.getField(j, i).isWalkable() ? fieldImage : fieldImageTower)
                      .setZindex(3)
@@ -1015,12 +1019,12 @@ public class Game {
             bulletRepo = new StackedEntityRepo<BulletDoubleDaemon>() {
                 @Override
                 public void onAdd(BulletDoubleDaemon bullet) {
-                    System.out.println(DaemonUtils.timedTag() + bullet.getName() + " BULLET ADDED TO REPO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     renderer.consume(() -> {
                             for (ImageView view : bullet.getViews())
                             view.hide();
                     });
-                    bullet.setVelocity(0).pause().clearAndInterrupt();
+                    bullet.setVelocity(0).popSprite().pause().clearAndInterrupt();
+                    activeBullets.remove(bullet);
                 }
 
                 @Override
@@ -1030,6 +1034,7 @@ public class Game {
                         for (ImageView view : bullet.getViews())
                             view.show();
                     });
+                    activeBullets.add(bullet);
                 }
             };
 
@@ -1037,12 +1042,12 @@ public class Game {
             rocketRepo = new StackedEntityRepo<BulletDoubleDaemon>() {
                 @Override
                 public void onAdd(BulletDoubleDaemon rocket) {
-                    System.out.println(DaemonUtils.timedTag() + rocket.getName() + " ROCKET ADDED TO REPO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     renderer.consume(() -> {
                         for (ImageView view : rocket.getViews())
                             view.hide();
                     });
-                    rocket.setVelocity(0).clearAndInterrupt();
+                    rocket.setVelocity(0).popSprite().pause().clearAndInterrupt();
+                    activeRockets.remove(rocket);
                 }
 
                 @Override
@@ -1052,6 +1057,7 @@ public class Game {
                         for (ImageView view : rocket.getViews())
                             view.show();
                     });
+                    activeRockets.add(rocket);
                 }
             };
 
@@ -1107,9 +1113,9 @@ public class Game {
                                 bulletDamage,
                                 bulletSprite[0].getWidth(),
                                 dXY
-                        ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
-                        .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
-                        .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(0)))
+                        ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                        .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                        .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                 ).setName(bulletName);
 
                 bulletDoubleDaemon.getPrototype().setBorders(
@@ -1291,9 +1297,14 @@ public class Game {
 
                 enemyDoubleDaemon.start().rotate(angle)
                         .goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
-                        new Runnable() {// gameConsumer
+                        new Closure<Boolean>() {// gameConsumer
                             @Override
-                            public void run() {
+                            public void onReturn(Return<Boolean> ret) {
+
+                                if (!ret.runtimeCheckAndGet()){
+                                    enemyRepo.add(enemyDoubleDaemon);
+                                    return;
+                                }
 
                                 Pair<Float, Float> currentCoord = enemyDoubleDaemon.getPrototype().getLastCoordinates();
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
@@ -1344,7 +1355,7 @@ public class Game {
                                                 next.getCenterX(),
                                                 next.getCenterY()
                                         )
-                                ).goTo(next.getCenterX(), next.getCenterY(), enemyDoubleDaemon.getVelocity().intensity, this::run);
+                                ).goTo(next.getCenterX(), next.getCenterY(), enemyDoubleDaemon.getVelocity().intensity, this::onReturn);
                             }
                         }
                 );
@@ -1354,6 +1365,11 @@ public class Game {
             enemyGenerator.setName("Enemy Generator").start();
 
             //marking start and end field
+
+            AtomicReference<Field> currentField = new AtomicReference<>(firstField);
+
+
+
             ImageView firstFieldView = gridViewMatrix[0][0];
             ImageView lastFieldView = gridViewMatrix[rows - 1][columns - 1];
 
@@ -1391,11 +1407,22 @@ public class Game {
             }).setName("Start End field marker").start();
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
-
-//            DummyDaemon.create(gameConsumer, 5000).start().setClosure(()->{
+//
+            DummyDaemon.create(gameConsumer, 3000).start().setClosure(()->{
 //
 //                System.out.println("*************************************************************");
-//                System.out.println("ENEMY REPO STATE (" + enemyRepo.size() + "):");
+//
+                System.err.println(DaemonUtils.timedTag() + "ACTIVE ROCKETS : " + activeRockets.size());
+//
+                for (BulletDoubleDaemon rocket : activeRockets)
+                    System.err.println(DaemonUtils.timedTag() + rocket.getName() + ", STATUS: " + rocket.getStatusList().toString() + ", VELOCITY: " + rocket.getVelocity().intensity + ", CURRENT COORDS X: " + rocket.getLastCoordinates().getFirst().toString() + ", Y: " + rocket.getLastCoordinates().getSecond().toString() + ", TARGET COORD X: " + rocket.getTargetCoordinates().getFirst() + ", Y: " +rocket.getTargetCoordinates().getSecond());
+
+                System.err.println(DaemonUtils.timedTag() + "ACTIVE BULLETS : " + activeRockets.size());
+
+                for (BulletDoubleDaemon bullet : activeBullets)
+                    System.err.println(DaemonUtils.timedTag() + bullet.getName() + ", VELOCITY: " + bullet.getVelocity().intensity + ", CURRENT COORDS X: " + bullet.getLastCoordinates().getFirst().toString() + ", Y: " + bullet.getLastCoordinates().getSecond().toString() + ", TARGET COORD X: " + bullet.getTargetCoordinates().getFirst() + ", Y: " + bullet.getTargetCoordinates().getSecond());
+
+                //                System.out.println("ENEMY REPO STATE (" + enemyRepo.size() + "):");
 //
 //                for(EnemyDoubleDaemon enemyDoubleDaemon : enemyRepo.getStructure())
 //                    System.out.println(enemyDoubleDaemon.getName() + " - STATE: " + enemyDoubleDaemon.getState());
@@ -1419,7 +1446,7 @@ public class Game {
 //                    System.out.println(rocketDoubleDaemon.getName() + " - STATE: " + rocketDoubleDaemon.getState());
 //
 //                System.out.println("*************************************************************");
-//            });
+            });
 
         });
     }
@@ -1637,7 +1664,13 @@ public class Game {
         else
             bulletDoubleDaemon.cont();
 
-        bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, () -> {
+        bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, ret -> {
+
+            if (!ret.runtimeCheckAndGet()) {
+                bulletRepo.add(bulletDoubleDaemon);
+                return;
+            }
+
             if (!enemy.isShootable()) {
                 bulletRepo.add(bulletDoubleDaemon);
                 return;
@@ -1652,7 +1685,10 @@ public class Game {
 
                 moneyDaemon.setAmount(1)
                         .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, ()->{
+                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToRet ->{
+
+                            moneyGoToRet.runtimeCheckAndGet();
+
                             renderer.consume(()->{
                                 moneyView.getFirst().hide();
                                 moneyView.getSecond().hide();
@@ -1710,8 +1746,13 @@ public class Game {
         else
             rocketDoubleDaemon.cont();
 
+        rocketDoubleDaemon.addStatus(Bullet.STATUS.LAUNCHED);
 
-        rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, () -> {
+        rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, ret -> {
+
+            ret.runtimeCheckAndGet();
+
+            rocketDoubleDaemon.addStatus(Bullet.STATUS.AT_LAUNCH_COORD);
 
             if (!enemy.isShootable()) {
                 rocketDoubleDaemon.rotateAndGoTo(
@@ -1724,8 +1765,11 @@ public class Game {
                         sourceCoord.getFirst(),
                         sourceCoord.getSecond(),
                         4,
-                        ()->rocketRepo.add(rocketDoubleDaemon)
-                );
+                        ret1 -> {
+                            rocketDoubleDaemon.addStatus(Bullet.STATUS.RETURNED_TO_SOURCE);
+                            rocketRepo.add(rocketDoubleDaemon);
+                        }
+                ).addStatus(Bullet.STATUS.LAUNCH_FAILED);
             } else {
 
                 Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
@@ -1742,10 +1786,14 @@ public class Game {
                         enemy.getLastCoordinates().getFirst(),
                         enemy.getLastCoordinates().getSecond(),
                         velocity,
-                        ()->{
+                        ret2 ->{
+
+                            ret2.runtimeCheckAndGet();
+
+                            rocketDoubleDaemon.addStatus(Bullet.STATUS.AT_ENEMY_COORDS);
 
                             if (!enemy.isShootable()) {
-                                rocketRepo.add(rocketDoubleDaemon);
+                                rocketRepo.add(rocketDoubleDaemon.addStatus(Bullet.STATUS.ENEMY_NOT_SHOOTABLE));
                                 return;
                             }
 
@@ -1764,7 +1812,10 @@ public class Game {
                                     enemyRepo.add(enemy);
 
                                     moneyDaemon.setAmount(1).setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                                            .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, ()->{
+                                            .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToRet->{
+
+                                                moneyGoToRet.runtimeCheckAndGet();
+
                                                 renderer.consume(()->{
                                                     moneyView.getFirst().hide();
                                                     moneyView.getSecond().hide();
@@ -1780,7 +1831,7 @@ public class Game {
                                 }
                             }
 
-                            rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, ()->rocketRepo.add(rocketDoubleDaemon));
+                            rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, ()-> rocketRepo.add(rocketDoubleDaemon.addStatus(Bullet.STATUS.EXPLOADED)));
                         });
             }
         });
@@ -1803,12 +1854,15 @@ public class Game {
                 });
 
             } else {
-                Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
 
+                Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
                 enemyRepo.add(enemy);
 
                 moneyDaemon.setAmount(1).setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, ()->{
+                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToRet->{
+
+                            moneyGoToRet.runtimeCheckAndGet();
+
                             renderer.consume(()->{
                                 moneyView.getFirst().hide();
                                 moneyView.getSecond().hide();
