@@ -132,7 +132,7 @@ public class Game {
     private float enemyVelocity = 1;
     private int enemyHp = 10;
     private long enemyGenerateinterval = 5000;
-    private long waveInterval = 20000;
+    private long waveInterval = 10000;
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
@@ -1025,6 +1025,7 @@ public class Game {
                     });
                     bullet.setVelocity(0).popSprite().pause().clearAndInterrupt();
                     activeBullets.remove(bullet);
+                    bullet.addStatus(Bullet.STATUS.RETURNED_TO_REPO);
                 }
 
                 @Override
@@ -1035,6 +1036,7 @@ public class Game {
                             view.show();
                     });
                     activeBullets.add(bullet);
+                    bullet.addStatus(Bullet.STATUS.OUT_OF_REPO);
                 }
             };
 
@@ -1048,6 +1050,7 @@ public class Game {
                     });
                     rocket.setVelocity(0).popSprite().pause().clearAndInterrupt();
                     activeRockets.remove(rocket);
+                    rocket.addStatus(Bullet.STATUS.RETURNED_TO_REPO);
                 }
 
                 @Override
@@ -1058,6 +1061,7 @@ public class Game {
                             view.show();
                     });
                     activeRockets.add(rocket);
+                    rocket.addStatus(Bullet.STATUS.OUT_OF_REPO);
                 }
             };
 
