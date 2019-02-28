@@ -14,7 +14,7 @@ public class DrawConsumer extends DaemonConsumer {
 
     @Override
     public boolean consume(Runnable runnable) {
-        System.out.println(DaemonUtils.tag() + "DRAW CONSUMING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        //System.out.println(DaemonUtils.tag() + "DRAW CONSUMING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         boolean ret = super.consume(runnable);
         this.renderer.setDirty();
         return ret;

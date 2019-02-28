@@ -83,7 +83,7 @@ public class Game {
     private Image fieldGreenDiagonal;
 
     //score
-    private int score = 0;
+    private int score = 1000;
     private ImageView scoreBackGrView;
     private ImageView scoreTitleView;
     private ImageView[] viewsNum;
@@ -151,11 +151,11 @@ public class Game {
     private int bulletDamage = 2;
     private int rocketExplosionRange;
 
-    private int maxBullets = 120;
+    private int maxBullets = 150;
     private StackedEntityRepo<BulletDoubleDaemon> bulletRepo;
     private Set<BulletDoubleDaemon> activeBullets = new HashSet<>();
 
-    private int maxRockets = 120;
+    private int maxRockets = 150;
     private StackedEntityRepo<BulletDoubleDaemon> rocketRepo;
 
     private Set<BulletDoubleDaemon> activeRockets = new HashSet<>();
@@ -1032,8 +1032,11 @@ public class Game {
                 public void onGet(BulletDoubleDaemon bullet) {
                     System.out.println(DaemonUtils.tag() + "Bullet get state: " + bullet.getState());
                     renderer.consume(()->{
-                        for (ImageView view : bullet.getViews())
+                        for (ImageView view : bullet.getViews()) {
+                            view.setAbsoluteX(bullet.getLastCoordinates().getFirst());
+                            view.setAbsoluteY(bullet.getLastCoordinates().getSecond());
                             view.show();
+                        }
                     });
                     activeBullets.add(bullet);
                     bullet.addStatus(Bullet.STATUS.OUT_OF_REPO);
@@ -1057,8 +1060,11 @@ public class Game {
                 public void onGet(BulletDoubleDaemon rocket) {
                     System.out.println(DaemonUtils.tag() + "Rocket get state: " + rocket.getState());
                     renderer.consume(()->{
-                        for (ImageView view : rocket.getViews())
+                        for (ImageView view : rocket.getViews()) {
+                            view.setAbsoluteX(rocket.getLastCoordinates().getFirst());
+                            view.setAbsoluteY(rocket.getLastCoordinates().getSecond());
                             view.show();
+                        }
                     });
                     activeRockets.add(rocket);
                     rocket.addStatus(Bullet.STATUS.OUT_OF_REPO);
@@ -1079,8 +1085,8 @@ public class Game {
                                 enemyHp,
                                 Pair.create(grid.getStartingX(), grid.getStartingY()),
                                 dXY
-                        ).setView(scene.addImageView(new ImageViewImpl(enemyName + " View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
-                        .setHpView(scene.addImageView(new ImageViewImpl(enemyName + " HP View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(3)))
+                        ).setView(scene.addImageView(new ImageViewImpl(enemyName + " View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(10)))
+                        .setHpView(scene.addImageView(new ImageViewImpl(enemyName + " HP View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(10)))
                         .setHealthBarImage(healthBarSprite)
                 ).setName(enemyName);
 
@@ -1093,11 +1099,8 @@ public class Game {
 
                 enemy.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
                             System.err.println(DaemonUtils.timedTag() + enemy.getName() +  " ENEMY OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!12345");
-                            //throw new IllegalStateException(enemy.getName() + "OUT OF BORDERS!!!!");
                             enemyRepo.add(enemy);
-                        })
-                        .setAnimateEnemySideQuest()
-                        .setClosure(new MultiViewAnimateClosure()::onReturn);
+                        }).setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 enemyRepo.getStructure().add(enemy);
             }
@@ -1160,16 +1163,17 @@ public class Game {
                 ).setName(rocketName);
 
                 rocketDoubleDaemon.getPrototype().setBorders(
-                        grid.getStartingX(),//TODO fix offset
-                        (grid.getStartingX() + grid.getGridWidth()),
-                        grid.getStartingY(),
-                        (grid.getStartingY() + grid.getGridHeight())
+                        0,//TODO fix offset
+                        borderX,
+                        0,
+                        borderY
                 );
 
                 rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
                     System.err.println(DaemonUtils.timedTag() + rocketDoubleDaemon.getName() + " ROCKET OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     rocketRepo.add(rocketDoubleDaemon);
                 });
+
                 rocketDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 rocketRepo.getStructure().push(rocketDoubleDaemon);
@@ -1230,8 +1234,6 @@ public class Game {
 
         }).addState(()->{//gameState
 
-
-
             //laser start
             for (ImageView laserView : laserViews)
                 laserView.setAbsoluteX(-100).setAbsoluteY(-100);
@@ -1273,7 +1275,7 @@ public class Game {
                     if (enemyGenerateinterval > 1000)
                         enemyGenerateinterval -= 500;
 
-                    if (enemyCounter % 15 == 0 && waveInterval > 2000)
+                    if (enemyCounter % 30 == 0 && waveInterval > 6000)
                         waveInterval -= 2000;
 
                     enemyHp++;
@@ -1412,19 +1414,34 @@ public class Game {
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
 //
-            DummyDaemon.create(gameConsumer, 3000).start().setClosure(()->{
+            DummyDaemon.create(gameConsumer, 1000).start().setClosure(()->{
 //
 //                System.out.println("*************************************************************");
 //
                 System.err.println(DaemonUtils.timedTag() + "ACTIVE ROCKETS : " + activeRockets.size());
 //
-                for (BulletDoubleDaemon rocket : activeRockets)
-                    System.err.println(DaemonUtils.timedTag() + rocket.getName() + ", STATUS: " + rocket.getStatusList().toString() + ", VELOCITY: " + rocket.getVelocity().intensity + ", CURRENT COORDS X: " + rocket.getLastCoordinates().getFirst().toString() + ", Y: " + rocket.getLastCoordinates().getSecond().toString() + ", TARGET COORD X: " + rocket.getTargetCoordinates().getFirst() + ", Y: " +rocket.getTargetCoordinates().getSecond());
+                for (BulletDoubleDaemon rocket : activeRockets) {
+                    System.err.println(DaemonUtils.timedTag() + rocket.getName() + ", STATUS: " + rocket.getStatusList().toString() + ", VELOCITY: " + rocket.getVelocity().intensity + ", CURRENT COORDS X: " + rocket.getLastCoordinates().getFirst().toString() + ", Y: " + rocket.getLastCoordinates().getSecond().toString() + ", TARGET COORD X: " + rocket.getTargetCoordinates().getFirst() + ", Y: " + rocket.getTargetCoordinates().getSecond());
 
-                System.err.println(DaemonUtils.timedTag() + "ACTIVE BULLETS : " + activeRockets.size());
+                    System.err.println(DaemonUtils.timedTag() + rocket.getName() + "ROCKET ENGINE STATES:***********************************************");
+
+                    for(DaemonState state: rocket.getEnginesState())
+                        System.err.println(DaemonUtils.timedTag() + state);
+
+                    System.err.println(DaemonUtils.timedTag() + rocket.getName() + "ROCKET ENGINE QUEUE SIZES:***********************************************");
+
+                    for(Integer queueSize : rocket.getEnginesQueueSizes())
+                        System.err.println(DaemonUtils.timedTag() + queueSize);
+
+                }
+
+                System.err.println(DaemonUtils.timedTag() + "ACTIVE BULLETS : " + activeBullets.size());
 
                 for (BulletDoubleDaemon bullet : activeBullets)
                     System.err.println(DaemonUtils.timedTag() + bullet.getName() + ", VELOCITY: " + bullet.getVelocity().intensity + ", CURRENT COORDS X: " + bullet.getLastCoordinates().getFirst().toString() + ", Y: " + bullet.getLastCoordinates().getSecond().toString() + ", TARGET COORD X: " + bullet.getTargetCoordinates().getFirst() + ", Y: " + bullet.getTargetCoordinates().getSecond());
+
+
+
 
                 //                System.out.println("ENEMY REPO STATE (" + enemyRepo.size() + "):");
 //
@@ -1749,6 +1766,16 @@ public class Game {
             rocketDoubleDaemon.start();
         else
             rocketDoubleDaemon.cont();
+
+        System.out.println(DaemonUtils.timedTag() + rocketDoubleDaemon.getName() + "ROCKET ENGINE STATES:***********************************************");
+
+        for(DaemonState state: rocketDoubleDaemon.getEnginesState())
+            System.out.println(DaemonUtils.timedTag() + state);
+
+        System.out.println(DaemonUtils.timedTag() + rocketDoubleDaemon.getName() + "ROCKET ENGINE QUEUE SIZES:***********************************************");
+
+        for(Integer queueSize : rocketDoubleDaemon.getEnginesQueueSizes())
+            System.out.println(DaemonUtils.timedTag() + queueSize);
 
         rocketDoubleDaemon.addStatus(Bullet.STATUS.LAUNCHED);
 

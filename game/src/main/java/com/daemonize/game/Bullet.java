@@ -25,6 +25,8 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     public enum STATUS {
         OUT_OF_REPO,
+        ROTATING,
+        TRANSLATING,
         LAUNCHED,
         AT_LAUNCH_COORD,
         LAUNCH_FAILED,
@@ -43,12 +45,12 @@ public class Bullet extends CoordinatedImageTranslationMover {
     }
 
     @CallingThread
-    public List<STATUS> getStatusList() {
+    public synchronized List<STATUS> getStatusList() {
         return statusList;
     }
 
     @CallingThread
-    public void addStatus(STATUS status) {
+    public synchronized void addStatus(STATUS status) {
         if (status.equals(STATUS.RETURNED_TO_REPO))
             statusList.clear();
         statusList.add(status);
@@ -199,7 +201,9 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     public boolean rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
         setVelocity(0);
+        addStatus(STATUS.ROTATING);
         rotationMover.rotate(angle);
+        addStatus(STATUS.TRANSLATING);
         return goTo(x, y, velocityInt);
     }
 

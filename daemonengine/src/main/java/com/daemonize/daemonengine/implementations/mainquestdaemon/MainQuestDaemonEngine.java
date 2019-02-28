@@ -56,7 +56,13 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
 
   @Override
   public void stop() {
+    mainQuestLock.lock();
     mainQuestQueue.clear();
+    mainQuestLock.unlock();
     super.stop();
+  }
+
+  public int queueSize() {
+    return mainQuestQueue.size();
   }
 }

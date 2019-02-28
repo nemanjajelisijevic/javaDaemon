@@ -59,6 +59,8 @@ public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
       currentQuest = getQuest();
 
       if (currentQuest == null) {
+          if (state.equals(DaemonState.IDLE))//TODO check dis
+              continue;
         break;
       }
 

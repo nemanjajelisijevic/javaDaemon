@@ -65,7 +65,9 @@ public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine impl
 
   @Override
   public EagerMainQuestDaemonEngine clearAndInterrupt() {
+      mainQuestLock.lock();
       mainQuestQueue.clear();
+      mainQuestLock.unlock();
       interrupt();
       return this;
   }

@@ -13,9 +13,12 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
         this.velocity.intensity = velocity;
         cache.setSprite(sprite);
         setSprite(new Image[]{sprite[sprite.length - 1]});
-        cache.await();
-        cache.clearCache();
-        animateSemaphore.unsubscribe();
+        try {
+            cache.await();
+        } finally {
+            cache.clearCache();
+            animateSemaphore.unsubscribe();
+        }
     }
 
     public void popSprite() {

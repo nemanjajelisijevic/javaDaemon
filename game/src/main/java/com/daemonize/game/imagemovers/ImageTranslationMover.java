@@ -97,6 +97,8 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     @Override
     public boolean setDirectionAndMove(float x, float y, float velocityInt) {
 
+        velocity.intensity = velocityInt;
+
         if (x - lastX == 0 || y - lastY == 0)
             return false;
 
@@ -114,7 +116,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
             throw new IllegalStateException("SET DIRECTION COORDINATES NaN Value! INPUT X: " + x + ", Y: " + y + ", LAST X: " + lastX + ", LAST Y: " + lastY);
         }
 
-        velocity.intensity = velocityInt;
+
         velocity.direction.coeficientX = (float) dX;
         velocity.direction.coeficientY = (float) dY;
 
