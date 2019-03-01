@@ -7,6 +7,9 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
 
   protected volatile DaemonState state = DaemonState.STOPPED;
@@ -43,7 +46,6 @@ public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
     this.state = state;
   }
 
-  @Override
   public DaemonState getState() {
     return state;
   }
@@ -111,4 +113,10 @@ public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
     throw new IllegalStateException("This method can only be called from MainQuestDaemonEngine");
   }
 
+    @Override
+    public List<DaemonState> getEnginesState() {
+        List<DaemonState> ret = new ArrayList<>(1);
+        ret.add(getState());
+        return ret;
+    }
 }

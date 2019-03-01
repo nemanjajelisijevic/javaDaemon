@@ -6,7 +6,9 @@ import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -94,7 +96,6 @@ public class DaemonConsumer implements Consumer, Daemon<DaemonConsumer> {
         return this;
     }
 
-    @Override
     public DaemonState getState() {
         return state;
     }
@@ -119,5 +120,12 @@ public class DaemonConsumer implements Consumer, Daemon<DaemonConsumer> {
     public DaemonConsumer registerDaemon(Daemon daemon) {
         daemon.setConsumer(this);
         return this;
+    }
+
+    @Override
+    public List<DaemonState> getEnginesState() {
+        List<DaemonState> ret = new ArrayList<>(1);
+        ret.add(getState());
+        return ret;
     }
 }

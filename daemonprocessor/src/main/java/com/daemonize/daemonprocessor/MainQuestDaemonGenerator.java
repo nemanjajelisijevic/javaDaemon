@@ -209,13 +209,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonApiMethods.add(generateGetPrototypeDaemonApiMethod());
             daemonApiMethods.add(generateSetPrototypeDaemonApiMethod());
             daemonApiMethods.add(generateStartDaemonApiMethod());
-
-
             daemonApiMethods.add(generateDedicatedEnginesStopDaemonApiMethod());
             daemonApiMethods.add(generateDedicatedEnginesQueueStopDaemonApiMethod());
-
-            daemonApiMethods.add(generateGetStateDaemonApiMethod());
-
             daemonApiMethods.add(generateDedicatedEnginesSetNameDaemonApiMethod());
             daemonApiMethods.add(generateGetNameDaemonApiMethod());
             daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
@@ -516,6 +511,33 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             builder.addStatement(dedicatedEngine.getFirst() + ".clearAndInterrupt()");
 
         return builder.addStatement("return this")
+                .build();
+    }
+
+    public MethodSpec generateGetEnginesStateDaemonApiMethod() {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("getEnginesState")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName))
+                .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName), ParameterizedTypeName.get(ClassName.get(ArrayList.class), daemonStateClassName))
+                .addStatement("ret.add(" + getDaemonEngineString() + ".getState())");
+
+        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : getDedicatedThreadEngines().entrySet())
+            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".getState())");
+
+        return builder.addStatement("return ret").build();
+    }
+
+    public MethodSpec generateGetEnginesQueueSizeDaemonApiMethod() {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("getEnginesQueueSizes")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)))
+                .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(Integer.class)))
+                .addStatement("ret.add(" + getDaemonEngineString() + ".queueSize())");
+
+        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : getDedicatedThreadEngines().entrySet())
+            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".queueSize())");
+
+        return builder.addStatement("return ret")
                 .build();
     }
 

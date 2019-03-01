@@ -65,4 +65,5 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
   public int queueSize() {
     return mainQuestQueue.size();
   }
+
 }

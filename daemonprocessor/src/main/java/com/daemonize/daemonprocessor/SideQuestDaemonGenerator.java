@@ -11,6 +11,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -212,4 +213,33 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .build();
     }
 
+
+    @Override
+    public MethodSpec generateGetEnginesStateDaemonApiMethod() {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("getEnginesState")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName))
+                .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName), ParameterizedTypeName.get(ClassName.get(ArrayList.class), daemonStateClassName))
+                .addStatement("ret.add(" + getDaemonEngineString() + ".getState())");
+
+        return builder.addStatement("return ret").build();
+    }
+
+    @Override
+    public MethodSpec generateGetEnginesQueueSizeDaemonApiMethod() {
+        return null;
+    }
+
+
+    @Override
+    public MethodSpec generateQueueStopDaemonApiMethod() {
+        return MethodSpec.methodBuilder("queueStop")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                //.returns(void.class)
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement("stop()")
+                .addStatement("return this")
+                .build();
+    }
 }

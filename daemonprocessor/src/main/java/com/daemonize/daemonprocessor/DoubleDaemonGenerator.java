@@ -2,7 +2,6 @@ package com.daemonize.daemonprocessor;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -185,8 +184,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(generateStartDaemonApiMethod());
         apiMethods.add(generateStopDaemonApiMethod());
         apiMethods.add(generateQueueStopDaemonApiMethod());//TODO override !!!!!!!!!!!!!!!!!!!!!!!!!!
-        apiMethods.add(sideGenerator.generateGetStateDaemonApiMethod());
-        apiMethods.add(generateGetStateDaemonApiMethod());
+        apiMethods.add(sideGenerator.generateGetEnginesStateDaemonApiMethod());
         apiMethods.add(generateGetEnginesQueueSizeDaemonApiMethod());
         apiMethods.add(generateSetNameDaemonApiMethod());
         apiMethods.add(mainGenerator.generateGetNameDaemonApiMethod());//TODO CHECK THISSS!!!!!!!
@@ -316,7 +314,8 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
     }
 
 
-    public MethodSpec generateGetStateDaemonApiMethod() {
+    @Override
+    public MethodSpec generateGetEnginesStateDaemonApiMethod() {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("getEnginesState")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName))
@@ -331,6 +330,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .build();
     }
 
+    @Override
     public MethodSpec generateGetEnginesQueueSizeDaemonApiMethod() {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("getEnginesQueueSizes")
                 .addModifiers(Modifier.PUBLIC)

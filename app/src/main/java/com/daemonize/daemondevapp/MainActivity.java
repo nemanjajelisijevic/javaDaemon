@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ConstraintLayout layout;
+    //private ConstraintLayout layout;
     private Game game;
 
     private int getPercentageValue(int percent, int hundredPercentValue) {
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         int borderX = getResources().getDisplayMetrics().widthPixels;
         int borderY = getResources().getDisplayMetrics().heightPixels;
 
-        layout = findViewById(R.id.cl);
+        //layout = findViewById(R.id.cl);
 
         //renderer init
         AndroidSurfaceViewRenderer renderer = new AndroidSurfaceViewRenderer(this);

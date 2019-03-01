@@ -31,13 +31,13 @@ public class DoubleExample {
         return true;
     }
 
-/*
-    @SideQuest
+
+/*    @SideQuest
     public synchronized int logAndReturn() {
         //Log.i(DaemonUtils.tag(), "INSIDE DoubleExample logAndReturn COUNTER: " + Integer.toString(cnt));
         return cnt;
-    }
-*/
+    }*/
+
 
 }
 

@@ -2,6 +2,8 @@ package com.daemonize.daemonengine;
 
 import com.daemonize.daemonengine.consumer.Consumer;
 
+import java.util.List;
+
 public interface Daemon<D extends Daemon> {
 
   D start();
@@ -10,7 +12,7 @@ public interface Daemon<D extends Daemon> {
 
   D queueStop();
 
-  DaemonState getState();
+  List<DaemonState> getEnginesState();
 
   D setName(String name);
 
