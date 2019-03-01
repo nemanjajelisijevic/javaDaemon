@@ -1012,7 +1012,7 @@ public class Game {
                             enemy.getView().setAbsoluteY(0);
                             enemy.getView().hide();
                         });
-                        enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).clear().stop();
+                        enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
                     });
                     activeEnemies.remove(enemy);
                 }
