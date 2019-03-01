@@ -1012,7 +1012,7 @@ public class Game {
                             enemy.getView().setAbsoluteY(0);
                             enemy.getView().hide();
                         });
-                        enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
+                        enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).clear().stop();
                     });
                     activeEnemies.remove(enemy);
                 }
@@ -1223,10 +1223,13 @@ public class Game {
                     (MoneyHandler) new MoneyHandler(moneyNumbersImages, dollarSign, dXY).setBorders(0, borderX, 0, borderY)
             ).setName("Money handler Daemon")
                     .setAmount(0)
-                    .setOutOfBordersConsumer(renderer)
+                    .setOutOfBordersConsumer(gameConsumer)
                     .setOutOfBordersClosure(()->{
-                        moneyView.getFirst().hide();
-                        moneyView.getSecond().hide();
+                        moneyDaemon.clearAndInterrupt();
+                        renderer.consume(()->{
+                            moneyView.getFirst().hide();
+                            moneyView.getSecond().hide();
+                        });
                     });
 
             moneyDaemon.setAnimateMoneySideQuest().setClosure(ret ->{
@@ -1306,6 +1309,9 @@ public class Game {
                     bulletDamage += 1;
 
                 EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy->enemy.setMaxHp(enemyHp).setHp(enemyHp));
+
+
+                System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + ", STATES: " +enemyDoubleDaemon.getEnginesState().toString());
 
                 System.out.println(DaemonUtils.tag() + "Enemy counter: " + enemyCounter);
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());

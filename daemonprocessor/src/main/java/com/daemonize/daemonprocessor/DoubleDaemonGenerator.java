@@ -185,7 +185,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(generateStopDaemonApiMethod());
         apiMethods.add(generateQueueStopDaemonApiMethod());//TODO override !!!!!!!!!!!!!!!!!!!!!!!!!!
         apiMethods.add(generateClearDaemonApiMethod());
-        apiMethods.add(sideGenerator.generateGetEnginesStateDaemonApiMethod());
+        apiMethods.add(generateGetEnginesStateDaemonApiMethod());
         apiMethods.add(generateGetEnginesQueueSizeDaemonApiMethod());
         apiMethods.add(generateSetNameDaemonApiMethod());
         apiMethods.add(mainGenerator.generateGetNameDaemonApiMethod());//TODO CHECK THISSS!!!!!!!
@@ -356,8 +356,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         for (Pair<String, FieldSpec> dedicatedEngine : mainGenerator.getDedicatedThreadEngines().values())
             builder.addStatement(dedicatedEngine.getFirst() + ".clear()");
 
-        return builder.addStatement(sideGenerator.getDaemonEngineString() + ".clear()").addStatement("return this")
-                .build();
+        return builder.addStatement("return this").build();
     }
 
 }
