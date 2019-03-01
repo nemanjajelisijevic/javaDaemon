@@ -1,6 +1,7 @@
 package com.daemonize.daemonengine.implementations.sidequestdaemon;
 
 
+import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.SideQuest;
@@ -28,5 +29,8 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
     return sideQuest;
   }
 
-
+  @Override
+  public SideQuestDaemonEngine clear() {
+    return this;
+  }
 }

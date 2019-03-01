@@ -209,6 +209,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonApiMethods.add(generateGetPrototypeDaemonApiMethod());
             daemonApiMethods.add(generateSetPrototypeDaemonApiMethod());
             daemonApiMethods.add(generateStartDaemonApiMethod());
+            daemonApiMethods.add(generateClearDaemonApiMethod());
             daemonApiMethods.add(generateDedicatedEnginesStopDaemonApiMethod());
             daemonApiMethods.add(generateDedicatedEnginesQueueStopDaemonApiMethod());
             daemonApiMethods.add(generateDedicatedEnginesSetNameDaemonApiMethod());
@@ -500,6 +501,20 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .build();
     }
 
+    public MethodSpec generateClearDaemonApiMethod() {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("clear")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement(daemonEngineString + ".clear()");
+
+        for (Pair<String, FieldSpec> dedicatedEngine : getDedicatedThreadEngines().values())
+            builder.addStatement(dedicatedEngine.getFirst() + ".clear()");
+
+        return builder.addStatement("return this")
+                .build();
+    }
+
     public MethodSpec generateClearAndInterruptMethod(){
         MethodSpec.Builder builder = MethodSpec.methodBuilder("clearAndInterrupt")
                 .addAnnotation(Override.class)
@@ -540,5 +555,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return builder.addStatement("return ret")
                 .build();
     }
+
+
 
 }

@@ -230,6 +230,15 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return null;
     }
 
+    public MethodSpec generateClearDaemonApiMethod() {
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("clear")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, daemonSimpleName));
+
+        return builder.addStatement("return this")
+                .build();
+    }
 
     @Override
     public MethodSpec generateQueueStopDaemonApiMethod() {

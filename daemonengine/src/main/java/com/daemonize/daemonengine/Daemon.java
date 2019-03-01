@@ -19,4 +19,6 @@ public interface Daemon<D extends Daemon> {
   String getName();
 
   D setConsumer(Consumer consumer);
+
+  D clear();
 }

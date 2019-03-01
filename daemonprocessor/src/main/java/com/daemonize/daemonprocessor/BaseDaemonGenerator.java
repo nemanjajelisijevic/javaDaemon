@@ -183,6 +183,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         ret.add(generateSetPrototypeDaemonApiMethod());
         ret.add(generateStartDaemonApiMethod());
         ret.add(generateStopDaemonApiMethod());
+        ret.add(generateClearDaemonApiMethod());
         ret.add(generateQueueStopDaemonApiMethod());
         ret.add(generateGetEnginesStateDaemonApiMethod());
         ret.add(generateSetNameDaemonApiMethod());
@@ -477,5 +478,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     public abstract MethodSpec generateGetEnginesStateDaemonApiMethod();
 
     public abstract MethodSpec generateGetEnginesQueueSizeDaemonApiMethod();
+
+    public abstract MethodSpec generateClearDaemonApiMethod();
 
 }

@@ -128,4 +128,12 @@ public class DaemonConsumer implements Consumer, Daemon<DaemonConsumer> {
         ret.add(getState());
         return ret;
     }
+
+    @Override
+    public DaemonConsumer clear() {
+        closureLock.lock();
+        closureQueue.clear();
+        closureLock.unlock();
+        return null;
+    }
 }

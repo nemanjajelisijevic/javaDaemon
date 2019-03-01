@@ -56,9 +56,7 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
 
   @Override
   public void stop() {
-    mainQuestLock.lock();
-    mainQuestQueue.clear();
-    mainQuestLock.unlock();
+    clear();
     super.stop();
   }
 
@@ -66,4 +64,12 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
     return mainQuestQueue.size();
   }
 
+
+  @Override
+  public MainQuestDaemonEngine clear() {
+    mainQuestLock.lock();
+    mainQuestQueue.clear();
+    mainQuestLock.unlock();
+    return this;
+  }
 }

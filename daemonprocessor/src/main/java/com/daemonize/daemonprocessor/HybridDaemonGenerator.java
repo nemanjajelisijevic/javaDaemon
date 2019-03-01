@@ -156,24 +156,27 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         //Add API METHODS
         List<MethodSpec> daemonApiMethods;
 
-        if (autoGenerateApiMethods) {
-            daemonApiMethods = sideGenerator.generateDaemonApiMethods();
-        } else {
+//        if (autoGenerateApiMethods) {
+//            daemonApiMethods = sideGenerator.generateDaemonApiMethods();
+//        } else {
             daemonApiMethods = new ArrayList<>(9);
 
             daemonApiMethods.add(generateGetPrototypeDaemonApiMethod());
             daemonApiMethods.add(generateSetPrototypeDaemonApiMethod());
             daemonApiMethods.add(generateStartDaemonApiMethod());
 
-
+            daemonApiMethods.add(generateClearDaemonApiMethod());
             daemonApiMethods.add(mainGenerator.generateDedicatedEnginesStopDaemonApiMethod());
             daemonApiMethods.add(mainGenerator.generateDedicatedEnginesQueueStopDaemonApiMethod());
+
+            daemonApiMethods.add(generateGetEnginesStateDaemonApiMethod());
+            daemonApiMethods.add(generateGetEnginesQueueSizeDaemonApiMethod());
 
             daemonApiMethods.add(mainGenerator.generateDedicatedEnginesSetNameDaemonApiMethod());
             daemonApiMethods.add(generateGetNameDaemonApiMethod());
             daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
 
-        }
+//        }
 
         if (mainGenerator.isConsumer())
             daemonApiMethods.add(mainGenerator.generateConsumeMethod());
@@ -216,5 +219,15 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
             builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".queueSize())");
 
         return builder.addStatement("return ret").build();
+    }
+
+    @Override
+    public MethodSpec generateClearDaemonApiMethod() {
+        return mainGenerator.generateClearDaemonApiMethod();
+    }
+
+    @Override
+    public MethodSpec generateQueueStopDaemonApiMethod() {
+        return mainGenerator.generateDedicatedEnginesQueueStopDaemonApiMethod();
     }
 }
