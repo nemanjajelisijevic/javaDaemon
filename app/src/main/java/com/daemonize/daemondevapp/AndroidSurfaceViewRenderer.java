@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -130,7 +131,7 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     public AndroidSurfaceViewRenderer drawScene() {
         if (surfaceHolder.getSurface().isValid()) {
             canvas = surfaceHolder.lockCanvas();
-            canvas.drawColor(Color.BLACK);
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             for (ImageView view : scene.getViews()) {
                 if (view.isShowing()) {
                     canvas.drawBitmap(

@@ -1006,6 +1006,7 @@ public class Game {
                         enemy.getHpView().setAbsoluteY(0);
                         enemy.getHpView().hide();
                     });
+
                     enemy.setShootable(false).setVelocity(0).pushSprite(explodeSprite, 0, ()->{
                         renderer.consume(()->{
                             enemy.getView().setAbsoluteX(0);
@@ -1040,7 +1041,7 @@ public class Game {
                             for (ImageView view : bullet.getViews())
                             view.hide();
                     });
-                    bullet.setVelocity(0).popSprite().pause().clearAndInterrupt();
+                    bullet.setVelocity(0).popSprite().pause();
                     activeBullets.remove(bullet);
                     bullet.addStatus(Bullet.STATUS.RETURNED_TO_REPO);
                 }
@@ -1068,7 +1069,7 @@ public class Game {
                         for (ImageView view : rocket.getViews())
                             view.hide();
                     });
-                    rocket.setVelocity(0).popSprite().pause().clearAndInterrupt();
+                    rocket.setVelocity(0).popSprite().pause();
                     activeRockets.remove(rocket);
                     rocket.addStatus(Bullet.STATUS.RETURNED_TO_REPO);
                 }
@@ -1116,7 +1117,7 @@ public class Game {
 
                 enemy.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
                             System.err.println(DaemonUtils.timedTag() + enemy.getName() +  " ENEMY OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!12345");
-                            enemyRepo.add(enemy);
+                            enemyRepo.add(enemy.clearAndInterrupt());
                         }).setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 enemyRepo.getStructure().add(enemy);
@@ -1151,7 +1152,7 @@ public class Game {
 
                 bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
                     System.err.println(DaemonUtils.timedTag() + bulletDoubleDaemon.getName() + " BULLET OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    bulletRepo.add(bulletDoubleDaemon);
+                    bulletRepo.add(bulletDoubleDaemon.clearAndInterrupt());
                 });
 
                 bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
@@ -1188,7 +1189,7 @@ public class Game {
 
                 rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
                     System.err.println(DaemonUtils.timedTag() + rocketDoubleDaemon.getName() + " ROCKET OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    rocketRepo.add(rocketDoubleDaemon);
+                    rocketRepo.add(rocketDoubleDaemon.clearAndInterrupt());
                 });
 
                 rocketDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
