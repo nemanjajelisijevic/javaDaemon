@@ -1001,6 +1001,7 @@ public class Game {
                 @Override
                 public void onAdd(EnemyDoubleDaemon enemy) {
                     System.out.println(DaemonUtils.timedTag() + enemy.getName() + " ENEMY ADDED TO REPO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
                     renderer.consume(()->{
                         enemy.getHpView().setAbsoluteX(0);
                         enemy.getHpView().setAbsoluteY(0);
@@ -1022,7 +1023,7 @@ public class Game {
                 public void onGet(EnemyDoubleDaemon enemy) {
                     enemy.setShootable(true)
                             //.setCoordinates(grid.getStartingX(), grid.getStartingY())
-                            .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(0.5F, 0.5F)))
+                            .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1F, 0.0F)))
                             .setCoordinates(grid.getStartingX(), grid.getStartingY())
                             .clearAndInterrupt();
                     renderer.consume(()->{
@@ -1117,7 +1118,23 @@ public class Game {
 
                 enemy.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
                             System.err.println(DaemonUtils.timedTag() + enemy.getName() +  " ENEMY OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!12345");
+
+//                            System.err.println(DaemonUtils.timedTag() + enemy.getName() + " TARGET COORDS X: " + enemy.getPrototype().getTargetCoordinates().getFirst() + ", Y: " + enemy.getPrototype().getTargetCoordinates().getSecond());
                             enemyRepo.add(enemy.clearAndInterrupt());
+
+//                            for (Integer queueSize : enemy.getEnginesQueueSizes()) {
+//                                System.err.println(DaemonUtils.timedTag() + enemy.getName() + " Queue size: " + queueSize);
+//                                if (queueSize != 0)
+//                                    throw new IllegalStateException(DaemonUtils.timedTag() + enemy.getName() + " Engine queue size not empty!");
+//                            }
+//
+//                            for (DaemonState engineState : enemy.getEnginesState())
+//                                System.err.println(DaemonUtils.timedTag() + enemy.getName() + " Engine state: " + engineState);
+//
+//                            for (DaemonState engineState : enemy.getEnginesState())
+//                                if (!engineState.equals(DaemonState.IDLE) && !engineState.equals(DaemonState.SIDE_QUEST))
+//                                    throw new IllegalStateException(DaemonUtils.timedTag() + enemy.getName() + " engine state: " + engineState);
+
                         }).setAnimateEnemySideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 enemyRepo.getStructure().add(enemy);
@@ -1385,6 +1402,25 @@ public class Game {
                                         next.getCenterX(),
                                         next.getCenterY()
                                 );
+
+//                                System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + "*******************************************************************");
+//                                System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + " at coords X: " + enemyDoubleDaemon.getLastCoordinates().getFirst() + ", Y: " + enemyDoubleDaemon.getLastCoordinates().getSecond());
+//                                System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + " TARGET coords X: " + enemyDoubleDaemon.getPrototype().getTargetCoordinates().getFirst() + ", Y: " + enemyDoubleDaemon.getPrototype().getTargetCoordinates().getSecond());
+//                                System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + " at field: [" + current.getRow() +  "][" + current.getColumn() +  "]");
+//
+//                                for (Integer queueSize : enemyDoubleDaemon.getEnginesQueueSizes()) {
+//                                    System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + " Queue size: " + queueSize);
+////                                    if (queueSize != 0)
+////                                        throw new IllegalStateException(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + " Engine queue size not empty!");
+//                                }
+//
+//                                for (DaemonState engineState : enemyDoubleDaemon.getEnginesState()) {
+//                                    System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + " Engine state: " + engineState);
+////                                    if (!engineState.equals(DaemonState.IDLE) && !engineState.equals(DaemonState.SIDE_QUEST))
+////                                        throw new IllegalStateException(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + " engine state: " + engineState);
+//                                }
+//
+//                                System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + "*******************************************************************");
 
                                 enemyDoubleDaemon.rotate(angle).goTo(
                                         next.getCenterX(),

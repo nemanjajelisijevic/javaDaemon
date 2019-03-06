@@ -21,7 +21,6 @@ public class BasicSpriteIterator implements SpriteIterator {
         return sprite.length;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public BasicSpriteIterator setSprite(Image[] sprite) {
         spriteLock.lock();

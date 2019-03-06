@@ -1,10 +1,10 @@
 package com.daemonize.game.imagemovers;
 
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonCountingLatch;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.game.Enemy;
 import com.daemonize.game.Pair;
 import com.daemonize.game.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.game.imagemovers.spriteiterators.SpriteIterator;
@@ -29,6 +29,10 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     protected float initVelocity;
 
     protected volatile Velocity velocity;
+
+    public void clearVelocity() {
+        velocity = new Velocity(0, new Direction(0, 0));
+    }
 
     protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore();
     private DaemonSemaphore pauseSemaphore = new DaemonSemaphore();
@@ -97,15 +101,16 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     @Override
     public boolean setDirectionAndMove(float x, float y, float velocityInt) {
 
-        velocity.intensity = velocityInt;
+        velocity.intensity = 0;
+        velocity.direction.coeficientX = 0;
+        velocity.direction.coeficientY = 0;
 
         if (x - lastX == 0 || y - lastY == 0)
             return false;
 
-        synchronized (this) {
-            dX = x - lastX;
-            dY = y - lastY;
-        }
+        dX = x - lastX;
+        dY = y - lastY;
+
 
         double hypotenuse = Math.sqrt(dX*dX + dY*dY);
 
@@ -116,7 +121,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
             throw new IllegalStateException("SET DIRECTION COORDINATES NaN Value! INPUT X: " + x + ", Y: " + y + ", LAST X: " + lastX + ", LAST Y: " + lastY);
         }
 
-
+        velocity.intensity = velocityInt;
         velocity.direction.coeficientX = (float) dX;
         velocity.direction.coeficientY = (float) dY;
 
@@ -146,11 +151,11 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         pauseSemaphore.go();
     }
 
-    private Consumer consumer;
+    private Consumer outOfBordersConsumer;
     private Runnable outOfBordersClosure;
 
     public void setOutOfBordersConsumer(Consumer consumer) {
-        this.consumer = consumer;
+        this.outOfBordersConsumer = consumer;
     }
 
     public void setOutOfBordersClosure(Runnable closure) {
@@ -167,11 +172,11 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
         ret.image = iterateSprite();
 
-        if (lastX <= (borderX1 + velocity.intensity) ||
-                lastX >= (borderX2 - velocity.intensity)||
-                lastY <= (borderY1 + velocity.intensity) ||
-                lastY >= (borderY2 - velocity.intensity)) {
-            consumer.consume(outOfBordersClosure);
+        if (lastX <= (borderX1 + velocity.intensity * velocity.direction.coeficientX * dXY) ||
+                lastX >= (borderX2 - velocity.intensity * velocity.direction.coeficientX * dXY)||
+                lastY <= (borderY1 + velocity.intensity * velocity.direction.coeficientY * dXY) ||
+                lastY >= (borderY2 - velocity.intensity * velocity.direction.coeficientY * dXY)) {
+            outOfBordersConsumer.consume(outOfBordersClosure);
             animateSemaphore.stop();
             return null;
         }
