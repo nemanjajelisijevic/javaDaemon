@@ -229,6 +229,8 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return super.animate();
     }
 
+
+
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() throws InterruptedException {
 
@@ -256,33 +258,55 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     }
 
+    //direction cache
+    private Direction lastDirection = new Direction(0,0);
+    private Direction lastOffsetDirection = new Direction(0,0);
+    private Direction lastOffset2Direction = new Direction(0,0);
+
     private GenericNode<Pair<PositionedImage, ImageView>> calculateOffsetImage(PositionedImage posImage, Direction movingDirection, int spaceBetweenBullet){
-
-        double directionAngle = RotatingSpriteImageMover.getAngle(0, 0, movingDirection.coeficientX, movingDirection.coeficientY);
-
-        double ortAngle1;
-        double ortAngle2;
-
-        //-90 deg
-        ortAngle1 = directionAngle >= 90 && directionAngle <= 360 ? directionAngle - 90 : 360 + (directionAngle - 90);
-        Direction offsetDirPosImage = new Direction((float)Math.cos(ortAngle1), (float)(-Math.sin(ortAngle1)));
-
-        //+90 deg
-        ortAngle2 = directionAngle >= 0 && directionAngle <= 270 ? directionAngle + 90 : (directionAngle + 90) - 360;
-        Direction offsetDirPosImage2 = new Direction((float)Math.cos(ortAngle2), (float)(-Math.sin(ortAngle2)));
 
         PositionedImage posImage1 = posImage.clone();
         PositionedImage posImage2 = posImage.clone();
 
-        posImage1.positionX = posImage.positionX + spaceBetweenBullet*(offsetDirPosImage.coeficientX);
-        posImage1.positionY = posImage.positionY + spaceBetweenBullet*(offsetDirPosImage.coeficientY);
+        Direction offsetDirPosImage;
+        Direction offsetDirPosImage2;
 
-        posImage2.positionX = posImage.positionX + spaceBetweenBullet*(offsetDirPosImage2.coeficientX);
-        posImage2.positionY = posImage.positionY + spaceBetweenBullet*(offsetDirPosImage2.coeficientY);
+        if (movingDirection.coeficientX == lastDirection.coeficientX && movingDirection.coeficientY == lastDirection.coeficientY) {
+
+            offsetDirPosImage = lastOffsetDirection;
+            offsetDirPosImage2 = lastOffset2Direction;
+
+        } else {
+
+            double directionAngle = RotatingSpriteImageMover.getAngle(0, 0, movingDirection.coeficientX, movingDirection.coeficientY);
+
+            double ortAngle1;
+            double ortAngle2;
+
+            //-90 deg
+            ortAngle1 = directionAngle >= 90 && directionAngle <= 360 ? directionAngle - 90 : 360 + (directionAngle - 90);
+            offsetDirPosImage = new Direction((float) Math.cos(ortAngle1), (float) (-Math.sin(ortAngle1)));
+
+            //+90 deg
+            ortAngle2 = directionAngle >= 0 && directionAngle <= 270 ? directionAngle + 90 : (directionAngle + 90) - 360;
+            offsetDirPosImage2 = new Direction((float) Math.cos(ortAngle2), (float) (-Math.sin(ortAngle2)));
+
+            lastDirection = movingDirection;
+            lastOffsetDirection = offsetDirPosImage;
+            lastOffset2Direction = offsetDirPosImage2;
+
+        }
+
+        posImage1.positionX = posImage.positionX + spaceBetweenBullet * (offsetDirPosImage.coeficientX);
+        posImage1.positionY = posImage.positionY + spaceBetweenBullet * (offsetDirPosImage.coeficientY);
+
+        posImage2.positionX = posImage.positionX + spaceBetweenBullet * (offsetDirPosImage2.coeficientX);
+        posImage2.positionY = posImage.positionY + spaceBetweenBullet * (offsetDirPosImage2.coeficientY);
+
 
         GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(posImage1, view));
         root.addChild(new GenericNode<>(Pair.create(posImage2,view2)));
-       return root;
+        return root;
 
     }
 
