@@ -288,8 +288,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
             offsetDirPosImage = new Direction((float) Math.cos(ortAngle1), (float) (-Math.sin(ortAngle1)));
 
             //+90 deg
-            ortAngle2 = directionAngle >= 0 && directionAngle <= 270 ? directionAngle + 90 : (directionAngle + 90) - 360;
-            offsetDirPosImage2 = new Direction((float) Math.cos(ortAngle2), (float) (-Math.sin(ortAngle2)));
+            offsetDirPosImage2 = new Direction( - offsetDirPosImage.coeficientX, - offsetDirPosImage.coeficientY);
 
             lastDirection = movingDirection;
             lastOffsetDirection = offsetDirPosImage;
