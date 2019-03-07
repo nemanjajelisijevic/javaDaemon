@@ -23,46 +23,12 @@ import java.util.List;
 @Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon")
 public class Bullet extends CoordinatedImageTranslationMover {
 
-//    public enum STATUS {
-//        OUT_OF_REPO,
-//        ROTATING,
-//        TRANSLATING,
-//        LAUNCHED,
-//        AT_LAUNCH_COORD,
-//        LAUNCH_FAILED,
-//        RETURNED_TO_SOURCE,
-//        AT_ENEMY_COORDS,
-//        ENEMY_NOT_SHOOTABLE,
-//        EXPLOADED,
-//        RETURNED_TO_REPO
-//    }
-//
-//
-//    private List<STATUS> statusList = new LinkedList<>();
-//
-//    {
-//        statusList.add(STATUS.RETURNED_TO_REPO);
-//    }
-//
-//    @CallingThread
-//    public synchronized List<STATUS> getStatusList() {
-//        return statusList;
-//    }
-//
-//    @CallingThread
-//    public synchronized void addStatus(STATUS status) {
-//        if (status.equals(STATUS.RETURNED_TO_REPO))
-//            statusList.clear();
-//        statusList.add(status);
-//    }
-
     private ImageView view;
     private ImageView view2;
     private ImageView view3;
 
     private int level = 1;
     private volatile int damage;
-
     private int spaceBetweenBullets;
 
     private RotatingSpriteImageMover rotationMover;
@@ -83,9 +49,16 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     @CallingThread
     @Override
+    public void clearVelocity() {
+        super.clearVelocity();
+    }
+
+    @CallingThread
+    @Override
     public void setCoordinates(float lastX, float lastY) {
         super.setCoordinates(lastX, lastY);
     }
+
 
     @CallingThread
     @Override
@@ -200,10 +173,8 @@ public class Bullet extends CoordinatedImageTranslationMover {
     }
 
     public boolean rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
-        setVelocity(0);
-        //addStatus(STATUS.ROTATING);
+        clearVelocity();
         rotationMover.rotate(angle);
-        //addStatus(STATUS.TRANSLATING);
         return goTo(x, y, velocityInt);
     }
 
@@ -228,8 +199,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
     public PositionedImage animate() throws InterruptedException {
         return super.animate();
     }
-
-
 
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() throws InterruptedException {
