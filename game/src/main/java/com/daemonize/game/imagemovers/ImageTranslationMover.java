@@ -31,7 +31,9 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     protected volatile Velocity velocity;
 
     public void clearVelocity() {
-        velocity = new Velocity(0, new Direction(0, 0));
+        velocity.intensity = 0;
+        velocity.direction.coeficientX = 0;
+        velocity.direction.coeficientY = 0;
     }
 
     protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore();

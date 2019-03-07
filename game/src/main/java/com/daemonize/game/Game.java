@@ -808,8 +808,6 @@ public class Game {
 
                 chain.next();
 
-
-
             } catch (IOException ex) {
                 System.err.println(DaemonUtils.tag() + "Could not init game!");
                 ex.printStackTrace();
@@ -837,76 +835,78 @@ public class Game {
                     scene.addImageView(new ImageViewImpl("Dollar Sign").setZindex(10).setImage(dollarSign).hide())
             );
 
-            Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage).onClick(()->{
+            Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage)
+                    .onClick(()->{
 
-                TowerDaemon tow = towerUpgradeDialogue.getTower();
-                tow.levelUp();
-                Image[] currentSprite = null;
-                switch (tow.getTowertype()) {
-                    case TYPE1:
-                        currentSprite = redTower.get(tow.getTowerLevel().currentLevel - 1);
-                        break;
-                    case TYPE2:
-                        currentSprite = blueTower.get(tow.getTowerLevel().currentLevel - 1);
-                        break;
-                    case TYPE3:
-                        currentSprite =  greenTower.get(tow.getTowerLevel().currentLevel - 1);
-                        break;
-                }
+                        TowerDaemon tow = towerUpgradeDialogue.getTower();
+                        tow.levelUp();
 
-                tow.setRotationSprite(currentSprite);
+                        Image[] currentSprite = null;
 
-                tow.updateSprite(renderer, update -> {
-                    ImageMover.PositionedImage posBmp = update.runtimeCheckAndGet();
-                    tow.getView().setAbsoluteX(posBmp.positionX);
-                    tow.getView().setAbsoluteY(posBmp.positionY);
-                    tow.getView().setImage(posBmp.image);
-                });
+                        switch (tow.getTowertype()) {
+                            case TYPE1:
+                                currentSprite = redTower.get(tow.getTowerLevel().currentLevel - 1);
+                                break;
+                            case TYPE2:
+                                currentSprite = blueTower.get(tow.getTowerLevel().currentLevel - 1);
+                                break;
+                            case TYPE3:
+                                currentSprite =  greenTower.get(tow.getTowerLevel().currentLevel - 1);
+                                break;
+                        }
 
-                tow.cont();
+                        tow.setRotationSprite(currentSprite);
 
-                CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
+                        tow.updateSprite(renderer, update -> {
+                            ImageMover.PositionedImage posBmp = update.runtimeCheckAndGet();
+                            tow.getView().setAbsoluteX(posBmp.positionX);
+                            tow.getView().setAbsoluteY(posBmp.positionY);
+                            tow.getView().setImage(posBmp.image);
+                        });
 
-                renderer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
+                        tow.cont();
 
-                if (score > 2 && tow.getTowerLevel().currentLevel < 3)
-                    renderer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").show());
-                else
-                    renderer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide());
+                        CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
 
-                score -= 2;
-                renderer.consume(()->infoScore.setNumbers(score));
-            });
+                        renderer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
 
+                        if (score > 2 && tow.getTowerLevel().currentLevel < 3)
+                            renderer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").show());
+                        else
+                            renderer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide());
 
-            Button closeButton = new Button("Close", 0, 0, closeButtonImage).onClick(()->
-                    renderer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().hide()));
-
-
-            Button saleButton = new Button("Sale", 0, 0, saleButtonImage).onClick(()->{
-                //cont();
-
-                TowerDaemon tower = towerUpgradeDialogue.getTower();
-
-                Field field = grid.getField(
-                        tower.getLastCoordinates().getFirst(),
-                        tower.getLastCoordinates().getSecond()
-                );
-
-                //stop and remove tower
-                tower.stop();
-                towers.remove(tower);
-                field.setTower(null);
-
-                //remove tower from grid and recalculate path
-                if (grid.destroyTower(field.getRow(), field.getColumn())) {
-                    renderer.consume(() -> {
-                        gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide();
-                        towerUpgradeDialogue.getTowerUpgrade().hide();
-                        infoScore.setNumbers(++score);
+                        score -= 2;
+                        renderer.consume(()->infoScore.setNumbers(score));
                     });
-                }
-            });
+
+
+            Button closeButton = new Button("Close", 0, 0, closeButtonImage)
+                    .onClick(()->renderer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().hide()));
+
+
+            Button saleButton = new Button("Sale", 0, 0, saleButtonImage)
+                    .onClick(()->{
+                        TowerDaemon tower = towerUpgradeDialogue.getTower();
+
+                        Field field = grid.getField(
+                                tower.getLastCoordinates().getFirst(),
+                                tower.getLastCoordinates().getSecond()
+                        );
+
+                        //stop and remove tower
+                        tower.stop();
+                        towers.remove(tower);
+                        field.setTower(null);
+
+                        //remove tower from grid and recalculate path
+                        if (grid.destroyTower(field.getRow(), field.getColumn())) {
+                            renderer.consume(() -> {
+                                gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide();
+                                towerUpgradeDialogue.getTowerUpgrade().hide();
+                                infoScore.setNumbers(++score);
+                            });
+                        }
+                    });
 
             towerUpgradeDialogue = new TowerUpgradeDialog(
                     borderX / 3,
@@ -1000,8 +1000,6 @@ public class Game {
             enemyRepo = new QueuedEntityRepo<EnemyDoubleDaemon>() {
                 @Override
                 public void onAdd(EnemyDoubleDaemon enemy) {
-                    System.out.println(DaemonUtils.timedTag() + enemy.getName() + " ENEMY ADDED TO REPO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
                     renderer.consume(()->{
                         enemy.getHpView().hide();
                         enemy.getHpView().setAbsoluteX(0);
@@ -1022,7 +1020,6 @@ public class Game {
                 @Override
                 public void onGet(EnemyDoubleDaemon enemy) {
                     enemy.setShootable(true)
-                            //.setCoordinates(grid.getStartingX(), grid.getStartingY())
                             .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1F, 0.0F)))
                             .setCoordinates(grid.getStartingX(), grid.getStartingY())
                             .clearAndInterrupt();
@@ -1048,7 +1045,6 @@ public class Game {
 
                 @Override
                 public void onGet(BulletDoubleDaemon bullet) {
-                    System.out.println(DaemonUtils.tag() + "Bullet get state: " + bullet.getEnginesState().get(bullet.getEnginesState().size() - 1));
                     renderer.consume(()->{
                         for (ImageView view : bullet.getViews()) {
                             view.setAbsoluteX(bullet.getLastCoordinates().getFirst());
@@ -1074,7 +1070,6 @@ public class Game {
 
                 @Override
                 public void onGet(BulletDoubleDaemon rocket) {
-                    System.out.println(DaemonUtils.tag() + "Rocket get state: " + rocket.getEnginesState().get(rocket.getEnginesState().size() - 1));
                     renderer.consume(()->{
                         for (ImageView view : rocket.getViews()) {
                             view.setAbsoluteX(rocket.getLastCoordinates().getFirst());
@@ -1147,12 +1142,11 @@ public class Game {
                         (grid.getStartingY() + grid.getGridHeight())
                 );
 
-                bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
-                    System.err.println(DaemonUtils.timedTag() + bulletDoubleDaemon.getName() + " BULLET OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    bulletRepo.add(bulletDoubleDaemon.clearAndInterrupt());
-                });
+                bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
+                        .setOutOfBordersClosure(()->bulletRepo.add(bulletDoubleDaemon.clearAndInterrupt()));
 
-                bulletDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
+                bulletDoubleDaemon.setAnimateBulletSideQuest()
+                        .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 bulletRepo.getStructure().push(bulletDoubleDaemon);
             }
@@ -1184,12 +1178,11 @@ public class Game {
                         borderY
                 );
 
-                rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer).setOutOfBordersClosure(()->{
-                    System.err.println(DaemonUtils.timedTag() + rocketDoubleDaemon.getName() + " ROCKET OUT OF BORDERS CLOSURE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    rocketRepo.add(rocketDoubleDaemon.clearAndInterrupt());
-                });
+                rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
+                        .setOutOfBordersClosure(()-> rocketRepo.add(rocketDoubleDaemon.clearAndInterrupt()));
 
-                rocketDoubleDaemon.setAnimateBulletSideQuest().setClosure(new MultiViewAnimateClosure()::onReturn);
+                rocketDoubleDaemon.setAnimateBulletSideQuest()
+                        .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 rocketRepo.getStructure().push(rocketDoubleDaemon);
             }
@@ -1213,22 +1206,21 @@ public class Game {
                             .setImage(viewAndImage.getSecond().image);
             });
 
-
             //init moneyDaemon
             moneyDaemon = new MoneyHandlerDaemon(
                     gameConsumer,
                     renderer,
                     (MoneyHandler) new MoneyHandler(moneyNumbersImages, dollarSign, dXY).setBorders(0, borderX, 0, borderY)
             ).setName("Money handler Daemon")
-                    .setAmount(0)
-                    .setOutOfBordersConsumer(gameConsumer)
-                    .setOutOfBordersClosure(()->{
-                        moneyDaemon.clearAndInterrupt();
-                        renderer.consume(()->{
-                            moneyView.getFirst().hide();
-                            moneyView.getSecond().hide();
-                        });
-                    });
+             .setAmount(0)
+             .setOutOfBordersConsumer(gameConsumer)
+             .setOutOfBordersClosure(()->{
+                 moneyDaemon.clearAndInterrupt();
+                 renderer.consume(()->{
+                     moneyView.getFirst().hide();
+                     moneyView.getSecond().hide();
+                 });
+             });
 
             moneyDaemon.setAnimateMoneySideQuest().setClosure(ret ->{
                 Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> result = ret.runtimeCheckAndGet();
@@ -1390,8 +1382,7 @@ public class Game {
                                         this::onReturn
                                 );
                             }
-                        }
-                );
+                        });
             });
 
             //start enemy generator
