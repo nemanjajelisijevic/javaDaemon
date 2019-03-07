@@ -23,38 +23,38 @@ import java.util.List;
 @Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon")
 public class Bullet extends CoordinatedImageTranslationMover {
 
-    public enum STATUS {
-        OUT_OF_REPO,
-        ROTATING,
-        TRANSLATING,
-        LAUNCHED,
-        AT_LAUNCH_COORD,
-        LAUNCH_FAILED,
-        RETURNED_TO_SOURCE,
-        AT_ENEMY_COORDS,
-        ENEMY_NOT_SHOOTABLE,
-        EXPLOADED,
-        RETURNED_TO_REPO
-    }
-
-
-    private List<STATUS> statusList = new LinkedList<>();
-
-    {
-        statusList.add(STATUS.RETURNED_TO_REPO);
-    }
-
-    @CallingThread
-    public synchronized List<STATUS> getStatusList() {
-        return statusList;
-    }
-
-    @CallingThread
-    public synchronized void addStatus(STATUS status) {
-        if (status.equals(STATUS.RETURNED_TO_REPO))
-            statusList.clear();
-        statusList.add(status);
-    }
+//    public enum STATUS {
+//        OUT_OF_REPO,
+//        ROTATING,
+//        TRANSLATING,
+//        LAUNCHED,
+//        AT_LAUNCH_COORD,
+//        LAUNCH_FAILED,
+//        RETURNED_TO_SOURCE,
+//        AT_ENEMY_COORDS,
+//        ENEMY_NOT_SHOOTABLE,
+//        EXPLOADED,
+//        RETURNED_TO_REPO
+//    }
+//
+//
+//    private List<STATUS> statusList = new LinkedList<>();
+//
+//    {
+//        statusList.add(STATUS.RETURNED_TO_REPO);
+//    }
+//
+//    @CallingThread
+//    public synchronized List<STATUS> getStatusList() {
+//        return statusList;
+//    }
+//
+//    @CallingThread
+//    public synchronized void addStatus(STATUS status) {
+//        if (status.equals(STATUS.RETURNED_TO_REPO))
+//            statusList.clear();
+//        statusList.add(status);
+//    }
 
     private ImageView view;
     private ImageView view2;
@@ -201,9 +201,9 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     public boolean rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
         setVelocity(0);
-        addStatus(STATUS.ROTATING);
+        //addStatus(STATUS.ROTATING);
         rotationMover.rotate(angle);
-        addStatus(STATUS.TRANSLATING);
+        //addStatus(STATUS.TRANSLATING);
         return goTo(x, y, velocityInt);
     }
 

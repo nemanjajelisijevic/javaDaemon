@@ -107,6 +107,12 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
     @CallingThread
     @Override
+    public void clearVelocity() {
+        super.clearVelocity();
+    }
+
+    @CallingThread
+    @Override
     public Pair<Float, Float> getLastCoordinates() {
         return super.getLastCoordinates();
     }

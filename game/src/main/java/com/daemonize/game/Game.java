@@ -1003,16 +1003,16 @@ public class Game {
                     System.out.println(DaemonUtils.timedTag() + enemy.getName() + " ENEMY ADDED TO REPO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
                     renderer.consume(()->{
+                        enemy.getHpView().hide();
                         enemy.getHpView().setAbsoluteX(0);
                         enemy.getHpView().setAbsoluteY(0);
-                        enemy.getHpView().hide();
                     });
 
-                    enemy.setShootable(false).setVelocity(0).pushSprite(explodeSprite, 0, ()->{
+                    enemy.setShootable(false).clearVelocity().pushSprite(explodeSprite, 0, ()->{
                         renderer.consume(()->{
+                            enemy.getView().hide();
                             enemy.getView().setAbsoluteX(0);
                             enemy.getView().setAbsoluteY(0);
-                            enemy.getView().hide();
                         });
                         enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
                     });
@@ -1039,12 +1039,12 @@ public class Game {
                 @Override
                 public void onAdd(BulletDoubleDaemon bullet) {
                     renderer.consume(() -> {
-                            for (ImageView view : bullet.getViews())
+                        for (ImageView view : bullet.getViews())
                             view.hide();
                     });
                     bullet.setVelocity(0).popSprite().pause();
                     activeBullets.remove(bullet);
-                    bullet.addStatus(Bullet.STATUS.RETURNED_TO_REPO);
+                    //bullet.addStatus(Bullet.STATUS.RETURNED_TO_REPO);
                 }
 
                 @Override
@@ -1058,7 +1058,7 @@ public class Game {
                         }
                     });
                     activeBullets.add(bullet);
-                    bullet.addStatus(Bullet.STATUS.OUT_OF_REPO);
+                    //bullet.addStatus(Bullet.STATUS.OUT_OF_REPO);
                 }
             };
 
@@ -1072,7 +1072,7 @@ public class Game {
                     });
                     rocket.setVelocity(0).popSprite().pause();
                     activeRockets.remove(rocket);
-                    rocket.addStatus(Bullet.STATUS.RETURNED_TO_REPO);
+                    //rocket.addStatus(Bullet.STATUS.RETURNED_TO_REPO);
                 }
 
                 @Override
@@ -1086,7 +1086,7 @@ public class Game {
                         }
                     });
                     activeRockets.add(rocket);
-                    rocket.addStatus(Bullet.STATUS.OUT_OF_REPO);
+                    //rocket.addStatus(Bullet.STATUS.OUT_OF_REPO);
                 }
             };
 
@@ -1845,13 +1845,13 @@ public class Game {
         for(Integer queueSize : rocketDoubleDaemon.getEnginesQueueSizes())
             if (queueSize != 0) throw new IllegalStateException(rocketDoubleDaemon.getName() + " MAIN QUEUE NOT EMPTY!!!!!!");
 
-        rocketDoubleDaemon.addStatus(Bullet.STATUS.LAUNCHED);
+        //rocketDoubleDaemon.addStatus(Bullet.STATUS.LAUNCHED);
 
         rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, ret -> {
 
             ret.runtimeCheckAndGet();
 
-            rocketDoubleDaemon.addStatus(Bullet.STATUS.AT_LAUNCH_COORD);
+            //rocketDoubleDaemon.addStatus(Bullet.STATUS.AT_LAUNCH_COORD);
 
             if (!enemy.isShootable()) {
                 rocketDoubleDaemon.rotateAndGoTo(
@@ -1865,10 +1865,10 @@ public class Game {
                         sourceCoord.getSecond(),
                         4,
                         ret1 -> {
-                            rocketDoubleDaemon.addStatus(Bullet.STATUS.RETURNED_TO_SOURCE);
+                            //rocketDoubleDaemon.addStatus(Bullet.STATUS.RETURNED_TO_SOURCE);
                             rocketRepo.add(rocketDoubleDaemon);
                         }
-                ).addStatus(Bullet.STATUS.LAUNCH_FAILED);
+                );//.addStatus(Bullet.STATUS.LAUNCH_FAILED);
             } else {
 
                 Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
@@ -1889,10 +1889,10 @@ public class Game {
 
                             ret2.runtimeCheckAndGet();
 
-                            rocketDoubleDaemon.addStatus(Bullet.STATUS.AT_ENEMY_COORDS);
+                            //rocketDoubleDaemon.addStatus(Bullet.STATUS.AT_ENEMY_COORDS);
 
                             if (!enemy.isShootable()) {
-                                rocketRepo.add(rocketDoubleDaemon.addStatus(Bullet.STATUS.ENEMY_NOT_SHOOTABLE));
+                                rocketRepo.add(rocketDoubleDaemon/*.addStatus(Bullet.STATUS.ENEMY_NOT_SHOOTABLE)*/);
                                 return;
                             }
 
@@ -1930,7 +1930,7 @@ public class Game {
                                 }
                             }
 
-                            rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, ()-> rocketRepo.add(rocketDoubleDaemon.addStatus(Bullet.STATUS.EXPLOADED)));
+                            rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, ()-> rocketRepo.add(rocketDoubleDaemon/*.addStatus(Bullet.STATUS.EXPLOADED)*/));
                         });
             }
         });
