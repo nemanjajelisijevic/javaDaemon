@@ -99,10 +99,10 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         MethodSpec.Builder daemonConstructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(consumer, "mainConsumer")
-                .addParameter(consumer, "sideConsumer")
+                //.addParameter(consumer, "sideConsumer")
                 .addParameter(ClassName.get(classElement.asType()), PROTOTYPE_STRING)
                 .addStatement("this.$N = new $N(mainConsumer).setName(this.getClass().getSimpleName() + \" - MAIN\")", MAIN_DAEMON_ENGINE_STRING, mainGenerator.getDaemonEngineSimpleName())
-                .addStatement("this.$N = new $N(sideConsumer).setName(this.getClass().getSimpleName() + \" - SIDE\")", SIDE_DAEMON_ENGINE_STRING, sideGenerator.getDaemonEngineSimpleName());
+                .addStatement("this.$N = new $N().setName(this.getClass().getSimpleName() + \" - SIDE\")", SIDE_DAEMON_ENGINE_STRING, sideGenerator.getDaemonEngineSimpleName());
 
         //add dedicated daemon engines
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
