@@ -14,6 +14,7 @@ import com.squareup.javapoet.TypeVariableName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -393,6 +394,29 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         }
         protected TypeName getClosureOfRet() {
             return closureOfRet;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(this instanceof PrototypeMethodData))
+                return false;
+            else {
+                PrototypeMethodData rhs = (PrototypeMethodData) obj;
+                if (this.methodName.equals(rhs.methodName) &&
+                        this.methodRetTypeName.equals(rhs.methodRetTypeName) &&
+                        this.isVoid == rhs.isVoid &&
+                        this.closureOfRet.equals(rhs.closureOfRet) &&
+                        this.arguments.equals(rhs.arguments) &&
+                        this.parameters.equals(rhs.parameters))
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(methodName, methodRetTypeName, isVoid, closureOfRet, arguments, parameters);
         }
     }
 
