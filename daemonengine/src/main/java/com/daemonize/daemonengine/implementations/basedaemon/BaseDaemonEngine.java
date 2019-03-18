@@ -38,6 +38,8 @@ public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
     return consumer;
   }
 
+  protected BaseDaemonEngine(){}
+
   protected BaseDaemonEngine(Consumer consumer) {
     this.consumer = consumer;
   }

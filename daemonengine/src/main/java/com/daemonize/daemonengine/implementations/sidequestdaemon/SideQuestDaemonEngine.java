@@ -11,8 +11,8 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   private SideQuest sideQuest;
 
-  public SideQuestDaemonEngine(Consumer consumer){
-    super(consumer);
+  public SideQuestDaemonEngine(){
+    super();
   }
 
   public void setSideQuest(SideQuest quest) {

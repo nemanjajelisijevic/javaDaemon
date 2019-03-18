@@ -1088,7 +1088,6 @@ public class Game {
 
                 EnemyDoubleDaemon enemy = new EnemyDoubleDaemon(
                         gameConsumer,
-                        renderer,
                         new Enemy(
                                 enemySprite,
                                 enemyVelocity,
@@ -1109,7 +1108,7 @@ public class Game {
 
                 enemy.setOutOfBordersConsumer(gameConsumer)
                         .setOutOfBordersClosure(()-> enemyRepo.add(enemy.clearAndInterrupt()))
-                        .setAnimateEnemySideQuest()
+                        .setAnimateEnemySideQuest(renderer)
                         .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 enemyRepo.getStructure().add(enemy);
@@ -1122,7 +1121,6 @@ public class Game {
 
                 BulletDoubleDaemon bulletDoubleDaemon = new BulletDoubleDaemon(
                         gameConsumer,
-                        renderer,
                         new Bullet(
                                 bulletSprite,
                                 0,
@@ -1145,7 +1143,7 @@ public class Game {
                 bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
                         .setOutOfBordersClosure(()->bulletRepo.add(bulletDoubleDaemon.clearAndInterrupt()));
 
-                bulletDoubleDaemon.setAnimateBulletSideQuest()
+                bulletDoubleDaemon.setAnimateBulletSideQuest(renderer)
                         .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 bulletRepo.getStructure().push(bulletDoubleDaemon);
@@ -1158,7 +1156,6 @@ public class Game {
 
                 BulletDoubleDaemon rocketDoubleDaemon = new BulletDoubleDaemon(
                         gameConsumer,
-                        renderer,
                         new Bullet(
                                 bulletSpriteRocket,
                                 0,
@@ -1181,7 +1178,7 @@ public class Game {
                 rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
                         .setOutOfBordersClosure(()-> rocketRepo.add(rocketDoubleDaemon.clearAndInterrupt()));
 
-                rocketDoubleDaemon.setAnimateBulletSideQuest()
+                rocketDoubleDaemon.setAnimateBulletSideQuest(renderer)
                         .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 rocketRepo.getStructure().push(rocketDoubleDaemon);
@@ -1194,11 +1191,10 @@ public class Game {
             //laser init
             laser = new LaserBulletDaemon(
                     gameConsumer,
-                    renderer,
                     new LaserBullet(laserSprite, 40, Pair.create(0F, 0F), bulletDamage, dXY)
             ).setViews(laserViews);
 
-            laser.setAnimateLaserSideQuest().setClosure(ret->{
+            laser.setAnimateLaserSideQuest(renderer).setClosure(ret->{
                 for (Pair<ImageView, ImageMover.PositionedImage> viewAndImage : ret.runtimeCheckAndGet())
                     viewAndImage.getFirst()
                             .setAbsoluteX(viewAndImage.getSecond().positionX)
@@ -1209,7 +1205,6 @@ public class Game {
             //init moneyDaemon
             moneyDaemon = new MoneyHandlerDaemon(
                     gameConsumer,
-                    renderer,
                     (MoneyHandler) new MoneyHandler(moneyNumbersImages, dollarSign, dXY).setBorders(0, borderX, 0, borderY)
             ).setName("Money handler Daemon")
              .setAmount(0)
@@ -1222,7 +1217,7 @@ public class Game {
                  });
              });
 
-            moneyDaemon.setAnimateMoneySideQuest().setClosure(ret ->{
+            moneyDaemon.setAnimateMoneySideQuest(renderer).setClosure(ret ->{
                 Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> result = ret.runtimeCheckAndGet();
                 moneyView.getFirst().setImage(result.getFirst().image).setAbsoluteX(result.getFirst().positionX).setAbsoluteY(result.getFirst().positionY);
                 moneyView.getSecond().setImage(result.getSecond().image).setAbsoluteX(result.getSecond().positionX).setAbsoluteY(result.getSecond().positionY);
@@ -1550,7 +1545,6 @@ public class Game {
 
                 TowerDaemon towerDaemon = new TowerDaemon(
                         gameConsumer,
-                        renderer,
                         new Tower(
                                 currentTowerSprite,
                                 Pair.create(field.getCenterX(), field.getCenterY()),
@@ -1563,7 +1557,7 @@ public class Game {
                 towers.add(towerDaemon);
                 field.setTower(towerDaemon);
 
-                towerDaemon.setAnimateSideQuest().setClosure(new ImageAnimateClosure(fieldView)::onReturn);
+                towerDaemon.setAnimateSideQuest(renderer).setClosure(new ImageAnimateClosure(fieldView)::onReturn);
 
                 towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
                     @Override
