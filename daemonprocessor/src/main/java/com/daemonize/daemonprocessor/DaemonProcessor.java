@@ -1,7 +1,6 @@
 package com.daemonize.daemonprocessor;
 
 import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -79,7 +78,9 @@ public class DaemonProcessor extends AbstractProcessor {
                 );
 
                 List<ExecutableElement> publicPrototypeMethods =
-                        BaseDaemonGenerator.getAnnotatedClassMethods(classElement);
+                        classElement.getAnnotation(Daemonize.class).daemonizeBaseClasses() ?
+                                BaseDaemonGenerator.getPublicClassMethodsWithBaseClasses(classElement) :
+                                BaseDaemonGenerator.getPublicClassMethods(classElement);
 
                 List<Pair<ExecutableElement, SideQuest>> sideQuestMethods =
                         BaseDaemonGenerator.getSideQuestMethods(publicPrototypeMethods);

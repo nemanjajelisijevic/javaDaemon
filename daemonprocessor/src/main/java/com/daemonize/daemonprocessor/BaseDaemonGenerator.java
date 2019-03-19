@@ -13,18 +13,22 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 
@@ -58,8 +62,8 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     protected final String DAEMON_ENGINE_PACKAGE_ROOT = "com.daemonize.daemonengine";
     protected final String DAEMON_ENGINE_IMPL_PACKAGE = DAEMON_ENGINE_PACKAGE_ROOT + ".implementations";
 
-    protected final String CLOSURE_PACKAGE = "com.daemonize.daemonengine.closure";
-    protected final String CLOSURE_STRING = "Closure";
+    protected static final String CLOSURE_PACKAGE = "com.daemonize.daemonengine.closure";
+    protected static final String CLOSURE_STRING = "Closure";
 
     protected final String QUEST_PACKAGE = "com.daemonize.daemonengine.quests";
     protected String QUEST_TYPE_NAME;
@@ -133,9 +137,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
     }
 
-    public static List<ExecutableElement> getAnnotatedClassMethods(Element annotatedClass) {
-
-        //TODO ignore accessors
+    public static List<ExecutableElement> getPublicClassMethods(Element annotatedClass) {
 
         List<ExecutableElement> publicMethods = new ArrayList<>(10);
         for(Element innerElement :  annotatedClass.getEnclosedElements()) {
@@ -147,6 +149,52 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         }
 
         return publicMethods;
+    }
+
+
+    public static List<ExecutableElement> getPublicClassMethodsWithBaseClasses(Element annotatedClass) {
+
+        Map<PrototypeMethodData, ExecutableElement> publicMethodsMap = new HashMap<>();
+
+        TypeElement annClass = (TypeElement) annotatedClass;
+
+        System.err.println("Annotated class: " + annClass.getQualifiedName());
+
+        for(Element innerElement :  annClass.getEnclosedElements()) {
+            if ((innerElement instanceof ExecutableElement) &&
+                    !innerElement.getSimpleName().toString().equals("<init>") &&
+                    innerElement.getModifiers().contains(Modifier.PUBLIC)) {
+
+                PrototypeMethodData innerElMethodData = new PrototypeMethodData((ExecutableElement) innerElement);
+                publicMethodsMap.put(innerElMethodData, (ExecutableElement) innerElement);
+            }
+        }
+
+        if (annClass.getKind().equals(ElementKind.CLASS)) {
+            while (!(((TypeElement) ((DeclaredType) annClass.getSuperclass()).asElement())).getQualifiedName().toString().equals("java.lang.Object")) {
+
+                annClass = (TypeElement) ((DeclaredType) annClass.getSuperclass()).asElement();
+                for (Element innerElement : annClass.getEnclosedElements()) {
+                    if ((innerElement instanceof ExecutableElement) &&
+                            !innerElement.getSimpleName().toString().equals("<init>") &&
+                            innerElement.getModifiers().contains(Modifier.PUBLIC)) {
+
+                        PrototypeMethodData innerElMethodData = new PrototypeMethodData((ExecutableElement) innerElement);
+
+                        if (!publicMethodsMap.containsKey(innerElMethodData)) {
+                            publicMethodsMap.put(innerElMethodData, (ExecutableElement) innerElement);
+                        }
+                    }
+                }
+            }
+        }
+
+        List<ExecutableElement> ret = new ArrayList<>(publicMethodsMap.size());
+        for (ExecutableElement method : publicMethodsMap.values()) {
+            ret.add(method);
+        }
+
+        return ret;
     }
 
     public static List<Pair<ExecutableElement, SideQuest>> getSideQuestMethods(List<ExecutableElement> publicMethods) {
@@ -327,14 +375,15 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     }
 
 
-    protected class PrototypeMethodData {
+    protected static class PrototypeMethodData {
 
         private String methodName;
         private TypeName methodRetTypeName;
         private boolean isVoid;
         private TypeName closureOfRet;
         private String arguments = "";
-        private List<Pair<TypeName, String>> parameters = new ArrayList<>();
+        private List<TypeName> parametersType = new ArrayList<>();
+        private List<String> parametersName = new ArrayList<>();
 
         protected PrototypeMethodData(ExecutableElement prototypeMethod) {
             methodName = prototypeMethod.getSimpleName().toString();
@@ -367,7 +416,8 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                 TypeMirror fieldType = fieldElement.asType();
                 String fieldName = fieldElement.getSimpleName().toString().toLowerCase();
 
-                parameters.add(Pair.create(ClassName.get(fieldType), fieldName));
+                parametersType.add(ClassName.get(fieldType));
+                parametersName.add(fieldName);
 
                 argumentBuilder.append(fieldName);
                 if (i != methodParameters.size() - 1) {
@@ -382,16 +432,25 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         protected String getMethodName() {
             return methodName;
         }
+
         protected TypeName getMethodRetTypeName() {
             return methodRetTypeName;
         }
+
         protected boolean isVoid() { return isVoid; }
+
         protected String getArguments() {
             return arguments;
         }
+
         protected List<Pair<TypeName, String>> getParameters() {
-            return parameters;
+            List<Pair<TypeName, String>> ret  = new ArrayList<>(parametersType.size());
+            for(int i = 0; i < parametersType.size(); ++i) {
+                ret.add(Pair.create(parametersType.get(i), parametersName.get(i)));
+            }
+            return ret;
         }
+
         protected TypeName getClosureOfRet() {
             return closureOfRet;
         }
@@ -404,10 +463,8 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                 PrototypeMethodData rhs = (PrototypeMethodData) obj;
                 if (this.methodName.equals(rhs.methodName) &&
                         this.methodRetTypeName.equals(rhs.methodRetTypeName) &&
-                        this.isVoid == rhs.isVoid &&
                         this.closureOfRet.equals(rhs.closureOfRet) &&
-                        this.arguments.equals(rhs.arguments) &&
-                        this.parameters.equals(rhs.parameters))
+                        this.parametersType.equals(rhs.parametersType))
                     return true;
                 else
                     return false;
@@ -416,7 +473,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
         @Override
         public int hashCode() {
-            return Objects.hash(methodName, methodRetTypeName, isVoid, closureOfRet, arguments, parameters);
+            return Objects.hash(methodName, methodRetTypeName, closureOfRet, parametersType);
         }
     }
 
