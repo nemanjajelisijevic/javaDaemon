@@ -1757,7 +1757,7 @@ public class Game {
                         enemy.getLastCoordinates().getFirst(),
                         enemy.getLastCoordinates().getSecond(),
                         velocity,
-                        ret2 ->{
+                        ret2 -> {
 
                             ret2.runtimeCheckAndGet();
 
@@ -1831,7 +1831,7 @@ public class Game {
         });
     }
 
-    private Closure<Boolean> moneyGoToClosure = moneyGoToRet->{
+    private Closure<Boolean> moneyGoToClosure = moneyGoToRet -> {
 
         moneyGoToRet.runtimeCheckAndGet();
 
