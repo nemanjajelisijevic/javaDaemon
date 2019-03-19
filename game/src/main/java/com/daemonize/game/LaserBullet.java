@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-@Daemonize(doubleDaemonize = true)
+@Daemonize(doubleDaemonize = true, daemonizeBaseClasses = true)
 public class LaserBullet extends Bullet {
 
     protected List<ImageView> views;
@@ -48,12 +48,6 @@ public class LaserBullet extends Bullet {
 
     @CallingThread
     @Override
-    public int getDamage() {
-        return super.getDamage();
-    }
-
-    @CallingThread
-    @Override
     public void setCoordinates(float lastX, float lastY) {
         super.setCoordinates(lastX, lastY);
     }
@@ -73,11 +67,6 @@ public class LaserBullet extends Bullet {
         super(sprite, velocity, startingPos, damage, 0, dXY);
         this.phaseLock = new DaemonCountingLatch();
         this.phaseLock.subscribe();
-    }
-
-    @Override
-    public void rotate(int angle) throws InterruptedException {
-        super.rotate(angle);
     }
 
     public List<ImageView> desintegrateTarget(

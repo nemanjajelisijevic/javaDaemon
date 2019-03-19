@@ -22,7 +22,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-@Daemonize(doubleDaemonize = true)
+@Daemonize(doubleDaemonize = true, daemonizeBaseClasses = true)
 public class Tower extends RotatingSpriteImageMover {
 
     public enum TowerType {
@@ -133,19 +133,8 @@ public class Tower extends RotatingSpriteImageMover {
 
     @CallingThread
     @Override
-    public Pair<Float, Float> getLastCoordinates() {
-        return super.getLastCoordinates();
-    }
-
-    @CallingThread
-    @Override
     public void setRotationSprite(Image[] rotationSprite) {
         super.setRotationSprite(rotationSprite);
-    }
-
-    @Override
-    public void rotateTowards(float x, float y) throws InterruptedException {
-        super.rotateTowards(x, y);
     }
 
     private Pair<TowerType, EnemyDoubleDaemon> scanRet = Pair.create(null, null);

@@ -1,8 +1,6 @@
 package com.daemonize.game;
 
 
-import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.ImageTranslationMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
@@ -16,11 +14,10 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 
-@Daemonize(doubleDaemonize = true, className = "BulletDoubleDaemon")
+@Daemonize(doubleDaemonize = true, daemonizeBaseClasses = true, className = "BulletDoubleDaemon")
 public class Bullet extends CoordinatedImageTranslationMover {
 
     private ImageView view;
@@ -49,19 +46,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     @CallingThread
     @Override
-    public void clearVelocity() {
-        super.clearVelocity();
-    }
-
-    @CallingThread
-    @Override
-    public void setCoordinates(float lastX, float lastY) {
-        super.setCoordinates(lastX, lastY);
-    }
-
-
-    @CallingThread
-    @Override
     public void setVelocity(Velocity velocity) {
         super.setVelocity(velocity);
     }
@@ -70,24 +54,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @Override
     public void setVelocity(float velocity) {
         super.setVelocity(velocity);
-    }
-
-    @CallingThread
-    @Override
-    public Velocity getVelocity() {
-        return super.getVelocity();
-    }
-
-    @CallingThread
-    @Override
-    public Pair<Float, Float> getLastCoordinates() {
-        return super.getLastCoordinates();
-    }
-
-    @CallingThread
-    @Override
-    public Pair<Float, Float> getTargetCoordinates() {
-        return super.getTargetCoordinates();
     }
 
     @CallingThread
@@ -150,12 +116,6 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     @GenerateRunnable
     @Override
-    public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
-        return super.goTo(x, y, velocityInt);
-    }
-
-    @GenerateRunnable
-    @Override
     public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
         this.velocity.intensity = velocity;
         rotationMover.pushSprite(sprite, velocity);
@@ -178,26 +138,9 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return goTo(x, y, velocityInt);
     }
 
-    @CallingThread
-    @Override
-    public void pause() {
-        super.pause();
-    }
-
-    @CallingThread
-    @Override
-    public void cont() {
-        super.cont();
-    }
-
     @Override
     public Image iterateSprite() {
         return rotationMover.iterateSprite();
-    }
-
-    @Override
-    public PositionedImage animate() throws InterruptedException {
-        return super.animate();
     }
 
     @SideQuest(SLEEP = 25)
@@ -276,17 +219,5 @@ public class Bullet extends CoordinatedImageTranslationMover {
         root.addChild(new GenericNode<>(Pair.create(posImage2,view2)));
         return root;
 
-    }
-
-    @CallingThread
-    @Override
-    public void setOutOfBordersConsumer(Consumer consumer) {
-        super.setOutOfBordersConsumer(consumer);
-    }
-
-    @CallingThread
-    @Override
-    public void setOutOfBordersClosure(Runnable outOfBordersClosure) {
-        super.setOutOfBordersClosure(outOfBordersClosure);
     }
 }

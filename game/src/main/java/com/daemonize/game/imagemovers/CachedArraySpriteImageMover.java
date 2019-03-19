@@ -1,5 +1,6 @@
 package com.daemonize.game.imagemovers;
 
+import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.game.Pair;
 import com.daemonize.game.images.Image;
 
@@ -21,6 +22,7 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
         }
     }
 
+    @CallingThread
     public void popSprite() {
         cache.clearCache();
     }

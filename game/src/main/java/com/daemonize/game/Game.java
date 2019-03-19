@@ -1207,6 +1207,7 @@ public class Game {
                     gameConsumer,
                     (MoneyHandler) new MoneyHandler(moneyNumbersImages, dollarSign, dXY).setBorders(0, borderX, 0, borderY)
             ).setName("Money handler Daemon")
+             .setCoordinates(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY())
              .setAmount(0)
              .setOutOfBordersConsumer(gameConsumer)
              .setOutOfBordersClosure(()->{
@@ -1663,20 +1664,9 @@ public class Game {
             else {
 
                 enemyRepo.add(enemy);
-
                 moneyDaemon.setAmount(1)
                         .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToRet ->{
-
-                            moneyGoToRet.runtimeCheckAndGet();
-
-                            renderer.consume(()->{
-                                moneyView.getFirst().hide();
-                                moneyView.getSecond().hide();
-                            });
-
-                            renderer.consume(()->infoScore.setNumbers(++score));
-                        });
+                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
                 renderer.consume(()->{
                     moneyView.getFirst().show();
@@ -1790,18 +1780,9 @@ public class Game {
 
                                     enemyRepo.add(enemy);
 
-                                    moneyDaemon.setAmount(1).setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                                            .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToRet->{
-
-                                                moneyGoToRet.runtimeCheckAndGet();
-
-                                                renderer.consume(()->{
-                                                    moneyView.getFirst().hide();
-                                                    moneyView.getSecond().hide();
-                                                });
-
-                                                renderer.consume(()->infoScore.setNumbers(++score));
-                                            });
+                                    moneyDaemon.setAmount(1)
+                                            .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
+                                            .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
                                     renderer.consume(()->{
                                         moneyView.getFirst().show();
@@ -1837,18 +1818,9 @@ public class Game {
                 Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
                 enemyRepo.add(enemy);
 
-                moneyDaemon.setAmount(1).setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToRet->{
-
-                            moneyGoToRet.runtimeCheckAndGet();
-
-                            renderer.consume(()->{
-                                moneyView.getFirst().hide();
-                                moneyView.getSecond().hide();
-                            });
-
-                            renderer.consume(()->infoScore.setNumbers(++score));
-                        });
+                moneyDaemon.setAmount(1)
+                        .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
+                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
                 renderer.consume(()->{
                     moneyView.getFirst().show();
@@ -1857,4 +1829,17 @@ public class Game {
             }
         });
     }
+
+    private Closure<Boolean> moneyGoToClosure = moneyGoToRet->{
+
+        moneyGoToRet.runtimeCheckAndGet();
+
+        renderer.consume(()->{
+            moneyView.getFirst().hide();
+            moneyView.getSecond().hide();
+        });
+
+        renderer.consume(()->infoScore.setNumbers(++score));
+    };
+
 }

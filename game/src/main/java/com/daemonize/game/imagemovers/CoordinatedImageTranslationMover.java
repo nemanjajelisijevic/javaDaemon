@@ -3,6 +3,8 @@ package com.daemonize.game.imagemovers;
 
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonprocessor.annotations.CallingThread;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.game.Bullet;
 import com.daemonize.game.Enemy;
 import com.daemonize.game.Pair;
@@ -28,11 +30,12 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         this.targetY = targetY;
     }
 
+    @CallingThread
     public Pair<Float, Float> getTargetCoordinates() {
         return Pair.create(targetX, targetY);
     }
 
-    public CoordinatedImageTranslationMover(
+    public  CoordinatedImageTranslationMover(
             Image [] sprite,
             float velocity,
             Pair<Float, Float> startingPos,
@@ -66,16 +69,17 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         return ret;
     }
 
+    @CallingThread
     @Override
     public void setCoordinates(float lastX, float lastY) {
-        //coordinateLock.lock();
         super.setCoordinates(lastX, lastY);
         setTargetCoordinates(0F, 0F);
-        //coordinateLock.unlock();
     }
 
     @Override
     public PositionedImage animate() throws InterruptedException {
+
+        PositionedImage ret = super.animate();
 
         Pair<Float, Float> lastCoord = getLastCoordinates();
 
@@ -89,7 +93,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
             return null;
         }
 
-        return super.animate();
+        return ret;
     }
 
 }

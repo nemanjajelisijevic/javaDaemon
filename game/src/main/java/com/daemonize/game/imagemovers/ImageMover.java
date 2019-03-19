@@ -3,12 +3,12 @@ package com.daemonize.game.imagemovers;
 
 import com.daemonize.game.Pair;
 import com.daemonize.game.images.Image;
-//import com.daemonize.daemonprocessor.annotations.CallingThread;
-//import com.daemonize.daemonprocessor.annotations.Daemonize;
-//import com.daemonize.daemonprocessor.annotations.SideQuest;
+import com.daemonize.daemonprocessor.annotations.CallingThread;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 
-//@Daemonize
+@Daemonize
 public interface ImageMover {
 
     class Velocity {
@@ -53,10 +53,10 @@ public interface ImageMover {
         }
     }
 
-    //@CallingThread
+    @CallingThread
     Pair<Float, Float> getLastCoordinates();
 
-    //@CallingThread
+    @CallingThread
     Velocity getVelocity();
 
     void setCoordinates(float lastX, float lastY);
@@ -69,10 +69,10 @@ public interface ImageMover {
 
     void setVelocity(float velocity);
 
-    //@CallingThread
+    @CallingThread
     <K extends ImageMover> K setBorders(float x1, float x2, float y1, float y2);
 
-    //@SideQuest(SLEEP = 25)
-     PositionedImage animate() throws InterruptedException;
+    @SideQuest(SLEEP = 25)
+    PositionedImage animate() throws InterruptedException;
 
 }

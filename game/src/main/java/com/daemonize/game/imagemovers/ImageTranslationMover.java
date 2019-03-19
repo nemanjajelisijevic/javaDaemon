@@ -4,7 +4,9 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.game.Enemy;
+import com.daemonize.game.MoneyHandler;
 import com.daemonize.game.Pair;
 import com.daemonize.game.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.game.imagemovers.spriteiterators.SpriteIterator;
@@ -21,6 +23,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     private float dXY;
 
+    @CallingThread
     public float getdXY() {
         return dXY;
     }
@@ -30,6 +33,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     protected volatile Velocity velocity;
 
+    @CallingThread
     public void clearVelocity() {
         velocity.intensity = 0;
         velocity.direction.coeficientX = 0;
@@ -54,11 +58,13 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return this;
     }
 
+    @CallingThread
     @Override
     public Pair<Float, Float> getLastCoordinates() {
         return Pair.create(lastX, lastY);
     }
 
+    @CallingThread
     @Override
     public Velocity getVelocity() {
         return velocity;
@@ -145,10 +151,12 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         this.velocity.intensity = velocity;
     }
 
+    @CallingThread
     public void pause(){
         pauseSemaphore.stop();
     }
 
+    @CallingThread
     public void cont(){
         pauseSemaphore.go();
     }
@@ -156,10 +164,12 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     private Consumer outOfBordersConsumer;
     private Runnable outOfBordersClosure;
 
+    @CallingThread
     public void setOutOfBordersConsumer(Consumer consumer) {
         this.outOfBordersConsumer = consumer;
     }
 
+    @CallingThread
     public void setOutOfBordersClosure(Runnable closure) {
         this.outOfBordersClosure = closure;
     }

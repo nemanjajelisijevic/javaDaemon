@@ -1,7 +1,5 @@
 package com.daemonize.game;
 
-import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
@@ -15,7 +13,7 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import java.util.Arrays;
 
 
-@Daemonize(doubleDaemonize = true, className = "EnemyDoubleDaemon")
+@Daemonize(doubleDaemonize = true, daemonizeBaseClasses = true, className = "EnemyDoubleDaemon")
 public class Enemy extends CoordinatedImageTranslationMover {
 
     private ImageView view;
@@ -26,16 +24,6 @@ public class Enemy extends CoordinatedImageTranslationMover {
     private Image[] spriteHealthBarImage;
 
     private Pair<Integer, Integer> previousField;
-
-    @CallingThread
-    public void setOutOfBordersConsumer(Consumer consumer) {
-        super.setOutOfBordersConsumer(consumer);
-    }
-
-    @CallingThread
-    public void setOutOfBordersClosure(Runnable outOfBordersClosure) {
-        super.setOutOfBordersClosure(outOfBordersClosure);
-    }
 
     @CallingThread
     public Pair<Integer, Integer> getPreviousField() {
@@ -84,6 +72,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return view;
     }
 
+    @CallingThread
     public Enemy setView(ImageView view) {
         this.view = view;
         return this;
@@ -99,24 +88,6 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return this;
     }
 
-    @CallingThread
-    @Override
-    public void setCoordinates(float lastX, float lastY) {
-        super.setCoordinates(lastX, lastY);
-    }
-
-    @CallingThread
-    @Override
-    public void clearVelocity() {
-        super.clearVelocity();
-    }
-
-    @CallingThread
-    @Override
-    public Pair<Float, Float> getLastCoordinates() {
-        return super.getLastCoordinates();
-    }
-
     public Enemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
         super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
         this.hp = hp;
@@ -130,48 +101,14 @@ public class Enemy extends CoordinatedImageTranslationMover {
         rotationMover.pushSprite(sprite, velocity);
     }
 
-    @CallingThread
-    @Override
-    public void popSprite() {
-        super.popSprite();
+    public void rotate(int angle) throws InterruptedException {
+        rotationMover.rotate(angle);
     }
 
     @DedicatedThread
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
-    }
-
-    public void rotate(int angle) throws InterruptedException {
-        rotationMover.rotate(angle);
-    }
-
-    @CallingThread
-    @Override
-    public void pause() {
-        super.pause();
-    }
-
-    @CallingThread
-    @Override
-    public void cont() {
-        super.cont();
-    }
-
-    @CallingThread
-    @Override
-    public Velocity getVelocity() {
-        return super.getVelocity();
-    }
-
-    @Override
-    public void setVelocity(Velocity velocity) {
-        super.setVelocity(velocity);
-    }
-
-    @Override
-    public void setVelocity(float velocity) {
-        super.setVelocity(velocity);
     }
 
     @Override
@@ -197,11 +134,5 @@ public class Enemy extends CoordinatedImageTranslationMover {
         root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
 
         return root;
-    }
-
-    @CallingThread
-    @Override
-    public String toString() {
-        return super.toString() + "\nEnemy - previous Row:  " + previousField.getFirst() + ", previous Column: " + previousField.getSecond();
     }
 }
