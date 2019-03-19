@@ -1819,6 +1819,7 @@ public class Game {
                 });
 
             } else {
+
                 Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
 
                 enemyRepo.add(enemy);
