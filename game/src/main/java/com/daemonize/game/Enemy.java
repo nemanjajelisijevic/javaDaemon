@@ -13,7 +13,7 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import java.util.Arrays;
 
 
-@Daemonize(doubleDaemonize = true, daemonizeBaseClasses = true, className = "EnemyDoubleDaemon")
+@Daemonize(doubleDaemonize = true, daemonizeBaseMethods = true, className = "EnemyDoubleDaemon")
 public class Enemy extends CoordinatedImageTranslationMover {
 
     private ImageView view;

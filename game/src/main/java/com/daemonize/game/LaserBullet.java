@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-@Daemonize(doubleDaemonize = true, daemonizeBaseClasses = true)
+@Daemonize(doubleDaemonize = true, daemonizeBaseMethods = true)
 public class LaserBullet extends Bullet {
 
     protected List<ImageView> views;

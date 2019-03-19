@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@Daemonize(doubleDaemonize = true, daemonizeBaseClasses = true, className = "BulletDoubleDaemon")
+@Daemonize(doubleDaemonize = true, daemonizeBaseMethods = true, className = "BulletDoubleDaemon")
 public class Bullet extends CoordinatedImageTranslationMover {
 
     private ImageView view;

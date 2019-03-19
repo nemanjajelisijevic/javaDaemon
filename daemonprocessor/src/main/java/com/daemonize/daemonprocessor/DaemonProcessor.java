@@ -78,7 +78,7 @@ public class DaemonProcessor extends AbstractProcessor {
                 );
 
                 List<ExecutableElement> publicPrototypeMethods =
-                        classElement.getAnnotation(Daemonize.class).daemonizeBaseClasses() ?
+                        classElement.getAnnotation(Daemonize.class).daemonizeBaseMethods() ?
                                 BaseDaemonGenerator.getPublicClassMethodsWithBaseClasses(classElement) :
                                 BaseDaemonGenerator.getPublicClassMethods(classElement);
 

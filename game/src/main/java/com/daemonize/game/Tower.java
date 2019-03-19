@@ -1,7 +1,6 @@
 package com.daemonize.game;
 
 
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
@@ -22,7 +21,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-@Daemonize(doubleDaemonize = true, daemonizeBaseClasses = true)
+@Daemonize(doubleDaemonize = true, daemonizeBaseMethods = true)
 public class Tower extends RotatingSpriteImageMover {
 
     public enum TowerType {
