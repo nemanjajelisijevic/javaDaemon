@@ -1800,6 +1800,7 @@ public class Game {
     public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, long duration) {
 
         laser.desintegrateTarget(source, enemy, duration, renderer, ret->{
+
             int newHp = enemy.getHp() - laser.getDamage();
             if (newHp > 0) {
 
