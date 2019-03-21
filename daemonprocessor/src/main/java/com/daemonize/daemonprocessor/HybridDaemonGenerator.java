@@ -96,12 +96,12 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
 //            );
 //        }
 
-
-        Set<String> dedicatedEnginesNameSet = new HashSet<>();
-
         //add dedicated daemon engines
+
+        Set<String> dedNameSet = new HashSet<>(mainGenerator.dedicatedEnginesNameSet);
+
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
-            if (!dedicatedEnginesNameSet.contains(entry.getValue().getFirst())) {
+            if (dedNameSet.contains(entry.getValue().getFirst())) {
                 daemonClassBuilder.addField(entry.getValue().getSecond());
                 daemonConstructorBuilder.addStatement(
                         "this." + entry.getValue().getFirst() +
@@ -109,8 +109,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                                 + entry.getValue().getFirst() + "\")",
                         daemonEngineSimpleName
                 );
-
-                dedicatedEnginesNameSet.add(entry.getValue().getFirst());
+                dedNameSet.remove(entry.getValue().getFirst());
             }
         }
 
@@ -221,8 +220,11 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName), ParameterizedTypeName.get(ClassName.get(ArrayList.class), daemonStateClassName))
                 .addStatement("ret.add(" + mainGenerator.getDaemonEngineString() + ".getState())");
 
-        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet())
-            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".getState())");
+        //for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet())
+        //    builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".getState())");
+
+        for (String dedEngine : mainGenerator.dedicatedEnginesNameSet)
+            builder.addStatement("ret.add(" + dedEngine + ".getState())");
 
         return builder.addStatement("return ret").build();
     }
@@ -235,8 +237,11 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(Integer.class)))
                 .addStatement("ret.add(" + mainGenerator.getDaemonEngineString() + ".queueSize())");
 
-        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet())
-            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".queueSize())");
+//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet())
+//            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".queueSize())");
+
+        for (String dedEngine : mainGenerator.dedicatedEnginesNameSet)
+            builder.addStatement("ret.add(" + dedEngine + ".queueSize())");
 
         return builder.addStatement("return ret").build();
     }

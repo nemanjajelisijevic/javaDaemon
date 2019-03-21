@@ -871,9 +871,9 @@ public class Game {
                         renderer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
 
                         if (score > 2 && tow.getTowerLevel().currentLevel < 3)
-                            renderer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").show());
+                            renderer.consume(towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade")::show);
                         else
-                            renderer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide());
+                            renderer.consume(towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade")::hide);
 
                         score -= 2;
                         renderer.consume(()->infoScore.setNumbers(score));
@@ -881,7 +881,7 @@ public class Game {
 
 
             Button closeButton = new Button("Close", 0, 0, closeButtonImage)
-                    .onClick(()->renderer.consume(()-> towerUpgradeDialogue.getTowerUpgrade().hide()));
+                    .onClick(()->renderer.consume(towerUpgradeDialogue.getTowerUpgrade()::hide));
 
 
             Button saleButton = new Button("Sale", 0, 0, saleButtonImage)
@@ -965,7 +965,7 @@ public class Game {
             scene.addImageViews(selectTowerDialogue.getSelectTowerDialogue().getAllViews());
             scene.addImageView(scoreBackGrView);
 
-            renderer.consume(()->selectTowerDialogue.getSelectTowerDialogue().show());
+            renderer.consume(selectTowerDialogue.getSelectTowerDialogue()::show);
 
             for (ImageView view : viewsNum)
                 scene.addImageView(view);
@@ -1297,7 +1297,7 @@ public class Game {
                 EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy->enemy.setMaxHp(enemyHp).setHp(enemyHp));
 
 
-                System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + ", STATES: " +enemyDoubleDaemon.getEnginesState().toString());
+                System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + ", STATES: " + enemyDoubleDaemon.getEnginesState().toString());
 
                 System.out.println(DaemonUtils.tag() + "Enemy counter: " + enemyCounter);
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());
@@ -1639,10 +1639,12 @@ public class Game {
         else
             bulletDoubleDaemon.cont();
 
+        //TODO remove sanity check
         for(DaemonState state: bulletDoubleDaemon.getEnginesState())
             if (!state.equals(DaemonState.INITIALIZING) && !state.equals(DaemonState.IDLE) && !state.equals(DaemonState.SIDE_QUEST))
                 throw new IllegalStateException(bulletDoubleDaemon.getName() + " STATES: " + bulletDoubleDaemon.getEnginesState().toString());
 
+        //TODO remove sanity check
         for(Integer queueSize : bulletDoubleDaemon.getEnginesQueueSizes())
             if (queueSize != 0) throw new IllegalStateException(bulletDoubleDaemon.getName() + " MAIN QUEUE NOT EMPTY!!!!!!");
 

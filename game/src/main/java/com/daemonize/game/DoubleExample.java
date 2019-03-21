@@ -16,14 +16,14 @@ public class DoubleExample {
 
     public DoubleExample() {}
 
-    //@DedicatedThread(NAME = "FUCK")
+    @DedicatedThread(name = "FUCK")
     @ConsumerArg
     @GenerateRunnable
     public void testVoid(long sleepMillis) throws InterruptedException {
         Thread.sleep(sleepMillis);
     }
 
-    //@DedicatedThread(NAME = "FUCK")
+    @DedicatedThread(name = "FUCK")
     @ConsumerArg
     public synchronized boolean increment() throws InterruptedException {
         Thread.sleep(5000);
@@ -31,14 +31,11 @@ public class DoubleExample {
         return true;
     }
 
-
-/*
     @SideQuest
     public synchronized int logAndReturn() {
         //Log.i(DaemonUtils.tag(), "INSIDE DoubleExample logAndReturn COUNTER: " + Integer.toString(cnt));
         return cnt;
     }
-*/
 
 
 }

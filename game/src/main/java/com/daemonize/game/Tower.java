@@ -138,7 +138,7 @@ public class Tower extends RotatingSpriteImageMover {
 
     private Pair<TowerType, EnemyDoubleDaemon> scanRet = Pair.create(null, null);
 
-    @DedicatedThread
+    @DedicatedThread(name = "scan")
     public Pair<TowerType, EnemyDoubleDaemon> scan() throws InterruptedException {
 
         //pause scan semaphore
