@@ -16,6 +16,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,12 +97,9 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         for (Pair<ExecutableElement, DedicatedThread> dedicatedThreadMethod : dedicatedThreadMethods) {
 
-            String daemonEngineDedicatedString =
-                    dedicatedThreadMethod.getFirst().getSimpleName().toString() + daemonConcatEngineString;
-
-//            String daemonEngineDedicatedString = dedicatedThreadMethod.getSecond().NAME().isEmpty() ?
-//                    dedicatedThreadMethod.getFirst().getSimpleName().toString() + daemonConcatEngineString :
-//                    dedicatedThreadMethod.getSecond().NAME() + daemonConcatEngineString;
+            String daemonEngineDedicatedString = dedicatedThreadMethod.getSecond().name().isEmpty() ?
+                        dedicatedThreadMethod.getFirst().getSimpleName().toString() + daemonConcatEngineString :
+                        dedicatedThreadMethod.getSecond().name() + daemonConcatEngineString;
 
             dedicatedThreadEngines.put(
                     dedicatedThreadMethod.getFirst(),
@@ -176,15 +174,22 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addParameter(ClassName.get(classElement.asType()), PROTOTYPE_STRING)
                 .addStatement("this." + daemonEngineString + " = new $N(consumer).setName(this.getClass().getSimpleName())", daemonEngineSimpleName);
 
+
+        Set<String> dedicatedEnginesNameSet = new HashSet<>();
+
         //add dedicated daemon engines
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : dedicatedThreadEngines.entrySet()) {
-            daemonClassBuilder.addField(entry.getValue().getSecond());
-            daemonConstructorBuilder.addStatement(
-                    "this." + entry.getValue().getFirst() +
-                            " = new $N(consumer).setName(this.getClass().getSimpleName() + \" - "
-                            + entry.getValue().getFirst() + "\")",
-                    daemonEngineSimpleName
-            );
+            if (!dedicatedEnginesNameSet.contains(entry.getValue().getFirst())) {
+                daemonClassBuilder.addField(entry.getValue().getSecond());
+                daemonConstructorBuilder.addStatement(
+                        "this." + entry.getValue().getFirst() +
+                                " = new $N(consumer).setName(this.getClass().getSimpleName() + \" - "
+                                + entry.getValue().getFirst() + "\")",
+                        daemonEngineSimpleName
+                );
+
+                dedicatedEnginesNameSet.add(entry.getValue().getFirst());
+            }
         }
 
         MethodSpec daemonConstructor = daemonConstructorBuilder
@@ -325,7 +330,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                         "Prototype method {@link $N#$N}",
                         classElement.getNestingKind().equals(NestingKind.MEMBER)
                                 ? prototypeMethod.getEnclosingElement().toString()
-                                : prototypeMethod.getEnclosingElement().getSimpleName(),
+                                : ((TypeElement)prototypeMethod.getEnclosingElement()).getQualifiedName(),
                         prototypeMethod.getSimpleName()
                 );
 

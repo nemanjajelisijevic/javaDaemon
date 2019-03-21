@@ -11,9 +11,11 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -84,14 +86,32 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addStatement("this.daemonEngine = new $N(consumer).setName(this.getClass().getSimpleName())", daemonEngineSimpleName);
 
         //add dedicated daemon engines
+//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
+//            daemonClassBuilder.addField(entry.getValue().getSecond());
+//            daemonConstructorBuilder.addStatement(
+//                    "this." + entry.getValue().getFirst() +
+//                            " = new $N(consumer).setName(this.getClass().getSimpleName() + \" - "
+//                            + entry.getValue().getFirst() + "\")",
+//                    daemonEngineSimpleName
+//            );
+//        }
+
+
+        Set<String> dedicatedEnginesNameSet = new HashSet<>();
+
+        //add dedicated daemon engines
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
-            daemonClassBuilder.addField(entry.getValue().getSecond());
-            daemonConstructorBuilder.addStatement(
-                    "this." + entry.getValue().getFirst() +
-                            " = new $N(consumer).setName(this.getClass().getSimpleName() + \" - "
-                            + entry.getValue().getFirst() + "\")",
-                    daemonEngineSimpleName
-            );
+            if (!dedicatedEnginesNameSet.contains(entry.getValue().getFirst())) {
+                daemonClassBuilder.addField(entry.getValue().getSecond());
+                daemonConstructorBuilder.addStatement(
+                        "this." + entry.getValue().getFirst() +
+                                " = new $N(consumer).setName(this.getClass().getSimpleName() + \" - "
+                                + entry.getValue().getFirst() + "\")",
+                        daemonEngineSimpleName
+                );
+
+                dedicatedEnginesNameSet.add(entry.getValue().getFirst());
+            }
         }
 
         MethodSpec daemonConstructor = daemonConstructorBuilder
