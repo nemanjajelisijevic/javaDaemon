@@ -594,5 +594,20 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     }
 
 
+    public MethodSpec generateSetConsumerDaemonApiMethod() {
+        MethodSpec.Builder builder =  MethodSpec.methodBuilder("setConsumer")
+                .addParameter(consumer, "consumer")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement(daemonEngineString + ".setConsumer(consumer)");
+
+
+        for (String dedicatedEngine : dedicatedEnginesNameSet)
+            builder.addStatement(dedicatedEngine + ".setConsumer(consumer)");
+
+       return builder.addStatement("return this").build();
+    }
+
 
 }

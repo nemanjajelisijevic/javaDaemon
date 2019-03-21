@@ -182,7 +182,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
 
             daemonApiMethods.add(generateGetPrototypeDaemonApiMethod());
             daemonApiMethods.add(generateSetPrototypeDaemonApiMethod());
-            daemonApiMethods.add(generateStartDaemonApiMethod());
+            daemonApiMethods.add(mainGenerator.generateStartDaemonApiMethod());
 
             daemonApiMethods.add(generateClearDaemonApiMethod());
             daemonApiMethods.add(mainGenerator.generateDedicatedEnginesStopDaemonApiMethod());
@@ -193,7 +193,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
 
             daemonApiMethods.add(mainGenerator.generateDedicatedEnginesSetNameDaemonApiMethod());
             daemonApiMethods.add(generateGetNameDaemonApiMethod());
-            daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
+            daemonApiMethods.add(mainGenerator.generateSetConsumerDaemonApiMethod());
 
 //        }
 

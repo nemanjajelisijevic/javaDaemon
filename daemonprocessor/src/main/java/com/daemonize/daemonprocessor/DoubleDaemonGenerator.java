@@ -320,13 +320,16 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
     }
 
     public MethodSpec generateSetMainConsumerDaemonApiMethod() {
-        return MethodSpec.methodBuilder("setMainQuestConsumer")
+        MethodSpec.Builder builder =   MethodSpec.methodBuilder("setMainQuestConsumer")
                 .addParameter(consumer, "consumer")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
-                .addStatement(mainGenerator.getDaemonEngineString() + ".setConsumer(consumer)")
-                .addStatement("return this")
-                .build();
+                .addStatement(mainGenerator.getDaemonEngineString() + ".setConsumer(consumer)");
+
+        for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
+            builder.addStatement(dedicatedEngine + ".setConsumer(consumer)");
+
+        return builder.addStatement("return this").build();
     }
 
     public MethodSpec generateSetSideConsumerDaemonApiMethod() {
