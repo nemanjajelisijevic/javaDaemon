@@ -103,22 +103,9 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .addParameter(consumer, "consumer")
                 //.addParameter(consumer, "sideConsumer")
                 .addParameter(ClassName.get(classElement.asType()), PROTOTYPE_STRING)
-                .addStatement("this.$N = new $N(consumer).setName(this.getClass().getSimpleName() + \" - MAIN\")", MAIN_DAEMON_ENGINE_STRING, mainGenerator.getDaemonEngineSimpleName())
+                .addStatement("this.$N = new $N(consumer).setName(this.getClass().getSimpleName())", MAIN_DAEMON_ENGINE_STRING, mainGenerator.getDaemonEngineSimpleName())
                 .addStatement("this.$N = new $N().setName(this.getClass().getSimpleName() + \" - SIDE\")", SIDE_DAEMON_ENGINE_STRING, sideGenerator.getDaemonEngineSimpleName());
 
-        //add dedicated daemon engines
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
-//            daemonClassBuilder.addField(entry.getValue().getSecond());
-//            daemonConstructorBuilder.addStatement(
-//                    "this." + entry.getValue().getFirst() +
-//                            " = new $N(mainConsumer).setName(this.getClass().getSimpleName() + \" - "
-//                            + entry.getValue().getFirst() + "\")",
-//                    mainGenerator.getDaemonEngineSimpleName()
-////                    daemonEngineSimpleName
-//            );
-//        }
-
-        //dedicatedEnginesNameSet = new HashSet<>();
 
         //add dedicated daemon engines
         Set<String> dedNameSet = new HashSet<>(mainGenerator.dedicatedEnginesNameSet);
@@ -248,9 +235,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(MAIN_DAEMON_ENGINE_STRING + ".start()");
 
-//        for (Pair<String, FieldSpec> dedicatedEngine : mainGenerator.getDedicatedThreadEngines().values())
-//            methodSpecBuilder.addStatement(dedicatedEngine.getFirst() + ".start()");
-
         for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
             methodSpecBuilder.addStatement(dedicatedEngine + ".start()");
 
@@ -268,11 +252,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .addStatement(mainGenerator.getDaemonEngineString() + ".stop()")
                 .addStatement(sideGenerator.getDaemonEngineString() + ".stop()");
 
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
-//            builder.addStatement( entry.getValue().getFirst() + ".stop()");
-//
-//        }
-
         for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
             builder.addStatement(dedicatedEngine + ".stop()");
 
@@ -286,14 +265,8 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(daemonClassName)
-                .addStatement(mainGenerator.getDaemonEngineString() + ".queueStop(this)");
-                //.addStatement(sideGenerator.getDaemonEngineString() + ".stop()");
-
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
-//            builder.addStatement( entry.getValue().getFirst() + ".stop()");
-//        }
-
-        builder.addStatement("return this");
+                .addStatement(mainGenerator.getDaemonEngineString() + ".queueStop(this)")
+                .addStatement("return this");
 
         return builder.build();
     }
@@ -308,10 +281,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(mainGenerator.getDaemonEngineString() + ".setName(name + \" - MAIN\")")
                 .addStatement(sideGenerator.getDaemonEngineString() + ".setName(name + \" - SIDE\")");
-
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
-//            builder.addStatement(entry.getValue().getFirst() + ".setName(name +\" - " + entry.getValue().getFirst() + "\")");
-//        }
 
         for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
             builder.addStatement(dedicatedEngine + ".setName(name +\" - " + dedicatedEngine + "\")");
@@ -362,9 +331,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName), ParameterizedTypeName.get(ClassName.get(ArrayList.class), daemonStateClassName))
                 .addStatement("ret.add(" + mainGenerator.getDaemonEngineString() + ".getState())");
 
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet())
-//            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".getState())");
-
         for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
             builder.addStatement("ret.add(" + dedicatedEngine + ".getState())");
 
@@ -381,9 +347,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(Integer.class)))
                 .addStatement("ret.add(" + mainGenerator.getDaemonEngineString() + ".queueSize())");
 
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet())
-//            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".queueSize())");
-
         for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
             builder.addStatement("ret.add(" + dedicatedEngine + ".queueSize())");
 
@@ -397,9 +360,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(mainGenerator.getDaemonEngineString() + ".clear()");
-
-//        for (Pair<String, FieldSpec> dedicatedEngine : mainGenerator.getDedicatedThreadEngines().values())
-//            builder.addStatement(dedicatedEngine.getFirst() + ".clear()");
 
         for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
             builder.addStatement(dedicatedEngine + ".clear()");

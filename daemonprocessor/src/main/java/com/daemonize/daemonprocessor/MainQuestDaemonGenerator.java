@@ -449,11 +449,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(void.class)
                 .addStatement(daemonEngineString + ".stop()");
 
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : dedicatedThreadEngines.entrySet()) {
-//            builder.addStatement( entry.getValue().getFirst() + ".stop()");
-//
-//        }
-
         for (String dedicatedEngine : dedicatedEnginesNameSet)
             builder.addStatement(dedicatedEngine + ".stop()");
 
@@ -465,14 +460,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
-                .addStatement(daemonEngineString + ".queueStop(this)");
-
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : dedicatedThreadEngines.entrySet()) {
-//            builder.addStatement( entry.getValue().getFirst() + ".stop()");
-//
-//        }
-
-        builder.addStatement("return this");
+                .addStatement(daemonEngineString + ".queueStop(this)")
+                .addStatement("return this");
 
         return builder.build();
     }
@@ -484,10 +473,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".setName(name)");
-
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : dedicatedThreadEngines.entrySet()) {
-//            builder.addStatement(entry.getValue().getFirst() + ".setName(name +\" - " + entry.getValue().getFirst() + "\")");
-//        }
 
         for (String dedicatedEngine : dedicatedEnginesNameSet)
             builder.addStatement(dedicatedEngine + ".setName(name +\" - " + dedicatedEngine + "\")");
@@ -515,9 +500,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".interrupt()");
 
-//        for (Pair<String, FieldSpec> dedicatedEngine : getDedicatedThreadEngines().values())
-//            builder.addStatement(dedicatedEngine.getFirst() + ".interrupt()");
-
         for (String dedicatedEngine : dedicatedEnginesNameSet)
             builder.addStatement(dedicatedEngine + ".interrupt()");
 
@@ -533,9 +515,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".clear()");
 
-//        for (Pair<String, FieldSpec> dedicatedEngine : getDedicatedThreadEngines().values())
-//            builder.addStatement(dedicatedEngine.getFirst() + ".clear()");
-
         for (String dedicatedEngine : dedicatedEnginesNameSet)
             builder.addStatement(dedicatedEngine + ".clear()");
 
@@ -549,9 +528,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".clearAndInterrupt()");
-
-//        for (Pair<String, FieldSpec> dedicatedEngine : getDedicatedThreadEngines().values())
-//            builder.addStatement(dedicatedEngine.getFirst() + ".clearAndInterrupt()");
 
         for (String dedicatedEngine : dedicatedEnginesNameSet)
             builder.addStatement(dedicatedEngine + ".clearAndInterrupt()");
@@ -567,9 +543,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName), ParameterizedTypeName.get(ClassName.get(ArrayList.class), daemonStateClassName))
                 .addStatement("ret.add(" + getDaemonEngineString() + ".getState())");
 
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : getDedicatedThreadEngines().entrySet())
-//            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".getState())");
-
         for (String dedicatedEngine : dedicatedEnginesNameSet)
             builder.addStatement("ret.add(" + dedicatedEngine + ".getState())");
 
@@ -582,9 +555,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)))
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(Integer.class)))
                 .addStatement("ret.add(" + getDaemonEngineString() + ".queueSize())");
-
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : getDedicatedThreadEngines().entrySet())
-//            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".queueSize())");
 
         for (String dedicatedEngine : dedicatedEnginesNameSet)
             builder.addStatement("ret.add(" + dedicatedEngine + ".queueSize())");

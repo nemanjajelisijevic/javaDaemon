@@ -86,18 +86,6 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addStatement("this.daemonEngine = new $N(consumer).setName(this.getClass().getSimpleName())", daemonEngineSimpleName);
 
         //add dedicated daemon engines
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
-//            daemonClassBuilder.addField(entry.getValue().getSecond());
-//            daemonConstructorBuilder.addStatement(
-//                    "this." + entry.getValue().getFirst() +
-//                            " = new $N(consumer).setName(this.getClass().getSimpleName() + \" - "
-//                            + entry.getValue().getFirst() + "\")",
-//                    daemonEngineSimpleName
-//            );
-//        }
-
-        //add dedicated daemon engines
-
         Set<String> dedNameSet = new HashSet<>(mainGenerator.dedicatedEnginesNameSet);
 
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
@@ -220,9 +208,6 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName), ParameterizedTypeName.get(ClassName.get(ArrayList.class), daemonStateClassName))
                 .addStatement("ret.add(" + mainGenerator.getDaemonEngineString() + ".getState())");
 
-        //for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet())
-        //    builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".getState())");
-
         for (String dedEngine : mainGenerator.dedicatedEnginesNameSet)
             builder.addStatement("ret.add(" + dedEngine + ".getState())");
 
@@ -236,9 +221,6 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .returns(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)))
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(Integer.class)))
                 .addStatement("ret.add(" + mainGenerator.getDaemonEngineString() + ".queueSize())");
-
-//        for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet())
-//            builder.addStatement("ret.add(" + entry.getValue().getFirst() + ".queueSize())");
 
         for (String dedEngine : mainGenerator.dedicatedEnginesNameSet)
             builder.addStatement("ret.add(" + dedEngine + ".queueSize())");
