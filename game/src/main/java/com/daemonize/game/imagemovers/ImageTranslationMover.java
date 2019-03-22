@@ -23,6 +23,29 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     private float dXY;
 
+    protected float borderX1;
+    protected float borderX2;
+
+    protected float borderY1;
+    protected float borderY2;
+
+    private Consumer outOfBordersConsumer;
+    private Runnable outOfBordersClosure;
+    private PositionedImage ret = new PositionedImage();
+
+    protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore();
+    private DaemonSemaphore pauseSemaphore = new DaemonSemaphore();
+
+    public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
+        this.spriteIterator = new BasicSpriteIterator(sprite);
+        this.initVelocity = velocity;
+        this.velocity = new Velocity(velocity, new Direction(0, 0));
+        this.dXY = dXY;
+        lastX = startingPos.getFirst();
+        lastY = startingPos.getSecond();
+        animateSemaphore.stop();
+    }
+
     @CallingThread
     public float getdXY() {
         return dXY;
@@ -40,18 +63,19 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         velocity.direction.coeficientY = 0;
     }
 
-    protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore();
-    private DaemonSemaphore pauseSemaphore = new DaemonSemaphore();
-
+    @CallingThread
+    @Override
     public Image [] getSprite() {
         return spriteIterator.getSprite();
     }
 
+    @CallingThread
     @Override
     public int getSize() {
         return spriteIterator.getSize();
     }
 
+    @CallingThread
     @Override
     public ImageTranslationMover setSprite(Image[] sprite) {
         spriteIterator.setSprite(sprite);
@@ -70,40 +94,35 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return velocity;
     }
 
+    @CallingThread
     @Override
     public synchronized void setCoordinates(float lastX, float lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
     }
 
-    protected float borderX1;
-    protected float borderX2;
-
-    protected float borderY1;
-    protected float borderY2;
-
-    public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
-        this.spriteIterator = new BasicSpriteIterator(sprite);
-        this.initVelocity = velocity;
-        this.velocity = new Velocity(velocity, new Direction(0, 0));
-        this.dXY = dXY;
-        lastX = startingPos.getFirst();
-        lastY = startingPos.getSecond();
-        animateSemaphore.stop();
-    }
-
+    @CallingThread
+    @Override
     public Image iterateSprite() {
         return spriteIterator.iterateSprite();
     }
 
+    @CallingThread
     @Override
     public void setDirection(Direction direction) {
         this.velocity.direction = direction;
     }
 
+    @CallingThread
     @Override
     public void setVelocity(Velocity velocity) {
         this.velocity = velocity;
+    }
+
+    @CallingThread
+    @Override
+    public void setVelocity(float velocity) {
+        this.velocity.intensity = velocity;
     }
 
     @Override
@@ -119,15 +138,10 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         dX = x - lastX;
         dY = y - lastY;
 
-
         double hypotenuse = Math.sqrt(dX*dX + dY*dY);
 
         dX = dX / hypotenuse;
         dY = dY / hypotenuse;
-
-        if (Double.valueOf(dX).isNaN() || Double.valueOf(dY).isNaN()) {//TODO DEBUG
-            throw new IllegalStateException("SET DIRECTION COORDINATES NaN Value! INPUT X: " + x + ", Y: " + y + ", LAST X: " + lastX + ", LAST Y: " + lastY);
-        }
 
         velocity.intensity = velocityInt;
         velocity.direction.coeficientX = (float) dX;
@@ -146,11 +160,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return this;
     }
 
-    @Override
-    public void setVelocity(float velocity) {
-        this.velocity.intensity = velocity;
-    }
-
     @CallingThread
     public void pause(){
         pauseSemaphore.stop();
@@ -161,9 +170,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         pauseSemaphore.go();
     }
 
-    private Consumer outOfBordersConsumer;
-    private Runnable outOfBordersClosure;
-
     @CallingThread
     public void setOutOfBordersConsumer(Consumer consumer) {
         this.outOfBordersConsumer = consumer;
@@ -173,8 +179,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     public void setOutOfBordersClosure(Runnable closure) {
         this.outOfBordersClosure = closure;
     }
-
-    private PositionedImage ret = new PositionedImage();
 
     @Override
     public PositionedImage animate() throws InterruptedException {

@@ -43,7 +43,6 @@ public class AwaitedArraySprite<T> {
         }
     }
 
-
     public void await(Runnable action) throws InterruptedException {
         lock.lock();
         try {

@@ -279,11 +279,11 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
-                .addStatement(mainGenerator.getDaemonEngineString() + ".setName(name + \" - MAIN\")")
+                .addStatement(mainGenerator.getDaemonEngineString() + ".setName(name)")
                 .addStatement(sideGenerator.getDaemonEngineString() + ".setName(name + \" - SIDE\")");
 
         for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
-            builder.addStatement(dedicatedEngine + ".setName(name +\" - " + dedicatedEngine + "\")");
+            builder.addStatement(dedicatedEngine + ".setName(name + \" - " + dedicatedEngine + "\")");
 
         return builder.addStatement("return this").build();
     }

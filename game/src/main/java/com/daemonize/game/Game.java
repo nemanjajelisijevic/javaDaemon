@@ -1027,7 +1027,7 @@ public class Game {
                         enemy.getView().show();
                         enemy.getHpView().show();
                     });
-                    activeEnemies.add(enemy);
+                    activeEnemies.add(enemy.start());
                 }
             };
 
@@ -1310,8 +1310,7 @@ public class Game {
                         firstField.getCenterY()
                 );
 
-                enemyDoubleDaemon.start()
-                        .rotate(angle)
+                enemyDoubleDaemon.rotate(angle)
                         .goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
                         new Closure<Boolean>() {// gameConsumer
                             @Override
@@ -1732,12 +1731,7 @@ public class Game {
 
             if (!enemy.isShootable()) {
                 rocketDoubleDaemon.rotateAndGoTo(
-                        (int) RotatingSpriteImageMover.getAngle(
-                                launchX,
-                                launchY,
-                                sourceCoord.getFirst(),
-                                sourceCoord.getSecond()
-                        ),
+                        - angle,
                         sourceCoord.getFirst(),
                         sourceCoord.getSecond(),
                         4,

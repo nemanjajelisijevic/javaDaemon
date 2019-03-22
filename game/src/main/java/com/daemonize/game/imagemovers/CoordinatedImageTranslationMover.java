@@ -5,8 +5,6 @@ import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
-import com.daemonize.game.Bullet;
-import com.daemonize.game.Enemy;
 import com.daemonize.game.Pair;
 import com.daemonize.game.images.Image;
 
