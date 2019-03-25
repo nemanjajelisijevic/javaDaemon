@@ -166,6 +166,8 @@ public class Game {
     private Image[] laserSprite;
     private int laserViewNo = 50;
 
+    private DummyDaemon enemyParalyizer;
+
     //random int
     private Random random = new Random();
 
@@ -1244,6 +1246,8 @@ public class Game {
             for (ImageView laserView : laserViews)
                 laserView.setAbsoluteX(-100).setAbsoluteY(-100);
 
+            enemyParalyizer = DummyDaemon.create(gameConsumer, 3000).setName("Enemy Paralyzer");
+
             laser.start();
 
             //money handler start
@@ -1659,7 +1663,7 @@ public class Game {
                 return;
             }
 
-            int newHp = enemy.getHp() - bulletDoubleDaemon.getPrototype().getDamage();
+            int newHp = enemy.getHp() - bulletDoubleDaemon.getDamage();
             if (newHp > 0)
                 enemy.setHp(newHp);
             else {
@@ -1673,7 +1677,6 @@ public class Game {
                     moneyView.getFirst().show();
                     moneyView.getSecond().show();
                 });
-
             }
 
             bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
@@ -1803,8 +1806,7 @@ public class Game {
                 float enemyVelocity = enemy.getVelocity().intensity;
                 enemy.setHp(newHp).setVelocity(enemyVelocity / 4);
 
-                DummyDaemon enemyParalyizer = DummyDaemon.create(gameConsumer, 3000);
-                enemyParalyizer.setName("Enemy Paralyzer").start().setClosure(()->{
+                enemyParalyizer.start().setClosure(()->{
                     if (enemy.isShootable())
                         enemy.setVelocity(enemyVelocity);
                     enemyParalyizer.stop();

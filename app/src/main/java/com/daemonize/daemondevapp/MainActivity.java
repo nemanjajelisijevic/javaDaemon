@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.SurfaceView;
 import android.view.WindowManager;
 
 
@@ -43,12 +44,13 @@ public class MainActivity extends AppCompatActivity {
         int borderX = getResources().getDisplayMetrics().widthPixels;
         int borderY = getResources().getDisplayMetrics().heightPixels;
 
+        SurfaceView surfaceView = findViewById(R.id.surfaceView);
+        surfaceView.setZOrderOnTop(true);
+
         //layout = findViewById(R.id.cl);
 
         //renderer init
-        AndroidSurfaceViewRenderer renderer = new AndroidSurfaceViewRenderer(this);
-        //renderer.setWindowSize(borderX, borderY);
-        setContentView(renderer);
+        AndroidSurfaceViewRenderer renderer = new AndroidSurfaceViewRenderer(surfaceView);
 
         ImageLoader imageLoader = new AndroidImageLoader(this);
 

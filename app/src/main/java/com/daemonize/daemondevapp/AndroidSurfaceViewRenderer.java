@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -19,7 +20,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback {
+public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback {
 
     private Scene2D scene;
 
@@ -66,10 +67,10 @@ public class AndroidSurfaceViewRenderer extends SurfaceView implements Renderer2
     public void surfaceDestroyed(SurfaceHolder holder) {}
 
 
-    public AndroidSurfaceViewRenderer(Context context) {
-        super(context);
-        this.surfaceHolder = getHolder();
+    public AndroidSurfaceViewRenderer(SurfaceView surfaceView) {
+        this.surfaceHolder = surfaceView.getHolder();
         this.surfaceHolder.addCallback(this);
+        this.surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
         this.paint = new Paint();
         this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer");
     }
