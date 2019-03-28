@@ -2,7 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.game.images.Image;
-import com.daemonize.game.view.ImageView;
+import com.daemonize.game.scene.views.ImageView;
 
 public class InfoTable {
     private int x,y;

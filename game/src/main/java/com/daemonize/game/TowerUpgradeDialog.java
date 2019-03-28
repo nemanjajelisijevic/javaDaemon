@@ -1,8 +1,8 @@
 package com.daemonize.game;
 
 import com.daemonize.game.images.Image;
-import com.daemonize.game.view.Button;
-import com.daemonize.game.view.CompositeImageViewImpl;
+import com.daemonize.game.scene.views.Button;
+import com.daemonize.game.scene.views.CompositeImageViewImpl;
 
 public class TowerUpgradeDialog {
 

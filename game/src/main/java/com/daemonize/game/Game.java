@@ -1,7 +1,6 @@
 package com.daemonize.game;
 
-import com.daemonize.daemonengine.Daemon;
-import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
+
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
@@ -16,10 +15,10 @@ import com.daemonize.game.scene.Scene2D;
 import com.daemonize.game.tabel.Field;
 import com.daemonize.game.tabel.Grid;
 
-import com.daemonize.game.view.Button;
-import com.daemonize.game.view.CompositeImageViewImpl;
-import com.daemonize.game.view.ImageView;
-import com.daemonize.game.view.ImageViewImpl;
+import com.daemonize.game.scene.views.Button;
+import com.daemonize.game.scene.views.CompositeImageViewImpl;
+import com.daemonize.game.scene.views.ImageView;
+import com.daemonize.game.scene.views.ImageViewImpl;
 
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
@@ -34,7 +33,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -308,15 +306,15 @@ public class Game {
     }
 
     public Game onTouch(float x, float y) {
-        gameConsumer.consume(()->{
+        gameConsumer.consume(()-> {
             if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
                 towerUpgradeDialogue.getTowerUpgrade().checkCoordinates(x, y);
             else {
 
                 if (selectTowerDialogue.getSelectTowerDialogue().isShowing())
-                   selectTowerDialogue.getSelectTowerDialogue().checkCoordinates(x,y);
+                    selectTowerDialogue.getSelectTowerDialogue().checkCoordinates(x, y);
 
-                if (towerSelect == null )
+                if (towerSelect == null)
                     System.out.println("Select" + "please select tower");
                 else
                     setTower(x, y);
@@ -324,7 +322,6 @@ public class Game {
         });
         return this;
     }
-
 
     {
         //init state

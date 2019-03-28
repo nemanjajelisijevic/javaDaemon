@@ -8,7 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import com.daemonize.game.scene.Scene2D;
-import com.daemonize.game.view.ImageView;
+import com.daemonize.game.scene.views.ImageView;
 
 
 public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {

@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,8 +12,7 @@ import android.view.SurfaceView;
 import com.daemonize.game.renderer.DrawConsumer;
 import com.daemonize.game.renderer.Renderer2D;
 import com.daemonize.game.scene.Scene2D;
-import com.daemonize.game.view.ImageView;
-import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.game.scene.views.ImageView;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -29,6 +27,13 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
     private Condition dirtyCondition = dirtyLock.newCondition();
 
     private DrawConsumer drawConsumer;
+
+    private Thread drawThread;
+    private volatile boolean drawing;
+
+    private Paint paint;
+    private Canvas canvas;
+    private SurfaceHolder surfaceHolder;
 
     @Override
     public AndroidSurfaceViewRenderer setDirty() {
@@ -49,13 +54,6 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
         this.scene = scene;
         return this;
     }
-
-    private Thread drawThread;
-    private volatile boolean drawing;
-
-    private Paint paint;
-    private Canvas canvas;
-    private SurfaceHolder surfaceHolder;
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}

@@ -6,8 +6,8 @@ import com.daemonize.game.controller.TouchController;
 import com.daemonize.game.images.Image;
 import com.daemonize.game.renderer.Renderer2D;
 import com.daemonize.game.scene.Scene2D;
-import com.daemonize.game.view.Button;
-import com.daemonize.game.view.ImageViewImpl;
+import com.daemonize.game.scene.views.Button;
+import com.daemonize.game.scene.views.ImageViewImpl;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 

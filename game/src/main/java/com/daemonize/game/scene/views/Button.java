@@ -1,4 +1,4 @@
-package com.daemonize.game.view;
+package com.daemonize.game.scene.views;
 
 
 import com.daemonize.game.images.Image;

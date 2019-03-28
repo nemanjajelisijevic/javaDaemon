@@ -3,7 +3,7 @@ package com.daemonize.game;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
-import com.daemonize.game.view.ImageView;
+import com.daemonize.game.scene.views.ImageView;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
