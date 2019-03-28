@@ -343,7 +343,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
         MethodSpec.Builder pursueImplementation = MethodSpec.methodBuilder("pursue")
                 .addAnnotation(Override.class)
-                .addModifiers(Modifier.PROTECTED, Modifier.FINAL);
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL);
 
         pursueImplementation.returns(methodRetTypeName);
         pursueImplementation.addException(Exception.class);//TODO check this shit

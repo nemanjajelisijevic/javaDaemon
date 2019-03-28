@@ -1,11 +1,9 @@
 package com.daemonize.daemonengine.dummy;
 
-import com.daemonize.daemonengine.Daemon;
-import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.DummyQuest;
-import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.quests.BaseQuest;
 
 public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
 
@@ -16,7 +14,7 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
     }
 
     @Override
-    protected Quest getQuest() {
+    protected BaseQuest getQuest() {
         return dummyQuest;
     }
 

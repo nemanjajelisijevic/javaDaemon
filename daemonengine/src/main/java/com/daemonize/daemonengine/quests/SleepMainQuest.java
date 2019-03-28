@@ -9,7 +9,7 @@ public class SleepMainQuest extends MainQuest<Void> {
     }
 
     @Override
-    protected Void pursue() throws Exception {
+    public Void pursue() throws Exception {
         Thread.sleep(tts);
         return null;
     }

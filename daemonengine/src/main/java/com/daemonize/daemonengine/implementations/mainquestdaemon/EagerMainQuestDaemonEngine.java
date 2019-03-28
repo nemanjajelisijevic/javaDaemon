@@ -4,11 +4,11 @@ import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.MainQuest;
-import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.quests.BaseQuest;
 
 import java.util.concurrent.locks.Condition;
 
-public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine implements EagerDaemon {
+public class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine implements EagerDaemon {
 
   private final Condition mainQuestAvailable = mainQuestLock.newCondition();
 
@@ -17,7 +17,7 @@ public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine impl
   }
 
   @Override
-  protected boolean addMainQuest(MainQuest quest) {
+  public boolean addMainQuest(MainQuest quest) {
     boolean ret;
     mainQuestLock.lock();
     ret = mainQuestQueue.add(quest);//TODO check ret of this expression
@@ -33,9 +33,9 @@ public final class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine impl
   }
 
   @Override
-  protected Quest getQuest() {
+  protected BaseQuest getQuest() {
 
-    Quest ret = null;
+    BaseQuest ret = null;
     try {
       mainQuestLock.lock();
       while (mainQuestQueue.isEmpty()) {

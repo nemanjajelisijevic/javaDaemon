@@ -4,7 +4,7 @@ package com.daemonize.daemonengine.implementations.basedaemon;
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
@@ -52,11 +52,11 @@ public abstract class BaseDaemonEngine<D extends Daemon> implements Daemon {
     return state;
   }
 
-  protected abstract Quest getQuest();
+  protected abstract BaseQuest getQuest();
 
   private void loop(){
 
-    Quest currentQuest;
+    BaseQuest currentQuest;
 
     while (!state.equals(DaemonState.GONE_DAEMON)) {
 

@@ -12,7 +12,7 @@ public class ConsumeQuest extends MainQuest<Void> {
     }
 
     @Override
-    protected Void pursue() throws Exception {
+    public Void pursue() throws Exception {
         runnable.run();
         return null;
     }

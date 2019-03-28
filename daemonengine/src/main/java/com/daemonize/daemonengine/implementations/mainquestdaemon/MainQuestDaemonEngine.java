@@ -2,12 +2,10 @@ package com.daemonize.daemonengine.implementations.mainquestdaemon;
 
 
 import com.daemonize.daemonengine.Daemon;
-import com.daemonize.daemonengine.DaemonState;
-import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
-import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.quests.StopMainQuest;
 
 import java.util.LinkedList;
@@ -24,7 +22,7 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
     super(consumer);
   }
 
-  protected boolean addMainQuest(MainQuest quest) {
+  public boolean addMainQuest(MainQuest quest) {
     boolean ret;
     mainQuestLock.lock();
     ret = mainQuestQueue.add(quest);
@@ -38,8 +36,8 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
 
   //returns null
   @Override
-  protected Quest getQuest() {
-    Quest ret = null;
+  protected BaseQuest getQuest() {
+    BaseQuest ret = null;
     mainQuestLock.lock();
     if (!mainQuestQueue.isEmpty()) {
       ret = mainQuestQueue.poll();

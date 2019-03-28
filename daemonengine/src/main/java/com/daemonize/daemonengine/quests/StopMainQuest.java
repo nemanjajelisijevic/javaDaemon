@@ -13,7 +13,7 @@ public class StopMainQuest extends MainQuest<Void> {
     }
 
     @Override
-    protected Void pursue() {
+    public Void pursue() {
         daemon.stop();
         return null;
     }

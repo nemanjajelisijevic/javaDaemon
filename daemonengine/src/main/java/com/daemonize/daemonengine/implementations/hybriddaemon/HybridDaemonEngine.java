@@ -1,12 +1,11 @@
 package com.daemonize.daemonengine.implementations.hybriddaemon;
 
-import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.mainquestdaemon.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.sidequestdaemon.SideQuestDaemon;
 import com.daemonize.daemonengine.quests.MainQuest;
-import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
 
 public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQuestDaemon {
@@ -45,8 +44,8 @@ public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQue
   }
 
   @Override
-  protected Quest getQuest() {
-    Quest ret = super.getQuest();
+  protected BaseQuest getQuest() {
+    BaseQuest ret = super.getQuest();
     if (ret == null)
       ret = sideQuest;
     return ret;
