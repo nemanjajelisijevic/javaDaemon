@@ -91,6 +91,6 @@ public class AnonDaemon implements EagerDaemon<AnonDaemon> {
     @Override
     public AnonDaemon clear() {
         engine.clear();
-        return null;
+        return this;
     }
 }
