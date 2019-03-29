@@ -287,7 +287,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         for (Pair<TypeName, String> parameter : prototypeMethodData.getParameters()){
             mainQuestBuilder.addField(parameter.getFirst(), parameter.getSecond(),Modifier.PRIVATE);
             mainQuestConstructorBuilder.addParameter(parameter.getFirst(), parameter.getSecond());
-
         }
 
         if(!prototypeMethodData.isVoid()) {

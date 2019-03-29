@@ -1,11 +1,17 @@
 package com.daemonize.daemonengine.implementations.mainquestdaemon;
 
+import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
+import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.quests.AnonMainQuest;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
+import com.daemonize.daemonengine.quests.Quest;
+import com.daemonize.daemonengine.quests.VoidMainQuest;
 
+import java.util.List;
 import java.util.concurrent.locks.Condition;
 
 public class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine implements EagerDaemon {
@@ -14,6 +20,22 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine implements
 
   public EagerMainQuestDaemonEngine(Consumer consumer) {
     super(consumer);
+  }
+
+  public <T> EagerMainQuestDaemonEngine daemonize(Quest<T> quest, Closure<T> closure) {
+    addMainQuest((AnonMainQuest<T>)new AnonMainQuest(quest, closure).setConsumer(getConsumer())); //TODO check ret
+    return this;
+  }
+
+  public EagerMainQuestDaemonEngine daemonize(final Runnable quest, Runnable closure) {
+    addMainQuest((VoidMainQuest)new VoidMainQuest(closure) {
+      @Override
+      public Void pursue() throws Exception {
+        quest.run();
+        return null;
+      }
+    }.setConsumer(getConsumer()));
+    return this;
   }
 
   @Override
@@ -72,4 +94,28 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine implements
       return this;
   }
 
+  @Override
+  public EagerMainQuestDaemonEngine clear() {
+      return (EagerMainQuestDaemonEngine) super.clear();
+  }
+
+  @Override
+  public EagerMainQuestDaemonEngine setConsumer(Consumer consumer) {
+      return (EagerMainQuestDaemonEngine) super.setConsumer(consumer);
+  }
+
+  @Override
+  public EagerMainQuestDaemonEngine start() {
+      return (EagerMainQuestDaemonEngine) super.start();
+  }
+
+  @Override
+  public EagerMainQuestDaemonEngine queueStop() {
+      return (EagerMainQuestDaemonEngine) super.queueStop(this);
+  }
+
+  @Override
+  public List<DaemonState> getEnginesState() {
+      return super.getEnginesState();
+  }
 }

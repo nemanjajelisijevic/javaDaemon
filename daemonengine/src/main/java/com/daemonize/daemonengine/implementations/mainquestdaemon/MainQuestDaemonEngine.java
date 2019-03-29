@@ -2,11 +2,15 @@ package com.daemonize.daemonengine.implementations.mainquestdaemon;
 
 
 import com.daemonize.daemonengine.Daemon;
+import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
+import com.daemonize.daemonengine.quests.AnonMainQuest;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
+import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.StopMainQuest;
+import com.daemonize.daemonengine.quests.VoidMainQuest;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -20,6 +24,22 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
 
   public MainQuestDaemonEngine(Consumer consumer) {
     super(consumer);
+  }
+
+  public <T> MainQuestDaemonEngine daemonize(Quest<T> quest, Closure<T> closure) {
+    addMainQuest((AnonMainQuest<T>)new AnonMainQuest(quest, closure).setConsumer(getConsumer())); //TODO check ret
+    return this;
+  }
+
+  public MainQuestDaemonEngine daemonize(final Runnable quest, Runnable closure) {
+    addMainQuest((VoidMainQuest)new VoidMainQuest(closure) {
+      @Override
+      public Void pursue() throws Exception {
+        quest.run();
+        return null;
+      }
+    }.setConsumer(getConsumer()));
+    return this;
   }
 
   public boolean addMainQuest(MainQuest quest) {
