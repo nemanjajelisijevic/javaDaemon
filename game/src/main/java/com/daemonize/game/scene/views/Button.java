@@ -3,7 +3,7 @@ package com.daemonize.game.scene.views;
 
 import com.daemonize.game.images.Image;
 
-public class Button extends CompositeImageViewImpl implements ClickableImageView {
+public class Button extends CompositeImageViewImpl implements ClickableImageView<Button> {
 
     private Runnable onClickCallback;
 
@@ -15,7 +15,6 @@ public class Button extends CompositeImageViewImpl implements ClickableImageView
         super(name, absX, absY, z, image);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Button onClick(Runnable onclick) {
         this.onClickCallback = onclick;

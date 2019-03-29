@@ -36,12 +36,12 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
   }
 
   public <T> MainQuestDaemonEngine daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
-      addMainQuest((AnonMainQuest<T>)new AnonMainQuest(quest, closure).setConsumer(consumer)); //TODO check ret
+      addMainQuest((AnonMainQuest<T>) new AnonMainQuest(quest, closure).setConsumer(consumer)); //TODO check ret
       return this;
   }
 
   public MainQuestDaemonEngine daemonize(Consumer consumer, final VoidQuest quest, Runnable closure) {
-      addMainQuest((VoidMainQuest)new VoidMainQuest(closure) {
+      addMainQuest((VoidMainQuest) new VoidMainQuest(closure) {
           @Override
           public Void pursue() throws Exception {
               quest.pursue();

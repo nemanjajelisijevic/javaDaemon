@@ -51,7 +51,7 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine implements
   public boolean addMainQuest(MainQuest quest) {
     boolean ret;
     mainQuestLock.lock();
-    ret = mainQuestQueue.add(quest);//TODO check ret of this expression
+    ret = mainQuestQueue.add(quest);
     mainQuestAvailable.signal();
     mainQuestLock.unlock();
     return ret;
