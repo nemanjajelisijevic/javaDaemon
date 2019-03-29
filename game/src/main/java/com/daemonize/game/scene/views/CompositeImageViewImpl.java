@@ -140,9 +140,9 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     //@Override
     public void addChild(CompositeImageViewImpl child) {
         if(child.isRoot)
-            throw new IllegalStateException("Can not add a child view that is root. Please use non root constructor for this child view(" + child.viewName + ")");
-        child.setAbsoluteX((this.startingX + child.getRelativeX() ));//TODO check this -- need this because of root child
-        child.setAbsoluteY((this.startingY + child.getRelativeY() ));//TODO check this
+            throw new IllegalArgumentException("Can not add a child view that is root. Please use non root constructor for this child view(" + child.viewName + ")");
+        child.setAbsoluteX((this.startingX + child.getRelativeX()));//TODO check this -- need this because of root child
+        child.setAbsoluteY((this.startingY + child.getRelativeY()));//TODO check this
         child.setZindex(this.getZindex() + 1);
         this.addCh(child);
     }
