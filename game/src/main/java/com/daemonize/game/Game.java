@@ -180,6 +180,12 @@ public class Game {
 
     private float dXY;
 
+    //test DoubleDaemonEngine
+    private DoubleDaemonEngine ddTestEngine;
+    private CoordinatedImageTranslationMover ddTestMover;
+    private ImageView ddTestView;
+
+
     //closures
     private static class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
@@ -327,6 +333,17 @@ public class Game {
                 else
                     setTower(x, y);
             }
+
+            ddTestEngine.clearAndInterrupt();
+            renderer.consume(ddTestView::show);
+            ddTestEngine.daemonize(()->ddTestMover.goTo(x, y, enemyVelocity),ret->{
+                ret.runtimeCheckAndGet();
+                ddTestEngine.daemonize(()->ddTestMover.pushSprite(miniExplodeSprite, 0), ()->{
+                    ddTestMover.setSprite(bulletSpriteRocket);
+                    ddTestMover.setVelocity(0);
+                    ddTestEngine.daemonize(ddTestMover::animate, new ImageAnimateClosure(ddTestView));
+                });
+            });
         });
         return this;
     }
@@ -1231,6 +1248,8 @@ public class Game {
                 moneyView.getSecond().setImage(result.getSecond().image).setAbsoluteX(result.getSecond().positionX).setAbsoluteY(result.getSecond().positionY);
             });
 
+            ddTestView = scene.addImageView(new ImageViewImpl("ddTestView").setImage(bulletSprite[0]).setZindex(20).show());
+
             //prepare the scene and start the renderer
             scene.lockViews();
             scene.forEach(view->{
@@ -1434,6 +1453,25 @@ public class Game {
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
 
             towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).start();
+
+            ddTestEngine = new DoubleDaemonEngine(gameConsumer).setName("DdTestEngine");
+            ddTestMover = new CoordinatedImageTranslationMover(bulletSpriteRocket, enemyVelocity, Pair.create(grid.getField(5, 5).getCenterX(), grid.getField(5, 5).getCenterY()), dXY);
+            ddTestMover.setBorders(0, borderX, 0, borderY);
+            ddTestMover.setOutOfBordersConsumer(gameConsumer);
+            ddTestMover.setOutOfBordersClosure(()->{ddTestEngine.stop(); renderer.consume(ddTestView::hide);});
+
+            ddTestEngine.setSideQuest(renderer, ()->{Thread.sleep(30);return ddTestMover.animate();}).setClosure(new ImageAnimateClosure(ddTestView));
+
+            renderer.consume(ddTestView::show);
+
+            ddTestEngine.start().daemonize(()->ddTestMover.goTo(borderX, borderY, enemyVelocity), gone->{
+                gone.runtimeCheckAndGet();
+                ddTestEngine.daemonize(()->ddTestMover.pushSprite(miniExplodeSprite, 0), ()->{
+                    ddTestMover.setSprite(bulletSpriteRocket);
+                    ddTestMover.setVelocity(0);
+                    ddTestEngine.daemonize(ddTestMover::animate, new ImageAnimateClosure(ddTestView));
+                });
+            });
         });
     }
 

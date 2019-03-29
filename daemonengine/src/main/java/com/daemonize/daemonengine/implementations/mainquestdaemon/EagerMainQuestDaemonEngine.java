@@ -24,19 +24,27 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine implements
   }
 
   public <T> EagerMainQuestDaemonEngine daemonize(Quest<T> quest, Closure<T> closure) {
-    addMainQuest((AnonMainQuest<T>)new AnonMainQuest(quest, closure).setConsumer(getConsumer())); //TODO check ret
-    return this;
+    return daemonize(getConsumer(), quest, closure);
   }
 
   public EagerMainQuestDaemonEngine daemonize(final VoidQuest quest, Runnable closure) {
-    addMainQuest((VoidMainQuest)new VoidMainQuest(closure) {
-      @Override
-      public Void pursue() throws Exception {
-        quest.pursue();
-        return null;
-      }
-    }.setConsumer(getConsumer()));
-    return this;
+      return daemonize(getConsumer(), quest, closure);
+  }
+
+  public <T> EagerMainQuestDaemonEngine daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
+      addMainQuest((AnonMainQuest<T>)new AnonMainQuest(quest, closure).setConsumer(consumer)); //TODO check ret
+      return this;
+  }
+
+  public EagerMainQuestDaemonEngine daemonize(Consumer consumer, final VoidQuest quest, Runnable closure) {
+      addMainQuest((VoidMainQuest)new VoidMainQuest(closure) {
+          @Override
+          public Void pursue() throws Exception {
+              quest.pursue();
+              return null;
+          }
+      }.setConsumer(consumer));
+      return this;
   }
 
   @Override
