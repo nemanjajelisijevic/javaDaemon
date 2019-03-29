@@ -12,6 +12,7 @@ import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.daemonengine.quests.VoidQuest;
 
 public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQuestDaemon {
 
@@ -26,11 +27,11 @@ public class HybridDaemonEngine extends MainQuestDaemonEngine implements SideQue
     return this;
   }
 
-  public HybridDaemonEngine daemonize(final Runnable quest, Runnable closure) {
+  public HybridDaemonEngine daemonize(final VoidQuest quest, Runnable closure) {
     addMainQuest((VoidMainQuest)new VoidMainQuest(closure) {
       @Override
       public Void pursue() throws Exception {
-        quest.run();
+        quest.pursue();
         return null;
       }
     }.setConsumer(getConsumer()));

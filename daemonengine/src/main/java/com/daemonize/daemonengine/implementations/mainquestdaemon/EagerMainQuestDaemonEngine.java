@@ -10,6 +10,7 @@ import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.daemonengine.quests.VoidQuest;
 
 import java.util.List;
 import java.util.concurrent.locks.Condition;
@@ -27,11 +28,11 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonEngine implements
     return this;
   }
 
-  public EagerMainQuestDaemonEngine daemonize(final Runnable quest, Runnable closure) {
+  public EagerMainQuestDaemonEngine daemonize(final VoidQuest quest, Runnable closure) {
     addMainQuest((VoidMainQuest)new VoidMainQuest(closure) {
       @Override
       public Void pursue() throws Exception {
-        quest.run();
+        quest.pursue();
         return null;
       }
     }.setConsumer(getConsumer()));

@@ -11,6 +11,7 @@ import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.StopMainQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.daemonengine.quests.VoidQuest;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -31,11 +32,11 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
     return this;
   }
 
-  public MainQuestDaemonEngine daemonize(final Runnable quest, Runnable closure) {
+  public MainQuestDaemonEngine daemonize(final VoidQuest quest, Runnable closure) {
     addMainQuest((VoidMainQuest)new VoidMainQuest(closure) {
       @Override
       public Void pursue() throws Exception {
-        quest.run();
+        quest.pursue();
         return null;
       }
     }.setConsumer(getConsumer()));

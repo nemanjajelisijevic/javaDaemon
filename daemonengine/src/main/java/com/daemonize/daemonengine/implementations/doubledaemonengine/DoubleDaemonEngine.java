@@ -10,6 +10,7 @@ import com.daemonize.daemonengine.quests.AnonMainQuest;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.daemonengine.quests.VoidQuest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +30,11 @@ public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine> {
         return this;
     }
 
-    public DoubleDaemonEngine daemonize(final Runnable quest, Runnable closure) {
+    public DoubleDaemonEngine daemonize(final VoidQuest quest, Runnable closure) {
         mainQuestDaemonEngine.addMainQuest((VoidMainQuest)new VoidMainQuest(closure) {
             @Override
             public Void pursue() throws Exception {
-                quest.run();
+                quest.pursue();
                 return null;
             }
         }.setConsumer(mainQuestDaemonEngine.getConsumer()));
