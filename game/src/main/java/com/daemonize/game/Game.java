@@ -1,6 +1,9 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.implementations.doubledaemonengine.DoubleDaemonEngine;
+import com.daemonize.daemonengine.implementations.mainquestdaemon.EagerMainQuestDaemonEngine;
+import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
@@ -113,6 +116,8 @@ public class Game {
     private Tower.TowerType towerSelect;
 
     private Image[] currentTowerSprite;
+
+    private EagerMainQuestDaemonEngine towerSpriteUpgrader;
 
     //towers dialogue
     private TowerUpgradeDialog towerUpgradeDialogue;
@@ -244,6 +249,7 @@ public class Game {
 
     public void pause() {
         gameConsumer.consume(()->{
+            towerSpriteUpgrader.stop();
             enemyGenerator.stop();
             for (EnemyDoubleDaemon enemy : activeEnemies)
                 enemy.pause();
@@ -271,6 +277,7 @@ public class Game {
             for(BulletDoubleDaemon bullet : activeBullets)
                 bullet.cont();
             renderer.start();
+            towerSpriteUpgrader.start();
             paused = false;
         });
     }
@@ -291,6 +298,7 @@ public class Game {
 
     public Game stop(){
         gameConsumer.consume(()-> {
+            towerSpriteUpgrader.stop();
             moneyDaemon.stop();
             enemyGenerator.stop();
             for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
@@ -856,7 +864,7 @@ public class Game {
 
                         tow.setRotationSprite(currentSprite);
 
-                        tow.updateSprite(renderer, update -> {
+                        towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, update ->{
                             ImageMover.PositionedImage posBmp = update.runtimeCheckAndGet();
                             tow.getView().setAbsoluteX(posBmp.positionX);
                             tow.getView().setAbsoluteY(posBmp.positionY);
@@ -1424,6 +1432,8 @@ public class Game {
             }).setName("Start End field marker").start();
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
+
+            towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).start();
         });
     }
 
@@ -1517,6 +1527,7 @@ public class Game {
                     }).setName("Denied marker").start();
                 }
             } else {
+
 
                 {
                     renderer.consume(()->fieldView.setImage(currentTowerSprite[0]).show());
@@ -1638,15 +1649,6 @@ public class Game {
             bulletDoubleDaemon.start();
         else
             bulletDoubleDaemon.cont();
-
-        //TODO remove sanity check
-        for(DaemonState state: bulletDoubleDaemon.getEnginesState())
-            if (!state.equals(DaemonState.INITIALIZING) && !state.equals(DaemonState.IDLE) && !state.equals(DaemonState.SIDE_QUEST))
-                throw new IllegalStateException(bulletDoubleDaemon.getName() + " STATES: " + bulletDoubleDaemon.getEnginesState().toString());
-
-        //TODO remove sanity check
-        for(Integer queueSize : bulletDoubleDaemon.getEnginesQueueSizes())
-            if (queueSize != 0) throw new IllegalStateException(bulletDoubleDaemon.getName() + " MAIN QUEUE NOT EMPTY!!!!!!");
 
         bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, ret -> {
 
