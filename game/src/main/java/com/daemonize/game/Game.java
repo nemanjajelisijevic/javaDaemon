@@ -1758,13 +1758,6 @@ public class Game {
         else
             rocketDoubleDaemon.cont();
 
-        for(DaemonState state: rocketDoubleDaemon.getEnginesState())
-            if (!state.equals(DaemonState.INITIALIZING) && !state.equals(DaemonState.IDLE) && !state.equals(DaemonState.SIDE_QUEST))
-                throw new IllegalStateException(rocketDoubleDaemon.getName() + " STATES: " + rocketDoubleDaemon.getEnginesState().toString());
-
-        for(Integer queueSize : rocketDoubleDaemon.getEnginesQueueSizes())
-            if (queueSize != 0) throw new IllegalStateException(rocketDoubleDaemon.getName() + " MAIN QUEUE NOT EMPTY!!!!!!");
-
         rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, ret -> {
 
             ret.runtimeCheckAndGet();
