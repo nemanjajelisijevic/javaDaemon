@@ -7,6 +7,10 @@ public class Button extends CompositeImageViewImpl implements ClickableImageView
 
     private Runnable onClickCallback;
 
+    public Button(String name, Image image) {
+        super(name, image);
+    }
+
     public Button(String name, int relX, int relY, Image image) {
         super(name, relX, relY, image);
     }

@@ -47,6 +47,13 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     }
 
     //for child views
+    public CompositeImageViewImpl(String name, Image image) {
+        super(name);
+        childrenViews = new LinkedList<>();
+        this.setImage(image);
+    }
+
+    //for child views
     public CompositeImageViewImpl(String name, float relX, float relY, Image image) {
         super(name);
         childrenViews = new LinkedList<>();

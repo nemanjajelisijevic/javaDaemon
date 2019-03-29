@@ -859,7 +859,7 @@ public class Game {
                     scene.addImageView(new ImageViewImpl("Dollar Sign").setZindex(10).setImage(dollarSign).hide())
             );
 
-            Button upgradeButton = new Button("Upgrade", 0, 0, upgradeButtonImage)
+            Button upgradeButton = new Button("Upgrade", upgradeButtonImage)
                     .onClick(()->{
 
                         TowerDaemon tow = towerUpgradeDialogue.getTower();
@@ -904,11 +904,11 @@ public class Game {
                     });
 
 
-            Button closeButton = new Button("Close", 0, 0, closeButtonImage)
+            Button closeButton = new Button("Close", closeButtonImage)
                     .onClick(()->renderer.consume(towerUpgradeDialogue.getTowerUpgrade()::hide));
 
 
-            Button saleButton = new Button("Sale", 0, 0, saleButtonImage)
+            Button saleButton = new Button("Sale", saleButtonImage)
                     .onClick(()->{
                         TowerDaemon tower = towerUpgradeDialogue.getTower();
 
@@ -943,7 +943,7 @@ public class Game {
                     borderY / 2
             );
 
-            Button tow1 = new Button("TowerType1",0,0,redTower.get(0)[0]).onClick(()->{
+            Button tow1 = new Button("TowerType1", redTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE1;
                 currentTowerSprite = redTower.get(0);
                 renderer.consume(()->{
@@ -953,7 +953,7 @@ public class Game {
                 });
             });
 
-            Button tow2 = new Button("TowerType2",0,0,blueTower.get(0)[0]).onClick(()->{
+            Button tow2 = new Button("TowerType2", blueTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE2;
                 currentTowerSprite = blueTower.get(0);
                 renderer.consume(()->{
@@ -964,7 +964,7 @@ public class Game {
 
             });
 
-            Button tow3 = new Button("TowerType3",0,0,greenTower.get(0)[0]).onClick(()->{
+            Button tow3 = new Button("TowerType3", greenTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE3;
                 currentTowerSprite = greenTower.get(0);
                 renderer.consume(()->{
