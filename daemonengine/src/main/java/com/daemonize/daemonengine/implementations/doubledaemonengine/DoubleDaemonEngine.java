@@ -50,13 +50,7 @@ public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine> {
     }
 
     public <T> SideQuest<T> setSideQuest(Consumer consumer, final Quest<T> sideQuest) {
-        sideQuestDaemonEngine.setSideQuest((SideQuest) new SideQuest() {
-            @Override
-            public T pursue() throws Exception {
-                return sideQuest.pursue();
-            }
-        }.setConsumer(consumer));
-        return sideQuestDaemonEngine.getSideQuest();
+        return sideQuestDaemonEngine.setSideQuest(consumer, sideQuest);
     }
 
     @Override

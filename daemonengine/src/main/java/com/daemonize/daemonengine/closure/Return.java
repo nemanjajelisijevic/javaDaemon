@@ -18,6 +18,7 @@ public class Return<T> {
 
     public void setResult(T result) {
         this.result = result;
+        this.error = null;
     }
 
     void setError(Exception error, String daemonDescription) {
