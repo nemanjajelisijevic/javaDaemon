@@ -187,4 +187,9 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
     public float getHeight() {
         return getEndY() - getStartingY();
     }
+
+    @Override
+    public String toString() {
+        return viewName + ", isShowing: " + showing + ", Z index: " + zIndex;
+    }
 }

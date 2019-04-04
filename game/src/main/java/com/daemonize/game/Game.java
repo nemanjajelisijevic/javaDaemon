@@ -95,9 +95,16 @@ public class Game {
     private MoneyHandlerDaemon moneyDaemon;
 
     private Image[] dialogueImageTowerUpgrade;
+
     private Image upgradeButtonImage;
+    private Image upgradeButtonImagePressed;
+
     private Image saleButtonImage;
+    private Image saleButtonImagePressed;
+
     private Image closeButtonImage;
+    private Image closeButtonImagePressed;
+
     private Image scoreBackGrImage;
     private Image[] scorenumbersImages;
     private Image[] moneyNumbersImages;
@@ -421,8 +428,13 @@ public class Game {
                 int selectionHeight = borderY / 2;
 
                 upgradeButtonImage = imageLoader.loadImageFromAssets("ButtonUpgrade.png",borderX / 6,borderY / 10);
+                upgradeButtonImagePressed = imageLoader.loadImageFromAssets("ButtonUpgradePressed.png",borderX / 6,borderY / 10);
+
                 closeButtonImage = imageLoader.loadImageFromAssets("ButtonX.png",borderX / 20,borderY /  10);
+                closeButtonImagePressed = imageLoader.loadImageFromAssets("ButtonXPressed.png",borderX / 20,borderY /  10);
+
                 saleButtonImage = imageLoader.loadImageFromAssets("ButtonSale.png",borderX / 6,borderY / 10);
+                saleButtonImagePressed = imageLoader.loadImageFromAssets("ButtonSalePressed.png",borderX / 6,borderY / 10);
 
                 selection = imageLoader.loadImageFromAssets("greenOctagon.png", selectionWidth, selectionWidth);
                 deselection = imageLoader.loadImageFromAssets("redOctagon.png", selectionWidth, selectionWidth);
@@ -859,78 +871,97 @@ public class Game {
                     scene.addImageView(new ImageViewImpl("Dollar Sign").setZindex(10).setImage(dollarSign).hide())
             );
 
-            Button upgradeButton = new Button("Upgrade", upgradeButtonImage)
-                    .onClick(()->{
+            Button upgradeButton = new Button("Upgrade", upgradeButtonImage);
+            upgradeButton.onClick(()->{
 
-                        TowerDaemon tow = towerUpgradeDialogue.getTower();
-                        tow.levelUp();
+                TowerDaemon tow = towerUpgradeDialogue.getTower();
+                tow.levelUp();
 
-                        Image[] currentSprite = null;
+                Image[] currentSprite = null;
 
-                        switch (tow.getTowertype()) {
-                            case TYPE1:
-                                currentSprite = redTower.get(tow.getTowerLevel().currentLevel - 1);
-                                break;
-                            case TYPE2:
-                                currentSprite = blueTower.get(tow.getTowerLevel().currentLevel - 1);
-                                break;
-                            case TYPE3:
-                                currentSprite =  greenTower.get(tow.getTowerLevel().currentLevel - 1);
-                                break;
-                        }
+                switch (tow.getTowertype()) {
+                    case TYPE1:
+                        currentSprite = redTower.get(tow.getTowerLevel().currentLevel - 1);
+                        break;
+                    case TYPE2:
+                        currentSprite = blueTower.get(tow.getTowerLevel().currentLevel - 1);
+                        break;
+                    case TYPE3:
+                        currentSprite =  greenTower.get(tow.getTowerLevel().currentLevel - 1);
+                        break;
+                }
 
-                        tow.setRotationSprite(currentSprite);
+                tow.setRotationSprite(currentSprite);
 
-                        towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, update ->{
-                            ImageMover.PositionedImage posBmp = update.runtimeCheckAndGet();
-                            tow.getView().setAbsoluteX(posBmp.positionX);
-                            tow.getView().setAbsoluteY(posBmp.positionY);
-                            tow.getView().setImage(posBmp.image);
+                towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, update -> {
+                    ImageMover.PositionedImage posBmp = update.runtimeCheckAndGet();
+                    tow.getView().setAbsoluteX(posBmp.positionX);
+                    tow.getView().setAbsoluteY(posBmp.positionY);
+                    tow.getView().setImage(posBmp.image);
+                });
+
+
+                renderer.consume(()->upgradeButton.disable().setImage(upgradeButtonImagePressed));
+                towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
+
+                    tow.cont();
+
+                    CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
+
+                    renderer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
+
+                    if (score > 2 && tow.getTowerLevel().currentLevel < 3)
+                        renderer.consume(towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade")::show);
+                    else
+                        renderer.consume(towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade")::hide);
+
+                    score -= 2;
+
+                    renderer.consume(()->infoScore.setNumbers(score));
+                    renderer.consume(()->upgradeButton.enable().setImage(upgradeButtonImage));
+                });
+            });
+
+
+            Button closeButton = new Button("Close", closeButtonImage);
+            closeButton.onClick(()->{
+                renderer.consume(()->closeButton.disable().setImage(closeButtonImagePressed));
+                towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
+                    renderer.consume(()->closeButton.enable().setImage(closeButtonImage));
+                    renderer.consume(towerUpgradeDialogue.getTowerUpgrade()::hide);
+                });
+            });
+
+
+            Button saleButton = new Button("Sale", saleButtonImage);
+            saleButton.onClick(()->{
+
+                renderer.consume(()->saleButton.disable().setImage(saleButtonImagePressed));
+                towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
+                    TowerDaemon tower = towerUpgradeDialogue.getTower();
+
+                    Field field = grid.getField(
+                            tower.getLastCoordinates().getFirst(),
+                            tower.getLastCoordinates().getSecond()
+                    );
+
+                    //stop and remove tower
+                    tower.stop();
+                    towers.remove(tower);
+                    field.setTower(null);
+
+                    renderer.consume(()->saleButton.enable().setImage(saleButtonImage));
+
+                    //remove tower from grid and recalculate path
+                    if (grid.destroyTower(field.getRow(), field.getColumn())) {
+                        renderer.consume(()->{
+                            gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide();
+                            towerUpgradeDialogue.getTowerUpgrade().hide();
+                            infoScore.setNumbers(++score);
                         });
-
-                        tow.cont();
-
-                        CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
-
-                        renderer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
-
-                        if (score > 2 && tow.getTowerLevel().currentLevel < 3)
-                            renderer.consume(towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade")::show);
-                        else
-                            renderer.consume(towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade")::hide);
-
-                        score -= 2;
-                        renderer.consume(()->infoScore.setNumbers(score));
-                    });
-
-
-            Button closeButton = new Button("Close", closeButtonImage)
-                    .onClick(()->renderer.consume(towerUpgradeDialogue.getTowerUpgrade()::hide));
-
-
-            Button saleButton = new Button("Sale", saleButtonImage)
-                    .onClick(()->{
-                        TowerDaemon tower = towerUpgradeDialogue.getTower();
-
-                        Field field = grid.getField(
-                                tower.getLastCoordinates().getFirst(),
-                                tower.getLastCoordinates().getSecond()
-                        );
-
-                        //stop and remove tower
-                        tower.stop();
-                        towers.remove(tower);
-                        field.setTower(null);
-
-                        //remove tower from grid and recalculate path
-                        if (grid.destroyTower(field.getRow(), field.getColumn())) {
-                            renderer.consume(() -> {
-                                gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide();
-                                towerUpgradeDialogue.getTowerUpgrade().hide();
-                                infoScore.setNumbers(++score);
-                            });
-                        }
-                    });
+                    }
+                });
+            });
 
             towerUpgradeDialogue = new TowerUpgradeDialog(
                     borderX / 3,
@@ -1252,6 +1283,9 @@ public class Game {
 
             //prepare the scene and start the renderer
             scene.lockViews();
+
+            System.out.println(DaemonUtils.tag() + "Scene size: " + scene.getViews().size());
+
             scene.forEach(view->{
                 System.out.println(DaemonUtils.tag() + view.getName());
                 System.out.println(DaemonUtils.tag() + "X: " + view.getAbsoluteX());
@@ -1338,9 +1372,11 @@ public class Game {
                         firstField.getCenterY()
                 );
 
-                enemyDoubleDaemon.rotate(angle)
-                        .goTo(firstField.getCenterX(), firstField.getCenterY(), enemyVelocity,
-                        new Closure<Boolean>() {// gameConsumer
+                enemyDoubleDaemon.rotate(angle).goTo(
+                        firstField.getCenterX(),
+                        firstField.getCenterY(),
+                        enemyVelocity,
+                        new Closure<Boolean>() {
                             @Override
                             public void onReturn(Return<Boolean> ret) {
 
@@ -1455,12 +1491,16 @@ public class Game {
             towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).start();
 
 //            ddTestEngine = new DoubleDaemonEngine(gameConsumer).setName("DdTestEngine");
+//
 //            ddTestMover = new CoordinatedImageTranslationMover(bulletSpriteRocket, enemyVelocity, Pair.create(grid.getField(5, 5).getCenterX(), grid.getField(5, 5).getCenterY()), dXY);
 //            ddTestMover.setBorders(0, borderX, 0, borderY);
 //            ddTestMover.setOutOfBordersConsumer(gameConsumer);
-//            ddTestMover.setOutOfBordersClosure(()->{ddTestEngine.stop(); renderer.consume(ddTestView::hide);});
+//            ddTestMover.setOutOfBordersClosure(()->{
+//                ddTestEngine.stop();
+//                renderer.consume(ddTestView::hide);
+//            });
 //
-//            ddTestEngine.setSideQuest(renderer, ()->{Thread.sleep(30);return ddTestMover.animate();}).setClosure(new ImageAnimateClosure(ddTestView));
+//            ddTestEngine.setSideQuest(renderer, ()->{Thread.sleep(25);return ddTestMover.animate();}).setClosure(new ImageAnimateClosure(ddTestView));
 //
 //            renderer.consume(ddTestView::show);
 //
@@ -1565,7 +1605,6 @@ public class Game {
                     }).setName("Denied marker").start();
                 }
             } else {
-
 
                 {
                     renderer.consume(()->fieldView.setImage(currentTowerSprite[0]).show());
