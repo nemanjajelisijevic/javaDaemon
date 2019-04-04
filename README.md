@@ -1,8 +1,8 @@
 # javaDaemon
 
-***Edit: 
+***Edit:
 Readme.md has not been updated for quite some time now. But it will be soon.The project has moved forward and a demo 
-2D tower defense game has been made, running on both JavaFX and Android with the same code base. Below is the gif showing 
+2D tower defense sprite based game has been made, running on both JavaFX and Android with the same code base. Below is the gif showing 
 the sample. For the implementation glimpse see:
 https://github.com/nemanjajelisijevic/javaDaemon/blob/master/game/src/main/java/com/daemonize/game/Game.java
 
