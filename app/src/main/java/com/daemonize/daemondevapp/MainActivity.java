@@ -15,6 +15,7 @@ import com.daemonize.game.Game;
 import com.daemonize.game.images.Image;
 import com.daemonize.game.images.imageloader.ImageLoader;
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.game.renderer.Renderer2D;
 
 
 import java.io.IOException;
@@ -47,11 +48,8 @@ public class MainActivity extends AppCompatActivity {
         SurfaceView surfaceView = findViewById(R.id.surfaceView);
         surfaceView.setZOrderOnTop(true);
 
-        //layout = findViewById(R.id.cl);
-
         //renderer init
-        AndroidSurfaceViewRenderer renderer = new AndroidSurfaceViewRenderer(surfaceView);
-
+        Renderer2D renderer = new AndroidSurfaceViewRenderer(surfaceView);
         ImageLoader imageLoader = new AndroidImageLoader(this);
 
         int rows = 6;
