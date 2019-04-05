@@ -1055,18 +1055,12 @@ public class Game {
             enemyRepo = new QueuedEntityRepo<EnemyDoubleDaemon>() {
                 @Override
                 public void onAdd(EnemyDoubleDaemon enemy) {
-                    renderer.consume(()->{
-                        enemy.getHpView().hide();
-                        enemy.getHpView().setAbsoluteX(0);
-                        enemy.getHpView().setAbsoluteY(0);
-                    });
+                    enemy.setShootable(false).clearVelocity().clearAndInterrupt();
 
-                    enemy.setShootable(false).clearVelocity().pushSprite(explodeSprite, 0, ()->{
-                        renderer.consume(()->{
-                            enemy.getView().hide();
-                            enemy.getView().setAbsoluteX(0);
-                            enemy.getView().setAbsoluteY(0);
-                        });
+                    renderer.consume(()->enemy.getHpView().hide().setAbsoluteX(0).setAbsoluteY(0));
+
+                    enemy.pushSprite(explodeSprite, 0, ()->{
+                        renderer.consume(()->enemy.getView().hide().setAbsoluteX(0).setAbsoluteY(0));
                         enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
                     });
                     activeEnemies.remove(enemy);
@@ -1094,7 +1088,7 @@ public class Game {
                         for (ImageView view : bullet.getViews())
                             view.hide();
                     });
-                    bullet.clearVelocity().popSprite().pause();
+                    bullet.clearAndInterrupt().clearVelocity().popSprite().pause();
                     activeBullets.remove(bullet);
                 }
 
@@ -1119,7 +1113,7 @@ public class Game {
                         for (ImageView view : rocket.getViews())
                             view.hide();
                     });
-                    rocket.clearVelocity().popSprite().pause();
+                    rocket.clearAndInterrupt().clearVelocity().popSprite().pause();
                     activeRockets.remove(rocket);
                 }
 
