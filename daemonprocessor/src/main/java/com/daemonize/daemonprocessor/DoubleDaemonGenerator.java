@@ -124,12 +124,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
             }
         }
 
-        System.out.println("[DoubleDaemongenerator] DEDICATED NAME SET: ");
-
-        for(String dedName : mainGenerator.dedicatedEnginesNameSet) {
-            System.err.println("[DoubleDaemongenerator] " + dedName);
-        }
-
         MethodSpec daemonConstructor = daemonConstructorBuilder
                 .addStatement("this.$N = $N", PROTOTYPE_STRING, PROTOTYPE_STRING)
                 .build();
