@@ -47,9 +47,9 @@ public class Tower extends RotatingSpriteImageMover {
     private TowerLevel towerLevel = new TowerLevel(1,2,1500);
     private ImageView view;
 
-    private volatile Queue<EnemyDoubleDaemon> targetQueue;
-    private Lock targetLock;
-    private Condition targetCondition;
+    protected volatile Queue<EnemyDoubleDaemon> targetQueue;
+    protected Lock targetLock;
+    protected Condition targetCondition;
 
     @CallingThread
     public boolean addTarget(EnemyDoubleDaemon target) {
@@ -167,10 +167,13 @@ public class Tower extends RotatingSpriteImageMover {
             targetLock.unlock();
         }
 
+        rotateTo(target);
+        return scanRet;
+    }
+
+    protected void rotateTo(EnemyDoubleDaemon target) throws InterruptedException {
         if (target.isShootable()) {
-
             animateSemaphore.subscribe();
-
             try {
                 rotateTowards(
                         target.getLastCoordinates().getFirst(),
@@ -180,10 +183,7 @@ public class Tower extends RotatingSpriteImageMover {
                 animateSemaphore.unsubscribe();
             }
         }
-
-        return scanRet;
     }
-
 
     @CallingThread
     @Override
@@ -218,7 +218,7 @@ public class Tower extends RotatingSpriteImageMover {
         scanSemaphore.go();
     }
 
-    private volatile PositionedImage ret = new PositionedImage();
+    protected volatile PositionedImage ret = new PositionedImage();
 
     @ConsumerArg
     public PositionedImage updateSprite() {//hack but improves performance

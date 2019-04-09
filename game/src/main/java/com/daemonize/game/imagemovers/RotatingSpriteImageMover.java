@@ -2,7 +2,6 @@ package com.daemonize.game.imagemovers;
 
 
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
-import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.AngleToBitmapArray;
 import com.daemonize.game.Pair;
 import com.daemonize.game.images.Image;
@@ -42,11 +41,18 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     }
 
     public void rotateTowards(float x, float y) throws InterruptedException {
-        int targetAngle = (int) getAngle(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y);
-        rotate(targetAngle);
+        rotate((int) getAngle(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y));
     }
 
     public void rotate(int targetAngle) throws InterruptedException {
+        Image[] rotateSprite = getRotationSprite(targetAngle);
+        if (rotateSprite.length == 1)
+            setSprite(rotateSprite);
+        else
+            pushSprite(rotateSprite, velocity.intensity);
+    }
+
+    public Image[] getRotationSprite(int targetAngle) throws InterruptedException {
 
         int currentAngle = spriteBuffer.getCurrentAngle();
 
@@ -55,9 +61,12 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
             spriteBuffer.setCurrentAngle(targetAngle);
             Image[] last = new Image[1];
             last[0] = spriteBuffer.getCurrent();
-            setSprite(last);
+            return last;
+//            Image[] last = new Image[1];
+//            last[0] = spriteBuffer.getCurrent();
+//            setSprite(last);
 
-        } else {//rotate smoothly
+        } else {//getRotationSprite smoothly
 
             size = 0;
             int mirrorAngle;
@@ -74,7 +83,10 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
                 currentRotationSprite[size++] = direction ? spriteBuffer.getIncrementedByStep() : spriteBuffer.getDecrementedByStep();
             }
 
-            pushSprite(Arrays.copyOf(currentRotationSprite, size), velocity.intensity);
+            Image[] ret = Arrays.copyOf(currentRotationSprite, size);
+            return ret;
+
+            //pushSprite(Arrays.copyOf(currentRotationSprite, size), velocity.intensity);
         }
     }
 

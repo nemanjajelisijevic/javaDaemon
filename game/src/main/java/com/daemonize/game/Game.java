@@ -1063,7 +1063,49 @@ public class Game {
                         renderer.consume(()->enemy.getView().hide().setAbsoluteX(0).setAbsoluteY(0));
                         enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
                     });
+
                     activeEnemies.remove(enemy);
+
+                    if (activeEnemies.isEmpty()) {
+
+                        final AtomicReference<Field> currentErasingField = new AtomicReference<>(grid.getField(0, 0));
+
+                        DummyDaemon fieldEraser = DummyDaemon.create(renderer, 150).setName("Field Eraser");
+                        fieldEraser.setClosure(() -> {
+
+                            if (gridViewMatrix[currentErasingField.get().getRow()][currentErasingField.get().getColumn()].isShowing() && gridViewMatrix[currentErasingField.get().getRow()][currentErasingField.get().getColumn()].getImage().equals(fieldImage)) {
+
+                                gridViewMatrix[currentErasingField.get().getRow()][currentErasingField.get().getColumn()].hide();
+
+                                if ((currentErasingField.get().getRow() > 0) && (currentErasingField.get().getColumn() > 0) && diagonalMatrix[currentErasingField.get().getRow() - 1][currentErasingField.get().getColumn() - 1].isShowing())
+                                    diagonalMatrix[currentErasingField.get().getRow() - 1][currentErasingField.get().getColumn() - 1].hide();
+
+                                if ((currentErasingField.get().getRow() > 0) && (currentErasingField.get().getColumn() < columns - 1) && diagonalMatrix[currentErasingField.get().getRow() - 1][currentErasingField.get().getColumn()].isShowing())
+                                    diagonalMatrix[currentErasingField.get().getRow() - 1][currentErasingField.get().getColumn()].hide();
+
+                                if (grid.getMinWeightOfNeighbors(currentErasingField.get()) != null)
+                                    currentErasingField.set(grid.getMinWeightOfNeighbors(currentErasingField.get()));
+                                else
+                                    fieldEraser.stop();
+
+                            } else {
+
+                                fieldEraser.stop();
+
+                                for (int j = 0; j < rows; ++j )
+                                    for (int i = 0; i < columns; ++i)
+                                        if (gridViewMatrix[j][i].getImage().equals(fieldImage) && gridViewMatrix[j][i].isShowing())
+                                            gridViewMatrix[j][i].hide();
+
+                                for (int j = 0; j < rows - 1; ++j )
+                                    for (int i = 0; i < columns - 1; ++i)
+                                        if (diagonalMatrix[j][i].getImage().equals(fieldGreenDiagonal) && diagonalMatrix[j][i].isShowing())
+                                            diagonalMatrix[j][i].hide();
+                            }
+
+                        }).start();
+                    }
+
                 }
 
                 @Override
@@ -1071,12 +1113,14 @@ public class Game {
                     enemy.setShootable(true)
                             .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1F, 0.0F)))
                             .setCoordinates(grid.getStartingX(), grid.getStartingY())
-                            .clearAndInterrupt();
+                            .clearAndInterrupt().start();
+
+                    activeEnemies.add(enemy);
+
                     renderer.consume(()->{
                         enemy.getView().show();
                         enemy.getHpView().show();
                     });
-                    activeEnemies.add(enemy.start());
                 }
             };
 
@@ -1626,16 +1670,28 @@ public class Game {
                         renderer.consume(diagonalMatrix[fieldRow][fieldColumn]::hide);
                 }
 
-                TowerDaemon towerDaemon = new TowerDaemon(
-                        gameConsumer,
-                        new Tower(
+
+                Tower prototype = towerSelect == Tower.TowerType.TYPE3
+                        ? new LaserTower (
+                                renderer,
+                                new ImageAnimateClosure(fieldView),
                                 currentTowerSprite,
                                 Pair.create(field.getCenterX(), field.getCenterY()),
                                 range,
                                 towerSelect,
                                 dXY
                         )
-                ).setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]").setView(fieldView);
+                :       new Tower(
+                        currentTowerSprite,
+                        Pair.create(field.getCenterX(), field.getCenterY()),
+                        range,
+                        towerSelect,
+                        dXY
+                );
+
+                TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, prototype)
+                        .setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]")
+                        .setView(fieldView);
 
                 towers.add(towerDaemon);
                 field.setTower(towerDaemon);
@@ -1709,17 +1765,17 @@ public class Game {
     ) {
         System.out.println(DaemonUtils.tag() + "Bullet queue size: " + bulletRepo.size());
 
-        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet ->
+        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet -> {
             bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage)
-                    .setSprite(bulletSprite)
-        );
+                    .setSprite(bulletSprite);
 
-        if (bulletDoubleDaemon.getEnginesState().get(bulletDoubleDaemon.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
-            bulletDoubleDaemon.start();
-        else
-            bulletDoubleDaemon.cont();
+            if (bullet.getEnginesState().get(bullet.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
+                bullet.start();
+            else
+                bullet.cont();
+        });
 
         bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, ret -> {
 
@@ -1762,12 +1818,18 @@ public class Game {
     ) {
         System.out.println(DaemonUtils.tag() + "Rocket stack size: " + rocketRepo.size());
 
-        BulletDoubleDaemon rocketDoubleDaemon = rocketRepo.configureAndGet(rocket->
+        BulletDoubleDaemon rocketDoubleDaemon = rocketRepo.configureAndGet(rocket-> {
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage)
-                    .setSprite(bulletSpriteRocket)
-        );
+                    .setSprite(bulletSpriteRocket);
+
+            if (rocket.getEnginesState().get(rocket.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
+                rocket.start();
+            else
+                rocket.cont();
+
+        });
 
         int launchX = getRandomInt(
                 (int)(sourceCoord.getFirst() - fieldImage.getWidth() / 2),
@@ -1785,11 +1847,6 @@ public class Game {
                 launchX,
                 launchY
         );
-
-        if (rocketDoubleDaemon.getEnginesState().get(rocketDoubleDaemon.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
-            rocketDoubleDaemon.start();
-        else
-            rocketDoubleDaemon.cont();
 
         rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, ret -> {
 
