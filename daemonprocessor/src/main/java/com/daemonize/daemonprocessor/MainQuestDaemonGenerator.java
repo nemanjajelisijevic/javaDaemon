@@ -61,7 +61,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
     {
         QUEST_TYPE_NAME = "MainQuest";
-        daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE + ".mainquestdaemon";
+        daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE;
         daemonEngineSimpleName = "MainQuestDaemonEngine";
     }
 

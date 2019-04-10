@@ -27,7 +27,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
     protected SideQuestDaemonGenerator sideGenerator;
 
     {
-        daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE + ".hybriddaemon";
+        daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE;
         daemonEngineSimpleName = "HybridDaemonEngine";
     }
 

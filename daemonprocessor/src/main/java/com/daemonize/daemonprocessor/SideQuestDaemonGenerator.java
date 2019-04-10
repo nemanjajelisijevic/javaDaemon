@@ -26,7 +26,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
     {
         QUEST_TYPE_NAME = "SideQuest";
-        daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE + ".sidequestdaemon";
+        daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE;
         daemonEngineSimpleName = "SideQuestDaemonEngine";
     }
 
