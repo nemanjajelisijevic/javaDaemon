@@ -1,8 +1,7 @@
 package com.daemonize.game;
 
 
-import com.daemonize.daemonengine.implementations.doubledaemonengine.DoubleDaemonEngine;
-import com.daemonize.daemonengine.implementations.mainquestdaemon.EagerMainQuestDaemonEngine;
+import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;

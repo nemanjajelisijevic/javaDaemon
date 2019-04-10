@@ -37,7 +37,7 @@ public class LaserTower extends Tower{
             ret.positionX = lastCoord.getFirst();
             ret.positionY = lastCoord.getSecond();
 
-            if(target != null) {
+            if(target != null && target.isShootable()) {
 
                 int targetAngle = (int) getAngle(
                         getLastCoordinates().getFirst(),
@@ -56,7 +56,7 @@ public class LaserTower extends Tower{
                         Thread.sleep(25);
                         renderer.consume(updateRunnable.setResult(ret));
                     }
-                //ret.image = spriteBuffer.getByAngle(targetAngle);
+
             }
 
             return ret;
