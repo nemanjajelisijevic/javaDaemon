@@ -17,34 +17,6 @@ public class HybridDaemonEngine extends MainQuestDaemonBaseEngine<HybridDaemonEn
     super(consumer);
   }
 
-//  public <T> HybridDaemonEngine daemonize(Quest<T> quest, Closure<T> closure) {
-//    return daemonize(getConsumer(), quest, closure);
-//  }
-//
-//  public HybridDaemonEngine daemonize(final VoidQuest quest, Runnable closure) {
-//    return daemonize(getConsumer(), quest, closure);
-//  }
-//
-//  public HybridDaemonEngine daemonize(final VoidQuest quest) {
-//      return daemonize(quest, null);
-//  }
-//
-//  public <T> HybridDaemonEngine daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
-//      addMainQuest((AnonMainQuest<T>)new AnonMainQuest(quest, closure).setConsumer(consumer)); //TODO check ret
-//      return this;
-//  }
-//
-//  public HybridDaemonEngine daemonize(Consumer consumer, final VoidQuest quest, Runnable closure) {
-//     addMainQuest(new VoidMainQuest(closure) {
-//         @Override
-//         public Void pursue() throws Exception {
-//             quest.pursue();
-//             return null;
-//         }
-//     }.setConsumer(consumer));
-//     return this;
-//  }
-
   public <T> SideQuest<T> setSideQuest(Consumer consumer, final Quest<T> sideQuest) {
     this.sideQuest = (SideQuest) new SideQuest() {
       @Override

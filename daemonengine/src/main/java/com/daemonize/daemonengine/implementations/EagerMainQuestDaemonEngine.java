@@ -17,34 +17,6 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonBaseEngine<EagerM
     super(consumer);
   }
 
-//  public <T> EagerMainQuestDaemonEngine daemonize(Quest<T> quest, Closure<T> closure) {
-//    return daemonize(getConsumer(), quest, closure);
-//  }
-//
-//  public EagerMainQuestDaemonEngine daemonize(final VoidQuest quest, Runnable closure) {
-//      return daemonize(getConsumer(), quest, closure);
-//  }
-//
-//  public EagerMainQuestDaemonEngine daemonize(final VoidQuest quest) {
-//      return daemonize(quest, null);
-//  }
-//
-//  public <T> EagerMainQuestDaemonEngine daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
-//      addMainQuest((AnonMainQuest<T>)new AnonMainQuest(quest, closure).setConsumer(consumer)); //TODO check ret
-//      return this;
-//  }
-//
-//  public EagerMainQuestDaemonEngine daemonize(Consumer consumer, final VoidQuest quest, Runnable closure) {
-//      addMainQuest(new VoidMainQuest(closure) {
-//          @Override
-//          public Void pursue() throws Exception {
-//              quest.pursue();
-//              return null;
-//          }
-//      }.setConsumer(consumer));
-//      return this;
-//  }
-
   @Override
   public boolean addMainQuest(MainQuest quest) {
     boolean ret;
@@ -100,30 +72,9 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonBaseEngine<EagerM
       interrupt();
       return this;
   }
-//
-//  @Override
-//  public EagerMainQuestDaemonEngine clear() {
-//      return (EagerMainQuestDaemonEngine) super.clear();
-//  }
-//
-//  @Override
-//  public EagerMainQuestDaemonEngine setConsumer(Consumer consumer) {
-//      return (EagerMainQuestDaemonEngine) super.setConsumer(consumer);
-//  }
-//
-//  @Override
-//  public EagerMainQuestDaemonEngine start() {
-//      return (EagerMainQuestDaemonEngine) super.start();
-//  }
 
   @Override
   public EagerMainQuestDaemonEngine queueStop() {
       return super.queueStop(this);
   }
-
-//
-//  @Override
-//  public List<DaemonState> getEnginesState() {
-//      return super.getEnginesState();
-//  }
 }
