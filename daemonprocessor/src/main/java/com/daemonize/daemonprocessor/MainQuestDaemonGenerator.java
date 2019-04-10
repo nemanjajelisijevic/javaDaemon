@@ -252,14 +252,12 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
 
+        boolean voidQuest = prototypeMethodData.isVoid();
         boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
 
-        ClassName className = voidWithRunnable ? ClassName.get(QUEST_PACKAGE, VOID_QUEST_TYPE_NAME) : ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME);
+        ClassName className = voidQuest ? ClassName.get(QUEST_PACKAGE, VOID_QUEST_TYPE_NAME) : ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME);
 
-        TypeName mainQuestOfRet = ParameterizedTypeName.get(
-                className,
-                prototypeMethodData.getMethodRetTypeName()
-        );
+        TypeName mainQuestOfRet = voidQuest ? className : ParameterizedTypeName.get(className, prototypeMethodData.getMethodRetTypeName());
 
         String mainQuestName = Character.valueOf(
                 prototypeMethodData.getMethodName().charAt(0)

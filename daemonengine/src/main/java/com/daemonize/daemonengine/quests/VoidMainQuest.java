@@ -3,11 +3,11 @@ package com.daemonize.daemonengine.quests;
 import com.daemonize.daemonengine.exceptions.DaemonRuntimeError;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public abstract class VoidMainQuest<T> extends MainQuest<T> {
+public abstract class VoidMainQuest extends MainQuest<Void> {
 
     private Runnable retRun;
 
-    public VoidMainQuest<T> setRetRun(Runnable retRun) {
+    public VoidMainQuest setRetRun(Runnable retRun) {
         this.retRun = retRun;
         return this;
     }
@@ -23,7 +23,7 @@ public abstract class VoidMainQuest<T> extends MainQuest<T> {
     public void run() {
         try {
             pursue();
-            if (!Thread.currentThread().isInterrupted())
+            if (!Thread.currentThread().isInterrupted() && retRun != null)
                 consumer.consume(retRun);
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
