@@ -6,10 +6,9 @@ application {
 }
 
 dependencies {
-    implementation project(':daemonengine')
-    implementation project(':game')
+    compile project(':daemonengine')
+    compile project(':game')
 }
-
 
 sourceSets {
     main{
@@ -18,15 +17,18 @@ sourceSets {
         }
     }
 }
-//
-//jar {
-//    manifest {
-//        attributes(
-//                //'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-//                'Main-Class': 'com.daemonize.javafxmain.Main'
-//        )
-//    }
-//    from {
-//        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-//    }
-//}
+
+
+jar {
+    doFirst {
+        manifest {
+            attributes(
+                    'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                    'Main-Class': 'com.daemonize.javafxmain.Main'
+            )
+        }
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

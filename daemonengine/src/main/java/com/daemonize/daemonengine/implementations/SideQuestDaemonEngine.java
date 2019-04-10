@@ -1,13 +1,13 @@
-package com.daemonize.daemonengine.implementations.sidequestdaemon;
+package com.daemonize.daemonengine.implementations;
 
 
+import com.daemonize.daemonengine.SideQuestDaemon;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
 
-public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon {
+public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon<SideQuestDaemonEngine> {
 
   private SideQuest sideQuest;
 

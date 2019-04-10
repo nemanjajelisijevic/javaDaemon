@@ -1,11 +1,10 @@
-package com.daemonize.daemonengine.implementations.doubledaemonengine;
+package com.daemonize.daemonengine.implementations;
 
+import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.implementations.mainquestdaemon.EagerMainQuestDaemonEngine;
-import com.daemonize.daemonengine.implementations.sidequestdaemon.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.AnonMainQuest;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
@@ -15,7 +14,7 @@ import com.daemonize.daemonengine.quests.VoidQuest;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine> {
+public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine>, DaemonEngine<DoubleDaemonEngine> {
 
     private EagerMainQuestDaemonEngine mainQuestDaemonEngine;
     private SideQuestDaemonEngine sideQuestDaemonEngine;
@@ -33,13 +32,17 @@ public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine> {
         return daemonize(mainQuestDaemonEngine.getConsumer(), quest, closure);
     }
 
+    public DoubleDaemonEngine daemonize(final VoidQuest quest) {
+        return daemonize(quest, null);
+    }
+
     public <T> DoubleDaemonEngine daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
         mainQuestDaemonEngine.addMainQuest((AnonMainQuest<T>) new AnonMainQuest(quest, closure).setConsumer(consumer)); //TODO check ret
         return this;
     }
 
     public DoubleDaemonEngine daemonize(Consumer consumer, final VoidQuest quest, Runnable closure) {
-        mainQuestDaemonEngine.addMainQuest((VoidMainQuest) new VoidMainQuest(closure) {
+        mainQuestDaemonEngine.addMainQuest(new VoidMainQuest(closure) {
             @Override
             public Void pursue() throws Exception {
                 quest.pursue();

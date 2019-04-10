@@ -1,10 +1,10 @@
-package com.daemonize.daemonengine.implementations.mainquestdaemon;
+package com.daemonize.daemonengine.implementations;
 
 
 import com.daemonize.daemonengine.Daemon;
+import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.implementations.basedaemon.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.AnonMainQuest;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
@@ -18,37 +18,41 @@ import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngine> {
+class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> extends BaseDaemonEngine<D> implements DaemonEngine<D> {
 
   protected final Queue<MainQuest> mainQuestQueue = new LinkedList<>();
   protected final Lock mainQuestLock = new ReentrantLock();
 
-  public MainQuestDaemonEngine(Consumer consumer) {
+  MainQuestDaemonBaseEngine(Consumer consumer) {
     super(consumer);
   }
 
-  public <T> MainQuestDaemonEngine daemonize(Quest<T> quest, Closure<T> closure) {
+  public <T> D daemonize(Quest<T> quest, Closure<T> closure) {
     return daemonize(getConsumer(), quest, closure);
   }
 
-  public MainQuestDaemonEngine daemonize(final VoidQuest quest, Runnable closure) {
-    return daemonize(getConsumer(), quest, closure);
-  }
-
-  public <T> MainQuestDaemonEngine daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
+  public <T> D daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
       addMainQuest((AnonMainQuest<T>) new AnonMainQuest(quest, closure).setConsumer(consumer)); //TODO check ret
-      return this;
+      return (D) this;
   }
 
-  public MainQuestDaemonEngine daemonize(Consumer consumer, final VoidQuest quest, Runnable closure) {
-      addMainQuest((VoidMainQuest) new VoidMainQuest(closure) {
+  public D daemonize(final VoidQuest quest, Runnable closure) {
+    return daemonize(getConsumer(), quest, closure);
+  }
+
+  public D daemonize(final VoidQuest quest) {
+      return daemonize(quest, null);
+  }
+
+  public D daemonize(Consumer consumer, final VoidQuest quest, Runnable closure) {
+      addMainQuest(new VoidMainQuest(closure) {
           @Override
           public Void pursue() throws Exception {
               quest.pursue();
               return null;
           }
       }.setConsumer(consumer));
-      return this;
+      return (D) this;
   }
 
   public boolean addMainQuest(MainQuest quest) {
@@ -76,9 +80,9 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
   }
 
   //@Override
-  public MainQuestDaemonEngine queueStop(Daemon daemon) {
+  public D queueStop(Daemon daemon) {
     addMainQuest(new StopMainQuest(daemon));
-    return this;
+    return (D) this;
   }
 
   @Override
@@ -93,10 +97,31 @@ public class MainQuestDaemonEngine extends BaseDaemonEngine<MainQuestDaemonEngin
 
 
   @Override
-  public MainQuestDaemonEngine clear() {
+  public D clear() {
     mainQuestLock.lock();
     mainQuestQueue.clear();
     mainQuestLock.unlock();
-    return this;
+    return (D) this;
   }
+
+
+//    @Override
+//    public D setName(String name) {
+//        return super.setName(name);
+//    }
+//
+//    @Override
+//    public D setConsumer(Consumer consumer) {
+//        return super.setConsumer(consumer);
+//    }
+//
+//    @Override
+//    public D start() {
+//        return super.start();
+//    }
+//
+    @Override
+    public D queueStop() {
+        return queueStop(this);
+    }
 }
