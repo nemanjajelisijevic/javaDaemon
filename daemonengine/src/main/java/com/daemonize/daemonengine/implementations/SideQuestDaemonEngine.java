@@ -26,6 +26,7 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
   }
 
 
+  @Override
   public void setSideQuest(SideQuest quest) {
     this.sideQuest = quest;
   }

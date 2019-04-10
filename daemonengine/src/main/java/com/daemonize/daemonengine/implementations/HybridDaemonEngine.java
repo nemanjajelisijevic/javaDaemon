@@ -27,6 +27,7 @@ public class HybridDaemonEngine extends MainQuestDaemonBaseEngine<HybridDaemonEn
     return this.sideQuest;
   }
 
+  @Override
   public void setSideQuest(SideQuest quest) {
     this.sideQuest = quest;
   }
@@ -61,11 +62,6 @@ public class HybridDaemonEngine extends MainQuestDaemonBaseEngine<HybridDaemonEn
       ret = sideQuest;
     return ret;
   }
-
-//  @Override
-//  public HybridDaemonEngine queueStop(Daemon daemon) {
-//    return super.queueStop(daemon);
-//  }
 
   @Override
   public HybridDaemonEngine clear() {

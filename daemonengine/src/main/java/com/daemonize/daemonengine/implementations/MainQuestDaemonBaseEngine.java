@@ -56,52 +56,52 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
     }
 
     public boolean addMainQuest(MainQuest quest) {
-    boolean ret;
-    mainQuestLock.lock();
-    ret = mainQuestQueue.add(quest);
-    mainQuestLock.unlock();
-    return ret;
+        boolean ret;
+        mainQuestLock.lock();
+        ret = mainQuestQueue.add(quest);
+        mainQuestLock.unlock();
+        return ret;
     }
 
     public boolean pursueQuest(MainQuest quest) {
-    return addMainQuest(quest);
+        return addMainQuest(quest);
     }
 
     //returns null
     @Override
     protected BaseQuest getQuest() {
-    BaseQuest ret = null;
-    mainQuestLock.lock();
-    if (!mainQuestQueue.isEmpty()) {
-      ret = mainQuestQueue.poll();
-    }
-    mainQuestLock.unlock();
-    return ret;
+        BaseQuest ret = null;
+        mainQuestLock.lock();
+        if (!mainQuestQueue.isEmpty()) {
+          ret = mainQuestQueue.poll();
+        }
+        mainQuestLock.unlock();
+        return ret;
     }
 
     //@Override
     public D queueStop(Daemon daemon) {
-    addMainQuest(new StopMainQuest(daemon));
-    return (D) this;
+        addMainQuest(new StopMainQuest(daemon));
+        return (D) this;
     }
 
     @Override
     public void stop() {
-    clear();
-    super.stop();
+        clear();
+        super.stop();
     }
 
     public int queueSize() {
-    return mainQuestQueue.size();
+        return mainQuestQueue.size();
     }
 
 
     @Override
     public D clear() {
-    mainQuestLock.lock();
-    mainQuestQueue.clear();
-    mainQuestLock.unlock();
-    return (D) this;
+        mainQuestLock.lock();
+        mainQuestQueue.clear();
+        mainQuestLock.unlock();
+        return (D) this;
     }
 
     @Override
