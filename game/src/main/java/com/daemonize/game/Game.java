@@ -1077,17 +1077,18 @@ public class Game {
 
                             } while ((currentErasingField = grid.getMinWeightOfNeighbors(currentErasingField)) != null);
 
-                            renderer.consume(()->{
-                                for (int j = 0; j < rows; ++j )
-                                    for (int i = 0; i < columns; ++i)
-                                        if (gridViewMatrix[j][i].getImage().equals(fieldImage) && gridViewMatrix[j][i].isShowing())
-                                            gridViewMatrix[j][i].hide();
+                            if (activeEnemies.isEmpty())
+                                renderer.consume(()->{
+                                    for (int j = 0; j < rows; ++j )
+                                        for (int i = 0; i < columns; ++i)
+                                            if (gridViewMatrix[j][i].getImage().equals(fieldImage) && gridViewMatrix[j][i].isShowing())
+                                                gridViewMatrix[j][i].hide();
 
-                                for (int j = 0; j < rows - 1; ++j )
-                                    for (int i = 0; i < columns - 1; ++i)
-                                        if (diagonalMatrix[j][i].getImage().equals(fieldGreenDiagonal) && diagonalMatrix[j][i].isShowing())
-                                            diagonalMatrix[j][i].hide();
-                            });
+                                    for (int j = 0; j < rows - 1; ++j )
+                                        for (int i = 0; i < columns - 1; ++i)
+                                            if (diagonalMatrix[j][i].getImage().equals(fieldGreenDiagonal) && diagonalMatrix[j][i].isShowing())
+                                                diagonalMatrix[j][i].hide();
+                                });
                         });
                     }
                 }

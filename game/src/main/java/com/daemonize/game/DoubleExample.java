@@ -3,6 +3,7 @@ package com.daemonize.game;
 //import android.util.Log;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
@@ -16,14 +17,15 @@ public class DoubleExample {
 
     public DoubleExample() {}
 
-    @DedicatedThread(name = "FUCK")
-    @ConsumerArg
-    @GenerateRunnable
-    public void testVoid(long sleepMillis) throws InterruptedException {
-        Thread.sleep(sleepMillis);
-    }
+    //@DedicatedThread(name = "FUCK")
+//    @ConsumerArg
+//    @GenerateRunnable
+//    public void testVoid(long sleepMillis) throws InterruptedException {
+//        Thread.sleep(sleepMillis);
+//    }
 
-    @DedicatedThread(name = "FUCK")
+    //@DedicatedThread(name = "FUCK")
+    @CallingThread
     @ConsumerArg
     public synchronized boolean increment() throws InterruptedException {
         Thread.sleep(5000);
@@ -31,11 +33,11 @@ public class DoubleExample {
         return true;
     }
 
-//    @SideQuest
-//    public synchronized int logAndReturn() {
-//        //Log.i(DaemonUtils.tag(), "INSIDE DoubleExample logAndReturn COUNTER: " + Integer.toString(cnt));
-//        return cnt;
-//    }
+    @SideQuest
+    public synchronized int logAndReturn() {
+        //Log.i(DaemonUtils.tag(), "INSIDE DoubleExample logAndReturn COUNTER: " + Integer.toString(cnt));
+        return ++cnt;
+    }
 
 
 }

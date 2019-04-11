@@ -13,5 +13,5 @@ public @interface Daemonize {
     boolean doubleDaemonize() default false;
     String className() default "";
     boolean consumer() default false;
-    boolean daemonizeBaseMethods() default false;
+    boolean daemonizeBaseMethods() default true;
 }
