@@ -120,6 +120,11 @@ public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine>, Daem
     }
 
     @Override
+    public Consumer getConsumer() {
+        return mainQuestDaemonEngine.getConsumer();
+    }
+
+    @Override
     public DoubleDaemonEngine clear() {
         mainQuestDaemonEngine.clear();
         return this;

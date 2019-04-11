@@ -1,6 +1,8 @@
 package com.daemonize.daemonprocessor;
 
+import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -85,7 +87,24 @@ public class DaemonProcessor extends AbstractProcessor {
                 List<Pair<ExecutableElement, SideQuest>> sideQuestMethods =
                         BaseDaemonGenerator.getSideQuestMethods(publicPrototypeMethods);
 
+                for (Pair<ExecutableElement, SideQuest> sideQuestMethod : sideQuestMethods) {
+                    if (sideQuestMethod.getFirst().getAnnotation(CallingThread.class) != null || sideQuestMethod.getFirst().getAnnotation(DedicatedThread.class) != null)
+                        throw new IllegalStateException(
+                                "Error daemonizing class: "
+                                        + classElement.getSimpleName().toString()
+                                        + " - @SideQuest method cant have other annotations."
+                        );
+                }
+
                 DaemonGenerator generator;
+
+                if (publicPrototypeMethods.size() < 1) {
+                    messager.printMessage(
+                            Diagnostic.Kind.NOTE,
+                            "No public methods in: " + classElement.asType().toString()
+                    );
+                    continue;
+                }
 
                 if(sideQuestMethods.isEmpty()) {
                     generator = new MainQuestDaemonGenerator(((TypeElement) classElement));
@@ -104,6 +123,15 @@ public class DaemonProcessor extends AbstractProcessor {
 
                         } else {
 
+                            for(ExecutableElement method : publicPrototypeMethods) {
+                                if(method.getAnnotation(DedicatedThread.class) != null)
+                                    throw new IllegalStateException(
+                                            "Error daemonizing class: "
+                                            + classElement.getSimpleName().toString()
+                                            + " - To use @DedicatedThread daemon must be marked with 'doubleDaemonize = true' annotation arg."
+                                    );
+                            }
+
                             //single threaded daemon
                             generator = new HybridDaemonGenerator(((TypeElement) classElement));
                         }
@@ -112,7 +140,7 @@ public class DaemonProcessor extends AbstractProcessor {
                         throw new IllegalStateException(
                                 classElement.toString()
                                         + " has more side quests than methods."
-                                        + " That is impossible. Fuck me...");
+                                        + " That cant be right...");
                     }
                 }
 

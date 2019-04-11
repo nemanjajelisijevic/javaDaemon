@@ -136,4 +136,9 @@ public class DaemonConsumer implements Consumer, Daemon<DaemonConsumer> {
         closureLock.unlock();
         return null;
     }
+
+    @Override
+    public Consumer getConsumer() {
+        return this;
+    }
 }

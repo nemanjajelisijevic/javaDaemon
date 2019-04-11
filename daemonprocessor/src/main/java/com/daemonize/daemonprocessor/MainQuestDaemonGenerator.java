@@ -229,6 +229,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonApiMethods.add(generateDedicatedEnginesSetNameDaemonApiMethod());
             daemonApiMethods.add(generateGetNameDaemonApiMethod());
             daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
+            daemonApiMethods.add(generateGetConsumerDaemonApiMethod());
 
         }
 
@@ -575,6 +576,4 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
        return builder.addStatement("return this").build();
     }
-
-
 }

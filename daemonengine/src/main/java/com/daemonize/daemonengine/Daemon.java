@@ -20,5 +20,7 @@ public interface Daemon<D extends Daemon> {
 
   D setConsumer(Consumer consumer);
 
+  Consumer getConsumer();
+
   D clear();
 }

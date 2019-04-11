@@ -238,6 +238,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         ret.add(generateSetNameDaemonApiMethod());
         ret.add(generateGetNameDaemonApiMethod());
         ret.add(generateSetConsumerDaemonApiMethod());
+        ret.add(generateGetConsumerDaemonApiMethod());
 
         return ret;
     }
@@ -327,6 +328,16 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".setConsumer(consumer)")
                 .addStatement("return this")
+                .build();
+    }
+
+
+    public MethodSpec generateGetConsumerDaemonApiMethod() {
+        return MethodSpec.methodBuilder("getConsumer")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .returns(consumerInterface)
+                .addStatement("return " + daemonEngineString + ".getConsumer()")
                 .build();
     }
 
@@ -555,6 +566,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
 
     }
+
 
     public abstract MethodSpec generateGetEnginesStateDaemonApiMethod();
 

@@ -200,6 +200,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(generateSetMainConsumerDaemonApiMethod());
         apiMethods.add(generateSetSideConsumerDaemonApiMethod());
         apiMethods.add(generateSetConsumerDaemonApiMethod());
+        apiMethods.add(mainGenerator.generateGetConsumerDaemonApiMethod());
 
         apiMethods.add(mainGenerator.generateInterruptMethod());
         apiMethods.add(mainGenerator.generateClearAndInterruptMethod());
