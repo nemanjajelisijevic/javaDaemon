@@ -30,7 +30,7 @@ public class Button extends CompositeImageViewImpl implements ClickableImageView
     @Override
     public boolean checkCoordinates(float x, float y) {
 
-        if (!enabled)
+        if (!enabled || onClickCallback == null)
             return false;
 
         if (x >= getStartingX() && x <= getEndX()) {

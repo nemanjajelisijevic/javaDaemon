@@ -24,11 +24,11 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
     protected final Lock mainQuestLock = new ReentrantLock();
 
     MainQuestDaemonBaseEngine(Consumer consumer) {
-    super(consumer);
+        super(consumer);
     }
 
     public <T> D daemonize(Quest<T> quest, Closure<T> closure) {
-    return daemonize(getConsumer(), quest, closure);
+        return daemonize(getConsumer(), quest, closure);
     }
 
     public <T> D daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
@@ -37,7 +37,7 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
     }
 
     public D daemonize(final VoidQuest quest, Runnable closure) {
-    return daemonize(getConsumer(), quest, closure);
+        return daemonize(getConsumer(), quest, closure);
     }
 
     public D daemonize(final VoidQuest quest) {
