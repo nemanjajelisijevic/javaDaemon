@@ -120,7 +120,7 @@ public class Grid {
         return setTower(row, column);
     }
 
-    public boolean setTower(int row, int column) {
+    public synchronized boolean setTower(int row, int column) {
 
         if (!grid[row][column].isWalkable() ) return false;
         if (row == grid.length - 1 && column == grid[row].length - 1) return false;
@@ -199,13 +199,13 @@ public class Grid {
         return neighbors;
     }
 
-    public Field getMinWeightOfNeighbors(Field field) {
+    public synchronized Field getMinWeightOfNeighbors(Field field) {
         return getMinWeightOfNeighbors(field.getRow(), field.getColumn());
     }
 
     private List<Field> neighbors = new ArrayList<>(8);
 
-    public Field getMinWeightOfNeighbors(int row, int column) {
+    public synchronized Field getMinWeightOfNeighbors(int row, int column) {
         //List<Field> neighbors = new ArrayList<>(8);
         neighbors.clear();
         for (int i = -1; i <= 1; i++) {

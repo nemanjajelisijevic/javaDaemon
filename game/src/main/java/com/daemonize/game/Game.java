@@ -1,6 +1,7 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.ImageMover;
@@ -81,6 +82,8 @@ public class Game {
     private Image fieldImageTowerDen;
 
     private Image fieldGreenDiagonal;
+
+    private DaemonEngine fieldEraserEngine;
 
     //score
     private int score = 1000;
@@ -186,12 +189,6 @@ public class Game {
 
     private float dXY;
 
-    //test DoubleDaemonEngine
-//    private DoubleDaemonEngine ddTestEngine;
-//    private CoordinatedImageTranslationMover ddTestMover;
-//    private ImageView ddTestView;
-
-
     //closures
     private static class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
@@ -262,6 +259,7 @@ public class Game {
     public void pause() {
         gameConsumer.consume(()->{
             towerSpriteUpgrader.stop();
+            fieldEraserEngine.stop();
             enemyGenerator.stop();
             for (EnemyDoubleDaemon enemy : activeEnemies)
                 enemy.pause();
@@ -290,6 +288,7 @@ public class Game {
                 bullet.cont();
             renderer.start();
             towerSpriteUpgrader.start();
+            fieldEraserEngine.start();
             paused = false;
         });
     }
@@ -311,6 +310,7 @@ public class Game {
     public Game stop(){
         gameConsumer.consume(()-> {
             towerSpriteUpgrader.stop();
+            fieldEraserEngine.stop();
             moneyDaemon.stop();
             enemyGenerator.stop();
             for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
@@ -339,17 +339,6 @@ public class Game {
                 else
                     setTower(x, y);
             }
-
-//            ddTestEngine.clearAndInterrupt();
-//            renderer.consume(ddTestView::show);
-//            ddTestEngine.daemonize(()->ddTestMover.goTo(x, y, enemyVelocity),ret->{
-//                ret.runtimeCheckAndGet();
-//                ddTestEngine.daemonize(()->ddTestMover.pushSprite(miniExplodeSprite, 0), ()->{
-//                    ddTestMover.setSprite(bulletSpriteRocket);
-//                    ddTestMover.setVelocity(0);
-//                    ddTestEngine.daemonize(renderer, ddTestMover::animate, new ImageAnimateClosure(ddTestView));
-//                });
-//            });
         });
         return this;
     }
@@ -1067,30 +1056,28 @@ public class Game {
 
                     if (activeEnemies.isEmpty()) {
 
-                        final AtomicReference<Field> currentErasingField = new AtomicReference<>(grid.getField(0, 0));
+                        fieldEraserEngine.daemonize(()->{
 
-                        DummyDaemon fieldEraser = DummyDaemon.create(renderer, 150).setName("Field Eraser");
-                        fieldEraser.setClosure(() -> {
+                            Field currentErasingField = grid.getField(0, 0);
 
-                            if (gridViewMatrix[currentErasingField.get().getRow()][currentErasingField.get().getColumn()].isShowing() && gridViewMatrix[currentErasingField.get().getRow()][currentErasingField.get().getColumn()].getImage().equals(fieldImage)) {
+                            do {
+                                if (gridViewMatrix[currentErasingField.getRow()][currentErasingField.getColumn()].isShowing() && gridViewMatrix[currentErasingField.getRow()][currentErasingField.getColumn()].getImage().equals(fieldImage)) {
 
-                                gridViewMatrix[currentErasingField.get().getRow()][currentErasingField.get().getColumn()].hide();
+                                    renderer.consume(gridViewMatrix[currentErasingField.getRow()][currentErasingField.getColumn()]::hide);
 
-                                if ((currentErasingField.get().getRow() > 0) && (currentErasingField.get().getColumn() > 0) && diagonalMatrix[currentErasingField.get().getRow() - 1][currentErasingField.get().getColumn() - 1].isShowing())
-                                    diagonalMatrix[currentErasingField.get().getRow() - 1][currentErasingField.get().getColumn() - 1].hide();
+                                    if ((currentErasingField.getRow() > 0) && (currentErasingField.getColumn() > 0) && diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn() - 1].isShowing())
+                                        renderer.consume(diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn() - 1]::hide);
 
-                                if ((currentErasingField.get().getRow() > 0) && (currentErasingField.get().getColumn() < columns - 1) && diagonalMatrix[currentErasingField.get().getRow() - 1][currentErasingField.get().getColumn()].isShowing())
-                                    diagonalMatrix[currentErasingField.get().getRow() - 1][currentErasingField.get().getColumn()].hide();
+                                    if ((currentErasingField.getRow() > 0) && (currentErasingField.getColumn() < columns - 1) && diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn()].isShowing())
+                                        renderer.consume(diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn()]::hide);
 
-                                if (grid.getMinWeightOfNeighbors(currentErasingField.get()) != null)
-                                    currentErasingField.set(grid.getMinWeightOfNeighbors(currentErasingField.get()));
-                                else
-                                    fieldEraser.stop();
+                                    Thread.sleep(150);
+                                } else
+                                    break;
 
-                            } else {
+                            } while ((currentErasingField = grid.getMinWeightOfNeighbors(currentErasingField)) != null);
 
-                                fieldEraser.stop();
-
+                            renderer.consume(()->{
                                 for (int j = 0; j < rows; ++j )
                                     for (int i = 0; i < columns; ++i)
                                         if (gridViewMatrix[j][i].getImage().equals(fieldImage) && gridViewMatrix[j][i].isShowing())
@@ -1100,11 +1087,9 @@ public class Game {
                                     for (int i = 0; i < columns - 1; ++i)
                                         if (diagonalMatrix[j][i].getImage().equals(fieldGreenDiagonal) && diagonalMatrix[j][i].isShowing())
                                             diagonalMatrix[j][i].hide();
-                            }
-
-                        }).start();
+                            });
+                        });
                     }
-
                 }
 
                 @Override
@@ -1316,8 +1301,6 @@ public class Game {
                 moneyView.getSecond().setImage(result.getSecond().image).setAbsoluteX(result.getSecond().positionX).setAbsoluteY(result.getSecond().positionY);
             });
 
-            //ddTestView = scene.addImageView(new ImageViewImpl("ddTestView").setImage(bulletSprite[0]).setZindex(20).show());
-
             //prepare the scene and start the renderer
             scene.lockViews();
 
@@ -1525,30 +1508,8 @@ public class Game {
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
 
-            towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).start();
-
-//            ddTestEngine = new DoubleDaemonEngine(gameConsumer).setName("DdTestEngine");
-//
-//            ddTestMover = new CoordinatedImageTranslationMover(bulletSpriteRocket, enemyVelocity, Pair.create(grid.getField(5, 5).getCenterX(), grid.getField(5, 5).getCenterY()), dXY);
-//            ddTestMover.setBorders(0, borderX, 0, borderY);
-//            ddTestMover.setOutOfBordersConsumer(gameConsumer);
-//            ddTestMover.setOutOfBordersClosure(()->{
-//                ddTestEngine.stop();
-//                renderer.consume(ddTestView::hide);
-//            });
-//
-//            ddTestEngine.setSideQuest(renderer, ()->{Thread.sleep(25);return ddTestMover.animate();}).setClosure(new ImageAnimateClosure(ddTestView));
-//
-//            renderer.consume(ddTestView::show);
-//
-//            ddTestEngine.start().daemonize(()->ddTestMover.goTo(borderX, borderY, enemyVelocity), gone->{
-//                gone.runtimeCheckAndGet();
-//                ddTestEngine.daemonize(()->ddTestMover.pushSprite(miniExplodeSprite, 0), ()->{
-//                    ddTestMover.setSprite(bulletSpriteRocket);
-//                    ddTestMover.setVelocity(0);
-//                    ddTestEngine.daemonize(renderer, ddTestMover::animate, new ImageAnimateClosure(ddTestView));
-//                });
-//            });
+            towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).setName("Tower Sprite Upgrader").start();
+            fieldEraserEngine = new EagerMainQuestDaemonEngine(renderer).setName("Field Eraser").start();
         });
     }
 
