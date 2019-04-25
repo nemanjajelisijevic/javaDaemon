@@ -21,7 +21,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-@Daemonize(doubleDaemonize = true, daemonizeBaseMethods = true)
+@Daemonize(doubleDaemonize = true)
 public class Tower extends RotatingSpriteImageMover {
 
     public enum TowerType {
@@ -51,6 +51,17 @@ public class Tower extends RotatingSpriteImageMover {
     protected Lock targetLock;
     protected Condition targetCondition;
 
+    protected volatile float range;
+
+    @FunctionalInterface
+    public interface TargetTester {
+        public boolean test(EnemyDoubleDaemon target);
+    }
+
+    protected TargetTester targetTester = target -> (target.isShootable()
+            && (Math.abs(target.getLastCoordinates().getFirst() - getLastCoordinates().getFirst()) < range
+            && Math.abs(target.getLastCoordinates().getSecond() - getLastCoordinates().getSecond()) < range));
+
     @CallingThread
     public boolean addTarget(EnemyDoubleDaemon target) {
         boolean ret = false;
@@ -71,8 +82,6 @@ public class Tower extends RotatingSpriteImageMover {
     public float getRange() {
         return range;
     }
-
-    private volatile float range;
 
     @CallingThread
     public void levelUp(){
@@ -117,6 +126,8 @@ public class Tower extends RotatingSpriteImageMover {
 
     public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, TowerType type, float dXY) {
         super(rotationSprite, 0, startingPos, dXY);
+        this.ret.positionX = startingPos.getFirst();
+        this.ret.positionY = startingPos.getSecond();
         this.range = range;
         this.towertype = type;
         this.targetQueue = new LinkedList<>();
@@ -155,10 +166,7 @@ public class Tower extends RotatingSpriteImageMover {
 
             target = targetQueue.peek();
 
-            if (target.isShootable()
-                    && (Math.abs(target.getLastCoordinates().getFirst() - getLastCoordinates().getFirst()) < range
-                    && Math.abs(target.getLastCoordinates().getSecond() - getLastCoordinates().getSecond()) < range)
-            )
+            if (targetTester.test(target))
                 scanRet = Pair.create(towertype, target);
             else
                 targetQueue.poll();
@@ -224,8 +232,6 @@ public class Tower extends RotatingSpriteImageMover {
     public PositionedImage updateSprite() {//hack but improves performance
         Pair<Float, Float> lastCoord = getLastCoordinates();
         ret.image = iterateSprite();
-        ret.positionX = lastCoord.getFirst();
-        ret.positionY = lastCoord.getSecond();
         return ret;
     }
 
@@ -238,7 +244,6 @@ public class Tower extends RotatingSpriteImageMover {
         } catch (InterruptedException ex) {
             return null;
         }
-        //return super.animate();
     }
 
     @CallingThread

@@ -327,6 +327,17 @@ public class Game {
 
     public Game onTouch(float x, float y) {
         gameConsumer.consume(()-> {
+
+
+            for(EnemyDoubleDaemon enemy : activeEnemies) {
+                if (Math.abs(enemy.getLastCoordinates().getFirst() - x) < gridViewMatrix[0][0].getWidth() / 2
+                        && Math.abs(enemy.getLastCoordinates().getSecond() - y) < gridViewMatrix[0][0].getHeight() / 2) {
+                    System.err.println("*******************************************************");
+                    System.err.println(DaemonUtils.tag() + "Clicked on: " + enemy.getName() + ", HP: " + enemy.getHp() + "/" + enemy.getMaxHp());
+                    System.err.println("*******************************************************");
+                }
+            }
+
             if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
                 towerUpgradeDialogue.getTowerUpgrade().checkCoordinates(x, y);
             else {
@@ -1078,7 +1089,7 @@ public class Game {
                             } while ((currentErasingField = grid.getMinWeightOfNeighbors(currentErasingField)) != null);
 
                             if (activeEnemies.isEmpty())
-                                renderer.consume(()->{
+                                renderer.consume(() -> {
                                     for (int j = 0; j < rows; ++j )
                                         for (int i = 0; i < columns; ++i)
                                             if (gridViewMatrix[j][i].getImage().equals(fieldImage) && gridViewMatrix[j][i].isShowing())
@@ -1440,7 +1451,7 @@ public class Game {
                                 if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     if (score > 0)
                                         renderer.consume(()-> infoScore.setNumbers(--score));
-                                    renderer.consume(()->currentFieldView.setImage(fieldImageTowerDen).show());
+                                    renderer.consume(currentFieldView.setImage(fieldImageTowerDen)::show);
                                     enemyRepo.add(enemyDoubleDaemon);
                                     return;
                                 }
@@ -1577,7 +1588,7 @@ public class Game {
                     deny = true;
 
                     boolean isGeenFieldShown = fieldView.isShowing() && fieldView.getImage().equals(fieldImage);
-                    renderer.consume(() -> fieldView.setImage(fieldImageTowerDen).show());
+                    renderer.consume(fieldView.setImage(fieldImageTowerDen)::show);
 
                     AtomicInteger markerCnt = new AtomicInteger(0);
 
@@ -1606,7 +1617,7 @@ public class Game {
             } else {
 
                 {
-                    renderer.consume(()->fieldView.setImage(currentTowerSprite[0]).show());
+                    renderer.consume(fieldView.setImage(currentTowerSprite[0])::show);
 
                     //hide diagonal views
                     int fieldRow = field.getRow();
@@ -1859,12 +1870,11 @@ public class Game {
                                 else {
 
                                     enemyRepo.add(enemy);
-
                                     moneyDaemon.setAmount(1)
                                             .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
                                             .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
-                                    renderer.consume(()->{
+                                    renderer.consume(() -> {
                                         moneyView.getFirst().show();
                                         moneyView.getSecond().show();
                                     });
@@ -1879,7 +1889,7 @@ public class Game {
 
     public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, long duration) {
 
-        laser.desintegrateTarget(source, enemy, duration, renderer, ret->{
+        laser.desintegrateTarget(source, enemy, duration, renderer, ret -> {
 
             int newHp = enemy.getHp() - laser.getDamage();
             if (newHp > 0) {
@@ -1887,7 +1897,7 @@ public class Game {
                 float enemyVelocity = enemy.getVelocity().intensity;
                 enemy.setHp(newHp).setVelocity(enemyVelocity / 4);
 
-                enemyParalyizer.start().setClosure(()->{
+                enemyParalyizer.start().setClosure(() -> {
                     if (enemy.isShootable())
                         enemy.setVelocity(enemyVelocity);
                     enemyParalyizer.stop();
@@ -1902,7 +1912,7 @@ public class Game {
                         .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
                         .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
-                renderer.consume(()->{
+                renderer.consume(() -> {
                     moneyView.getFirst().show();
                     moneyView.getSecond().show();
                 });

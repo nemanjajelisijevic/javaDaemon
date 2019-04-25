@@ -62,15 +62,14 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
             Image[] last = new Image[1];
             last[0] = spriteBuffer.getCurrent();
             return last;
-//            Image[] last = new Image[1];
-//            last[0] = spriteBuffer.getCurrent();
-//            setSprite(last);
 
         } else {//getRotationSprite smoothly
 
             size = 0;
+
             int mirrorAngle;
             boolean direction; //true for increasing angle
+
             if (targetAngle < 180) {
                 mirrorAngle = targetAngle + 180;
                 direction = !(currentAngle < mirrorAngle && currentAngle > targetAngle);
@@ -85,9 +84,11 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
             Image[] ret = Arrays.copyOf(currentRotationSprite, size);
             return ret;
-
-            //pushSprite(Arrays.copyOf(currentRotationSprite, size), velocity.intensity);
         }
+    }
+
+    public static double getAngle(Pair<Float, Float> one, Pair<Float, Float> two) {
+        return getAngle(one.getFirst(), one.getSecond(), two.getFirst(), two.getSecond());
     }
 
     public static double getAngle(float x1, float y1, float x2, float y2) {
@@ -101,17 +102,16 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         if (dx == 0 && dy == 0) {
             return 0;
         } else if(dx == 0) {
-            if(dy < 0) {
+            if(dy < 0)
                 return 90;
-            } else {
+            else
                 return 270;
-            }
         } else if (dy == 0){
-            if(dx < 0) {
+            if(dx < 0)
                 return 180;
-            } else {
+            else
                 return 0;
-            }
+
         } else if (dx > 0 && dy > 0) {
             return 360 - angle;
         } else if (dx < 0 && dy > 0) {

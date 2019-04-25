@@ -13,12 +13,12 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import java.util.Arrays;
 
 
-@Daemonize(doubleDaemonize = true, daemonizeBaseMethods = true, className = "EnemyDoubleDaemon")
+@Daemonize(doubleDaemonize = true, className = "EnemyDoubleDaemon")
 public class Enemy extends CoordinatedImageTranslationMover {
 
     private ImageView view;
     private ImageView hpView;
-    private int hpMax;
+    private volatile int hpMax;
     private volatile int hp;
     private volatile boolean shootable = true;
     private Image[] spriteHealthBarImage;
@@ -55,6 +55,11 @@ public class Enemy extends CoordinatedImageTranslationMover {
     @CallingThread
     public int getHp() {
         return hp;
+    }
+
+    @CallingThread
+    public int getMaxHp() {
+        return hpMax;
     }
 
     @CallingThread
