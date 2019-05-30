@@ -4,11 +4,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 
 import java.util.List;
 
-public interface Daemon<D extends Daemon> {
-
-  D start();
-
-  void stop();
+public interface Daemon<D extends Daemon> extends DaemonService<D> {
 
   D queueStop();
 

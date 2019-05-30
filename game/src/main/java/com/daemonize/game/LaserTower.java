@@ -25,7 +25,6 @@ public class LaserTower extends Tower {
     @Override
     protected void rotateTo(EnemyDoubleDaemon target) throws InterruptedException {}
 
-
     @Override
     public PositionedImage animate() throws InterruptedException {
 

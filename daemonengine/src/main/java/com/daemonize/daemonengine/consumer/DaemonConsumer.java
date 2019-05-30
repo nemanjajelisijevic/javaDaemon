@@ -14,7 +14,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DaemonConsumer implements Consumer, Daemon<DaemonConsumer> {
+public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonConsumer> {
 
     private volatile DaemonState state = DaemonState.STOPPED;
     private Queue<Runnable> closureQueue = new LinkedList<>();
@@ -100,7 +100,6 @@ public class DaemonConsumer implements Consumer, Daemon<DaemonConsumer> {
         return state;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public DaemonConsumer setName(String name) {
         this.name = name;

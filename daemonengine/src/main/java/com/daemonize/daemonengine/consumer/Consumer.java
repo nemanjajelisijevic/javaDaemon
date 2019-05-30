@@ -1,6 +1,8 @@
 package com.daemonize.daemonengine.consumer;
 
 
-public interface Consumer {
+import com.daemonize.daemonengine.DaemonService;
+
+public interface Consumer<C extends Consumer> extends DaemonService<C> {
     boolean consume(Runnable runnable);
 }

@@ -94,7 +94,7 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
     }
 
     @Override
-    public AndroidSurfaceViewRenderer stop() {
+    public void stop() {
         drawConsumer.stop();
         drawing = false;
         try {
@@ -106,7 +106,6 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
         } catch (InterruptedException e) {
             //
         }
-        return this;
     }
 
     @Override

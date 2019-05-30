@@ -439,8 +439,10 @@ public class Game {
                 deselection = imageLoader.loadImageFromAssets("redOctagon.png", selectionWidth, selectionWidth);
 
                 if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    renderer.consume(loaderBar.next()::show);
+
+//                    loaderBar.next().show();
+//                    renderer.drawScene();
                 }
 
                 scoreBackGrImage = imageLoader.loadImageFromAssets("SmallBox.png", scoreWidth, scoreHeight);
@@ -1718,9 +1720,11 @@ public class Game {
                                 default:
                                     throw new IllegalStateException("Tower type does not exist!");
                             }
+
+                            towerDaemon.reload(reloadInterval, ()->towerDaemon.scan(this::onReturn));
                         }
 
-                        towerDaemon.reload(reloadInterval, ()->towerDaemon.scan(this::onReturn));
+                       towerDaemon.scan(this::onReturn);
                     }
                 });
             }
