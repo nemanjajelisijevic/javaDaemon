@@ -75,10 +75,9 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
     }
 
     @Override
-    public JavaFXRenderer stop() {
+    public void stop() {
         drawConsumer.stop();
         animationTimer.stop();
-        return this;
     }
 
     @Override
