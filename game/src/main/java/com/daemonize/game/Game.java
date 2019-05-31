@@ -4,7 +4,6 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
-import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
@@ -40,7 +39,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Game {
 
@@ -58,7 +56,7 @@ public class Game {
     private ImageLoader imageLoader;
 
     //state holder
-    private DaemonChainScript chain = new DaemonChainScript();
+    private DaemonChainScript stateChain = new DaemonChainScript();
 
     //Scene
     private Scene2D scene;
@@ -299,7 +297,7 @@ public class Game {
 
     public Game run() {
         gameConsumer.start().consume(()->{
-            gameConsumer.consume(()->chain.run());
+            gameConsumer.consume(()-> stateChain.run());
             this.running = true;
             this.paused = false;
         });
@@ -355,7 +353,7 @@ public class Game {
 
     {
         //init state
-        chain.addState(()-> { //image loading State
+        stateChain.addState(()-> { //image loading State
 
             try {
 
@@ -840,7 +838,7 @@ public class Game {
 
                 renderer.drawScene();
 
-                gameConsumer.consume(chain::next);
+                gameConsumer.consume(stateChain::next);
 
             } catch (IOException ex) {
                 System.err.println(DaemonUtils.tag() + "Could not init game!");
@@ -1330,7 +1328,7 @@ public class Game {
 
             renderer.setScene(scene).start();
 
-            gameConsumer.consume(chain::next);
+            gameConsumer.consume(stateChain::next);
 
         }).addState(()->{//gameState
 
