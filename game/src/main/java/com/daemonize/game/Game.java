@@ -297,7 +297,7 @@ public class Game {
 
     public Game run() {
         gameConsumer.start().consume(()->{
-            gameConsumer.consume(()-> stateChain.run());
+            gameConsumer.consume(stateChain::run);
             this.running = true;
             this.paused = false;
         });
