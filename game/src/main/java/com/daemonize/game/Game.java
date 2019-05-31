@@ -3,6 +3,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
+import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
@@ -1487,37 +1488,31 @@ public class Game {
             ImageView firstFieldView = gridViewMatrix[0][0];
             ImageView lastFieldView = gridViewMatrix[rows - 1][columns - 1];
 
-            AtomicInteger markerCnt = new AtomicInteger(0);
+            new MainQuestDaemonEngine(renderer).daemonize(()->{
 
-            DummyDaemon startEndMarker = DummyDaemon.create(renderer, 300);
-            startEndMarker.setClosure(()->{
+                int cnt = 0;
 
-                if (firstFieldView.isShowing())
-                    firstFieldView.hide();
-                else
-                    firstFieldView.show();
+                while (cnt < 6) {
+                    if (firstFieldView.isShowing())
+                        renderer.consume(firstFieldView::hide);
+                    else
+                        renderer.consume(firstFieldView::show);
 
-                if (markerCnt.intValue() == 6) {
-                    firstFieldView.hide();
-                    markerCnt.set(0);
-                    startEndMarker.setClosure(()->{
+                    cnt++;
 
-                        if (lastFieldView.isShowing())
-                            lastFieldView.hide();
-                        else
-                            lastFieldView.setImage(fieldImageTowerDen).show();
-
-                        if (markerCnt.intValue() == 6) {
-                            lastFieldView.setImage(fieldImage).hide();
-                            startEndMarker.stop();
-                        }
-
-                        markerCnt.incrementAndGet();
-                    });
+                    Thread.sleep(300);
                 }
 
-                markerCnt.incrementAndGet();
+                while (cnt < 12) {
+                    if (lastFieldView.isShowing())
+                        renderer.consume(lastFieldView::hide);
+                    else
+                        renderer.consume(lastFieldView.setImage(fieldImageTowerDen)::show);
 
+                    cnt++;
+
+                    Thread.sleep(300);
+                }
             }).setName("Start End field marker").start();
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
