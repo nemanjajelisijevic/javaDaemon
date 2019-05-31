@@ -210,11 +210,10 @@ public class Game {
     private static class MultiViewAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
-            GenericNode.forEach(aReturn.runtimeCheckAndGet(), actionret -> {
-                Pair<ImageMover.PositionedImage, ImageView> imageAndView = actionret.runtimeCheckAndGet();
-                imageAndView.getSecond().setAbsoluteX(imageAndView.getFirst().positionX);
-                imageAndView.getSecond().setAbsoluteY(imageAndView.getFirst().positionY);
-                imageAndView.getSecond().setImage(imageAndView.getFirst().image);
+            GenericNode.forEach(aReturn.runtimeCheckAndGet(), arg -> {
+                arg.getSecond().setAbsoluteX(arg.getFirst().positionX);
+                arg.getSecond().setAbsoluteY(arg.getFirst().positionY);
+                arg.getSecond().setImage(arg.getFirst().image);
             });
         }
     }
