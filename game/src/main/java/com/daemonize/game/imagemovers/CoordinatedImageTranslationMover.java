@@ -24,6 +24,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     private volatile float targetY;
 
     private void setTargetCoordinates(float targetX, float targetY) {
+
         this.targetX = targetX;
         this.targetY = targetY;
     }
@@ -49,19 +50,17 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         if (!ret)
             return ret;
 
-        animateSemaphore.subscribe();
-
         coordinateLock.lock();
-
         setTargetCoordinates(x, y);
+        animateSemaphore.subscribe();
 
         try {
             while (!coordinatesReached)
                 coordinateReachedCondition.await();
         } finally {
             coordinatesReached = false;
-            coordinateLock.unlock();
             animateSemaphore.unsubscribe();
+            coordinateLock.unlock();
         }
 
         return ret;
@@ -71,7 +70,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     @Override
     public void setCoordinates(float lastX, float lastY) {
         super.setCoordinates(lastX, lastY);
-        setTargetCoordinates(0F, 0F);
+        setTargetCoordinates(Float.MIN_VALUE, Float.MIN_VALUE);
     }
 
     @Override
@@ -81,11 +80,11 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
 
         Pair<Float, Float> lastCoord = getLastCoordinates();
 
-        if (Math.abs(lastCoord.getFirst() - targetX)  <= velocity.intensity
-                && Math.abs(lastCoord.getSecond() - targetY)  <= velocity.intensity) {
+        if (Math.abs(lastCoord.getFirst() - targetX)  <= velocity.intensity * getdXY()
+                && Math.abs(lastCoord.getSecond() - targetY)  <= velocity.intensity * getdXY()) {
             coordinateLock.lock();
             coordinatesReached = true;
-            setTargetCoordinates(0F, 0F);
+            setTargetCoordinates(Float.MIN_VALUE, Float.MIN_VALUE);
             coordinateReachedCondition.signal();
             coordinateLock.unlock();
             return null;

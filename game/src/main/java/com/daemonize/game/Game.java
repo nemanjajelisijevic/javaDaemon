@@ -148,7 +148,7 @@ public class Game {
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
-    private int maxEnemies = 40;
+    private int maxEnemies = 50;
     private QueuedEntityRepo<EnemyDoubleDaemon> enemyRepo;
 
     //explosions
@@ -1106,6 +1106,9 @@ public class Game {
 
                 @Override
                 public void onGet(EnemyDoubleDaemon enemy) {
+
+                    System.err.println(DaemonUtils.tag() + "Enemy Queue size: " + this.size());
+
                     enemy.setShootable(true)
                             .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1F, 0.0F)))
                             .setCoordinates(grid.getStartingX(), grid.getStartingY())

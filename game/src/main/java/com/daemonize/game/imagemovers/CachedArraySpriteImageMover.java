@@ -12,6 +12,7 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
     public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
         animateSemaphore.subscribe();
         this.velocity.intensity = velocity;
+        cache.clearCache();
         cache.setSprite(sprite);
         setSprite(new Image[]{sprite[sprite.length - 1]});
         try {
