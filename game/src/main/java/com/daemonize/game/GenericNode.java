@@ -52,10 +52,8 @@ public class GenericNode<T> {
 
     public static <Tp> void forEach(GenericNode<Tp> root, Action<Tp> action) {
         action.execute(root.value);
-        if(root.getChildren() != null) {
-            for (GenericNode<Tp> child : root.getChildren()) {
+        if(root.getChildren() != null)
+            for (GenericNode<Tp> child : root.getChildren())
                 forEach(child, action);
-            }
-        }
     }
 }
