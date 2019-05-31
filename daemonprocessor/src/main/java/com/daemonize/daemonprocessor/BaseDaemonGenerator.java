@@ -114,8 +114,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
             "DaemonState"
     );
 
-    //protected
-
+    private static String baseClassBound = "java.lang.Object";
     private Set<String> overloadedPrototypeMethods = new TreeSet<>();
 
     public String getPackageName() {
@@ -171,7 +170,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         }
 
         if (annClass.getKind().equals(ElementKind.CLASS)) {
-            while (!(((TypeElement) ((DeclaredType) annClass.getSuperclass()).asElement())).getQualifiedName().toString().equals("java.lang.Object")) {
+            while (!(((TypeElement) ((DeclaredType) annClass.getSuperclass()).asElement())).getQualifiedName().toString().equals(baseClassBound)) {
 
                 annClass = (TypeElement) ((DeclaredType) annClass.getSuperclass()).asElement();
                 for (Element innerElement : annClass.getEnclosedElements()) {

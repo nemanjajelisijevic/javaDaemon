@@ -100,7 +100,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         this.dedicatedThreadEngines = new HashMap<>();
 
         List<Pair<ExecutableElement, DedicatedThread>> dedicatedThreadMethods =
-                BaseDaemonGenerator.getDedicatedThreadMethods(BaseDaemonGenerator.getPublicClassMethodsWithBaseClasses(classElement));
+                BaseDaemonGenerator.getDedicatedThreadMethods(getPublicClassMethodsWithBaseClasses(classElement));
 
         for (Pair<ExecutableElement, DedicatedThread> dedicatedThreadMethod : dedicatedThreadMethods) {
 
