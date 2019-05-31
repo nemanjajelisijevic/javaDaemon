@@ -48,6 +48,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
     private String CONSUME_QUEST_TYPE_NAME = "ConsumeQuest";
 
+    private boolean markDaemonMethods = false;
+
     public boolean isConsumer() {
         return consumerDaemon;
     }
@@ -69,16 +71,20 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         this(
                 classElement,
                 classElement.getAnnotation(Daemonize.class).eager(),
-                classElement.getAnnotation(Daemonize.class).consumer()
+                classElement.getAnnotation(Daemonize.class).consumer(),
+                classElement.getAnnotation(Daemonize.class).markDaemonMethods()
         );
     }
 
     public MainQuestDaemonGenerator(
             TypeElement classElement,
             boolean eager,
-            boolean consumer
+            boolean consumer,
+            boolean markDaemonMethods
     ) {
         super(classElement);
+
+        this.markDaemonMethods = markDaemonMethods;
 
         this.eager = eager;
 
@@ -248,7 +254,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return daemonClassBuilder.build();
     }
 
-
     public TypeSpec createMainQuest(ExecutableElement prototypeMethod){
 
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
@@ -331,7 +336,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     public MethodSpec createApiMethod(ExecutableElement prototypeMethod, String daemonEngineString) {
 
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
-        MethodSpec.Builder apiMethodBuilder = MethodSpec.methodBuilder(prototypeMethodData.getMethodName())
+        MethodSpec.Builder apiMethodBuilder = MethodSpec.methodBuilder(markDaemonMethods ? prototypeMethodData.getMethodName() + "_D" : prototypeMethodData.getMethodName())
                 .addModifiers(Modifier.PUBLIC)
                 .addJavadoc(
                         "Prototype method {@link $N#$N}",
