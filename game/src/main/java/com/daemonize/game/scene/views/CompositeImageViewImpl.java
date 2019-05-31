@@ -167,9 +167,8 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         else {
             CompositeImageViewImpl temp = this;
 
-            while(!temp.isRoot){
+            while(!temp.isRoot)
                 temp = temp.parent;
-            }
 
             newChild.root = temp;
         }

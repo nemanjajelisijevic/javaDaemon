@@ -298,12 +298,11 @@ public class Game {
     }
 
     public Game run() {
-        gameConsumer.consume(()->{
+        gameConsumer.start().consume(()->{
             gameConsumer.consume(()->chain.run());
             this.running = true;
             this.paused = false;
         });
-        gameConsumer.start();
         return this;
     }
 
@@ -329,14 +328,14 @@ public class Game {
         gameConsumer.consume(()-> {
 
 
-            for(EnemyDoubleDaemon enemy : activeEnemies) {
-                if (Math.abs(enemy.getLastCoordinates().getFirst() - x) < gridViewMatrix[0][0].getWidth() / 2
-                        && Math.abs(enemy.getLastCoordinates().getSecond() - y) < gridViewMatrix[0][0].getHeight() / 2) {
-                    System.err.println("*******************************************************");
-                    System.err.println(DaemonUtils.tag() + "Clicked on: " + enemy.getName() + ", HP: " + enemy.getHp() + "/" + enemy.getMaxHp());
-                    System.err.println("*******************************************************");
-                }
-            }
+//            for(EnemyDoubleDaemon enemy : activeEnemies) {
+//                if (Math.abs(enemy.getLastCoordinates().getFirst() - x) < gridViewMatrix[0][0].getWidth() / 2
+//                        && Math.abs(enemy.getLastCoordinates().getSecond() - y) < gridViewMatrix[0][0].getHeight() / 2) {
+//                    System.err.println("*******************************************************");
+//                    System.err.println(DaemonUtils.tag() + "Clicked on: " + enemy.getName() + ", HP: " + enemy.getHp() + "/" + enemy.getMaxHp());
+//                    System.err.println("*******************************************************");
+//                }
+//            }
 
             if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
                 towerUpgradeDialogue.getTowerUpgrade().checkCoordinates(x, y);
@@ -841,7 +840,7 @@ public class Game {
 
                 renderer.drawScene();
 
-                chain.next();
+                gameConsumer.consume(chain::next);
 
             } catch (IOException ex) {
                 System.err.println(DaemonUtils.tag() + "Could not init game!");
@@ -1331,7 +1330,7 @@ public class Game {
 
             renderer.setScene(scene).start();
 
-            chain.next();
+            gameConsumer.consume(chain::next);
 
         }).addState(()->{//gameState
 
@@ -1483,12 +1482,10 @@ public class Game {
             enemyGenerator.setName("Enemy Generator").start();
 
             //marking start and end field
-            AtomicReference<Field> currentField = new AtomicReference<>(firstField);
-
             ImageView firstFieldView = gridViewMatrix[0][0];
             ImageView lastFieldView = gridViewMatrix[rows - 1][columns - 1];
 
-            new MainQuestDaemonEngine(renderer).daemonize(()->{
+            new MainQuestDaemonEngine(renderer).daemonize(() -> {
 
                 int cnt = 0;
 
