@@ -10,13 +10,13 @@ public class Return<T> {
     private volatile Exception error;
     private volatile String daemonDescription;
 
-    public Return(){}
+    Return(){}
 
-    public Return(T result) {
+    Return(T result) {
         this.result = result;
     }
 
-    public void setResult(T result) {
+    void setResult(T result) {
         this.result = result;
         this.error = null;
     }
