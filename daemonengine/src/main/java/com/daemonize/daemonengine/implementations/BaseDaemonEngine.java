@@ -76,7 +76,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         currentQuest.run();
       }
 
-      System.out.println(DaemonUtils.tag() + "Daemon stopped!");
+      System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
 
       setState(DaemonState.STOPPED);
     }
