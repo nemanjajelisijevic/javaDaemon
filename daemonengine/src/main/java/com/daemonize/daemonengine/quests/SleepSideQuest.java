@@ -32,13 +32,6 @@ public abstract class SleepSideQuest<T> extends SideQuest<T> {
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
         } catch (Exception ex) {
-            if (getIsVoid())
-                returnRunnable = new ReturnRunnable<>(new Closure<T>() {
-                    @Override
-                    public void onReturn(Return<T> ret) {
-                        ret.get();
-                    }
-                });
             setErrorAndUpdate(ex);
         }
     }
