@@ -177,7 +177,7 @@ public class Game {
     private Image[] laserSprite;
     private int laserViewNo = 50;
 
-    private DummyDaemon enemyParalyizer;
+    private EagerMainQuestDaemonEngine enemyParalyizer;
 
     //random int
     private Random random = new Random();
@@ -1336,7 +1336,7 @@ public class Game {
             for (ImageView laserView : laserViews)
                 laserView.setAbsoluteX(-100).setAbsoluteY(-100);
 
-            enemyParalyizer = DummyDaemon.create(gameConsumer, 3000).setName("Enemy Paralyzer");
+            enemyParalyizer = new EagerMainQuestDaemonEngine(gameConsumer).setName("Enemy Paralyzer").start();
 
             laser.start();
 
@@ -1889,12 +1889,10 @@ public class Game {
                 float enemyVelocity = enemy.getVelocity().intensity;
                 enemy.setHp(newHp).setVelocity(enemyVelocity / 4);
 
-                enemyParalyizer.start().setClosure(() -> {
+                enemyParalyizer.daemonize(()->Thread.sleep(3000), ()->{
                     if (enemy.isShootable())
                         enemy.setVelocity(enemyVelocity);
-                    enemyParalyizer.stop();
                 });
-
             } else {
 
                 Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
