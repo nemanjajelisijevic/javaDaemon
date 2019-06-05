@@ -160,12 +160,10 @@ public class Tower extends RotatingSpriteImageMover {
 
         targetLock.lock();
         try {
-
             while (targetQueue.isEmpty())
                 targetCondition.await();
 
             target = targetQueue.peek();
-
             if (targetTester.test(target))
                 scanRet = Pair.create(towertype, target);
             else
@@ -230,7 +228,6 @@ public class Tower extends RotatingSpriteImageMover {
 
     @ConsumerArg
     public PositionedImage updateSprite() {//hack but improves performance
-        Pair<Float, Float> lastCoord = getLastCoordinates();
         ret.image = iterateSprite();
         return ret;
     }
