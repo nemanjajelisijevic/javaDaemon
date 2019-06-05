@@ -157,8 +157,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
         TypeElement annClass = (TypeElement) annotatedClass;
 
-        System.err.println("Annotated class: " + annClass.getQualifiedName());
-
         for(Element innerElement :  annClass.getEnclosedElements()) {
             if ((innerElement instanceof ExecutableElement) &&
                     !innerElement.getSimpleName().toString().equals("<init>") &&
