@@ -108,6 +108,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
           daemonThread.interrupt();
         }
       }
+      daemonThread = null;
     }
 
     @Override
