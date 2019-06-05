@@ -2,6 +2,7 @@ package com.daemonize.game.imagemovers;
 
 
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.game.AngleToBitmapArray;
 import com.daemonize.game.Pair;
 import com.daemonize.game.images.Image;
@@ -46,10 +47,7 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
     public void rotate(int targetAngle) throws InterruptedException {
         Image[] rotateSprite = getRotationSprite(targetAngle);
-        if (rotateSprite.length == 1)
-            setSprite(rotateSprite);
-        else
-            pushSprite(rotateSprite, velocity.intensity);
+        pushSprite(rotateSprite, velocity.intensity);
     }
 
     public Image[] getRotationSprite(int targetAngle) throws InterruptedException {
@@ -61,6 +59,7 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
             spriteBuffer.setCurrentAngle(targetAngle);
             Image[] last = new Image[1];
             last[0] = spriteBuffer.getCurrent();
+
             return last;
 
         } else {//getRotationSprite smoothly
