@@ -147,7 +147,7 @@ public class Game {
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
-    private int maxEnemies = 50;
+    private int maxEnemies = 100;
     private QueuedEntityRepo<EnemyDoubleDaemon> enemyRepo;
 
     //explosions
@@ -1743,12 +1743,9 @@ public class Game {
 
         bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, ret -> {
 
-            if (!ret.runtimeCheckAndGet()) {
-                bulletRepo.add(bulletDoubleDaemon);
-                return;
-            }
+            ret.runtimeCheckAndGet();
 
-            if (!enemy.isShootable()) {
+            if (enemy.isShootable()) {
                 bulletRepo.add(bulletDoubleDaemon);
                 return;
             }
