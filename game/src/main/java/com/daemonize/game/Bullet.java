@@ -146,12 +146,10 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() throws InterruptedException {
 
-        Pair<Float, Float> lastCoord = getLastCoordinates();
-
         PositionedImage posImage = super.animate();
 
         if(posImage == null)
-            return null;
+            return null;//TODO fix this : throw new IllegalStateException("Bullet pos image is null");
 
         Direction movingDirection = getVelocity().direction;
 

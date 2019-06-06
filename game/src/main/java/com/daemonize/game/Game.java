@@ -141,9 +141,9 @@ public class Game {
     private DummyDaemon enemyGenerator;
     private long enemyCounter = 0;
     private float enemyVelocity = 1;
-    private int enemyHp = 10;
+    private int enemyHp = 500;
     private long enemyGenerateinterval = 5000;
-    private long waveInterval = 10000;
+    private long waveInterval = 15000;
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
@@ -267,7 +267,7 @@ public class Game {
                 rocket.pause();
             for(BulletDoubleDaemon bullet : activeBullets)
                 bullet.pause();
-            renderer.stop();
+            //renderer.stop();
             paused = true;
         });
 
@@ -871,6 +871,7 @@ public class Game {
             upgradeButton.onClick(()->{
 
                 TowerDaemon tow = towerUpgradeDialogue.getTower();
+                tow.pause();
                 tow.levelUp();
 
                 Image[] currentSprite = null;
@@ -1745,7 +1746,7 @@ public class Game {
 
             ret.runtimeCheckAndGet();
 
-            if (enemy.isShootable()) {
+            if (!enemy.isShootable()) {
                 bulletRepo.add(bulletDoubleDaemon);
                 return;
             }
@@ -1870,7 +1871,7 @@ public class Game {
                                 }
                             }
 
-                            rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, ()-> rocketRepo.add(rocketDoubleDaemon));
+                            rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, () -> rocketRepo.add(rocketDoubleDaemon));
                         });
             }
         });
@@ -1883,10 +1884,9 @@ public class Game {
             int newHp = enemy.getHp() - laser.getDamage();
             if (newHp > 0) {
 
-                float enemyVelocity = enemy.getVelocity().intensity;
-                enemy.setHp(newHp).setVelocity(enemyVelocity / 4);
+                enemy.setHp(newHp).setVelocity(enemy.getVelocity().intensity / 4);
 
-                enemyParalyizer.daemonize(()->Thread.sleep(3000), ()->{
+                enemyParalyizer.daemonize(()->Thread.sleep(3000), () -> {
                     if (enemy.isShootable())
                         enemy.setVelocity(enemyVelocity);
                 });

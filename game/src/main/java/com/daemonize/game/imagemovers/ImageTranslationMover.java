@@ -104,7 +104,12 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     @CallingThread
     @Override
     public Image iterateSprite() {
-        return spriteIterator.iterateSprite();
+        Image ret = spriteIterator.iterateSprite();
+
+        if (ret == null)
+            throw new IllegalStateException("Sprite image can not be null!");
+
+        return ret;
     }
 
     @CallingThread

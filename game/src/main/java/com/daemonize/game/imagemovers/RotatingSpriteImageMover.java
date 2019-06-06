@@ -36,8 +36,7 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     }
 
     public RotatingSpriteImageMover(Image[] rotationSprite, DaemonCountingSemaphore animateSemaphore, float velocity, Pair<Float, Float> startingPos, float dXY) {
-        super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos, dXY);
-        setRotationSprite(rotationSprite);
+        this(rotationSprite, velocity, startingPos, dXY);
         this.animateSemaphore = animateSemaphore;
     }
 
@@ -110,7 +109,6 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
                 return 180;
             else
                 return 0;
-
         } else if (dx > 0 && dy > 0) {
             return 360 - angle;
         } else if (dx < 0 && dy > 0) {
