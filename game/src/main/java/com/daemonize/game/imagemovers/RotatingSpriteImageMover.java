@@ -30,12 +30,23 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         this.spriteBuffer.setCurrentAngle(currentAngle);
     }
 
-    public RotatingSpriteImageMover(Image[] rotationSprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
+    public RotatingSpriteImageMover(
+            Image[] rotationSprite,
+            float velocity,
+            Pair<Float, Float> startingPos,
+            float dXY
+    ) {
         super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos, dXY);
         setRotationSprite(rotationSprite);
     }
 
-    public RotatingSpriteImageMover(Image[] rotationSprite, DaemonCountingSemaphore animateSemaphore, float velocity, Pair<Float, Float> startingPos, float dXY) {
+    public RotatingSpriteImageMover(
+            Image[] rotationSprite,
+            DaemonCountingSemaphore animateSemaphore,
+            float velocity,
+            Pair<Float, Float> startingPos,
+            float dXY
+    ) {
         this(rotationSprite, velocity, startingPos, dXY);
         this.animateSemaphore = animateSemaphore;
     }
@@ -76,12 +87,10 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
                 direction = currentAngle < targetAngle && currentAngle > mirrorAngle;
             }
 
-            while (!(Math.abs(targetAngle - spriteBuffer.getCurrentAngle()) < 10) && size < currentRotationSprite.length) {//TODO fix this!!!!!!
+            while (!(Math.abs(targetAngle - spriteBuffer.getCurrentAngle()) < spriteBuffer.getStep()) && size < currentRotationSprite.length)//TODO fix this!!!!!!
                 currentRotationSprite[size++] = direction ? spriteBuffer.getIncrementedByStep() : spriteBuffer.getDecrementedByStep();
-            }
 
-            Image[] ret = Arrays.copyOf(currentRotationSprite, size);
-            return ret;
+            return Arrays.copyOf(currentRotationSprite, size);
         }
     }
 
