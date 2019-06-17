@@ -1707,7 +1707,7 @@ public class Game {
                             }
                         }
 
-                        towerDaemon.reload(/*reloadInterval*/200, () -> towerDaemon.scan(this::onReturn));
+                        towerDaemon.reload(reloadInterval, () -> towerDaemon.scan(this::onReturn));
                     }
                 });
             }
