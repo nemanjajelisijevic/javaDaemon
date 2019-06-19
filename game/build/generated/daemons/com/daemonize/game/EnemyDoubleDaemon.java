@@ -98,6 +98,10 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return prototype.getSprite();
   }
 
+  public boolean isParalyzed() {
+    return prototype.isParalyzed();
+  }
+
   public int getMaxHp() {
     return prototype.getMaxHp();
   }
@@ -109,6 +113,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
 
   public EnemyDoubleDaemon setOutOfBordersConsumer(Consumer consumer) {
     prototype.setOutOfBordersConsumer(consumer);
+    return this;
+  }
+
+  public EnemyDoubleDaemon setParalyzed(boolean paralyzed) {
+    prototype.setParalyzed(paralyzed);
     return this;
   }
 

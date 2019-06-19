@@ -178,6 +178,7 @@ public class Game {
     private int laserViewNo = 50;
 
     private EagerMainQuestDaemonEngine enemyParalyizer;
+    private int enemyParalyzingInterval = 3000;
 
     //random int
     private Random random = new Random();
@@ -860,7 +861,7 @@ public class Game {
             upgradeButton.onClick(()->{
 
                 TowerDaemon tow = towerUpgradeDialogue.getTower();
-                tow.pause();
+                //tow.pause();
                 tow.levelUp();
 
                 Image[] currentSprite = null;
@@ -890,7 +891,7 @@ public class Game {
                 renderer.consume(()->upgradeButton.disable().setImage(upgradeButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
 
-                    tow.cont();
+                    //tow.cont();
 
                     CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
 
@@ -1411,8 +1412,9 @@ public class Game {
                                 Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
                                 for(Field neighbour : grid.getNeighbors(current)) {
-                                    if (neighbour.getTower() != null)
-                                        neighbour.getTower().addTarget(enemyDoubleDaemon);
+                                    if (neighbour.getTower() != null) {
+                                        neighbour.getTower().addTarget(enemyDoubleDaemon);//TODO check ret val
+                                    }
                                 }
 
                                 ImageView currentFieldView = gridViewMatrix[current.getRow()][current.getColumn()];
@@ -1697,10 +1699,10 @@ public class Game {
                                     int lvl = towerDaemon.getTowerLevel().currentLevel;
 
                                     float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
-                                    long duration = lvl == 1 ? 300 : lvl == 2 ? 600 : 900;
+                                    long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
                                     fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration);
-                                    reloadInterval = 5000;
+                                    reloadInterval = 4000;
                                     break;
                                 default:
                                     throw new IllegalStateException("Tower type does not exist!");
@@ -1872,6 +1874,11 @@ public class Game {
 
     public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, float velocity, long duration) {
 
+        if (enemy.isParalyzed())
+            return;
+
+        enemy.setParalyzed(true);
+
         laser.desintegrateTarget(source, enemy, duration, renderer, ret -> {
 
             int newHp = enemy.getHp() - laser.getDamage();
@@ -1879,10 +1886,23 @@ public class Game {
 
                 enemy.setHp(newHp).setVelocity(velocity);
 
-                enemyParalyizer.daemonize(()->Thread.sleep(3000), () -> {
-                    if (enemy.isShootable())
-                        enemy.setVelocity(enemyVelocity);
-                });
+                if (enemyParalyizer.queueSize() == 0) {
+                    enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), () -> {
+                        enemy.setParalyzed(false);
+                        if (enemy.isShootable())
+                            enemy.setVelocity(enemyVelocity);
+                    });
+                } else {
+                    new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(()->{
+                        System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
+                        Thread.sleep(enemyParalyzingInterval);
+                    },()->{
+                        enemy.setParalyzed(false);
+                        if (enemy.isShootable())
+                            enemy.setVelocity(enemyVelocity);
+                    });
+                }
+
             } else {
 
                 Pair<Float, Float> targetCoord = enemy.getLastCoordinates();

@@ -23,6 +23,18 @@ public class Enemy extends CoordinatedImageTranslationMover {
     private volatile boolean shootable = true;
     private Image[] spriteHealthBarImage;
 
+    private boolean paralyzed = false;
+
+    @CallingThread
+    public boolean isParalyzed() {
+        return paralyzed;
+    }
+
+    @CallingThread
+    public void setParalyzed(boolean paralyzed) {
+        this.paralyzed = paralyzed;
+    }
+
     private Pair<Integer, Integer> previousField;
 
     @CallingThread

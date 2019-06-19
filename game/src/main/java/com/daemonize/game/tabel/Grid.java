@@ -90,8 +90,8 @@ public class Grid {
         Field ret = null;
 
         if (isInsideOfGrid(x,y)) {
-            int row = (int) ((y - yCoordinateInReal) / fieldWith);//TODO this shit right here
-            int column = (int) ((x - xCoordinateInReal) / fieldWith);
+            int row = (int)Math.floor((y - yCoordinateInReal) / fieldWith);
+            int column = (int) Math.floor((x - xCoordinateInReal) / fieldWith);
             ret = grid[row][column];
         }
 
