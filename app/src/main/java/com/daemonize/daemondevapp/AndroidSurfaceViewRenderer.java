@@ -86,6 +86,7 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
             throw new IllegalStateException("Scene not locked!");
 
         drawThread = new Thread(this);
+        drawThread.setPriority(Thread.MAX_PRIORITY);
         drawThread.setName("AndroidSurfaceViewRenderer");
         drawing = true;
         drawConsumer.start();
