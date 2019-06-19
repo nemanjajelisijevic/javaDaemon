@@ -202,7 +202,8 @@ So it can be used:
     //or maybe we dont want the exception to crash the app:
     exampleDaemon.add(48, 54, ret -> {
       try {
-         view.setText(ret.checkAndGet().toString()); //ret.checkAndGet() throws a checked exception
+         view.setText(ret.checkAndGet().toString());
+         //ret.checkAndGet() throws a checked DaemonException that encapsulates the exception thrown in prototype method
       } catch (DaemonException ex) {
          ex.printStackTrace();
       }
