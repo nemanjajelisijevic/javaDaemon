@@ -12,6 +12,7 @@ import java.io.IOException;
 import javafx.application.Application;
 
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -65,6 +66,7 @@ public class Main extends Application {
         //primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
 
+        scene.setCursor(Cursor.HAND);
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> game.onTouch((float) event.getSceneX(), (float) event.getSceneY()));
 
 //            scene.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
