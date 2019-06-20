@@ -268,7 +268,7 @@ public class Game {
                 rocket.pause();
             for(BulletDoubleDaemon bullet : activeBullets)
                 bullet.pause();
-            //renderer.stop();
+            renderer.stop();
             paused = true;
         });
 
