@@ -1621,7 +1621,7 @@ public class Game {
                 }
 
 
-                Tower prototype = towerSelect == Tower.TowerType.TYPE3
+                Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
                         ? new LaserTower (
                                 renderer,
                                 new ImageAnimateClosure(fieldView),
@@ -1639,7 +1639,7 @@ public class Game {
                         dXY
                 );
 
-                TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, prototype)
+                TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
                         .setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]")
                         .setView(fieldView);
 
