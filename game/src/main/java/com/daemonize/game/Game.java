@@ -1831,7 +1831,7 @@ public class Game {
                         velocity,
                         ret2 -> {
 
-                            if (! ret2.runtimeCheckAndGet() || !enemy.isShootable()) {
+                            if (!ret2.runtimeCheckAndGet() || !enemy.isShootable()) {
                                 rocketRepo.add(rocketDoubleDaemon);
                                 return;
                             }
