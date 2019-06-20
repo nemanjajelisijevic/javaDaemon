@@ -1096,7 +1096,7 @@ public class Game {
                 @Override
                 public void onGet(EnemyDoubleDaemon enemy) {
 
-                    System.err.println(DaemonUtils.tag() + "Enemy Queue size: " + this.size());
+                    System.err.println(DaemonUtils.tag() + "Enemy repo size: " + this.size());
 
                     enemy.setShootable(true)
                             .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1F, 0.0F)))
@@ -1925,5 +1925,4 @@ public class Game {
 
         renderer.consume(()->infoScore.setNumbers(++score));
     };
-
 }
