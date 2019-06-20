@@ -177,6 +177,7 @@ public class Game {
     private Image[] laserSprite;
     private int laserViewNo = 50;
 
+    //laser paralyzer
     private EagerMainQuestDaemonEngine enemyParalyizer;
     private int enemyParalyzingInterval = 3000;
 
@@ -187,9 +188,10 @@ public class Game {
         return random.nextInt((max - min) + 1) + min;
     }
 
+    //resolution scaling attribute
     private float dXY;
 
-    //closures
+    //animate closures
     private static class ImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
         private ImageView view;
@@ -218,6 +220,7 @@ public class Game {
         }
     }
 
+    //construct
     public Game(
             Renderer2D renderer,
             ImageLoader imageLoader,
@@ -323,6 +326,7 @@ public class Game {
         return this;
     }
 
+    //controller
     public Game onTouch(float x, float y) {
         gameConsumer.consume(()-> {
             if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
@@ -342,7 +346,7 @@ public class Game {
     }
 
     {
-        //init state
+        //init state (loading sprites)
         stateChain.addState(()-> { //image loading State
 
             try {
@@ -378,7 +382,6 @@ public class Game {
                                 .show()
                 );
 
-                //loadingScene.addImageView(new ImageViewImpl("Daemonize View").setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2).setZindex(1).setImage(daemonize).show());
                 loadingScene.addImageViews(laserViews);
                 loadingScene.lockViews();
                 renderer.setScene(loadingScene).drawScene();
@@ -443,7 +446,7 @@ public class Game {
                 }
 
                 for (int i = 0; i < 36; i++)
-                    enemySprite[i] = imageLoader.loadImageFromAssets("plane" + Integer.toString(i) + "0.png", width, height);
+                    enemySprite[i] = imageLoader.loadImageFromAssets("plane" + i + "0.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -462,7 +465,7 @@ public class Game {
                 bulletSpriteRocket = new Image[36];
 
                 for (int i = 0; i < 36; i++)
-                    bulletSpriteRocket[i] = imageLoader.loadImageFromAssets("rocket" + Integer.toString(i) + "0.png", bulletSize, bulletSize);
+                    bulletSpriteRocket[i] = imageLoader.loadImageFromAssets("rocket" + i + "0.png", bulletSize, bulletSize);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -835,7 +838,7 @@ public class Game {
                 ex.printStackTrace();
             }
 
-        }).addState(()-> { //view populating
+        }).addState(()-> { //views and dialogs population
 
             //add background to scene
             backgroundView = scene.addImageView(new ImageViewImpl("Background").setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
@@ -861,7 +864,7 @@ public class Game {
             upgradeButton.onClick(()->{
 
                 TowerDaemon tow = towerUpgradeDialogue.getTower();
-                //tow.pause();
+
                 tow.levelUp();
 
                 Image[] currentSprite = null;
@@ -1248,17 +1251,11 @@ public class Game {
                         .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                 ).setName(rocketName);
 
-                rocketDoubleDaemon.getPrototype().setBorders(
-                        0,//TODO fix offset
-                        borderX,
-                        0,
-                        borderY
-                );
+                rocketDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY);
 
                 rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
-                        .setOutOfBordersClosure(()-> rocketRepo.add(rocketDoubleDaemon.clearAndInterrupt()));
-
-                rocketDoubleDaemon.setAnimateBulletSideQuest(renderer)
+                        .setOutOfBordersClosure(()-> rocketRepo.add(rocketDoubleDaemon.clearAndInterrupt()))
+                        .setAnimateBulletSideQuest(renderer)
                         .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 rocketRepo.getStructure().push(rocketDoubleDaemon);
@@ -1380,7 +1377,6 @@ public class Game {
                     bulletDamage += 1;
 
                 EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy->enemy.setMaxHp(enemyHp).setHp(enemyHp));
-
 
                 System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + ", STATES: " + enemyDoubleDaemon.getEnginesState().toString());
 
@@ -1724,7 +1720,7 @@ public class Game {
             int bulletDamage,
             int noOfBulletsFired
     ) {
-        System.out.println(DaemonUtils.tag() + "Bullet queue size: " + bulletRepo.size());
+        System.out.println(DaemonUtils.tag() + "Bullet repo size: " + bulletRepo.size());
 
         BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet -> {
             bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
@@ -1772,7 +1768,7 @@ public class Game {
             int bulletDamage,
             int noOfBulletsFired
     ) {
-        System.out.println(DaemonUtils.tag() + "Rocket stack size: " + rocketRepo.size());
+        System.out.println(DaemonUtils.tag() + "Rocket repo size: " + rocketRepo.size());
 
         BulletDoubleDaemon rocketDoubleDaemon = rocketRepo.configureAndGet(rocket-> {
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
