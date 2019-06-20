@@ -353,8 +353,6 @@ public class Game {
 
                 backgroundImage = imageLoader.loadImageFromAssets("maphi.jpg", borderX, borderY);
 
-                //Image daemonize = imageLoader.loadImageFromAssets("@Daemonize.png", borderX /3, borderY / 5);
-
                 //laser views init
                 laserViews = new ArrayList<>(laserViewNo);
 
