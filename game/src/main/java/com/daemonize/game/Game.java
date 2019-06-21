@@ -1407,7 +1407,7 @@ public class Game {
 
                             BulletDoubleDaemon rocket = rocketRepo.configureAndGet(bullet -> {
                                 bullet.setCoordinates(enemyDoubleDaemon.getLastCoordinates().getFirst(), enemyDoubleDaemon.getLastCoordinates().getSecond())
-                                        .setLevel(3)
+                                        .setLevel(2)
                                         .setDamage(bulletDamage)
                                         .setSprite(bulletSpriteRocket);
                                 if (bullet.getEnginesState().get(bullet.getEnginesState().size() - 1).equals(DaemonState.STOPPED))

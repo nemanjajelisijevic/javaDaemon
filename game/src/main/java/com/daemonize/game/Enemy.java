@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
@@ -26,6 +27,7 @@ public class Enemy extends CoordinatedImageTranslationMover {
     private boolean paralyzed = false;
 
     private volatile TowerDaemon target;
+    private DaemonSemaphore targetSemaphore = new DaemonSemaphore();
 
     @CallingThread
     public TowerDaemon getTarget() {
@@ -35,12 +37,18 @@ public class Enemy extends CoordinatedImageTranslationMover {
     @CallingThread
     public void setTarget(TowerDaemon target) {
         this.target = target;
+
+        if (target == null)
+            targetSemaphore.stop();
+        else
+            targetSemaphore.go();
     }
 
     @DedicatedThread
     @GenerateRunnable
     public void reload() throws InterruptedException {
         Thread.sleep(400);
+        targetSemaphore.await();
     }
 
     @CallingThread
