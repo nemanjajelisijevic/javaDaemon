@@ -111,7 +111,7 @@ public class Game {
     private Image[] moneyNumbersImages;
 
     //towers
-    private int towerHp = 50;
+    private int towerHp = 100;
 
     private Image[] redTowerUpgSprite;
     private Image[] blueTowerUpgSprite;
@@ -1449,7 +1449,7 @@ public class Game {
                                         if (newHp > 0)
                                             target.setHp(newHp);
                                         else {
-                                            target.getHpView().hide().setImage(healthBarSprite[0]);
+                                            renderer.consume(()->target.getHpView().hide().setImage(healthBarSprite[0]));
 
                                             Field field = grid.getField(
                                                     target.getLastCoordinates().getFirst(),
@@ -1458,9 +1458,10 @@ public class Game {
 
                                             target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
 
+                                                renderer.consume(()->target.getView().hide());
+
                                                 target.stop();
                                                 towers.remove(target);
-
                                                 field.setTower(null);
 
                                                 //remove tower from grid and recalculate path
@@ -1710,6 +1711,8 @@ public class Game {
 
                 String towerName = "Tower[" + field.getColumn() + "][" + field.getRow() + "]";
 
+                renderer.consume(()->towerHpViwes[field.getRow()][field.getColumn()].setImage(healthBarSprite[9]));
+
                 Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
                         ? new LaserTower (
                                 renderer,
@@ -1732,6 +1735,8 @@ public class Game {
                 )
                 .setHpView(towerHpViwes[field.getRow()][field.getColumn()].show())
                 .setHealthBarImage(healthBarSprite);
+
+                //renderer.consume(towerHpViwes[field.getRow()][field.getColumn()]::show);
 
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
                         .setName(towerName)
