@@ -29,6 +29,8 @@ public class Enemy extends CoordinatedImageTranslationMover {
     private volatile TowerDaemon target;
     private DaemonSemaphore targetSemaphore = new DaemonSemaphore();
 
+    private PositionedImage hBar = new PositionedImage();
+
     public Enemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
         super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
         this.hp = hp;
@@ -158,8 +160,6 @@ public class Enemy extends CoordinatedImageTranslationMover {
     public Image iterateSprite() {
         return rotationMover.iterateSprite();
     }
-
-    private PositionedImage hBar = new PositionedImage();
 
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() throws InterruptedException {
