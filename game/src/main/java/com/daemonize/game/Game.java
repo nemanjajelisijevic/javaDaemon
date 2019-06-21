@@ -1443,7 +1443,7 @@ public class Game {
                                             target.setHp(newHp);
                                         else {
 
-                                            renderer.consume(()->target.getHpView().hide().setImage(healthBarSprite[0]));
+                                            renderer.consume(()->target.getHpView().hide().setImage(healthBarSprite[9]));
                                             enemyDoubleDaemon.setTarget(null);
 
                                             Field field = grid.getField(
@@ -1453,7 +1453,7 @@ public class Game {
 
                                             target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
 
-                                                renderer.consume(()->target.getView().hide());
+                                                renderer.consume(target.getView()::hide);
 
                                                 target.stop();
                                                 towers.remove(target);
