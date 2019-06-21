@@ -731,7 +731,6 @@ public class Game {
                     renderer.drawScene();
                 }
 
-
                 Image score = imageLoader.loadImageFromAssets("SmallBox.png", 300, 150);
                 Image titleScore = imageLoader.loadImageFromAssets("HealthBar.png", 300, 70);
 
@@ -921,7 +920,6 @@ public class Game {
 
             Button saleButton = new Button("Sale", saleButtonImage);
             saleButton.onClick(()->{
-
                 renderer.consume(()->saleButton.disable().setImage(saleButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
                     TowerDaemon tower = towerUpgradeDialogue.getTower();
