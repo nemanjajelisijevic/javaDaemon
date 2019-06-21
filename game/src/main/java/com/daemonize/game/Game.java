@@ -1450,8 +1450,6 @@ public class Game {
                                             target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
 
                                                 renderer.consume(target.getView()::hide);
-
-                                                target.stop();
                                                 towers.remove(target);
                                                 field.setTower(null);
 
@@ -1460,7 +1458,7 @@ public class Game {
                                                     renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
                                                 else
                                                     throw new IllegalStateException("Could not destroy tower");
-                                            });
+                                            }).queueStop();
                                         }
 
                                         rocket.pushSprite(rocketExplodeSprite, 0, () -> rocketRepo.add(rocket));
