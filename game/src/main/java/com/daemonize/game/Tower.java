@@ -24,6 +24,48 @@ import java.util.concurrent.locks.ReentrantLock;
 @Daemonize(doubleDaemonize = true)
 public class Tower extends RotatingSpriteImageMover {
 
+
+    private ImageView hpView;
+    private volatile int hpMax;
+    private volatile int hp;
+    private Image[] spriteHealthBarImage;
+
+    @CallingThread
+    public int getHp() {
+        return hp;
+    }
+
+    @CallingThread
+    public int getMaxHp() {
+        return hpMax;
+    }
+
+    @CallingThread
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    @CallingThread
+    public void setMaxHp(int maxHp) {
+        this.hpMax = maxHp;
+    }
+
+    @CallingThread
+    public ImageView getHpView() {
+        return hpView;
+    }
+
+    @CallingThread
+    public Tower setHpView(ImageView hpView) {
+        this.hpView = hpView;
+        return this;
+    }
+
+    public Tower setHealthBarImage(Image[] healthBarImage) {
+        this.spriteHealthBarImage = healthBarImage;
+        return this;
+    }
+
     public enum TowerType {
         TYPE1,
         TYPE2,
@@ -124,12 +166,14 @@ public class Tower extends RotatingSpriteImageMover {
         this.view = view;
     }
 
-    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, TowerType type, float dXY) {
+    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
         super(rotationSprite, 0, startingPos, dXY);
         this.ret.positionX = startingPos.getFirst();
         this.ret.positionY = startingPos.getSecond();
         this.range = range;
         this.towertype = type;
+        this.hp = hp;
+        this.hpMax = hp;
         this.targetQueue = new LinkedList<>();
         this.targetLock = new ReentrantLock();
         this.targetCondition = targetLock.newCondition();
@@ -145,6 +189,12 @@ public class Tower extends RotatingSpriteImageMover {
     @Override
     public void setRotationSprite(Image[] rotationSprite) {
         super.setRotationSprite(rotationSprite);
+    }
+
+    @GenerateRunnable
+    @Override
+    public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
+        super.pushSprite(sprite, velocity);
     }
 
     private Pair<TowerType, EnemyDoubleDaemon> scanRet = Pair.create(null, null);
@@ -225,16 +275,23 @@ public class Tower extends RotatingSpriteImageMover {
     }
 
     protected volatile PositionedImage ret = new PositionedImage();
+    private PositionedImage hBar = new PositionedImage();
 
     @ConsumerArg
-    public PositionedImage updateSprite() {//hack but improves performance
+    public GenericNode<Pair<PositionedImage, ImageView>> updateSprite() {//hack but improves performance
         ret.image = iterateSprite();
-        return ret;
+
+        GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(ret, view));
+        hBar.image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
+        hBar.positionX = ret.positionX;
+        hBar.positionY = ret.positionY - 2 * hBar.image.getHeight();
+        root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
+
+        return root;
     }
 
     @SideQuest(SLEEP = 25)
-    @Override
-    public PositionedImage animate() throws InterruptedException {
+    public GenericNode<Pair<PositionedImage, ImageView>>  animateTower() throws InterruptedException {
         try {
             animateSemaphore.await();
             return updateSprite();

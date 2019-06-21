@@ -12,8 +12,8 @@ public class LaserTower extends Tower {
     private Consumer renderer;
     private ReturnRunnable<PositionedImage> updateRunnable = new ReturnRunnable<>();
 
-    public LaserTower(Consumer renderer, Closure<PositionedImage> updateClosure, Image[] rotationSprite, Pair<Float, Float> startingPos, float range, TowerType type, float dXY) {
-        super(rotationSprite, startingPos, range, type, dXY);
+    public LaserTower(Consumer renderer, Closure<PositionedImage> updateClosure, Image[] rotationSprite, Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
+        super(rotationSprite, startingPos, range, type, dXY, hp);
         this.renderer = renderer;
         this.updateRunnable.setClosure(updateClosure);
         this.targetTester = target -> target.isShootable()

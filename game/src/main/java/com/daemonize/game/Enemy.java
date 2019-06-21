@@ -25,6 +25,24 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
     private boolean paralyzed = false;
 
+    private volatile TowerDaemon target;
+
+    @CallingThread
+    public TowerDaemon getTarget() {
+        return target;
+    }
+
+    @CallingThread
+    public void setTarget(TowerDaemon target) {
+        this.target = target;
+    }
+
+    @DedicatedThread
+    @GenerateRunnable
+    public void reload() throws InterruptedException {
+        Thread.sleep(400);
+    }
+
     @CallingThread
     public boolean isParalyzed() {
         return paralyzed;
@@ -133,6 +151,8 @@ public class Enemy extends CoordinatedImageTranslationMover {
         return rotationMover.iterateSprite();
     }
 
+    private PositionedImage hBar = new PositionedImage();
+
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() throws InterruptedException {
 
@@ -144,7 +164,6 @@ public class Enemy extends CoordinatedImageTranslationMover {
             return null;
 
         GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(enemyPosBmp, view));
-        PositionedImage hBar = new PositionedImage();
         hBar.image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
         hBar.positionX = lastCoord.getFirst();
         hBar.positionY = lastCoord.getSecond() - 2 * hBar.image.getHeight();

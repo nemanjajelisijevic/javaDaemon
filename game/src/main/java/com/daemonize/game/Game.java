@@ -85,7 +85,7 @@ public class Game {
     private DaemonEngine fieldEraserEngine;
 
     //score
-    private int score = 1000;
+    private int score = 100;
     private ImageView scoreBackGrView;
     private ImageView scoreTitleView;
     private ImageView[] viewsNum;
@@ -111,6 +111,8 @@ public class Game {
     private Image[] moneyNumbersImages;
 
     //towers
+    private int towerHp = 50;
+
     private Image[] redTowerUpgSprite;
     private Image[] blueTowerUpgSprite;
     private Image[] greenTowerUpgSprite;
@@ -118,6 +120,8 @@ public class Game {
     private List<Image[]> redTower;
     private List<Image[]> blueTower;
     private List<Image[]> greenTower;
+
+    private ImageView[][] towerHpViwes;
 
     private Set<TowerDaemon> towers = new HashSet<>();
     private int range;
@@ -881,13 +885,7 @@ public class Game {
 
                 tow.setRotationSprite(currentSprite);
 
-                towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, update -> {
-                    ImageMover.PositionedImage posBmp = update.runtimeCheckAndGet();
-                    tow.getView().setAbsoluteX(posBmp.positionX);
-                    tow.getView().setAbsoluteY(posBmp.positionY);
-                    tow.getView().setImage(posBmp.image);
-                });
-
+                towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, new MultiViewAnimateClosure()::onReturn);
 
                 renderer.consume(()->upgradeButton.disable().setImage(upgradeButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
@@ -1037,6 +1035,24 @@ public class Game {
                      .setImage(fieldGreenDiagonal)
                      .setZindex(3)
                      .hide();
+            }
+
+            //tower hp views
+            towerHpViwes = new ImageView[rows][columns];
+
+            for (int j = 0; j < rows; ++j ) {
+                for (int i = 0; i < columns; ++i) {
+
+                    String towerName = "Tower[" + i + "][" + j + "]";
+                    towerHpViwes[j][i] = scene.addImageView(
+                            new ImageViewImpl(towerName + " HP View")
+                                    .setImage(healthBarSprite[0])
+                                    .hide()
+                                    .setAbsoluteX(0)
+                                    .setAbsoluteY(0)
+                                    .setZindex(10)
+                    );
+                }
             }
 
             //enemy repo init
@@ -1389,7 +1405,78 @@ public class Game {
                         firstField.getCenterY()
                 );
 
-                enemyDoubleDaemon.rotate(angle).goTo(
+
+                enemyDoubleDaemon.reload(new Runnable() {
+                    @Override
+                    public void run() {
+                        TowerDaemon target = enemyDoubleDaemon.getTarget();
+
+                        if (target != null) {
+
+                            BulletDoubleDaemon rocket = rocketRepo.configureAndGet(bullet -> {
+                                bullet.setCoordinates(enemyDoubleDaemon.getLastCoordinates().getFirst(), enemyDoubleDaemon.getLastCoordinates().getSecond())
+                                        .setLevel(3)
+                                        .setDamage(bulletDamage)
+                                        .setSprite(bulletSpriteRocket);
+                                if (bullet.getEnginesState().get(bullet.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
+                                    bullet.start();
+                                else
+                                    bullet.cont();
+                            });
+
+
+                            int targetAngle = (int) RotatingSpriteImageMover.getAngle(
+                                    enemyDoubleDaemon.getLastCoordinates().getFirst(),
+                                    enemyDoubleDaemon.getLastCoordinates().getSecond(),
+                                    target.getLastCoordinates().getFirst(),
+                                    target.getLastCoordinates().getSecond()
+                            );
+
+                            rocket.rotateAndGoTo(
+                                    targetAngle,
+                                    target.getLastCoordinates().getFirst(),
+                                    target.getLastCoordinates().getSecond(),
+                                    15,
+                                    ret -> {
+
+                                        if (!ret.runtimeCheckAndGet()) {
+                                            bulletRepo.add(rocket);
+                                            return;
+                                        }
+
+                                        int newHp = target.getHp() - rocket.getDamage();
+
+                                        if (newHp > 0)
+                                            target.setHp(newHp);
+                                        else {
+                                            target.getHpView().hide().setImage(healthBarSprite[0]);
+
+                                            Field field = grid.getField(
+                                                    target.getLastCoordinates().getFirst(),
+                                                    target.getLastCoordinates().getSecond()
+                                            );
+
+                                            target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
+
+                                                target.stop();
+                                                towers.remove(target);
+
+                                                field.setTower(null);
+
+                                                //remove tower from grid and recalculate path
+                                                if (grid.destroyTower(field.getRow(), field.getColumn()))
+                                                    renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
+                                                else
+                                                    throw new IllegalStateException("Could not destroy tower");
+                                            });
+                                        }
+                                        rocket.pushSprite(rocketExplodeSprite, 0, ()->rocketRepo.add(rocket));
+                                    });
+                        }
+
+                        enemyDoubleDaemon.reload(this::run);
+                    }
+                }).rotate(angle).goTo(
                         firstField.getCenterX(),
                         firstField.getCenterY(),
                         enemyVelocity,
@@ -1408,6 +1495,7 @@ public class Game {
                                 for(Field neighbour : grid.getNeighbors(current)) {
                                     if (neighbour.getTower() != null) {
                                         neighbour.getTower().addTarget(enemyDoubleDaemon);//TODO check ret val
+                                        enemyDoubleDaemon.setTarget(neighbour.getTower());
                                     }
                                 }
 
@@ -1620,6 +1708,7 @@ public class Game {
                         renderer.consume(diagonalMatrix[fieldRow][fieldColumn]::hide);
                 }
 
+                String towerName = "Tower[" + field.getColumn() + "][" + field.getRow() + "]";
 
                 Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
                         ? new LaserTower (
@@ -1629,24 +1718,30 @@ public class Game {
                                 Pair.create(field.getCenterX(), field.getCenterY()),
                                 range,
                                 towerSelect,
-                                dXY
-                        )
+                                dXY,
+                                towerHp
+                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].show())
+                        .setHealthBarImage(healthBarSprite)
                 :       new Tower(
                         currentTowerSprite,
                         Pair.create(field.getCenterX(), field.getCenterY()),
                         range,
                         towerSelect,
-                        dXY
-                );
+                        dXY,
+                        towerHp
+                )
+                .setHpView(towerHpViwes[field.getRow()][field.getColumn()].show())
+                .setHealthBarImage(healthBarSprite);
 
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
-                        .setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]")
+                        .setName(towerName)
                         .setView(fieldView);
 
                 towers.add(towerDaemon);
                 field.setTower(towerDaemon);
 
-                towerDaemon.setAnimateSideQuest(renderer).setClosure(new ImageAnimateClosure(fieldView)::onReturn);
+                towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
+                //towerDaemon.setAnimateSideQuest(renderer).setClosure(new ImageAnimateClosure(fieldView)::onReturn);
 
                 towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
                     @Override
