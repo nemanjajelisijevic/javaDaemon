@@ -1460,7 +1460,7 @@ public class Game {
 
                                                 renderer.consume(()->target.getView().hide());
 
-                                                target.stop();
+                                                target.setTowerLevel(new Tower.TowerLevel(1,2,1500)).stop();
                                                 towers.remove(target);
                                                 field.setTower(null);
 

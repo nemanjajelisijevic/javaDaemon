@@ -35,10 +35,13 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
 
   protected EagerMainQuestDaemonEngine goToDaemonEngine;
 
+  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
+
   public EnemyDoubleDaemon(Consumer consumer, Enemy prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
     this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
+    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -87,6 +90,10 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon setVelocity(ImageMover.Velocity velocity) {
     prototype.setVelocity(velocity);
     return this;
+  }
+
+  public TowerDaemon getTarget() {
+    return prototype.getTarget();
   }
 
   public EnemyDoubleDaemon setHp(int hp) {
@@ -180,6 +187,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return prototype.getSize();
   }
 
+  public EnemyDoubleDaemon setTarget(TowerDaemon target) {
+    prototype.setTarget(target);
+    return this;
+  }
+
   public EnemyDoubleDaemon setPreviousField(Pair<Integer, Integer> previousfield) {
     prototype.setPreviousField(previousfield);
     return this;
@@ -208,6 +220,13 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
    * Prototype method {@link com.daemonize.game.Enemy#pushSprite} */
   public EnemyDoubleDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
     mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Enemy#reload} */
+  public EnemyDoubleDaemon reload(Runnable retRun) {
+    reloadDaemonEngine.pursueQuest(new ReloadMainQuest(retRun).setConsumer(reloadDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -274,6 +293,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon start() {
     mainDaemonEngine.start();
     goToDaemonEngine.start();
+    reloadDaemonEngine.start();
     sideDaemonEngine.start();
     return this;
   }
@@ -283,6 +303,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     mainDaemonEngine.stop();
     sideDaemonEngine.stop();
     goToDaemonEngine.stop();
+    reloadDaemonEngine.stop();
   }
 
   @Override
@@ -295,6 +316,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon clear() {
     mainDaemonEngine.clear();
     goToDaemonEngine.clear();
+    reloadDaemonEngine.clear();
     return this;
   }
 
@@ -302,6 +324,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     List<DaemonState> ret = new ArrayList<DaemonState>();
     ret.add(mainDaemonEngine.getState());
     ret.add(goToDaemonEngine.getState());
+    ret.add(reloadDaemonEngine.getState());
     ret.add(sideDaemonEngine.getState());
     return ret;
   }
@@ -310,6 +333,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     List<Integer> ret = new ArrayList<Integer>();
     ret.add(mainDaemonEngine.queueSize());
     ret.add(goToDaemonEngine.queueSize());
+    ret.add(reloadDaemonEngine.queueSize());
     return ret;
   }
 
@@ -318,6 +342,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     mainDaemonEngine.setName(name);
     sideDaemonEngine.setName(name + " - SIDE");
     goToDaemonEngine.setName(name + " - goToDaemonEngine");
+    reloadDaemonEngine.setName(name + " - reloadDaemonEngine");
     return this;
   }
 
@@ -329,6 +354,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon setMainQuestConsumer(Consumer consumer) {
     mainDaemonEngine.setConsumer(consumer);
     goToDaemonEngine.setConsumer(consumer);
+    reloadDaemonEngine.setConsumer(consumer);
     return this;
   }
 
@@ -351,6 +377,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon interrupt() {
     mainDaemonEngine.interrupt();
     goToDaemonEngine.interrupt();
+    reloadDaemonEngine.interrupt();
     return this;
   }
 
@@ -358,6 +385,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon clearAndInterrupt() {
     mainDaemonEngine.clearAndInterrupt();
     goToDaemonEngine.clearAndInterrupt();
+    reloadDaemonEngine.clearAndInterrupt();
     return this;
   }
 
@@ -429,6 +457,19 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     @Override
     public final Void pursue() throws Exception {
       prototype.pushSprite(sprite, velocity);
+      return null;
+    }
+  }
+
+  private final class ReloadMainQuest extends VoidMainQuest {
+    private ReloadMainQuest(Runnable retRun) {
+      super(retRun);
+      this.description = "reload";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.reload();
       return null;
     }
   }
