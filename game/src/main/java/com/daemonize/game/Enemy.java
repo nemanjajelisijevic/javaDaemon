@@ -29,6 +29,13 @@ public class Enemy extends CoordinatedImageTranslationMover {
     private volatile TowerDaemon target;
     private DaemonSemaphore targetSemaphore = new DaemonSemaphore();
 
+    public Enemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
+        super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
+        this.hp = hp;
+        this.hpMax = hp;
+        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
+    }
+
     @CallingThread
     public TowerDaemon getTarget() {
         return target;
@@ -129,13 +136,6 @@ public class Enemy extends CoordinatedImageTranslationMover {
     public Enemy setHpView(ImageView hpView) {
         this.hpView = hpView;
         return this;
-    }
-
-    public Enemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
-        super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
-        this.hp = hp;
-        this.hpMax = hp;
-        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
     }
 
     @GenerateRunnable
