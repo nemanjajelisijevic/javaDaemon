@@ -85,7 +85,7 @@ public class Game {
     private DaemonEngine fieldEraserEngine;
 
     //score
-    private int score = 10000;
+    private int score = 99999;
     private ImageView scoreBackGrView;
     private ImageView scoreTitleView;
     private ImageView[] viewsNum;
@@ -1043,7 +1043,6 @@ public class Game {
 
             for (int j = 0; j < rows; ++j ) {
                 for (int i = 0; i < columns; ++i) {
-
                     String towerName = "Tower[" + i + "][" + j + "]";
                     towerHpViwes[j][i] = scene.addImageView(
                             new ImageViewImpl(towerName + " HP View")
@@ -1118,7 +1117,8 @@ public class Game {
                     enemy.setShootable(true)
                             .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1F, 0.0F)))
                             .setCoordinates(grid.getStartingX(), grid.getStartingY())
-                            .clearAndInterrupt().start();
+                            .clearAndInterrupt()
+                            .start();
 
                     activeEnemies.add(enemy);
 
@@ -1399,17 +1399,10 @@ public class Game {
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());
                 System.out.println(DaemonUtils.tag() + "Enemy state: " + enemyDoubleDaemon.getEnginesState().get(enemyDoubleDaemon.getEnginesState().size() - 1));
 
-                int angle = (int) RotatingSpriteImageMover.getAngle(
-                        enemyDoubleDaemon.getLastCoordinates().getFirst(),
-                        enemyDoubleDaemon.getLastCoordinates().getSecond(),
-                        firstField.getCenterX(),
-                        firstField.getCenterY()
-                );
-
-
                 enemyDoubleDaemon.setTarget(null).reload(new Runnable() {
                     @Override
                     public void run() {
+
                         TowerDaemon target = enemyDoubleDaemon.getTarget();
 
                         if (target != null) {
@@ -1424,7 +1417,6 @@ public class Game {
                                 else
                                     bullet.cont();
                             });
-
 
                             int targetAngle = (int) RotatingSpriteImageMover.getAngle(
                                     enemyDoubleDaemon.getLastCoordinates().getFirst(),
@@ -1450,8 +1442,10 @@ public class Game {
                                         if (newHp > 0)
                                             target.setHp(newHp);
                                         else {
+
                                             renderer.consume(()->target.getHpView().hide().setImage(healthBarSprite[0]));
                                             enemyDoubleDaemon.setTarget(null);
+
                                             Field field = grid.getField(
                                                     target.getLastCoordinates().getFirst(),
                                                     target.getLastCoordinates().getSecond()
@@ -1472,13 +1466,21 @@ public class Game {
                                                     throw new IllegalStateException("Could not destroy tower");
                                             });
                                         }
-                                        rocket.pushSprite(rocketExplodeSprite, 0, ()->rocketRepo.add(rocket));
+
+                                        rocket.pushSprite(rocketExplodeSprite, 0, () -> rocketRepo.add(rocket));
                                     });
                         }
 
                         enemyDoubleDaemon.reload(this::run);
                     }
-                }).rotate(angle).goTo(
+                }).rotate(
+                        (int) RotatingSpriteImageMover.getAngle(
+                                enemyDoubleDaemon.getLastCoordinates().getFirst(),
+                                enemyDoubleDaemon.getLastCoordinates().getSecond(),
+                                firstField.getCenterX(),
+                                firstField.getCenterY()
+                        )
+                ).goTo(
                         firstField.getCenterX(),
                         firstField.getCenterY(),
                         enemyVelocity,
@@ -1584,6 +1586,7 @@ public class Game {
 
                     Thread.sleep(300);
                 }
+
             }).setName("Start End field marker").start();
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
@@ -1738,7 +1741,6 @@ public class Game {
                 .setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
                 .setHealthBarImage(healthBarSprite)
                 .setTowerLevel(new Tower.TowerLevel(1,2,1500));
-                //renderer.consume(towerHpViwes[field.getRow()][field.getColumn()]::show);
 
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
                         .setName(towerName)
@@ -1748,7 +1750,6 @@ public class Game {
                 field.setTower(towerDaemon);
 
                 towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
-                //towerDaemon.setAnimateSideQuest(renderer).setClosure(new ImageAnimateClosure(fieldView)::onReturn);
 
                 towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
                     @Override
