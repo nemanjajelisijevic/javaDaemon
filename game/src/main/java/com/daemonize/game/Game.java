@@ -1418,15 +1418,13 @@ public class Game {
                                     bullet.cont();
                             });
 
-                            int targetAngle = (int) RotatingSpriteImageMover.getAngle(
-                                    enemyDoubleDaemon.getLastCoordinates().getFirst(),
-                                    enemyDoubleDaemon.getLastCoordinates().getSecond(),
-                                    target.getLastCoordinates().getFirst(),
-                                    target.getLastCoordinates().getSecond()
-                            );
-
                             rocket.rotateAndGoTo(
-                                    targetAngle,
+                                    (int) RotatingSpriteImageMover.getAngle(
+                                            enemyDoubleDaemon.getLastCoordinates().getFirst(),
+                                            enemyDoubleDaemon.getLastCoordinates().getSecond(),
+                                            target.getLastCoordinates().getFirst(),
+                                            target.getLastCoordinates().getSecond()
+                                    ),
                                     target.getLastCoordinates().getFirst(),
                                     target.getLastCoordinates().getSecond(),
                                     15,
