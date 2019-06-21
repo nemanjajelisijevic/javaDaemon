@@ -1626,9 +1626,7 @@ public class Game {
                 //show upgrade dialog
                 renderer.consume(()->{
 
-                    towerUpgradeDialogue.getTowerUpgrade()
-                            .setAbsoluteX(borderX / 2)
-                            .setAbsoluteY(borderY / 2);
+                    towerUpgradeDialogue.getTowerUpgrade().setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2);
 
                     towerUpgradeDialogue.getTowerUpgrade()
                             .getViewByName("TowerView")
