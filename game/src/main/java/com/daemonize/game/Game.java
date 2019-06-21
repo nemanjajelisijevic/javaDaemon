@@ -1712,7 +1712,7 @@ public class Game {
 
                 String towerName = "Tower[" + field.getColumn() + "][" + field.getRow() + "]";
 
-                renderer.consume(()->towerHpViwes[field.getRow()][field.getColumn()].setImage(healthBarSprite[9]));
+                towerHpViwes[field.getRow()][field.getColumn()].setImage(healthBarSprite[9]);
 
                 Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
                         ? new LaserTower (
@@ -1724,7 +1724,7 @@ public class Game {
                                 towerSelect,
                                 dXY,
                                 towerHp
-                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].show())
+                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
                         .setHealthBarImage(healthBarSprite)
                         .setTowerLevel(new Tower.TowerLevel(1,2,1500))
                 :       new Tower(
@@ -1735,7 +1735,7 @@ public class Game {
                         dXY,
                         towerHp
                 )
-                .setHpView(towerHpViwes[field.getRow()][field.getColumn()].show())
+                .setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
                 .setHealthBarImage(healthBarSprite)
                 .setTowerLevel(new Tower.TowerLevel(1,2,1500));
                 //renderer.consume(towerHpViwes[field.getRow()][field.getColumn()]::show);
