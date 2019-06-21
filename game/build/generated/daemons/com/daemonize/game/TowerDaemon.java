@@ -63,11 +63,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return prototype.getTowerLevel();
   }
 
-  public TowerDaemon setTowerLevel(Tower.TowerLevel towerlevel) {
-    prototype.setTowerLevel(towerlevel);
-    return this;
-  }
-
   public TowerDaemon setVelocity(ImageMover.Velocity velocity) {
     prototype.setVelocity(velocity);
     return this;
@@ -186,6 +181,10 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
   public TowerDaemon setDirection(ImageMover.Direction direction) {
     prototype.setDirection(direction);
     return this;
+  }
+
+  public Tower setTowerLevel(Tower.TowerLevel towerlevel) {
+    return prototype.setTowerLevel(towerlevel);
   }
 
   public TowerDaemon pauseScan() {

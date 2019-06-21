@@ -1450,7 +1450,7 @@ public class Game {
                                             target.setHp(newHp);
                                         else {
                                             renderer.consume(()->target.getHpView().hide().setImage(healthBarSprite[0]));
-
+                                            enemyDoubleDaemon.setTarget(null);
                                             Field field = grid.getField(
                                                     target.getLastCoordinates().getFirst(),
                                                     target.getLastCoordinates().getSecond()
@@ -1460,7 +1460,7 @@ public class Game {
 
                                                 renderer.consume(()->target.getView().hide());
 
-                                                target.setTowerLevel(new Tower.TowerLevel(1,2,1500)).stop();
+                                                target.stop();
                                                 towers.remove(target);
                                                 field.setTower(null);
 
@@ -1725,6 +1725,7 @@ public class Game {
                                 towerHp
                         ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].show())
                         .setHealthBarImage(healthBarSprite)
+                        .setTowerLevel(new Tower.TowerLevel(1,2,1500))
                 :       new Tower(
                         currentTowerSprite,
                         Pair.create(field.getCenterX(), field.getCenterY()),
@@ -1734,8 +1735,8 @@ public class Game {
                         towerHp
                 )
                 .setHpView(towerHpViwes[field.getRow()][field.getColumn()].show())
-                .setHealthBarImage(healthBarSprite);
-
+                .setHealthBarImage(healthBarSprite)
+                .setTowerLevel(new Tower.TowerLevel(1,2,1500));
                 //renderer.consume(towerHpViwes[field.getRow()][field.getColumn()]::show);
 
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)

@@ -150,8 +150,9 @@ public class Tower extends RotatingSpriteImageMover {
     }
 
     @CallingThread
-    public void setTowerLevel(TowerLevel towerLevel) {
+    public Tower setTowerLevel(TowerLevel towerLevel) {
         this.towerLevel = towerLevel;
+        return this;
     }
 
     private DaemonSemaphore scanSemaphore = new DaemonSemaphore();
