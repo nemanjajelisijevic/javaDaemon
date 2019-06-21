@@ -85,7 +85,7 @@ public class Game {
     private DaemonEngine fieldEraserEngine;
 
     //score
-    private int score = 100;
+    private int score = 10000;
     private ImageView scoreBackGrView;
     private ImageView scoreTitleView;
     private ImageView[] viewsNum;
@@ -925,6 +925,7 @@ public class Game {
                 renderer.consume(()->saleButton.disable().setImage(saleButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
                     TowerDaemon tower = towerUpgradeDialogue.getTower();
+                    renderer.consume(tower.getHpView()::hide);
 
                     Field field = grid.getField(
                             tower.getLastCoordinates().getFirst(),
@@ -1406,7 +1407,7 @@ public class Game {
                 );
 
 
-                enemyDoubleDaemon.reload(new Runnable() {
+                enemyDoubleDaemon.setTarget(null).reload(new Runnable() {
                     @Override
                     public void run() {
                         TowerDaemon target = enemyDoubleDaemon.getTarget();
