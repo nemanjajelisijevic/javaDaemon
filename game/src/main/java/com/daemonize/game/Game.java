@@ -1973,7 +1973,8 @@ public class Game {
             int newHp = enemy.getHp() - laser.getDamage();
             if (newHp > 0) {
 
-                enemy.setHp(newHp).setVelocity(velocity);
+                enemy.setHp(newHp);
+                enemy.setVelocity(velocity);
 
                 if (enemyParalyizer.queueSize() == 0) {
                     enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), () -> {

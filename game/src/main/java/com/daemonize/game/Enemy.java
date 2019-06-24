@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 
 @Daemonize(doubleDaemonize = true, className = "EnemyDoubleDaemon")
-public class Enemy extends CoordinatedImageTranslationMover {
+public class Enemy extends CoordinatedImageTranslationMover implements Target {
 
     private ImageView view;
     private ImageView hpView;
@@ -90,13 +90,15 @@ public class Enemy extends CoordinatedImageTranslationMover {
     }
 
     @CallingThread
+    @Override
     public boolean isShootable() {
         return shootable;
     }
 
     @CallingThread
-    public void setShootable(boolean shootable) {
+    public Enemy setShootable(boolean shootable) {
         this.shootable = shootable;
+        return this;
     }
 
     @CallingThread
@@ -110,13 +112,15 @@ public class Enemy extends CoordinatedImageTranslationMover {
     }
 
     @CallingThread
-    public void setHp(int hp) {
+    public Enemy setHp(int hp) {
         this.hp = hp;
+        return this;
     }
 
     @CallingThread
-    public void setMaxHp(int maxHp) {
+    public Enemy setMaxHp(int maxHp) {
         this.hpMax = maxHp;
+        return this;
     }
 
     @CallingThread

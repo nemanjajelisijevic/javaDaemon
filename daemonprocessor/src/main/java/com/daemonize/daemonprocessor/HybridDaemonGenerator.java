@@ -8,7 +8,9 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +22,9 @@ import java.util.Set;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 
 public class HybridDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
 
@@ -54,6 +59,27 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addModifiers(
                         Modifier.PUBLIC
                 ).addSuperinterface(ParameterizedTypeName.get(daemonInterface, daemonClassName));
+
+        implementInterfaces(daemonClassBuilder, daemonClassName.box());
+
+//        for (TypeElement intf : interfaces) {
+//            TypeMirror intfMirror = intf.asType();
+//
+// //           List<? extends TypeParameterElement> typeParams = intf.getTypeParameters();
+//
+////            if (!typeParams.isEmpty()) {
+////
+////                for (TypeParameterElement type : typeParams) {
+////                    daemonClassBuilder.addTypeVariable(TypeVariableName.get(type));
+////                }
+////            }
+//            daemonClassBuilder.addSuperinterface(TypeName.get(intf.asType()));
+//        }
+
+//        for (TypeElement intf : interfaces)
+//            daemonClassBuilder.addSuperinterface(TypeName.get(intf.asType()));
+
+        //daemonClassBuilder.addSuperinterfaces(interfaces);
 
         if (mainGenerator.isConsumer())
             daemonClassBuilder.addSuperinterface(consumerInterface);
@@ -130,8 +156,13 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
 
         for (ExecutableElement method : publicPrototypeMethods) {
 
-            if (method.getAnnotation(CallingThread.class) != null) {
-                daemonClassBuilder.addMethod(mainGenerator.wrapMethod(method));
+            PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
+
+            if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
+                if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
+                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? mainGenerator.wrapIntfMethod(method) : mainGenerator.wrapMethod(method));
+                    continue;
+                }
                 continue;
             }
 

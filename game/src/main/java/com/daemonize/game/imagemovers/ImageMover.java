@@ -9,7 +9,7 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 
 @Daemonize
-public interface ImageMover {
+public interface ImageMover extends Movable {
 
     class Velocity {
         public volatile float intensity;
@@ -54,6 +54,7 @@ public interface ImageMover {
     }
 
     @CallingThread
+    @Override
     Pair<Float, Float> getLastCoordinates();
 
     @CallingThread
