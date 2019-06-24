@@ -1405,64 +1405,35 @@ public class Game {
 
                         if (target != null) {
 
-                            BulletDoubleDaemon rocket = rocketRepo.configureAndGet(bullet -> {
-                                bullet.setCoordinates(enemyDoubleDaemon.getLastCoordinates().getFirst(), enemyDoubleDaemon.getLastCoordinates().getSecond())
-                                        .setLevel(2)
-                                        .setDamage(bulletDamage)
-                                        .setSprite(bulletSpriteRocket);
-                                if (bullet.getEnginesState().get(bullet.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
-                                    bullet.start();
-                                else
-                                    bullet.cont();
-                            });
-
-                            rocket.rotateAndGoTo(
-                                    (int) RotatingSpriteImageMover.getAngle(
-                                            enemyDoubleDaemon.getLastCoordinates().getFirst(),
-                                            enemyDoubleDaemon.getLastCoordinates().getSecond(),
-                                            target.getLastCoordinates().getFirst(),
-                                            target.getLastCoordinates().getSecond()
-                                    ),
-                                    target.getLastCoordinates().getFirst(),
-                                    target.getLastCoordinates().getSecond(),
+                            fireRocketBullet(
+                                    enemyDoubleDaemon.getLastCoordinates(),
+                                    target,
                                     15,
-                                    ret -> {
+                                    target.getTowerLevel().bulletDamage,
+                                    2,
+                                    ()->{
+                                        renderer.consume(()->target.getHpView().hide().setImage(healthBarSprite[9]));
+                                        enemyDoubleDaemon.setTarget(null);
 
-                                        if (!ret.runtimeCheckAndGet()) {
-                                            bulletRepo.add(rocket);
-                                            return;
-                                        }
+                                        Field field = grid.getField(
+                                                target.getLastCoordinates().getFirst(),
+                                                target.getLastCoordinates().getSecond()
+                                        );
 
-                                        int newHp = target.getHp() - rocket.getDamage();
+                                        target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
 
-                                        if (newHp > 0)
-                                            target.setHp(newHp);
-                                        else {
+                                            renderer.consume(target.getView()::hide);
+                                            towers.remove(target);
+                                            field.setTower(null);
 
-                                            renderer.consume(()->target.getHpView().hide().setImage(healthBarSprite[9]));
-                                            enemyDoubleDaemon.setTarget(null);
-
-                                            Field field = grid.getField(
-                                                    target.getLastCoordinates().getFirst(),
-                                                    target.getLastCoordinates().getSecond()
-                                            );
-
-                                            target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
-
-                                                renderer.consume(target.getView()::hide);
-                                                towers.remove(target);
-                                                field.setTower(null);
-
-                                                //remove tower from grid and recalculate path
-                                                if (grid.destroyTower(field.getRow(), field.getColumn()))
-                                                    renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
-                                                else
-                                                    throw new IllegalStateException("Could not destroy tower");
-                                            }).queueStop();
-                                        }
-
-                                        rocket.pushSprite(rocketExplodeSprite, 0, () -> rocketRepo.add(rocket));
-                                    });
+                                            //remove tower from grid and recalculate path
+                                            if (grid.destroyTower(field.getRow(), field.getColumn()))
+                                                renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
+                                            else
+                                                throw new IllegalStateException("Could not destroy tower");
+                                        }).queueStop();
+                                    }
+                            );
                         }
 
                         enemyDoubleDaemon.reload(this::run);
@@ -1759,11 +1730,25 @@ public class Game {
                                 case TYPE1:
                                     fireBullet(
                                             towerDaemon.getLastCoordinates(),
-                                            enemy.getLastCoordinates(),
                                             enemy,
                                             25,
                                             towerDaemon.getTowerLevel().bulletDamage,
-                                            towerDaemon.getTowerLevel().currentLevel
+                                            towerDaemon.getTowerLevel().currentLevel,
+                                            false,
+                                            0,
+                                            bulletSprite,
+                                            miniExplodeSprite,
+                                            ()->{
+                                                enemyRepo.add(enemy);
+                                                moneyDaemon.setAmount(3)
+                                                        .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
+                                                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
+
+                                                renderer.consume(()->{
+                                                    moneyView.getFirst().show();
+                                                    moneyView.getSecond().show();
+                                                });
+                                            }
                                     );
                                     break;
                                 case TYPE2:
@@ -1772,7 +1757,18 @@ public class Game {
                                             enemy,
                                             18,
                                             towerDaemon.getTowerLevel().bulletDamage,
-                                            towerDaemon.getTowerLevel().currentLevel
+                                            towerDaemon.getTowerLevel().currentLevel,
+                                            ()->{
+                                                enemyRepo.add(enemy);
+                                                moneyDaemon.setAmount(5)
+                                                        .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
+                                                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
+
+                                                renderer.consume(() -> {
+                                                    moneyView.getFirst().show();
+                                                    moneyView.getSecond().show();
+                                                });
+                                            }
                                     );
                                     break;
                                 case TYPE3:
@@ -1790,7 +1786,18 @@ public class Game {
                                     float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
                                     long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
-                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration);
+                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, ()->{
+                                        enemyRepo.add(enemy);
+
+                                        moneyDaemon.setAmount(1)
+                                                .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
+                                                .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
+
+                                        renderer.consume(() -> {
+                                            moneyView.getFirst().show();
+                                            moneyView.getSecond().show();
+                                        });
+                                    });
                                     reloadInterval = 4000;
                                     break;
                                 default:
@@ -1807,11 +1814,15 @@ public class Game {
 
     private void fireBullet(
             Pair<Float, Float> sourceCoord,
-            Pair<Float, Float> targetCoord,
-            EnemyDoubleDaemon enemy,
+            Target target,
             float velocity,
             int bulletDamage,
-            int noOfBulletsFired
+            int noOfBulletsFired,
+            boolean rotate,
+            int bulletRotateAngle,
+            Image[] bulletSprite,
+            Image[] bulletExplodeSprite,
+            Runnable destructionClosure
     ) {
         System.out.println(DaemonUtils.tag() + "Bullet repo size: " + bulletRepo.size());
 
@@ -1827,39 +1838,37 @@ public class Game {
                 bullet.cont();
         });
 
-        bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, ret -> {
+        float targetX = target.getLastCoordinates().getFirst();
+        float targetY = target.getLastCoordinates().getSecond();
 
-            if (!ret.runtimeCheckAndGet() || !enemy.isShootable()) {
+        if(rotate) {
+            bulletDoubleDaemon.rotate(bulletRotateAngle, ()->{});
+        }
+
+        bulletDoubleDaemon.goTo(targetX, targetY, velocity, ret -> {
+
+            if (!ret.runtimeCheckAndGet() || !target.isShootable()) {
                 bulletRepo.add(bulletDoubleDaemon);
                 return;
             }
 
-            int newHp = enemy.getHp() - bulletDoubleDaemon.getDamage();
+            int newHp = target.getHp() - bulletDoubleDaemon.getDamage();
             if (newHp > 0)
-                enemy.setHp(newHp);
-            else {
+                target.setHp(newHp);
+            else
+                destructionClosure.run();
 
-                enemyRepo.add(enemy);
-                moneyDaemon.setAmount(3)
-                        .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
-
-                renderer.consume(()->{
-                    moneyView.getFirst().show();
-                    moneyView.getSecond().show();
-                });
-            }
-
-            bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
+            bulletDoubleDaemon.pushSprite(bulletExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
         });
     }
 
     private void fireRocketBullet(
             Pair<Float, Float> sourceCoord,
-            EnemyDoubleDaemon enemy,
+            Target target,
             float velocity,
             int bulletDamage,
-            int noOfBulletsFired
+            int noOfBulletsFired,
+            Runnable destructionClosure
     ) {
         System.out.println(DaemonUtils.tag() + "Rocket repo size: " + rocketRepo.size());
 
@@ -1900,7 +1909,7 @@ public class Game {
                 return;
             }
 
-            if (!enemy.isShootable()) {
+            if (!target.isShootable()) {
                 rocketDoubleDaemon.rotateAndGoTo(
                         - angle,
                         sourceCoord.getFirst(),
@@ -1910,23 +1919,23 @@ public class Game {
                 );
             } else {
 
-                Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
+                Pair<Float, Float> targetCoord = target.getLastCoordinates();
 
                 int targetAngle1 = (int) RotatingSpriteImageMover.getAngle(
                         rocketDoubleDaemon.getLastCoordinates().getFirst(),
                         rocketDoubleDaemon.getLastCoordinates().getSecond(),
-                        enemy.getLastCoordinates().getFirst(),
-                        enemy.getLastCoordinates().getSecond()
+                        target.getLastCoordinates().getFirst(),
+                        target.getLastCoordinates().getSecond()
                 );
 
                 rocketDoubleDaemon.rotateAndGoTo(
                         targetAngle1,
-                        enemy.getLastCoordinates().getFirst(),
-                        enemy.getLastCoordinates().getSecond(),
+                        target.getLastCoordinates().getFirst(),
+                        target.getLastCoordinates().getSecond(),
                         velocity,
                         ret2 -> {
 
-                            if (!ret2.runtimeCheckAndGet() || !enemy.isShootable()) {
+                            if (!ret2.runtimeCheckAndGet() || !target.isShootable()) {
                                 rocketRepo.add(rocketDoubleDaemon);
                                 return;
                             }
@@ -1934,25 +1943,15 @@ public class Game {
                             float bulletX = rocketDoubleDaemon.getLastCoordinates().getFirst();
                             float bulletY = rocketDoubleDaemon.getLastCoordinates().getSecond();
 
-                            if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) < rocketExplosionRange
-                                    && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) < rocketExplosionRange) {
+                            if (Math.abs(bulletX - target.getLastCoordinates().getFirst()) < rocketExplosionRange
+                                    && Math.abs(bulletY - target.getLastCoordinates().getSecond()) < rocketExplosionRange) {
 
-                                int newHp = enemy.getHp() - rocketDoubleDaemon.getDamage();
+                                int newHp = target.getHp() - rocketDoubleDaemon.getDamage();
 
                                 if (newHp > 0)
-                                    enemy.setHp(newHp);
-                                else {
-
-                                    enemyRepo.add(enemy);
-                                    moneyDaemon.setAmount(5)
-                                            .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                                            .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
-
-                                    renderer.consume(() -> {
-                                        moneyView.getFirst().show();
-                                        moneyView.getSecond().show();
-                                    });
-                                }
+                                    target.setHp(newHp);
+                                else
+                                    destructionClosure.run();
                             }
 
                             rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, () -> rocketRepo.add(rocketDoubleDaemon));
@@ -1961,52 +1960,46 @@ public class Game {
         });
     }
 
-    public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, float velocity, long duration) {
+    public void fireLaser(
+            Pair<Float, Float> source,
+            Target target,
+            float velocity,
+            long duration,
+            Runnable destructionClosure
+    ) {
 
-        if (enemy.isParalyzed())
+        if (target.isParalyzed())
             return;
 
-        enemy.setParalyzed(true);
+        target.setParalyzed(true);
 
-        laser.desintegrateTarget(source, enemy, duration, renderer, ret -> {
+        laser.desintegrateTarget(source, target, duration, renderer, ret -> {
 
-            int newHp = enemy.getHp() - laser.getDamage();
+            int newHp = target.getHp() - laser.getDamage();
             if (newHp > 0) {
 
-                enemy.setHp(newHp);
-                enemy.setVelocity(velocity);
+                target.setHp(newHp);
+                target.setVelocity(velocity);
 
                 if (enemyParalyizer.queueSize() == 0) {
                     enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), () -> {
-                        enemy.setParalyzed(false);
-                        if (enemy.isShootable())
-                            enemy.setVelocity(enemyVelocity);
+                        target.setParalyzed(false);
+                        if (target.isShootable())
+                            target.setVelocity(enemyVelocity);
                     });
                 } else {
                     new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(()->{
                         System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
                         Thread.sleep(enemyParalyzingInterval);
                     },()->{
-                        enemy.setParalyzed(false);
-                        if (enemy.isShootable())
-                            enemy.setVelocity(enemyVelocity);
+                        target.setParalyzed(false);
+                        if (target.isShootable())
+                            target.setVelocity(enemyVelocity);
                     });
                 }
 
-            } else {
-
-                Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
-                enemyRepo.add(enemy);
-
-                moneyDaemon.setAmount(1)
-                        .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
-
-                renderer.consume(() -> {
-                    moneyView.getFirst().show();
-                    moneyView.getSecond().show();
-                });
-            }
+            } else
+                destructionClosure.run();
         });
     }
 

@@ -20,7 +20,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImageMoverDaemon implements Daemon<ImageMoverDaemon> {
+public class ImageMoverDaemon implements Daemon<ImageMoverDaemon>, Movable {
   private ImageMover prototype;
 
   protected HybridDaemonEngine daemonEngine;
@@ -42,6 +42,7 @@ public class ImageMoverDaemon implements Daemon<ImageMoverDaemon> {
     return sideQuest;
   }
 
+  @Override
   public Pair<Float, Float> getLastCoordinates() {
     return prototype.getLastCoordinates();
   }

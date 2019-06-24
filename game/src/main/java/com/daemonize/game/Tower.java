@@ -22,13 +22,15 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 @Daemonize(doubleDaemonize = true)
-public class Tower extends RotatingSpriteImageMover {
+public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
 
 
     private ImageView hpView;
     private volatile int hpMax;
     private volatile int hp;
     private Image[] spriteHealthBarImage;
+
+    private boolean shootable = true;
 
     @CallingThread
     public int getHp() {
@@ -41,13 +43,15 @@ public class Tower extends RotatingSpriteImageMover {
     }
 
     @CallingThread
-    public void setHp(int hp) {
+    public Tower setHp(int hp) {
         this.hp = hp;
+        return this;
     }
 
     @CallingThread
-    public void setMaxHp(int maxHp) {
+    public Tower setMaxHp(int maxHp) {
         this.hpMax = maxHp;
+        return this;
     }
 
     @CallingThread
@@ -70,6 +74,29 @@ public class Tower extends RotatingSpriteImageMover {
         TYPE1,
         TYPE2,
         TYPE3
+    }
+
+    @Override
+    public boolean isShootable() {
+        return shootable;
+    }
+
+    @CallingThread
+    @Override
+    public Tower setShootable(boolean shootable) {
+        this.shootable = shootable;
+        return this;
+    }
+
+    @CallingThread
+    @Override
+    public Tower setParalyzed(boolean paralyzed) {
+        return this;
+    }
+
+    @Override
+    public boolean isParalyzed() {
+        return false;
     }
 
     public static class TowerLevel {

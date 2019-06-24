@@ -27,7 +27,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TowerDaemon implements EagerDaemon<TowerDaemon> {
+public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon> {
   private Tower prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
@@ -51,12 +51,14 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return sideQuest;
   }
 
+  @Override
   public int getHp() {
     return prototype.getHp();
   }
 
-  public ImageTranslationMover setSprite(Image[] sprite) {
-    return prototype.setSprite(sprite);
+  public TowerDaemon setSprite(Image[] sprite) {
+    prototype.setSprite(sprite);
+    return this;
   }
 
   public Tower.TowerLevel getTowerLevel() {
@@ -65,11 +67,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
 
   public TowerDaemon setVelocity(ImageMover.Velocity velocity) {
     prototype.setVelocity(velocity);
-    return this;
-  }
-
-  public TowerDaemon setHp(int hp) {
-    prototype.setHp(hp);
     return this;
   }
 
@@ -94,8 +91,9 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return prototype.getRange();
   }
 
-  public Tower setHpView(ImageView hpview) {
-    return prototype.setHpView(hpview);
+  public TowerDaemon setHpView(ImageView hpview) {
+    prototype.setHpView(hpview);
+    return this;
   }
 
   public TowerDaemon setView(ImageView view) {
@@ -107,9 +105,14 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return prototype.getSize();
   }
 
-  public TowerDaemon setVelocity(float velocity) {
-    prototype.setVelocity(velocity);
+  public TowerDaemon setHp(int hp) {
+    prototype.setHp(hp);
     return this;
+  }
+
+  @Override
+  public void setVelocity(float velocity) {
+    prototype.setVelocity(velocity);
   }
 
   public TowerDaemon contScan() {
@@ -121,14 +124,22 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return prototype.getdXY();
   }
 
+  @Override
   public Pair<Float, Float> getLastCoordinates() {
     return prototype.getLastCoordinates();
   }
 
+  @Override
   public ImageMover.Velocity getVelocity() {
     return prototype.getVelocity();
   }
 
+  @Override
+  public boolean isParalyzed() {
+    return prototype.isParalyzed();
+  }
+
+  @Override
   public int getMaxHp() {
     return prototype.getMaxHp();
   }
@@ -140,11 +151,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
 
   public TowerDaemon setOutOfBordersConsumer(Consumer consumer) {
     prototype.setOutOfBordersConsumer(consumer);
-    return this;
-  }
-
-  public TowerDaemon setMaxHp(int maxhp) {
-    prototype.setMaxHp(maxhp);
     return this;
   }
 
@@ -183,12 +189,28 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return this;
   }
 
-  public Tower setTowerLevel(Tower.TowerLevel towerlevel) {
-    return prototype.setTowerLevel(towerlevel);
+  @Override
+  public boolean isShootable() {
+    return prototype.isShootable();
+  }
+
+  public TowerDaemon setTowerLevel(Tower.TowerLevel towerlevel) {
+    prototype.setTowerLevel(towerlevel);
+    return this;
   }
 
   public TowerDaemon pauseScan() {
     prototype.pauseScan();
+    return this;
+  }
+
+  public TowerDaemon setParalyzed(boolean paralyzed) {
+    prototype.setParalyzed(paralyzed);
+    return this;
+  }
+
+  public TowerDaemon setMaxHp(int maxhp) {
+    prototype.setMaxHp(maxhp);
     return this;
   }
 
@@ -199,6 +221,11 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
 
   public ImageView getView() {
     return prototype.getView();
+  }
+
+  public TowerDaemon setShootable(boolean shootable) {
+    prototype.setShootable(shootable);
+    return this;
   }
 
   public ImageView getHpView() {

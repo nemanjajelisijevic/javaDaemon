@@ -72,8 +72,9 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.getTargetCoordinates();
   }
 
-  public Bullet setView3(ImageView view3) {
-    return prototype.setView3(view3);
+  public BulletDoubleDaemon setView3(ImageView view3) {
+    prototype.setView3(view3);
+    return this;
   }
 
   public BulletDoubleDaemon setVelocity(ImageMover.Velocity velocity) {

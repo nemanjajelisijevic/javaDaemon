@@ -26,7 +26,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
+public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target<EnemyDoubleDaemon> {
   private Enemy prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
@@ -53,38 +53,42 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return sideQuest;
   }
 
-  public EnemyDoubleDaemon setVelocity(float velocity) {
+  @Override
+  public void setVelocity(float velocity) {
     prototype.setVelocity(velocity);
-    return this;
   }
 
+  @Override
   public int getHp() {
     return prototype.getHp();
   }
 
-  public ImageTranslationMover setSprite(Image[] sprite) {
-    return prototype.setSprite(sprite);
+  public EnemyDoubleDaemon setSprite(Image[] sprite) {
+    prototype.setSprite(sprite);
+    return this;
   }
 
   public float getdXY() {
     return prototype.getdXY();
   }
 
+  @Override
   public Pair<Float, Float> getLastCoordinates() {
     return prototype.getLastCoordinates();
   }
 
+  @Override
   public ImageMover.Velocity getVelocity() {
     return prototype.getVelocity();
+  }
+
+  public Pair<Float, Float> getTargetCoordinates() {
+    return prototype.getTargetCoordinates();
   }
 
   public EnemyDoubleDaemon setShootable(boolean shootable) {
     prototype.setShootable(shootable);
     return this;
-  }
-
-  public Pair<Float, Float> getTargetCoordinates() {
-    return prototype.getTargetCoordinates();
   }
 
   public EnemyDoubleDaemon setVelocity(ImageMover.Velocity velocity) {
@@ -96,19 +100,16 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return prototype.getTarget();
   }
 
-  public EnemyDoubleDaemon setHp(int hp) {
-    prototype.setHp(hp);
-    return this;
-  }
-
   public Image[] getSprite() {
     return prototype.getSprite();
   }
 
+  @Override
   public boolean isParalyzed() {
     return prototype.isParalyzed();
   }
 
+  @Override
   public int getMaxHp() {
     return prototype.getMaxHp();
   }
@@ -123,8 +124,8 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return this;
   }
 
-  public EnemyDoubleDaemon setParalyzed(boolean paralyzed) {
-    prototype.setParalyzed(paralyzed);
+  public EnemyDoubleDaemon setHp(int hp) {
+    prototype.setHp(hp);
     return this;
   }
 
@@ -135,6 +136,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
 
   public EnemyDoubleDaemon clearVelocity() {
     prototype.clearVelocity();
+    return this;
+  }
+
+  public EnemyDoubleDaemon setParalyzed(boolean paralyzed) {
+    prototype.setParalyzed(paralyzed);
     return this;
   }
 
@@ -153,12 +159,14 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return this;
   }
 
+  @Override
   public boolean isShootable() {
     return prototype.isShootable();
   }
 
-  public Enemy setView(ImageView view) {
-    return prototype.setView(view);
+  public EnemyDoubleDaemon setView(ImageView view) {
+    prototype.setView(view);
+    return this;
   }
 
   public Pair<Integer, Integer> getPreviousField() {
