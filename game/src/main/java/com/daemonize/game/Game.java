@@ -1413,6 +1413,9 @@ public class Game {
                                     2,
                                     ()->{
 
+                                        if(!target.isShootable())
+                                            return;
+
                                         renderer.consume(target.getHpView()::hide);
 
                                         enemyDoubleDaemon.setTarget(null);
