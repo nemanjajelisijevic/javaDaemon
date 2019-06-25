@@ -9,11 +9,11 @@ import java.util.List;
 public class AStar extends PathFinding {
 
     @Override
-    public boolean recalculate(Grid grid) {
+    public <T> boolean recalculate(Grid<T> grid) {
         Field startNode =  grid.getGrid()[grid.startPoint.getFirst()][grid.startPoint.getSecond()];
         Field endNode = grid.getGrid()[grid.endPoint.getFirst()][grid.endPoint.getSecond()];
 
-        Field [] heapArray = new Field[grid.getGrid().length * grid.getGrid()[0].length];
+        Field<T>[] heapArray = new Field[grid.getGrid().length * grid.getGrid()[0].length];
         //        List<Field> openSet = new ArrayList<>() ;
         Heap<Field> openSet = new Heap<Field>(heapArray) ;
         HashSet<Field> closedSet = new HashSet<Field>();

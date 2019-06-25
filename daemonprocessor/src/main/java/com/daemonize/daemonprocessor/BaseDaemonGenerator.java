@@ -14,11 +14,13 @@ import com.squareup.javapoet.TypeVariableName;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -29,12 +31,25 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.NoType;
 import javax.lang.model.type.TypeMirror;
 
 
+import static javax.lang.model.type.TypeKind.NONE;
 import static javax.lang.model.type.TypeKind.VOID;
 
 public abstract class BaseDaemonGenerator implements DaemonGenerator {
+
+    @FunctionalInterface
+    public static interface Printer {
+        void print(String string);
+    }
+
+    protected Printer printer;
+
+    public void setPrinter(Printer printer) {
+        this.printer = printer;
+    }
 
     protected ClassName daemonClassName;
 
@@ -117,6 +132,9 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     private static String baseClassBound = "java.lang.Object";
     private Set<String> overloadedPrototypeMethods = new TreeSet<>();
 
+    protected List<TypeElement> interfaces;
+    protected HashSet<PrototypeMethodData> overriddenMethods;
+
     public String getPackageName() {
         return packageName;
     }
@@ -131,9 +149,30 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
             this.packageName = this.packageName.substring(0, packageName.lastIndexOf("."));
         }
 
+        interfaces = new ArrayList<>();
+        overriddenMethods = new HashSet<>();
+
+        for (TypeMirror intf : classElement.getInterfaces()) {
+            TypeElement intfElement = (TypeElement) ((DeclaredType) intf).asElement();
+            interfaces.add(intfElement);
+            populateOverridenMethods(intf);
+        }
+
         String name = classElement.getAnnotation(Daemonize.class).className();
         this.daemonSimpleName = name.isEmpty() ? prototypeClassSimpleName + "Daemon" : name;
 
+    }
+
+    private void populateOverridenMethods(TypeMirror intf) {
+        TypeElement intfElement = (TypeElement) ((DeclaredType) intf).asElement();
+
+        for (Element intfMethod : getPublicClassMethods(intfElement)) {
+            overriddenMethods.add(new PrototypeMethodData((ExecutableElement) intfMethod));
+        }
+
+        for (TypeMirror intfp : intfElement.getInterfaces()) {
+            populateOverridenMethods(intfp);
+        }
     }
 
     public static List<ExecutableElement> getPublicClassMethods(Element annotatedClass) {
@@ -168,6 +207,9 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         }
 
         if (annClass.getKind().equals(ElementKind.CLASS)) {
+
+            //while (!(annClass.getSuperclass() instanceof NoType || annClass.getSuperclass().getKind().equals(NONE))) {
+
             while (!(((TypeElement) ((DeclaredType) annClass.getSuperclass()).asElement())).getQualifiedName().toString().equals(baseClassBound)) {
 
                 annClass = (TypeElement) ((DeclaredType) annClass.getSuperclass()).asElement();
@@ -194,6 +236,34 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         return ret;
     }
 
+    public void implementInterfaces(TypeSpec.Builder daemonClassBuilder, TypeName specialization) {
+        for (TypeElement intf : interfaces) {
+            TypeMirror intfMirror = intf.asType();
+            List<? extends TypeParameterElement> typeParams = intf.getTypeParameters();
+
+            boolean builder = false;
+
+            if (!typeParams.isEmpty()) {
+
+                for (TypeParameterElement type : typeParams) {
+                    if (!type.getBounds().isEmpty() && type.getBounds().get(0).getClass().equals(intfMirror.getClass())) {// builder
+                        builder = true;
+                    } else {
+                        daemonClassBuilder.addTypeVariable(TypeVariableName.get(type));
+                    }
+                }
+            }
+
+            daemonClassBuilder.addSuperinterface(
+                    builder ?
+                            ParameterizedTypeName.get(
+                                    ClassName.get(intf),
+                                    specialization
+                            ) :
+                            TypeName.get(intf.asType()));
+        }
+    }
+
     public static List<Pair<ExecutableElement, SideQuest>> getSideQuestMethods(List<ExecutableElement> publicMethods) {
 
         List<Pair<ExecutableElement, SideQuest>> ret = new ArrayList<>();
@@ -218,6 +288,80 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         }
 
         return ret;
+    }
+
+    public MethodSpec wrapIntfMethod(ExecutableElement prototypeMethod){
+
+        PrototypeMethodData methodData = new PrototypeMethodData(prototypeMethod);
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(
+                prototypeMethod.getSimpleName().toString()
+        ).addModifiers(Modifier.PUBLIC).addAnnotation(Override.class);
+
+        methodBuilder = BaseDaemonGenerator.addTypeParameters(prototypeMethod, methodBuilder);
+
+        for(Pair<TypeName, String> param : methodData.getParameters()) {
+            methodBuilder.addParameter(param.getFirst(), param.getSecond());
+        }
+
+        for ( TypeMirror exception : prototypeMethod.getThrownTypes()) {
+            methodBuilder.addException(TypeName.get(exception));
+        }
+
+        if (methodData.getMethodRetTypeName().equals(TypeName.get(prototypeMethod.getEnclosingElement().asType()))) {
+            methodBuilder.returns(ClassName.get(packageName, daemonSimpleName)).addStatement("prototype."
+                    + prototypeMethod.getSimpleName().toString()
+                    + "(" + methodData.getArguments()
+                    + ")").addStatement("return this");
+        } else if (methodData.isVoid()) {
+            methodBuilder.returns(void.class).addStatement("prototype."
+                    + prototypeMethod.getSimpleName().toString()
+                    + "(" + methodData.getArguments()
+                    + ")");
+        } else
+            methodBuilder.returns(TypeName.get(prototypeMethod.getReturnType())).addStatement(
+                    "return prototype."
+                            + prototypeMethod.getSimpleName().toString()
+                            + "(" + methodData.getArguments()
+                            + ")");
+
+        return methodBuilder.build();
+    }
+
+    public MethodSpec wrapMethod(ExecutableElement prototypeMethod){
+
+        PrototypeMethodData methodData = new PrototypeMethodData(prototypeMethod);
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(
+                prototypeMethod.getSimpleName().toString()
+        ).addModifiers(Modifier.PUBLIC);
+
+        methodBuilder = BaseDaemonGenerator.addTypeParameters(prototypeMethod, methodBuilder);
+
+        for(Pair<TypeName, String> param : methodData.getParameters()) {
+            methodBuilder.addParameter(param.getFirst(), param.getSecond());
+        }
+
+        for ( TypeMirror exception : prototypeMethod.getThrownTypes()) {
+            methodBuilder.addException(TypeName.get(exception));
+        }
+
+        if (methodData.getMethodRetTypeName().equals(TypeName.get(prototypeMethod.getEnclosingElement().asType()))) {
+            methodBuilder.returns(ClassName.get(packageName, daemonSimpleName)).addStatement("prototype."
+                    + prototypeMethod.getSimpleName().toString()
+                    + "(" + methodData.getArguments()
+                    + ")").addStatement("return this");
+        } else if (methodData.isVoid()) {
+            methodBuilder.returns(ClassName.get(packageName, daemonSimpleName)).addStatement("prototype."
+                    + prototypeMethod.getSimpleName().toString()
+                    + "(" + methodData.getArguments()
+                    + ")").addStatement("return this");
+        } else
+            methodBuilder.returns(TypeName.get(prototypeMethod.getReturnType())).addStatement(
+                    "return prototype."
+                            + prototypeMethod.getSimpleName().toString()
+                            + "(" + methodData.getArguments()
+                            + ")");
+
+        return methodBuilder.build();
     }
 
 

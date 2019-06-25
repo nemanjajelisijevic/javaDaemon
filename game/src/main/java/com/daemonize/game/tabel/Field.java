@@ -2,7 +2,7 @@ package com.daemonize.game.tabel;
 
 import com.daemonize.game.TowerDaemon;
 
-public class Field implements  IHeapItem <Field>, Comparable<Field> {
+public class Field<T> implements  IHeapItem , Comparable {
     float centerX;
     float centerY;
 
@@ -18,14 +18,14 @@ public class Field implements  IHeapItem <Field>, Comparable<Field> {
     boolean walkable;
     int heapIndex;
 
-    private TowerDaemon tower;
+    private T object;
 
-    public TowerDaemon getTower() {
-        return tower;
+    public T getObject() {
+        return object;
     }
 
-    public Field setTower(TowerDaemon tower) {
-        this.tower = tower;
+    public Field setObject(T object) {
+        this.object = object;
         return this;
     }
 
@@ -38,7 +38,7 @@ public class Field implements  IHeapItem <Field>, Comparable<Field> {
         this.weight = weight;
     }
 
-    public Field (Field field) { // copy constructor
+    public Field (Field<T> field) { // copy constructor
         this.centerX = field.centerX;
         this.centerY = field.centerY;
         this.row = field.getRow();
@@ -48,7 +48,7 @@ public class Field implements  IHeapItem <Field>, Comparable<Field> {
         this.gCost = field.gCost;
         this.hCost = field.hCost;
         this.heapIndex = field.getHeapIndex();
-        this.tower = field.tower;
+        this.object = field.object;
     }
 
     public float getCenterX() {
@@ -114,24 +114,31 @@ public class Field implements  IHeapItem <Field>, Comparable<Field> {
     }
 
     @Override
-    public int compareTo(Field fieldToCompare) {
-        if (this.fCost() == fieldToCompare.fCost()) {
-            if (this.hCost == fieldToCompare.hCost) {
-                return 0;
+    public int compareTo(Object fieldToCompare) {
+
+        if (fieldToCompare instanceof Field) {
+
+            Field<T> other = (Field<T>) fieldToCompare;
+
+            if (this.fCost() == other.fCost()) {
+                if (this.hCost == other.hCost) {
+                    return 0;
+                } else {
+                    if (this.hCost < other.hCost) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                }
             } else {
-                if (this.hCost < fieldToCompare.hCost) {
+                if (this.fCost() < other.fCost()) {
                     return -1;
                 } else {
                     return 1;
                 }
             }
-        } else {
-            if (this.fCost() < fieldToCompare.fCost()) {
-                return -1;
-            } else {
-                return 1;
-            }
-        }
+        } else
+            return 0;
     }
 }
 

@@ -27,7 +27,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TowerDaemon implements EagerDaemon<TowerDaemon> {
+public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon> {
   private Tower prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
@@ -44,46 +44,25 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
   }
 
   /**
-   * Prototype method {@link Tower#animate} */
-  public SleepSideQuest<ImageMover.PositionedImage> setAnimateSideQuest(Consumer consumer) {
-    SleepSideQuest<ImageMover.PositionedImage> sideQuest = new AnimateSideQuest();
+   * Prototype method {@link Tower#animateTower} */
+  public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateTowerSideQuest(Consumer consumer) {
+    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateTowerSideQuest();
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
 
-  public TowerDaemon setVelocity(float velocity) {
-    prototype.setVelocity(velocity);
-    return this;
+  @Override
+  public int getHp() {
+    return prototype.getHp();
   }
 
-  public TowerDaemon contScan() {
-    prototype.contScan();
+  public TowerDaemon setSprite(Image[] sprite) {
+    prototype.setSprite(sprite);
     return this;
-  }
-
-  public ImageTranslationMover setSprite(Image[] sprite) {
-    return prototype.setSprite(sprite);
   }
 
   public Tower.TowerLevel getTowerLevel() {
     return prototype.getTowerLevel();
-  }
-
-  public float getdXY() {
-    return prototype.getdXY();
-  }
-
-  public Pair<Float, Float> getLastCoordinates() {
-    return prototype.getLastCoordinates();
-  }
-
-  public ImageMover.Velocity getVelocity() {
-    return prototype.getVelocity();
-  }
-
-  public TowerDaemon setTowerLevel(Tower.TowerLevel towerlevel) {
-    prototype.setTowerLevel(towerlevel);
-    return this;
   }
 
   public TowerDaemon setVelocity(ImageMover.Velocity velocity) {
@@ -99,6 +78,72 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return prototype.getTowertype();
   }
 
+  public boolean addTarget(EnemyDoubleDaemon target) {
+    return prototype.addTarget(target);
+  }
+
+  public TowerDaemon setOutOfBordersClosure(Runnable closure) {
+    prototype.setOutOfBordersClosure(closure);
+    return this;
+  }
+
+  public float getRange() {
+    return prototype.getRange();
+  }
+
+  public TowerDaemon setHpView(ImageView hpview) {
+    prototype.setHpView(hpview);
+    return this;
+  }
+
+  public TowerDaemon setView(ImageView view) {
+    prototype.setView(view);
+    return this;
+  }
+
+  public int getSize() {
+    return prototype.getSize();
+  }
+
+  public TowerDaemon setHp(int hp) {
+    prototype.setHp(hp);
+    return this;
+  }
+
+  @Override
+  public void setVelocity(float velocity) {
+    prototype.setVelocity(velocity);
+  }
+
+  public TowerDaemon contScan() {
+    prototype.contScan();
+    return this;
+  }
+
+  public float getdXY() {
+    return prototype.getdXY();
+  }
+
+  @Override
+  public Pair<Float, Float> getLastCoordinates() {
+    return prototype.getLastCoordinates();
+  }
+
+  @Override
+  public ImageMover.Velocity getVelocity() {
+    return prototype.getVelocity();
+  }
+
+  @Override
+  public boolean isParalyzed() {
+    return prototype.isParalyzed();
+  }
+
+  @Override
+  public int getMaxHp() {
+    return prototype.getMaxHp();
+  }
+
   public TowerDaemon setCoordinates(float lastx, float lasty) {
     prototype.setCoordinates(lastx, lasty);
     return this;
@@ -112,10 +157,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
   public TowerDaemon setCurrentAngle(int currentangle) {
     prototype.setCurrentAngle(currentangle);
     return this;
-  }
-
-  public boolean addTarget(EnemyDoubleDaemon target) {
-    return prototype.addTarget(target);
   }
 
   public TowerDaemon setRotationSprite(Image[] rotationsprite) {
@@ -148,13 +189,28 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return this;
   }
 
+  @Override
+  public boolean isShootable() {
+    return prototype.isShootable();
+  }
+
+  public TowerDaemon setTowerLevel(Tower.TowerLevel towerlevel) {
+    prototype.setTowerLevel(towerlevel);
+    return this;
+  }
+
   public TowerDaemon pauseScan() {
     prototype.pauseScan();
     return this;
   }
 
-  public TowerDaemon setOutOfBordersClosure(Runnable closure) {
-    prototype.setOutOfBordersClosure(closure);
+  public TowerDaemon setParalyzed(boolean paralyzed) {
+    prototype.setParalyzed(paralyzed);
+    return this;
+  }
+
+  public TowerDaemon setMaxHp(int maxhp) {
+    prototype.setMaxHp(maxhp);
     return this;
   }
 
@@ -163,21 +219,17 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return this;
   }
 
-  public float getRange() {
-    return prototype.getRange();
-  }
-
   public ImageView getView() {
     return prototype.getView();
   }
 
-  public TowerDaemon setView(ImageView view) {
-    prototype.setView(view);
+  public TowerDaemon setShootable(boolean shootable) {
+    prototype.setShootable(shootable);
     return this;
   }
 
-  public int getSize() {
-    return prototype.getSize();
+  public ImageView getHpView() {
+    return prototype.getHpView();
   }
 
   public SideQuest getCurrentSideQuest() {
@@ -192,21 +244,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.imagemovers.ImageTranslationMover#setBorders} */
-  public TowerDaemon setBorders(float x1, float x2, float y1, float y2,
-      Closure<ImageTranslationMover> closure) {
-    mainDaemonEngine.pursueQuest(new SetBordersMainQuest(x1, x2, y1, y2, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Tower#updateSprite} */
-  public TowerDaemon updateSprite(Consumer consumer, Closure<ImageMover.PositionedImage> closure) {
-    mainDaemonEngine.pursueQuest(new UpdateSpriteMainQuest(closure).setConsumer(consumer));
-    return this;
-  }
-
-  /**
    * Prototype method {@link com.daemonize.game.imagemovers.RotatingSpriteImageMover#rotate} */
   public TowerDaemon rotate(int targetangle) {
     mainDaemonEngine.pursueQuest(new RotateMainQuest(targetangle).setConsumer(mainDaemonEngine.getConsumer()));
@@ -214,9 +251,17 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.imagemovers.CachedArraySpriteImageMover#pushSprite} */
-  public TowerDaemon pushSprite(Image[] sprite, float velocity) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity).setConsumer(mainDaemonEngine.getConsumer()));
+   * Prototype method {@link com.daemonize.game.Tower#pushSprite} */
+  public TowerDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Tower#updateSprite} */
+  public TowerDaemon updateSprite(Consumer consumer,
+      Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
+    mainDaemonEngine.pursueQuest(new UpdateSpriteMainQuest(closure).setConsumer(consumer));
     return this;
   }
 
@@ -229,38 +274,15 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
 
   /**
    * Prototype method {@link com.daemonize.game.imagemovers.RotatingSpriteImageMover#getAngle} */
-  public TowerDaemon getAngle(Pair<Float, Float> one, Pair<Float, Float> two,
-      Closure<Double> closure) {
-    mainDaemonEngine.pursueQuest(new GetAngleMainQuest(one, two, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.imagemovers.RotatingSpriteImageMover#getAngle} */
   public TowerDaemon getAngle(float x1, float y1, float x2, float y2, Closure<Double> closure) {
-    mainDaemonEngine.pursueQuest(new GetAngleIMainQuest(x1, y1, x2, y2, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new GetAngleMainQuest(x1, y1, x2, y2, closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.Tower#scan} */
-  public TowerDaemon scan(Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>> closure) {
-    scanDaemonEngine.pursueQuest(new ScanMainQuest(closure).setConsumer(scanDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Tower#animate} */
-  public TowerDaemon animate(Closure<ImageMover.PositionedImage> closure) {
-    mainDaemonEngine.pursueQuest(new AnimateMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.imagemovers.ImageTranslationMover#setDirectionAndMove} */
-  public TowerDaemon setDirectionAndMove(float x, float y, float velocityint,
-      Closure<Boolean> closure) {
-    mainDaemonEngine.pursueQuest(new SetDirectionAndMoveMainQuest(x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
+   * Prototype method {@link com.daemonize.game.Tower#animateTower} */
+  public TowerDaemon animateTower(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
+    mainDaemonEngine.pursueQuest(new AnimateTowerMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -275,6 +297,51 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
    * Prototype method {@link com.daemonize.game.imagemovers.RotatingSpriteImageMover#getAbsoluteAngle} */
   public TowerDaemon getAbsoluteAngle(double angle, Closure<Double> closure) {
     mainDaemonEngine.pursueQuest(new GetAbsoluteAngleMainQuest(angle, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.imagemovers.ImageTranslationMover#setBorders} */
+  public TowerDaemon setBorders(float x1, float x2, float y1, float y2,
+      Closure<ImageTranslationMover> closure) {
+    mainDaemonEngine.pursueQuest(new SetBordersMainQuest(x1, x2, y1, y2, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Tower#setHealthBarImage} */
+  public TowerDaemon setHealthBarImage(Image[] healthbarimage, Closure<Tower> closure) {
+    mainDaemonEngine.pursueQuest(new SetHealthBarImageMainQuest(healthbarimage, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.imagemovers.RotatingSpriteImageMover#getAngle} */
+  public TowerDaemon getAngle(Pair<Float, Float> one, Pair<Float, Float> two,
+      Closure<Double> closure) {
+    mainDaemonEngine.pursueQuest(new GetAngleIMainQuest(one, two, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Tower#scan} */
+  public TowerDaemon scan(Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>> closure) {
+    scanDaemonEngine.pursueQuest(new ScanMainQuest(closure).setConsumer(scanDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.imagemovers.ImageTranslationMover#animate} */
+  public TowerDaemon animate(Closure<ImageMover.PositionedImage> closure) {
+    mainDaemonEngine.pursueQuest(new AnimateMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.imagemovers.ImageTranslationMover#setDirectionAndMove} */
+  public TowerDaemon setDirectionAndMove(float x, float y, float velocityint,
+      Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new SetDirectionAndMoveMainQuest(x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -385,14 +452,15 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     return this;
   }
 
-  private final class AnimateSideQuest extends SleepSideQuest<ImageMover.PositionedImage> {
-    private AnimateSideQuest() {
-      this.description = "animate";
+  private final class AnimateTowerSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private AnimateTowerSideQuest() {
+      this.description = "animateTower";
     }
 
     @Override
-    public final ImageMover.PositionedImage pursue() throws Exception {
-      return prototype.animate();
+    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
+        Exception {
+      return prototype.animateTower();
     }
   }
 
@@ -412,6 +480,137 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     public final Void pursue() throws Exception {
       prototype.rotateTowards(x, y);
       return null;
+    }
+  }
+
+  private final class RotateMainQuest extends VoidMainQuest {
+    private int targetangle;
+
+    private RotateMainQuest(int targetangle) {
+      setVoid();
+      this.targetangle = targetangle;
+      this.description = "rotate";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.rotate(targetangle);
+      return null;
+    }
+  }
+
+  private final class PushSpriteMainQuest extends VoidMainQuest {
+    private Image[] sprite;
+
+    private float velocity;
+
+    private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun) {
+      super(retRun);
+      this.sprite = sprite;
+      this.velocity = velocity;
+      this.description = "pushSprite";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.pushSprite(sprite, velocity);
+      return null;
+    }
+  }
+
+  private final class UpdateSpriteMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private UpdateSpriteMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
+      super(closure);
+      this.description = "updateSprite";
+    }
+
+    @Override
+    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
+        Exception {
+      return prototype.updateSprite();
+    }
+  }
+
+  private final class GetRotationSpriteMainQuest extends MainQuest<Image[]> {
+    private int targetangle;
+
+    private GetRotationSpriteMainQuest(int targetangle, Closure<Image[]> closure) {
+      super(closure);
+      this.targetangle = targetangle;
+      this.description = "getRotationSprite";
+    }
+
+    @Override
+    public final Image[] pursue() throws Exception {
+      return prototype.getRotationSprite(targetangle);
+    }
+  }
+
+  private final class GetAngleMainQuest extends MainQuest<Double> {
+    private float x1;
+
+    private float y1;
+
+    private float x2;
+
+    private float y2;
+
+    private GetAngleMainQuest(float x1, float y1, float x2, float y2, Closure<Double> closure) {
+      super(closure);
+      this.x1 = x1;
+      this.y1 = y1;
+      this.x2 = x2;
+      this.y2 = y2;
+      this.description = "getAngle";
+    }
+
+    @Override
+    public final Double pursue() throws Exception {
+      return Tower.getAngle(x1, y1, x2, y2);
+    }
+  }
+
+  private final class AnimateTowerMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private AnimateTowerMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
+      super(closure);
+      this.description = "animateTower";
+    }
+
+    @Override
+    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
+        Exception {
+      return prototype.animateTower();
+    }
+  }
+
+  private final class ReloadMainQuest extends VoidMainQuest {
+    private long millis;
+
+    private ReloadMainQuest(long millis, Runnable retRun) {
+      super(retRun);
+      this.millis = millis;
+      this.description = "reload";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.reload(millis);
+      return null;
+    }
+  }
+
+  private final class GetAbsoluteAngleMainQuest extends MainQuest<Double> {
+    private double angle;
+
+    private GetAbsoluteAngleMainQuest(double angle, Closure<Double> closure) {
+      super(closure);
+      this.angle = angle;
+      this.description = "getAbsoluteAngle";
+    }
+
+    @Override
+    public final Double pursue() throws Exception {
+      return Tower.getAbsoluteAngle(angle);
     }
   }
 
@@ -440,74 +639,27 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     }
   }
 
-  private final class UpdateSpriteMainQuest extends MainQuest<ImageMover.PositionedImage> {
-    private UpdateSpriteMainQuest(Closure<ImageMover.PositionedImage> closure) {
+  private final class SetHealthBarImageMainQuest extends MainQuest<Tower> {
+    private Image[] healthbarimage;
+
+    private SetHealthBarImageMainQuest(Image[] healthbarimage, Closure<Tower> closure) {
       super(closure);
-      this.description = "updateSprite";
+      this.healthbarimage = healthbarimage;
+      this.description = "setHealthBarImage";
     }
 
     @Override
-    public final ImageMover.PositionedImage pursue() throws Exception {
-      return prototype.updateSprite();
+    public final Tower pursue() throws Exception {
+      return prototype.setHealthBarImage(healthbarimage);
     }
   }
 
-  private final class RotateMainQuest extends VoidMainQuest {
-    private int targetangle;
-
-    private RotateMainQuest(int targetangle) {
-      setVoid();
-      this.targetangle = targetangle;
-      this.description = "rotate";
-    }
-
-    @Override
-    public final Void pursue() throws Exception {
-      prototype.rotate(targetangle);
-      return null;
-    }
-  }
-
-  private final class PushSpriteMainQuest extends VoidMainQuest {
-    private Image[] sprite;
-
-    private float velocity;
-
-    private PushSpriteMainQuest(Image[] sprite, float velocity) {
-      setVoid();
-      this.sprite = sprite;
-      this.velocity = velocity;
-      this.description = "pushSprite";
-    }
-
-    @Override
-    public final Void pursue() throws Exception {
-      prototype.pushSprite(sprite, velocity);
-      return null;
-    }
-  }
-
-  private final class GetRotationSpriteMainQuest extends MainQuest<Image[]> {
-    private int targetangle;
-
-    private GetRotationSpriteMainQuest(int targetangle, Closure<Image[]> closure) {
-      super(closure);
-      this.targetangle = targetangle;
-      this.description = "getRotationSprite";
-    }
-
-    @Override
-    public final Image[] pursue() throws Exception {
-      return prototype.getRotationSprite(targetangle);
-    }
-  }
-
-  private final class GetAngleMainQuest extends MainQuest<Double> {
+  private final class GetAngleIMainQuest extends MainQuest<Double> {
     private Pair<Float, Float> one;
 
     private Pair<Float, Float> two;
 
-    private GetAngleMainQuest(Pair<Float, Float> one, Pair<Float, Float> two,
+    private GetAngleIMainQuest(Pair<Float, Float> one, Pair<Float, Float> two,
         Closure<Double> closure) {
       super(closure);
       this.one = one;
@@ -518,30 +670,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     @Override
     public final Double pursue() throws Exception {
       return Tower.getAngle(one, two);
-    }
-  }
-
-  private final class GetAngleIMainQuest extends MainQuest<Double> {
-    private float x1;
-
-    private float y1;
-
-    private float x2;
-
-    private float y2;
-
-    private GetAngleIMainQuest(float x1, float y1, float x2, float y2, Closure<Double> closure) {
-      super(closure);
-      this.x1 = x1;
-      this.y1 = y1;
-      this.x2 = x2;
-      this.y2 = y2;
-      this.description = "getAngle";
-    }
-
-    @Override
-    public final Double pursue() throws Exception {
-      return Tower.getAngle(x1, y1, x2, y2);
     }
   }
 
@@ -588,37 +716,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon> {
     @Override
     public final Boolean pursue() throws Exception {
       return prototype.setDirectionAndMove(x, y, velocityint);
-    }
-  }
-
-  private final class ReloadMainQuest extends VoidMainQuest {
-    private long millis;
-
-    private ReloadMainQuest(long millis, Runnable retRun) {
-      super(retRun);
-      this.millis = millis;
-      this.description = "reload";
-    }
-
-    @Override
-    public final Void pursue() throws Exception {
-      prototype.reload(millis);
-      return null;
-    }
-  }
-
-  private final class GetAbsoluteAngleMainQuest extends MainQuest<Double> {
-    private double angle;
-
-    private GetAbsoluteAngleMainQuest(double angle, Closure<Double> closure) {
-      super(closure);
-      this.angle = angle;
-      this.description = "getAbsoluteAngle";
-    }
-
-    @Override
-    public final Double pursue() throws Exception {
-      return Tower.getAbsoluteAngle(angle);
     }
   }
 

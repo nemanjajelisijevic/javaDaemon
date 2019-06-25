@@ -2,7 +2,7 @@ package com.daemonize.game.tabel;
 
 public abstract class PathFinding {
 
-    public abstract boolean recalculate(Grid grid);
+    public abstract <T> boolean recalculate(Grid<T> grid);
 
     protected int getDistance(Field fieldA, Field fieldB) {
         int distX = Math.abs(fieldA.getRow() - fieldB.getRow());

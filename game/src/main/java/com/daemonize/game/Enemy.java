@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
@@ -14,7 +15,7 @@ import java.util.Arrays;
 
 
 @Daemonize(doubleDaemonize = true, className = "EnemyDoubleDaemon")
-public class Enemy extends CoordinatedImageTranslationMover {
+public class Enemy extends CoordinatedImageTranslationMover implements Target<Enemy> {
 
     private ImageView view;
     private ImageView hpView;
@@ -25,14 +26,56 @@ public class Enemy extends CoordinatedImageTranslationMover {
 
     private boolean paralyzed = false;
 
+    private volatile TowerDaemon target;
+    private DaemonSemaphore targetSemaphore = new DaemonSemaphore();
+
+    private PositionedImage hBar = new PositionedImage();
+
+    public Enemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
+        super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
+        this.hp = hp;
+        this.hpMax = hp;
+        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
+    }
+
     @CallingThread
+    public TowerDaemon getTarget() {
+        return target;
+    }
+
+    @CallingThread
+    public void setTarget(TowerDaemon target) {
+        this.target = target;
+
+        if (target == null)
+            targetSemaphore.stop();
+        else
+            targetSemaphore.go();
+    }
+
+    @DedicatedThread
+    @GenerateRunnable
+    public void reload() throws InterruptedException {
+        Thread.sleep(400);
+        targetSemaphore.await();
+    }
+
+    @Override
+    public void setVelocity(float velocity) {
+        super.setVelocity(velocity);
+    }
+
+    @CallingThread
+    @Override
     public boolean isParalyzed() {
         return paralyzed;
     }
 
     @CallingThread
-    public void setParalyzed(boolean paralyzed) {
+    @Override
+    public Enemy setParalyzed(boolean paralyzed) {
         this.paralyzed = paralyzed;
+        return this;
     }
 
     private Pair<Integer, Integer> previousField;
@@ -55,33 +98,42 @@ public class Enemy extends CoordinatedImageTranslationMover {
     }
 
     @CallingThread
+    @Override
     public boolean isShootable() {
         return shootable;
     }
 
     @CallingThread
-    public void setShootable(boolean shootable) {
+    @Override
+    public Enemy setShootable(boolean shootable) {
         this.shootable = shootable;
+        return this;
     }
 
     @CallingThread
+    @Override
     public int getHp() {
         return hp;
     }
 
     @CallingThread
+    @Override
     public int getMaxHp() {
         return hpMax;
     }
 
     @CallingThread
-    public void setHp(int hp) {
+    @Override
+    public Enemy setHp(int hp) {
         this.hp = hp;
+        return this;
     }
 
     @CallingThread
-    public void setMaxHp(int maxHp) {
+    @Override
+    public Enemy setMaxHp(int maxHp) {
         this.hpMax = maxHp;
+        return this;
     }
 
     @CallingThread
@@ -103,13 +155,6 @@ public class Enemy extends CoordinatedImageTranslationMover {
     public Enemy setHpView(ImageView hpView) {
         this.hpView = hpView;
         return this;
-    }
-
-    public Enemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
-        super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
-        this.hp = hp;
-        this.hpMax = hp;
-        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
     }
 
     @GenerateRunnable
@@ -144,7 +189,6 @@ public class Enemy extends CoordinatedImageTranslationMover {
             return null;
 
         GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(enemyPosBmp, view));
-        PositionedImage hBar = new PositionedImage();
         hBar.image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
         hBar.positionX = lastCoord.getFirst();
         hBar.positionY = lastCoord.getSecond() - 2 * hBar.image.getHeight();

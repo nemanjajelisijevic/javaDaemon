@@ -51,8 +51,9 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return this;
   }
 
-  public ImageTranslationMover setSprite(Image[] sprite) {
-    return prototype.setSprite(sprite);
+  public MoneyHandlerDaemon setSprite(Image[] sprite) {
+    prototype.setSprite(sprite);
+    return this;
   }
 
   public float getdXY() {

@@ -70,7 +70,7 @@ public class Game {
     private int borderY;
 
     //grid
-    private Grid grid;
+    private Grid<TowerDaemon> grid;
     private int rows;
     private int columns;
     private ImageView[][] gridViewMatrix;
@@ -85,7 +85,7 @@ public class Game {
     private DaemonEngine fieldEraserEngine;
 
     //score
-    private int score = 1000;
+    private int score = 99999;
     private ImageView scoreBackGrView;
     private ImageView scoreTitleView;
     private ImageView[] viewsNum;
@@ -111,6 +111,8 @@ public class Game {
     private Image[] moneyNumbersImages;
 
     //towers
+    private int towerHp = 300;
+
     private Image[] redTowerUpgSprite;
     private Image[] blueTowerUpgSprite;
     private Image[] greenTowerUpgSprite;
@@ -118,6 +120,8 @@ public class Game {
     private List<Image[]> redTower;
     private List<Image[]> blueTower;
     private List<Image[]> greenTower;
+
+    private ImageView[][] towerHpViwes;
 
     private Set<TowerDaemon> towers = new HashSet<>();
     private int range;
@@ -240,7 +244,7 @@ public class Game {
         this.gameConsumer = new DaemonConsumer("Game Consumer");
         this.rows = rows;
         this.columns = columns;
-        this.grid = new Grid(
+        this.grid = new Grid<TowerDaemon>(
                 rows,
                 columns,
                 Pair.create(0, 0),
@@ -726,7 +730,6 @@ public class Game {
                     renderer.drawScene();
                 }
 
-
                 Image score = imageLoader.loadImageFromAssets("SmallBox.png", 300, 150);
                 Image titleScore = imageLoader.loadImageFromAssets("HealthBar.png", 300, 70);
 
@@ -880,13 +883,7 @@ public class Game {
 
                 tow.setRotationSprite(currentSprite);
 
-                towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, update -> {
-                    ImageMover.PositionedImage posBmp = update.runtimeCheckAndGet();
-                    tow.getView().setAbsoluteX(posBmp.positionX);
-                    tow.getView().setAbsoluteY(posBmp.positionY);
-                    tow.getView().setImage(posBmp.image);
-                });
-
+                towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, new MultiViewAnimateClosure()::onReturn);
 
                 renderer.consume(()->upgradeButton.disable().setImage(upgradeButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
@@ -922,12 +919,12 @@ public class Game {
 
             Button saleButton = new Button("Sale", saleButtonImage);
             saleButton.onClick(()->{
-
                 renderer.consume(()->saleButton.disable().setImage(saleButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
                     TowerDaemon tower = towerUpgradeDialogue.getTower();
+                    renderer.consume(tower.getHpView()::hide);
 
-                    Field field = grid.getField(
+                    Field<TowerDaemon> field = grid.getField(
                             tower.getLastCoordinates().getFirst(),
                             tower.getLastCoordinates().getSecond()
                     );
@@ -935,7 +932,7 @@ public class Game {
                     //stop and remove tower
                     tower.stop();
                     towers.remove(tower);
-                    field.setTower(null);
+                    field.setObject(null);
 
                     renderer.consume(()->saleButton.enable().setImage(saleButtonImage));
 
@@ -1038,6 +1035,23 @@ public class Game {
                      .hide();
             }
 
+            //tower hp views
+            towerHpViwes = new ImageView[rows][columns];
+
+            for (int j = 0; j < rows; ++j ) {
+                for (int i = 0; i < columns; ++i) {
+                    String towerName = "Tower[" + i + "][" + j + "]";
+                    towerHpViwes[j][i] = scene.addImageView(
+                            new ImageViewImpl(towerName + " HP View")
+                                    .setImage(healthBarSprite[0])
+                                    .hide()
+                                    .setAbsoluteX(0)
+                                    .setAbsoluteY(0)
+                                    .setZindex(10)
+                    );
+                }
+            }
+
             //enemy repo init
             enemyRepo = new QueuedEntityRepo<EnemyDoubleDaemon>() {
                 @Override
@@ -1100,7 +1114,8 @@ public class Game {
                     enemy.setShootable(true)
                             .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1F, 0.0F)))
                             .setCoordinates(grid.getStartingX(), grid.getStartingY())
-                            .clearAndInterrupt().start();
+                            .clearAndInterrupt()
+                            .start();
 
                     activeEnemies.add(enemy);
 
@@ -1381,14 +1396,62 @@ public class Game {
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());
                 System.out.println(DaemonUtils.tag() + "Enemy state: " + enemyDoubleDaemon.getEnginesState().get(enemyDoubleDaemon.getEnginesState().size() - 1));
 
-                int angle = (int) RotatingSpriteImageMover.getAngle(
-                        enemyDoubleDaemon.getLastCoordinates().getFirst(),
-                        enemyDoubleDaemon.getLastCoordinates().getSecond(),
-                        firstField.getCenterX(),
-                        firstField.getCenterY()
-                );
+                enemyDoubleDaemon.setTarget(null).reload(new Runnable() {
+                    @Override
+                    public void run() {
 
-                enemyDoubleDaemon.rotate(angle).goTo(
+                        TowerDaemon target = enemyDoubleDaemon.getTarget();
+
+                        if (target != null && target.isShootable()) {
+
+                            fireRocketBullet(
+                                    enemyDoubleDaemon.getLastCoordinates(),
+                                    target,
+                                    15,
+                                    target.getTowerLevel().bulletDamage,
+                                    2,
+                                    ()->{
+
+                                        if(!target.isShootable())
+                                            return;
+
+                                        renderer.consume(target.getHpView()::hide);
+
+                                        enemyDoubleDaemon.setTarget(null);
+
+                                        Field<TowerDaemon> field = grid.getField(
+                                                target.getLastCoordinates().getFirst(),
+                                                target.getLastCoordinates().getSecond()
+                                        );
+
+                                        target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
+
+                                            target.setShootable(false);
+                                            renderer.consume(target.getView()::hide);
+                                            towers.remove(target);
+                                            field.setObject(null);
+
+                                            //remove tower from grid and recalculate path
+                                            if (grid.destroyTower(field.getRow(), field.getColumn())) {
+                                                renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
+                                            } else
+                                                throw new IllegalStateException("Could not destroy tower");
+                                        }).queueStop();
+
+                                    }
+                            );
+                        }
+
+                        enemyDoubleDaemon.reload(this::run);
+                    }
+                }).rotate(
+                        (int) RotatingSpriteImageMover.getAngle(
+                                enemyDoubleDaemon.getLastCoordinates().getFirst(),
+                                enemyDoubleDaemon.getLastCoordinates().getSecond(),
+                                firstField.getCenterX(),
+                                firstField.getCenterY()
+                        )
+                ).goTo(
                         firstField.getCenterX(),
                         firstField.getCenterY(),
                         enemyVelocity,
@@ -1402,11 +1465,12 @@ public class Game {
                                 }
 
                                 Pair<Float, Float> currentCoord = enemyDoubleDaemon.getPrototype().getLastCoordinates();
-                                Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
+                                Field<TowerDaemon> current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
-                                for(Field neighbour : grid.getNeighbors(current)) {
-                                    if (neighbour.getTower() != null) {
-                                        neighbour.getTower().addTarget(enemyDoubleDaemon);//TODO check ret val
+                                for(Field<TowerDaemon> neighbour : grid.getNeighbors(current)) {
+                                    if (neighbour.getObject() != null) {
+                                        neighbour.getObject().addTarget(enemyDoubleDaemon);//TODO check ret val
+                                        enemyDoubleDaemon.setTarget(neighbour.getObject().isShootable() ? neighbour.getObject() : null);
                                     }
                                 }
 
@@ -1493,6 +1557,7 @@ public class Game {
 
                     Thread.sleep(300);
                 }
+
             }).setName("Start End field marker").start();
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
@@ -1507,10 +1572,10 @@ public class Game {
     private void setTower(float x, float y) {
 
         //check if correct field
-        Field field = grid.getField(x, y);
+        Field<TowerDaemon> field = grid.getField(x, y);
         if (field == null) return;
 
-        TowerDaemon tow = field.getTower();
+        TowerDaemon tow = field.getObject();
 
         if (tow != null) {//upgrade existing tower
             if (!towerUpgradeDialogue.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
@@ -1536,9 +1601,7 @@ public class Game {
                 //show upgrade dialog
                 renderer.consume(()->{
 
-                    towerUpgradeDialogue.getTowerUpgrade()
-                            .setAbsoluteX(borderX / 2)
-                            .setAbsoluteY(borderY / 2);
+                    towerUpgradeDialogue.getTowerUpgrade().setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2);
 
                     towerUpgradeDialogue.getTowerUpgrade()
                             .getViewByName("TowerView")
@@ -1619,33 +1682,45 @@ public class Game {
                         renderer.consume(diagonalMatrix[fieldRow][fieldColumn]::hide);
                 }
 
+                String towerName = "Tower[" + field.getColumn() + "][" + field.getRow() + "]";
+
+                towerHpViwes[field.getRow()][field.getColumn()].setImage(healthBarSprite[9]);
 
                 Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
                         ? new LaserTower (
                                 renderer,
-                                new ImageAnimateClosure(fieldView),
+                                new MultiViewAnimateClosure(),
                                 currentTowerSprite,
                                 Pair.create(field.getCenterX(), field.getCenterY()),
                                 range,
                                 towerSelect,
-                                dXY
-                        )
+                                dXY,
+                                towerHp
+                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
+                        .setHealthBarImage(healthBarSprite)
+                        .setTowerLevel(new Tower.TowerLevel(1,2,1500))
+
                 :       new Tower(
                         currentTowerSprite,
                         Pair.create(field.getCenterX(), field.getCenterY()),
                         range,
                         towerSelect,
-                        dXY
-                );
+                        dXY,
+                        towerHp
+                )
+                .setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
+                .setHealthBarImage(healthBarSprite)
+                .setTowerLevel(new Tower.TowerLevel(1,2,1500));
 
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
-                        .setName("Tower[" + field.getColumn() + "][" + field.getRow() + "]")
-                        .setView(fieldView);
+                        .setName(towerName)
+                        .setView(fieldView)
+                        .setShootable(true);
 
                 towers.add(towerDaemon);
-                field.setTower(towerDaemon);
+                field.setObject(towerDaemon);
 
-                towerDaemon.setAnimateSideQuest(renderer).setClosure(new ImageAnimateClosure(fieldView)::onReturn);
+                towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
                     @Override
@@ -1663,11 +1738,25 @@ public class Game {
                                 case TYPE1:
                                     fireBullet(
                                             towerDaemon.getLastCoordinates(),
-                                            enemy.getLastCoordinates(),
                                             enemy,
                                             25,
                                             towerDaemon.getTowerLevel().bulletDamage,
-                                            towerDaemon.getTowerLevel().currentLevel
+                                            towerDaemon.getTowerLevel().currentLevel,
+                                            false,
+                                            0,
+                                            bulletSprite,
+                                            miniExplodeSprite,
+                                            ()->{
+                                                enemyRepo.add(enemy);
+                                                moneyDaemon.setAmount(3)
+                                                        .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
+                                                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
+
+                                                renderer.consume(()->{
+                                                    moneyView.getFirst().show();
+                                                    moneyView.getSecond().show();
+                                                });
+                                            }
                                     );
                                     break;
                                 case TYPE2:
@@ -1676,7 +1765,18 @@ public class Game {
                                             enemy,
                                             18,
                                             towerDaemon.getTowerLevel().bulletDamage,
-                                            towerDaemon.getTowerLevel().currentLevel
+                                            towerDaemon.getTowerLevel().currentLevel,
+                                            ()->{
+                                                enemyRepo.add(enemy);
+                                                moneyDaemon.setAmount(5)
+                                                        .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
+                                                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
+
+                                                renderer.consume(() -> {
+                                                    moneyView.getFirst().show();
+                                                    moneyView.getSecond().show();
+                                                });
+                                            }
                                     );
                                     break;
                                 case TYPE3:
@@ -1694,7 +1794,18 @@ public class Game {
                                     float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
                                     long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
-                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration);
+                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, ()->{
+                                        enemyRepo.add(enemy);
+
+                                        moneyDaemon.setAmount(1)
+                                                .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
+                                                .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
+
+                                        renderer.consume(() -> {
+                                            moneyView.getFirst().show();
+                                            moneyView.getSecond().show();
+                                        });
+                                    });
                                     reloadInterval = 4000;
                                     break;
                                 default:
@@ -1711,11 +1822,15 @@ public class Game {
 
     private void fireBullet(
             Pair<Float, Float> sourceCoord,
-            Pair<Float, Float> targetCoord,
-            EnemyDoubleDaemon enemy,
+            Target target,
             float velocity,
             int bulletDamage,
-            int noOfBulletsFired
+            int noOfBulletsFired,
+            boolean rotate,
+            int bulletRotateAngle,
+            Image[] bulletSprite,
+            Image[] bulletExplodeSprite,
+            Runnable destructionClosure
     ) {
         System.out.println(DaemonUtils.tag() + "Bullet repo size: " + bulletRepo.size());
 
@@ -1731,39 +1846,37 @@ public class Game {
                 bullet.cont();
         });
 
-        bulletDoubleDaemon.goTo(targetCoord.getFirst(), targetCoord.getSecond(), velocity, ret -> {
+        float targetX = target.getLastCoordinates().getFirst();
+        float targetY = target.getLastCoordinates().getSecond();
 
-            if (!ret.runtimeCheckAndGet() || !enemy.isShootable()) {
+        if(rotate) {
+            bulletDoubleDaemon.rotate(bulletRotateAngle, ()->{});
+        }
+
+        bulletDoubleDaemon.goTo(targetX, targetY, velocity, ret -> {
+
+            if (!ret.runtimeCheckAndGet() || !target.isShootable()) {
                 bulletRepo.add(bulletDoubleDaemon);
                 return;
             }
 
-            int newHp = enemy.getHp() - bulletDoubleDaemon.getDamage();
+            int newHp = target.getHp() - bulletDoubleDaemon.getDamage();
             if (newHp > 0)
-                enemy.setHp(newHp);
-            else {
+                target.setHp(newHp);
+            else
+                destructionClosure.run();
 
-                enemyRepo.add(enemy);
-                moneyDaemon.setAmount(3)
-                        .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
-
-                renderer.consume(()->{
-                    moneyView.getFirst().show();
-                    moneyView.getSecond().show();
-                });
-            }
-
-            bulletDoubleDaemon.pushSprite(miniExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
+            bulletDoubleDaemon.pushSprite(bulletExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
         });
     }
 
     private void fireRocketBullet(
             Pair<Float, Float> sourceCoord,
-            EnemyDoubleDaemon enemy,
+            Target target,
             float velocity,
             int bulletDamage,
-            int noOfBulletsFired
+            int noOfBulletsFired,
+            Runnable destructionClosure
     ) {
         System.out.println(DaemonUtils.tag() + "Rocket repo size: " + rocketRepo.size());
 
@@ -1777,7 +1890,6 @@ public class Game {
                 rocket.start();
             else
                 rocket.cont();
-
         });
 
         int launchX = getRandomInt(
@@ -1804,7 +1916,7 @@ public class Game {
                 return;
             }
 
-            if (!enemy.isShootable()) {
+            if (!target.isShootable()) {
                 rocketDoubleDaemon.rotateAndGoTo(
                         - angle,
                         sourceCoord.getFirst(),
@@ -1814,23 +1926,23 @@ public class Game {
                 );
             } else {
 
-                Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
+                Pair<Float, Float> targetCoord = target.getLastCoordinates();
 
                 int targetAngle1 = (int) RotatingSpriteImageMover.getAngle(
                         rocketDoubleDaemon.getLastCoordinates().getFirst(),
                         rocketDoubleDaemon.getLastCoordinates().getSecond(),
-                        enemy.getLastCoordinates().getFirst(),
-                        enemy.getLastCoordinates().getSecond()
+                        target.getLastCoordinates().getFirst(),
+                        target.getLastCoordinates().getSecond()
                 );
 
                 rocketDoubleDaemon.rotateAndGoTo(
                         targetAngle1,
-                        enemy.getLastCoordinates().getFirst(),
-                        enemy.getLastCoordinates().getSecond(),
+                        target.getLastCoordinates().getFirst(),
+                        target.getLastCoordinates().getSecond(),
                         velocity,
                         ret2 -> {
 
-                            if (!ret2.runtimeCheckAndGet() || !enemy.isShootable()) {
+                            if (!ret2.runtimeCheckAndGet() || !target.isShootable()) {
                                 rocketRepo.add(rocketDoubleDaemon);
                                 return;
                             }
@@ -1838,25 +1950,15 @@ public class Game {
                             float bulletX = rocketDoubleDaemon.getLastCoordinates().getFirst();
                             float bulletY = rocketDoubleDaemon.getLastCoordinates().getSecond();
 
-                            if (Math.abs(bulletX - enemy.getLastCoordinates().getFirst()) < rocketExplosionRange
-                                    && Math.abs(bulletY - enemy.getLastCoordinates().getSecond()) < rocketExplosionRange) {
+                            if (Math.abs(bulletX - target.getLastCoordinates().getFirst()) < rocketExplosionRange
+                                    && Math.abs(bulletY - target.getLastCoordinates().getSecond()) < rocketExplosionRange) {
 
-                                int newHp = enemy.getHp() - rocketDoubleDaemon.getDamage();
+                                int newHp = target.getHp() - rocketDoubleDaemon.getDamage();
 
                                 if (newHp > 0)
-                                    enemy.setHp(newHp);
-                                else {
-
-                                    enemyRepo.add(enemy);
-                                    moneyDaemon.setAmount(5)
-                                            .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                                            .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
-
-                                    renderer.consume(() -> {
-                                        moneyView.getFirst().show();
-                                        moneyView.getSecond().show();
-                                    });
-                                }
+                                    target.setHp(newHp);
+                                else
+                                    destructionClosure.run();
                             }
 
                             rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, () -> rocketRepo.add(rocketDoubleDaemon));
@@ -1865,51 +1967,46 @@ public class Game {
         });
     }
 
-    public void fireLaser(Pair<Float, Float> source, EnemyDoubleDaemon enemy, float velocity, long duration) {
+    public void fireLaser(
+            Pair<Float, Float> source,
+            Target target,
+            float velocity,
+            long duration,
+            Runnable destructionClosure
+    ) {
 
-        if (enemy.isParalyzed())
+        if (target.isParalyzed())
             return;
 
-        enemy.setParalyzed(true);
+        target.setParalyzed(true);
 
-        laser.desintegrateTarget(source, enemy, duration, renderer, ret -> {
+        laser.desintegrateTarget(source, target, duration, renderer, ret -> {
 
-            int newHp = enemy.getHp() - laser.getDamage();
+            int newHp = target.getHp() - laser.getDamage();
             if (newHp > 0) {
 
-                enemy.setHp(newHp).setVelocity(velocity);
+                target.setHp(newHp);
+                target.setVelocity(velocity);
 
                 if (enemyParalyizer.queueSize() == 0) {
                     enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), () -> {
-                        enemy.setParalyzed(false);
-                        if (enemy.isShootable())
-                            enemy.setVelocity(enemyVelocity);
+                        target.setParalyzed(false);
+                        if (target.isShootable())
+                            target.setVelocity(enemyVelocity);
                     });
                 } else {
                     new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(()->{
                         System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
                         Thread.sleep(enemyParalyzingInterval);
                     },()->{
-                        enemy.setParalyzed(false);
-                        if (enemy.isShootable())
-                            enemy.setVelocity(enemyVelocity);
+                        target.setParalyzed(false);
+                        if (target.isShootable())
+                            target.setVelocity(enemyVelocity);
                     });
                 }
 
-            } else {
-
-                Pair<Float, Float> targetCoord = enemy.getLastCoordinates();
-                enemyRepo.add(enemy);
-
-                moneyDaemon.setAmount(1)
-                        .setCoordinates(targetCoord.getFirst(), targetCoord.getSecond())
-                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
-
-                renderer.consume(() -> {
-                    moneyView.getFirst().show();
-                    moneyView.getSecond().show();
-                });
-            }
+            } else
+                destructionClosure.run();
         });
     }
 

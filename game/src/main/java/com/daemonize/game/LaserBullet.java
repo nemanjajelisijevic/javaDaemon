@@ -17,7 +17,7 @@ import java.util.List;
 public class LaserBullet extends Bullet {
 
     protected List<ImageView> views;
-    protected EnemyDoubleDaemon target;
+    protected Target target;
     private volatile List<PositionedImage> photonList;
     private float[] coefficients;
 
@@ -71,7 +71,7 @@ public class LaserBullet extends Bullet {
 
     public List<ImageView> desintegrateTarget(
             Pair<Float, Float> sourceCoord,
-            EnemyDoubleDaemon target,
+            Target target,
             long duration,
             Consumer drawConsumer
     ) throws InterruptedException {

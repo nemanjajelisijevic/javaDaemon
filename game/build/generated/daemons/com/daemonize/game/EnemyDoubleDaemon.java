@@ -26,18 +26,21 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
+public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target<EnemyDoubleDaemon> {
   private Enemy prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
+  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
+
   protected EagerMainQuestDaemonEngine goToDaemonEngine;
 
   public EnemyDoubleDaemon(Consumer consumer, Enemy prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
+    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
     this.prototype = prototype;
   }
@@ -50,29 +53,37 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return sideQuest;
   }
 
-  public EnemyDoubleDaemon setVelocity(float velocity) {
+  @Override
+  public void setVelocity(float velocity) {
     prototype.setVelocity(velocity);
-    return this;
   }
 
+  @Override
   public int getHp() {
     return prototype.getHp();
   }
 
-  public ImageTranslationMover setSprite(Image[] sprite) {
-    return prototype.setSprite(sprite);
+  public EnemyDoubleDaemon setSprite(Image[] sprite) {
+    prototype.setSprite(sprite);
+    return this;
   }
 
   public float getdXY() {
     return prototype.getdXY();
   }
 
+  @Override
   public Pair<Float, Float> getLastCoordinates() {
     return prototype.getLastCoordinates();
   }
 
+  @Override
   public ImageMover.Velocity getVelocity() {
     return prototype.getVelocity();
+  }
+
+  public Pair<Float, Float> getTargetCoordinates() {
+    return prototype.getTargetCoordinates();
   }
 
   public EnemyDoubleDaemon setShootable(boolean shootable) {
@@ -80,28 +91,25 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return this;
   }
 
-  public Pair<Float, Float> getTargetCoordinates() {
-    return prototype.getTargetCoordinates();
-  }
-
   public EnemyDoubleDaemon setVelocity(ImageMover.Velocity velocity) {
     prototype.setVelocity(velocity);
     return this;
   }
 
-  public EnemyDoubleDaemon setHp(int hp) {
-    prototype.setHp(hp);
-    return this;
+  public TowerDaemon getTarget() {
+    return prototype.getTarget();
   }
 
   public Image[] getSprite() {
     return prototype.getSprite();
   }
 
+  @Override
   public boolean isParalyzed() {
     return prototype.isParalyzed();
   }
 
+  @Override
   public int getMaxHp() {
     return prototype.getMaxHp();
   }
@@ -116,8 +124,8 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return this;
   }
 
-  public EnemyDoubleDaemon setParalyzed(boolean paralyzed) {
-    prototype.setParalyzed(paralyzed);
+  public EnemyDoubleDaemon setHp(int hp) {
+    prototype.setHp(hp);
     return this;
   }
 
@@ -128,6 +136,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
 
   public EnemyDoubleDaemon clearVelocity() {
     prototype.clearVelocity();
+    return this;
+  }
+
+  public EnemyDoubleDaemon setParalyzed(boolean paralyzed) {
+    prototype.setParalyzed(paralyzed);
     return this;
   }
 
@@ -146,12 +159,14 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     return this;
   }
 
+  @Override
   public boolean isShootable() {
     return prototype.isShootable();
   }
 
-  public Enemy setView(ImageView view) {
-    return prototype.setView(view);
+  public EnemyDoubleDaemon setView(ImageView view) {
+    prototype.setView(view);
+    return this;
   }
 
   public Pair<Integer, Integer> getPreviousField() {
@@ -178,6 +193,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
 
   public int getSize() {
     return prototype.getSize();
+  }
+
+  public EnemyDoubleDaemon setTarget(TowerDaemon target) {
+    prototype.setTarget(target);
+    return this;
   }
 
   public EnemyDoubleDaemon setPreviousField(Pair<Integer, Integer> previousfield) {
@@ -208,6 +228,13 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
    * Prototype method {@link com.daemonize.game.Enemy#pushSprite} */
   public EnemyDoubleDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
     mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Enemy#reload} */
+  public EnemyDoubleDaemon reload(Runnable retRun) {
+    reloadDaemonEngine.pursueQuest(new ReloadMainQuest(retRun).setConsumer(reloadDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -274,6 +301,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon start() {
     mainDaemonEngine.start();
     goToDaemonEngine.start();
+    reloadDaemonEngine.start();
     sideDaemonEngine.start();
     return this;
   }
@@ -283,6 +311,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     mainDaemonEngine.stop();
     sideDaemonEngine.stop();
     goToDaemonEngine.stop();
+    reloadDaemonEngine.stop();
   }
 
   @Override
@@ -295,6 +324,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon clear() {
     mainDaemonEngine.clear();
     goToDaemonEngine.clear();
+    reloadDaemonEngine.clear();
     return this;
   }
 
@@ -302,6 +332,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     List<DaemonState> ret = new ArrayList<DaemonState>();
     ret.add(mainDaemonEngine.getState());
     ret.add(goToDaemonEngine.getState());
+    ret.add(reloadDaemonEngine.getState());
     ret.add(sideDaemonEngine.getState());
     return ret;
   }
@@ -310,6 +341,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     List<Integer> ret = new ArrayList<Integer>();
     ret.add(mainDaemonEngine.queueSize());
     ret.add(goToDaemonEngine.queueSize());
+    ret.add(reloadDaemonEngine.queueSize());
     return ret;
   }
 
@@ -318,6 +350,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     mainDaemonEngine.setName(name);
     sideDaemonEngine.setName(name + " - SIDE");
     goToDaemonEngine.setName(name + " - goToDaemonEngine");
+    reloadDaemonEngine.setName(name + " - reloadDaemonEngine");
     return this;
   }
 
@@ -329,6 +362,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon setMainQuestConsumer(Consumer consumer) {
     mainDaemonEngine.setConsumer(consumer);
     goToDaemonEngine.setConsumer(consumer);
+    reloadDaemonEngine.setConsumer(consumer);
     return this;
   }
 
@@ -351,6 +385,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon interrupt() {
     mainDaemonEngine.interrupt();
     goToDaemonEngine.interrupt();
+    reloadDaemonEngine.interrupt();
     return this;
   }
 
@@ -358,6 +393,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
   public EnemyDoubleDaemon clearAndInterrupt() {
     mainDaemonEngine.clearAndInterrupt();
     goToDaemonEngine.clearAndInterrupt();
+    reloadDaemonEngine.clearAndInterrupt();
     return this;
   }
 
@@ -429,6 +465,19 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon> {
     @Override
     public final Void pursue() throws Exception {
       prototype.pushSprite(sprite, velocity);
+      return null;
+    }
+  }
+
+  private final class ReloadMainQuest extends VoidMainQuest {
+    private ReloadMainQuest(Runnable retRun) {
+      super(retRun);
+      this.description = "reload";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.reload();
       return null;
     }
   }

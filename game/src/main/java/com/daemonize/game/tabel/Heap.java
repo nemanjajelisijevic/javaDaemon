@@ -1,6 +1,6 @@
 package com.daemonize.game.tabel;
 
-public class Heap< T extends     IHeapItem <T> > {
+public class Heap<T extends IHeapItem> {
     T[] items;
     int currentItemCount;
 
@@ -14,8 +14,6 @@ public class Heap< T extends     IHeapItem <T> > {
         items[currentItemCount] = item;
         sortUp(item);
         currentItemCount++;
-
-
     }
 
     public T removeFirst(){

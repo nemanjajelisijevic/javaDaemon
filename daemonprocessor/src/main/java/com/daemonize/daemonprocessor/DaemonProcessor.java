@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -143,6 +144,13 @@ public class DaemonProcessor extends AbstractProcessor {
                                         + " That cant be right...");
                     }
                 }
+
+                ((BaseDaemonGenerator) generator).setPrinter(new BaseDaemonGenerator.Printer() {
+                    @Override
+                    public void print(String string) {
+                        messager.printMessage(Diagnostic.Kind.NOTE, string);
+                    }
+                });
 
                 TypeSpec daemonClass = generator.generateDaemon(publicPrototypeMethods);
                 JavaFile javaFile = JavaFile.builder(generator.getPackageName(), daemonClass).build();
