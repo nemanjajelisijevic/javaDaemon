@@ -213,9 +213,10 @@ public class Game {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
             GenericNode.forEach(aReturn.runtimeCheckAndGet(), arg -> {
-                arg.getSecond().setAbsoluteX(arg.getFirst().positionX);
-                arg.getSecond().setAbsoluteY(arg.getFirst().positionY);
-                arg.getSecond().setImage(arg.getFirst().image);
+                ImageMover.PositionedImage image = arg.getFirst();
+                arg.getSecond().setAbsoluteX(image.positionX)
+                        .setAbsoluteY(image.positionY)
+                        .setImage(image.image);
             });
         }
     }
