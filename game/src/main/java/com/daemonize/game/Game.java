@@ -1370,7 +1370,6 @@ public class Game {
                 } else
                     enemyGenerator.setSleepInterval(enemyGenerateinterval);
 
-
                 if (enemyCounter % 20 == 0 && bulletDamage < 10)
                     bulletDamage += 1;
 
