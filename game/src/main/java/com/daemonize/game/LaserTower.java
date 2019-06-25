@@ -3,16 +3,18 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonprocessor.annotations.CallingThread;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.game.images.Image;
+import com.daemonize.game.scene.views.ImageView;
 
 
 public class LaserTower extends Tower {
 
-
     private Consumer renderer;
-    private ReturnRunnable<PositionedImage> updateRunnable = new ReturnRunnable<>();
+    private ReturnRunnable<GenericNode<Pair<PositionedImage, ImageView>>> updateRunnable = new ReturnRunnable<>();
 
-    public LaserTower(Consumer renderer, Closure<PositionedImage> updateClosure, Image[] rotationSprite, Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
+    public LaserTower(Consumer renderer, Closure<GenericNode<Pair<PositionedImage, ImageView>>> updateClosure, Image[] rotationSprite, Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
         super(rotationSprite, startingPos, range, type, dXY, hp);
         this.renderer = renderer;
         this.updateRunnable.setClosure(updateClosure);
@@ -26,7 +28,10 @@ public class LaserTower extends Tower {
     protected void rotateTo(EnemyDoubleDaemon target) throws InterruptedException {}
 
     @Override
-    public PositionedImage animate() throws InterruptedException {
+    public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {}//TODO FIX this
+
+    @Override
+    public GenericNode<Pair<PositionedImage, ImageView>> animateTower() throws InterruptedException {
 
         targetLock.lock();
         try {
@@ -53,11 +58,11 @@ public class LaserTower extends Tower {
                     for(Image image : retSprite) {
                         ret.image = image;
                         Thread.sleep(25);
-                        renderer.consume(updateRunnable.setResult(ret));
+                        renderer.consume(updateRunnable.setResult(updateHpSprite(new GenericNode<>(Pair.create(ret, view)))));
                     }
             }
 
-            return ret;
+            return updateHpSprite(new GenericNode<Pair<PositionedImage, ImageView>>(Pair.create(ret, view)));
 
         } finally {
             targetLock.unlock();

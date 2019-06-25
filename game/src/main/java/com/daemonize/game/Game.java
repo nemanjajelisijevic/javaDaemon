@@ -70,7 +70,7 @@ public class Game {
     private int borderY;
 
     //grid
-    private Grid grid;
+    private Grid<TowerDaemon> grid;
     private int rows;
     private int columns;
     private ImageView[][] gridViewMatrix;
@@ -111,7 +111,7 @@ public class Game {
     private Image[] moneyNumbersImages;
 
     //towers
-    private int towerHp = 100;
+    private int towerHp = 300;
 
     private Image[] redTowerUpgSprite;
     private Image[] blueTowerUpgSprite;
@@ -245,7 +245,7 @@ public class Game {
         this.gameConsumer = new DaemonConsumer("Game Consumer");
         this.rows = rows;
         this.columns = columns;
-        this.grid = new Grid(
+        this.grid = new Grid<TowerDaemon>(
                 rows,
                 columns,
                 Pair.create(0, 0),
@@ -925,7 +925,7 @@ public class Game {
                     TowerDaemon tower = towerUpgradeDialogue.getTower();
                     renderer.consume(tower.getHpView()::hide);
 
-                    Field field = grid.getField(
+                    Field<TowerDaemon> field = grid.getField(
                             tower.getLastCoordinates().getFirst(),
                             tower.getLastCoordinates().getSecond()
                     );
@@ -933,7 +933,7 @@ public class Game {
                     //stop and remove tower
                     tower.stop();
                     towers.remove(tower);
-                    field.setTower(null);
+                    field.setObject(null);
 
                     renderer.consume(()->saleButton.enable().setImage(saleButtonImage));
 
@@ -1403,7 +1403,7 @@ public class Game {
 
                         TowerDaemon target = enemyDoubleDaemon.getTarget();
 
-                        if (target != null) {
+                        if (target != null && target.isShootable()) {
 
                             fireRocketBullet(
                                     enemyDoubleDaemon.getLastCoordinates(),
@@ -1412,26 +1412,30 @@ public class Game {
                                     target.getTowerLevel().bulletDamage,
                                     2,
                                     ()->{
-                                        renderer.consume(()->target.getHpView().hide().setImage(healthBarSprite[9]));
+
+                                        renderer.consume(target.getHpView()::hide);//.setImage(healthBarSprite[9]));
+
                                         enemyDoubleDaemon.setTarget(null);
 
-                                        Field field = grid.getField(
+                                        Field<TowerDaemon> field = grid.getField(
                                                 target.getLastCoordinates().getFirst(),
                                                 target.getLastCoordinates().getSecond()
                                         );
 
                                         target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
 
+                                            target.setShootable(false);
                                             renderer.consume(target.getView()::hide);
                                             towers.remove(target);
-                                            field.setTower(null);
+                                            field.setObject(null);
 
                                             //remove tower from grid and recalculate path
-                                            if (grid.destroyTower(field.getRow(), field.getColumn()))
+                                            if (grid.destroyTower(field.getRow(), field.getColumn())) {
                                                 renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
-                                            else
+                                            } else
                                                 throw new IllegalStateException("Could not destroy tower");
                                         }).queueStop();
+
                                     }
                             );
                         }
@@ -1459,12 +1463,12 @@ public class Game {
                                 }
 
                                 Pair<Float, Float> currentCoord = enemyDoubleDaemon.getPrototype().getLastCoordinates();
-                                Field current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
+                                Field<TowerDaemon> current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
-                                for(Field neighbour : grid.getNeighbors(current)) {
-                                    if (neighbour.getTower() != null) {
-                                        neighbour.getTower().addTarget(enemyDoubleDaemon);//TODO check ret val
-                                        enemyDoubleDaemon.setTarget(neighbour.getTower());
+                                for(Field<TowerDaemon> neighbour : grid.getNeighbors(current)) {
+                                    if (neighbour.getObject() != null) {
+                                        neighbour.getObject().addTarget(enemyDoubleDaemon);//TODO check ret val
+                                        enemyDoubleDaemon.setTarget(neighbour.getObject().isShootable() ? neighbour.getObject() : null);
                                     }
                                 }
 
@@ -1566,10 +1570,10 @@ public class Game {
     private void setTower(float x, float y) {
 
         //check if correct field
-        Field field = grid.getField(x, y);
+        Field<TowerDaemon> field = grid.getField(x, y);
         if (field == null) return;
 
-        TowerDaemon tow = field.getTower();
+        TowerDaemon tow = field.getObject();
 
         if (tow != null) {//upgrade existing tower
             if (!towerUpgradeDialogue.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
@@ -1683,7 +1687,7 @@ public class Game {
                 Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
                         ? new LaserTower (
                                 renderer,
-                                new ImageAnimateClosure(fieldView),
+                                new MultiViewAnimateClosure(),
                                 currentTowerSprite,
                                 Pair.create(field.getCenterX(), field.getCenterY()),
                                 range,
@@ -1693,6 +1697,7 @@ public class Game {
                         ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
                         .setHealthBarImage(healthBarSprite)
                         .setTowerLevel(new Tower.TowerLevel(1,2,1500))
+
                 :       new Tower(
                         currentTowerSprite,
                         Pair.create(field.getCenterX(), field.getCenterY()),
@@ -1707,10 +1712,11 @@ public class Game {
 
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
                         .setName(towerName)
-                        .setView(fieldView);
+                        .setView(fieldView)
+                        .setShootable(true);
 
                 towers.add(towerDaemon);
-                field.setTower(towerDaemon);
+                field.setObject(towerDaemon);
 
                 towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
 

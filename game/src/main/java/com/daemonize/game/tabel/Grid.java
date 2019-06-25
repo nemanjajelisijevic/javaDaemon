@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Grid {
+public class Grid<T> {
 
     PathFinding pathFinding;
 
     Pair<Integer, Integer> startPoint;
     Pair<Integer, Integer> endPoint;
+
 
     private float xCoordinateInReal;
     private float yCoordinateInReal;
@@ -27,7 +28,7 @@ public class Grid {
         return yCoordinateInReal;
     }
 
-    private Field[][] grid;
+    private Field<T>[][] grid;
     int fieldWith ;
 
     private List<Field> path;
@@ -64,8 +65,8 @@ public class Grid {
 
     }
 
-    Field[][] createFieldGround(int row, int column,float realCoordX, float realCoordY) {
-        Field[][] gridtemp = new Field[row][column];
+    Field<T>[][] createFieldGround(int row, int column,float realCoordX, float realCoordY) {
+        Field<T>[][] gridtemp = new Field[row][column];
 
         for (int i = 0; i < row; i++) {
             float y = realCoordY + fieldWith / 2 + i * fieldWith;
@@ -73,7 +74,7 @@ public class Grid {
             for (int j = 0; j < column; j++) {
                 float x = realCoordX + fieldWith / 2 + j * fieldWith;
 
-                Field field = new Field(x, y, i, j, 0, true);
+                Field<T> field = new Field<T>(x, y, i, j, 0, true);
                 field.gCost = Integer.MAX_VALUE;
                 gridtemp[i][j] = field;
             }
@@ -81,13 +82,13 @@ public class Grid {
         return gridtemp;
     }
 
-    public Field getField(int row, int column) {
+    public Field<T> getField(int row, int column) {
         return grid[row][column];
     }
 
-    public Field getField(float x, float y) {
+    public Field<T> getField(float x, float y) {
 
-        Field ret = null;
+        Field<T> ret = null;
 
         if (isInsideOfGrid(x,y)) {
             int row = (int)Math.floor((y - yCoordinateInReal) / fieldWith);
@@ -126,10 +127,10 @@ public class Grid {
         if (row == grid.length - 1 && column == grid[row].length - 1) return false;
 
         //copy of grid
-        Field[][] gridTemp = new Field[grid.length][grid[0].length];
+        Field<T>[][] gridTemp = new Field[grid.length][grid[0].length];
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[0].length; j++) {
-                Field field = new Field(grid[i][j]);
+                Field<T> field = new Field(grid[i][j]);
                 gridTemp[i][j] = field;
                 grid[i][j].gCost = Integer.MAX_VALUE;
             }
@@ -163,7 +164,7 @@ public class Grid {
         if (!grid[row][column].isWalkable()) {
             for (int i = 0; i < grid.length; i++) {
                 for (int j = 0; j < grid[0].length; j++) {
-                    Field field = new Field(grid[i][j]);
+                    Field<T> field = new Field(grid[i][j]);
 //                    gridTemp[i][j] = field;
                     grid[i][j].gCost = Integer.MAX_VALUE;
                 }
@@ -175,12 +176,12 @@ public class Grid {
     }
 
 
-        public List<Field> getNeighbors(Field field) {
+    public List<Field<T>> getNeighbors(Field<T> field) {
         return getNeighbors(field.row, field.column);
     }
 
-    protected List<Field> getNeighbors(int row, int column) {
-        List<Field> neighbors = new ArrayList<>();
+    protected List<Field<T>> getNeighbors(int row, int column) {
+        List<Field<T>> neighbors = new ArrayList<>();
 
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
@@ -199,13 +200,13 @@ public class Grid {
         return neighbors;
     }
 
-    public synchronized Field getMinWeightOfNeighbors(Field field) {
+    public synchronized Field<T> getMinWeightOfNeighbors(Field<T> field) {
         return getMinWeightOfNeighbors(field.getRow(), field.getColumn());
     }
 
-    private List<Field> neighbors = new ArrayList<>(8);
+    private List<Field<T>> neighbors = new ArrayList<>(8);
 
-    public synchronized Field getMinWeightOfNeighbors(int row, int column) {
+    public synchronized Field<T> getMinWeightOfNeighbors(int row, int column) {
         //List<Field> neighbors = new ArrayList<>(8);
         neighbors.clear();
         for (int i = -1; i <= 1; i++) {

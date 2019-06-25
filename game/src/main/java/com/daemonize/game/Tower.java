@@ -114,7 +114,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
 
     private TowerType towertype;
     private TowerLevel towerLevel = new TowerLevel(1,2,1500);
-    private ImageView view;
+    protected ImageView view;
 
     protected volatile Queue<EnemyDoubleDaemon> targetQueue;
     protected Lock targetLock;
@@ -308,13 +308,14 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
     @ConsumerArg
     public GenericNode<Pair<PositionedImage, ImageView>> updateSprite() {//hack but improves performance
         ret.image = iterateSprite();
+        return updateHpSprite(new GenericNode<>(Pair.create(ret, view)));
+    }
 
-        GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(ret, view));
+    protected GenericNode<Pair<PositionedImage, ImageView>> updateHpSprite(GenericNode<Pair<PositionedImage, ImageView>> root) {
         hBar.image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
         hBar.positionX = ret.positionX;
         hBar.positionY = ret.positionY - 2 * hBar.image.getHeight();
         root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
-
         return root;
     }
 
