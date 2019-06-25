@@ -26,7 +26,7 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
 
     private boolean paralyzed = false;
 
-    private volatile TowerDaemon target;
+    private volatile Target target;
     private DaemonSemaphore targetSemaphore = new DaemonSemaphore();
 
     private PositionedImage hBar = new PositionedImage();
@@ -39,12 +39,12 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     }
 
     @CallingThread
-    public TowerDaemon getTarget() {
+    public Target getTarget() {
         return target;
     }
 
     @CallingThread
-    public void setTarget(TowerDaemon target) {
+    public void setTarget(Target target) {
         this.target = target;
 
         if (target == null)
@@ -54,10 +54,10 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     }
 
     @DedicatedThread
-    @GenerateRunnable
-    public void reload() throws InterruptedException {
+    public Target reload() throws InterruptedException {
         Thread.sleep(400);
         targetSemaphore.await();
+        return getTarget();
     }
 
     @Override

@@ -1395,11 +1395,11 @@ public class Game {
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());
                 System.out.println(DaemonUtils.tag() + "Enemy state: " + enemyDoubleDaemon.getEnginesState().get(enemyDoubleDaemon.getEnginesState().size() - 1));
 
-                enemyDoubleDaemon.setTarget(null).reload(new Runnable() {
+                enemyDoubleDaemon.setTarget(null).reload(new Closure<Target>() {
                     @Override
-                    public void run() {
+                    public void onReturn(Return<Target> ret) {
 
-                        TowerDaemon target = enemyDoubleDaemon.getTarget();
+                        TowerDaemon target = (TowerDaemon) ret.runtimeCheckAndGet();
 
                         if (target != null && target.isShootable()) {
 
@@ -1441,7 +1441,7 @@ public class Game {
                             );
                         }
 
-                        enemyDoubleDaemon.reload(this::run);
+                        enemyDoubleDaemon.reload(this::onReturn);
                     }
                 }).rotate(
                         (int) RotatingSpriteImageMover.getAngle(
@@ -1721,9 +1721,9 @@ public class Game {
 
                 towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
 
-                towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>>() {
+                towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, Target>>() {
                     @Override
-                    public void onReturn(Return<Pair<Tower.TowerType, EnemyDoubleDaemon>> towerTypeAndEnemy) {
+                    public void onReturn(Return<Pair<Tower.TowerType, Target>> towerTypeAndEnemy) {
 
                         long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
 
@@ -1731,7 +1731,7 @@ public class Game {
                                 && towerTypeAndEnemy.runtimeCheckAndGet().getSecond() != null) {
 
                             Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
-                            EnemyDoubleDaemon enemy = towerTypeAndEnemy.get().getSecond();
+                            EnemyDoubleDaemon enemy = (EnemyDoubleDaemon) towerTypeAndEnemy.get().getSecond();
 
                             switch (towerType) {
                                 case TYPE1:

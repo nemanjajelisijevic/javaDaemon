@@ -25,7 +25,7 @@ public class LaserTower extends Tower {
     }
 
     @Override
-    protected void rotateTo(EnemyDoubleDaemon target) throws InterruptedException {}
+    protected void rotateTo(Target target) throws InterruptedException {}
 
     @Override
     public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {}//TODO FIX this
@@ -39,7 +39,7 @@ public class LaserTower extends Tower {
             while (targetQueue.isEmpty())
                 targetCondition.await();
 
-            EnemyDoubleDaemon target = targetQueue.peek();
+            Target target = targetQueue.peek();
 
             if(target != null && targetTester.test(target)) {
 

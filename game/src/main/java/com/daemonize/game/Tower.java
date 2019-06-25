@@ -116,7 +116,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
     private TowerLevel towerLevel = new TowerLevel(1,2,1500);
     protected ImageView view;
 
-    protected volatile Queue<EnemyDoubleDaemon> targetQueue;
+    protected volatile Queue<Target> targetQueue;
     protected Lock targetLock;
     protected Condition targetCondition;
 
@@ -124,7 +124,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
 
     @FunctionalInterface
     public interface TargetTester {
-        public boolean test(EnemyDoubleDaemon target);
+        public boolean test(Target target);
     }
 
     protected TargetTester targetTester = target -> (target.isShootable()
@@ -132,7 +132,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
             && Math.abs(target.getLastCoordinates().getSecond() - getLastCoordinates().getSecond()) < range));
 
     @CallingThread
-    public boolean addTarget(EnemyDoubleDaemon target) {
+    public boolean addTarget(Target target) {
         boolean ret = false;
         targetLock.lock();
         if (!targetQueue.contains(target)) {
@@ -225,15 +225,15 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         super.pushSprite(sprite, velocity);
     }
 
-    private Pair<TowerType, EnemyDoubleDaemon> scanRet = Pair.create(null, null);
+    private Pair<TowerType, Target> scanRet = Pair.create(null, null);
 
     @DedicatedThread(name = "scan")
-    public Pair<TowerType, EnemyDoubleDaemon> scan() throws InterruptedException {
+    public Pair<TowerType, Target> scan() throws InterruptedException {
 
         //pause scan semaphore
         scanSemaphore.await();
 
-        EnemyDoubleDaemon target;
+        Target target;
         scanRet = Pair.create(null, null);
 
         targetLock.lock();
@@ -255,7 +255,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return scanRet;
     }
 
-    protected void rotateTo(EnemyDoubleDaemon target) throws InterruptedException {
+    protected void rotateTo(Target target) throws InterruptedException {
         if (target.isShootable()) {
             animateSemaphore.subscribe();
             try {
