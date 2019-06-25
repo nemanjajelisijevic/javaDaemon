@@ -1413,7 +1413,7 @@ public class Game {
                                     2,
                                     ()->{
 
-                                        renderer.consume(target.getHpView()::hide);//.setImage(healthBarSprite[9]));
+                                        renderer.consume(target.getHpView()::hide);
 
                                         enemyDoubleDaemon.setTarget(null);
 
@@ -1888,7 +1888,6 @@ public class Game {
                 rocket.start();
             else
                 rocket.cont();
-
         });
 
         int launchX = getRandomInt(
