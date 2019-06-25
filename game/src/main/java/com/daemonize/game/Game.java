@@ -233,10 +233,8 @@ public class Game {
     ) {
         this.renderer = renderer;
         this.imageLoader = imageLoader;
-
         this.borderX = borderX;
         this.borderY = borderY;
-
         this.scene = new Scene2D();
         this.gameConsumer = new DaemonConsumer("Game Consumer");
         this.rows = rows;
