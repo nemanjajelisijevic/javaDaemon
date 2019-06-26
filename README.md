@@ -10,6 +10,7 @@ https://github.com/nemanjajelisijevic/javaDaemon/blob/master/game/src/main/java/
 ![Alt Text](https://github.com/nemanjajelisijevic/javaDaemon/blob/master/game/assets/towerDefenseDemo.gif)
 
 //Annotation processors : on.
+
 //For javafx usage use oracles jdk (openjdk) or whichever contains the javafx gui libraries.
 
 JavaDaemon is a java library/code generator for creating service objects. Based on the thread per object idea.
