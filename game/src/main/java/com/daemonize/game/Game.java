@@ -351,11 +351,11 @@ public class Game {
 
     //controller
     @FunctionalInterface
-    private static interface Controller {
+    private static interface TouchController {
         void onTouch(float x, float y);
     }
 
-    private Controller touchController = ((x, y) -> {});
+    private TouchController touchController = ((x, y) -> {});
 
     public Game onTouch(float x, float y) {
         touchController.onTouch(x, y);
