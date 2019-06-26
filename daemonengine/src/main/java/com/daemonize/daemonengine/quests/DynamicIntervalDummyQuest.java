@@ -2,18 +2,18 @@ package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public class DynamicSleepDummyQuest extends DummyQuest {
+public class DynamicIntervalDummyQuest extends DummyQuest {
 
     @FunctionalInterface
-    public static interface SleepRegulator {
+    public static interface IntervalRegulator {
         long getSleepInterval();
     }
 
-    private SleepRegulator sleepRegulator;
+    private IntervalRegulator intervalRegulator;
 
-    public DynamicSleepDummyQuest(SleepRegulator sleepRegulator) {
+    public DynamicIntervalDummyQuest(IntervalRegulator intervalRegulator) {
         super();
-        this.sleepRegulator = sleepRegulator;
+        this.intervalRegulator = intervalRegulator;
     }
 
     public DummyQuest setSleepInterval(long milliseconds) {
@@ -23,7 +23,7 @@ public class DynamicSleepDummyQuest extends DummyQuest {
     @Override
     public void run() {
         try {
-            long sleep = sleepRegulator.getSleepInterval();
+            long sleep = intervalRegulator.getSleepInterval();
             if (sleep > 0)
                 Thread.sleep(sleep);
             consumer.consume(closure);
