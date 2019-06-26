@@ -4,7 +4,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
-import com.daemonize.daemonengine.quests.DynamicSleepDummyQuest;
+import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
@@ -165,7 +165,7 @@ public class Game {
         enemyGenerateIntervalIt = enemyGenerateIntervals.iterator();
     }
 
-    private DynamicSleepDummyQuest.SleepRegulator enemyGenerationRegulator = () ->
+    private DynamicIntervalDummyQuest.IntervalRegulator enemyGenerationRegulator = () ->
         enemyGenerateIntervalIt.hasNext()
                 ? enemyGenerateIntervalIt.next()
                 : (enemyGenerateIntervalIt = enemyGenerateIntervals.iterator()).next();
@@ -1456,7 +1456,6 @@ public class Game {
                                             } else
                                                 throw new IllegalStateException("Could not destroy tower");
                                         }).queueStop();
-
                                     });
                         }
 
@@ -1486,9 +1485,10 @@ public class Game {
                                 Field<TowerDaemon> current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
 
                                 for(Field<TowerDaemon> neighbour : grid.getNeighbors(current)) {
-                                    if (neighbour.getObject() != null) {
-                                        neighbour.getObject().addTarget(enemyDoubleDaemon);//TODO check ret val
-                                        enemyDoubleDaemon.setTarget(neighbour.getObject().isShootable() ? neighbour.getObject() : null);
+                                    TowerDaemon neighbourTower = neighbour.getObject();
+                                    if (neighbourTower != null) {
+                                        neighbourTower.addTarget(enemyDoubleDaemon);//TODO check ret val
+                                        enemyDoubleDaemon.setTarget(neighbourTower.isShootable() ? neighbourTower : null);
                                     }
                                 }
 
