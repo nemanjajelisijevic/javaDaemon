@@ -4,6 +4,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
+import com.daemonize.daemonengine.quests.DynamicSleepDummyQuest;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
@@ -139,15 +140,35 @@ public class Game {
     private Image deselection;
 
     //enemies
+    private long enemyCounter = 0;
+    private float enemyVelocity = 1;
+    private int enemyHp = 500;
+
     private Image[] enemySprite;
     private Image[] healthBarSprite;
 
     private DummyDaemon enemyGenerator;
-    private long enemyCounter = 0;
-    private float enemyVelocity = 1;
-    private int enemyHp = 500;
-    private long enemyGenerateinterval = 5000;
-    private long waveInterval = 15000;
+    private List<Long> enemyGenerateIntervals = new ArrayList<>();
+    private Iterator<Long> enemyGenerateIntervalIt;
+
+    {
+        enemyGenerateIntervals.add(5000L);
+        enemyGenerateIntervals.add(1000L);
+        enemyGenerateIntervals.add(2000L);
+        enemyGenerateIntervals.add(10000L);
+        enemyGenerateIntervals.add(2000L);
+        enemyGenerateIntervals.add(1000L);
+        enemyGenerateIntervals.add(8000L);
+        enemyGenerateIntervals.add(500L);
+        enemyGenerateIntervals.add(2000L);
+        enemyGenerateIntervals.add(15000L);
+        enemyGenerateIntervalIt = enemyGenerateIntervals.iterator();
+    }
+
+    private DynamicSleepDummyQuest.SleepRegulator enemyGenerationRegulator = () ->
+        enemyGenerateIntervalIt.hasNext()
+                ? enemyGenerateIntervalIt.next()
+                : (enemyGenerateIntervalIt = enemyGenerateIntervals.iterator()).next();
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
@@ -1372,28 +1393,16 @@ public class Game {
             Field firstField = grid.getField(0, 0);
 
             //init enemy generator
-            enemyGenerator = DummyDaemon.create(gameConsumer, enemyGenerateinterval).setClosure(()->{
+            enemyGenerator = DummyDaemon.create(gameConsumer, enemyGenerationRegulator).setClosure(()->{
 
                 enemyCounter++;
 
                 //every... enemies increase the pain!!!!
                 if (enemyCounter % 3 == 0) {
-
                     if(enemyVelocity < 6)
                         enemyVelocity += 1;
-
-                    if (enemyGenerateinterval > 1000)
-                        enemyGenerateinterval -= 500;
-
-                    if (enemyCounter % 30 == 0 && waveInterval > 6000)
-                        waveInterval -= 2000;
-
                     enemyHp++;
-                    enemyGenerator.setSleepInterval(waveInterval);
-
-                } else
-                    enemyGenerator.setSleepInterval(enemyGenerateinterval);
-
+                }
 
                 if (enemyCounter % 20 == 0 && bulletDamage < 10)
                     bulletDamage += 1;
