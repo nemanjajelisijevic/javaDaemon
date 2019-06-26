@@ -12,7 +12,7 @@ public class Return<T> {
 
     Return(){}
 
-    Return(T result) {
+    public Return(T result) {
         this.result = result;
     }
 

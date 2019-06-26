@@ -329,21 +329,15 @@ public class Game {
     }
 
     //controller
+    @FunctionalInterface
+    private static interface Controller {
+        void onTouch(float x, float y);
+    }
+
+    private Controller touchController = ((x, y) -> {});
+
     public Game onTouch(float x, float y) {
-        gameConsumer.consume(()-> {
-            if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
-                towerUpgradeDialogue.getTowerUpgrade().checkCoordinates(x, y);
-            else {
-
-                if (selectTowerDialogue.getSelectTowerDialogue().isShowing())
-                    selectTowerDialogue.getSelectTowerDialogue().checkCoordinates(x, y);
-
-                if (towerSelect == null)
-                    System.out.println("Select" + "please select tower");
-                else
-                    setTower(x, y);
-            }
-        });
+        touchController.onTouch(x, y);
         return this;
     }
 
@@ -1326,10 +1320,27 @@ public class Game {
             });
 
             renderer.setScene(scene).start();
-
             gameConsumer.consume(stateChain::next);
 
         }).addState(()->{//gameState
+
+            //init controller
+            touchController = (x, y) -> {
+                gameConsumer.consume(()-> {
+                    if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
+                        towerUpgradeDialogue.getTowerUpgrade().checkCoordinates(x, y);
+                    else {
+
+                        if (selectTowerDialogue.getSelectTowerDialogue().isShowing())
+                            selectTowerDialogue.getSelectTowerDialogue().checkCoordinates(x, y);
+
+                        if (towerSelect == null)
+                            System.out.println("Select" + "please select tower");
+                        else
+                            setTower(x, y);
+                    }
+                });
+            };
 
             //laser start
             for (ImageView laserView : laserViews)
@@ -1401,7 +1412,7 @@ public class Game {
 
                         TowerDaemon target = (TowerDaemon) ret.runtimeCheckAndGet();
 
-                        if (target != null && target.isShootable()) {
+                        if (target.isShootable()) {
 
                             fireRocketBullet(
                                     enemyDoubleDaemon.getLastCoordinates(),
@@ -1732,6 +1743,18 @@ public class Game {
                             Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
                             EnemyDoubleDaemon enemy = (EnemyDoubleDaemon) towerTypeAndEnemy.get().getSecond();
 
+                            Closure<Integer> bulletClosure = amount -> {
+                                enemyRepo.add(enemy);
+                                moneyDaemon.setAmount(amount.get())
+                                        .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
+                                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
+
+                                renderer.consume(()->{
+                                    moneyView.getFirst().show();
+                                    moneyView.getSecond().show();
+                                });
+                            };
+
                             switch (towerType) {
                                 case TYPE1:
                                     fireBullet(
@@ -1744,17 +1767,7 @@ public class Game {
                                             0,
                                             bulletSprite,
                                             miniExplodeSprite,
-                                            ()->{
-                                                enemyRepo.add(enemy);
-                                                moneyDaemon.setAmount(3)
-                                                        .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
-                                                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
-
-                                                renderer.consume(()->{
-                                                    moneyView.getFirst().show();
-                                                    moneyView.getSecond().show();
-                                                });
-                                            }
+                                            ()-> bulletClosure.onReturn(new Return<>(3))
                                     );
                                     break;
                                 case TYPE2:
@@ -1764,17 +1777,7 @@ public class Game {
                                             18,
                                             towerDaemon.getTowerLevel().bulletDamage,
                                             towerDaemon.getTowerLevel().currentLevel,
-                                            ()->{
-                                                enemyRepo.add(enemy);
-                                                moneyDaemon.setAmount(5)
-                                                        .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
-                                                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
-
-                                                renderer.consume(() -> {
-                                                    moneyView.getFirst().show();
-                                                    moneyView.getSecond().show();
-                                                });
-                                            }
+                                            () -> bulletClosure.onReturn(new Return<>(5))
                                     );
                                     break;
                                 case TYPE3:
@@ -1792,18 +1795,8 @@ public class Game {
                                     float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
                                     long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
-                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, ()->{
-                                        enemyRepo.add(enemy);
+                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, () -> bulletClosure.onReturn(new Return<>(1)));
 
-                                        moneyDaemon.setAmount(1)
-                                                .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
-                                                .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
-
-                                        renderer.consume(() -> {
-                                            moneyView.getFirst().show();
-                                            moneyView.getSecond().show();
-                                        });
-                                    });
                                     reloadInterval = 4000;
                                     break;
                                 default:
