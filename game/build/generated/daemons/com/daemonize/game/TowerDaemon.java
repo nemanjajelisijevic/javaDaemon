@@ -78,10 +78,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return prototype.getTowertype();
   }
 
-  public boolean addTarget(EnemyDoubleDaemon target) {
-    return prototype.addTarget(target);
-  }
-
   public TowerDaemon setOutOfBordersClosure(Runnable closure) {
     prototype.setOutOfBordersClosure(closure);
     return this;
@@ -103,6 +99,10 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   public int getSize() {
     return prototype.getSize();
+  }
+
+  public boolean addTarget(Target target) {
+    return prototype.addTarget(target);
   }
 
   public TowerDaemon setHp(int hp) {
@@ -309,6 +309,13 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Tower#scan} */
+  public TowerDaemon scan(Closure<Pair<Tower.TowerType, Target>> closure) {
+    scanDaemonEngine.pursueQuest(new ScanMainQuest(closure).setConsumer(scanDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Tower#setHealthBarImage} */
   public TowerDaemon setHealthBarImage(Image[] healthbarimage, Closure<Tower> closure) {
     mainDaemonEngine.pursueQuest(new SetHealthBarImageMainQuest(healthbarimage, closure).setConsumer(mainDaemonEngine.getConsumer()));
@@ -320,13 +327,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   public TowerDaemon getAngle(Pair<Float, Float> one, Pair<Float, Float> two,
       Closure<Double> closure) {
     mainDaemonEngine.pursueQuest(new GetAngleIMainQuest(one, two, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Tower#scan} */
-  public TowerDaemon scan(Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>> closure) {
-    scanDaemonEngine.pursueQuest(new ScanMainQuest(closure).setConsumer(scanDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -639,6 +639,18 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     }
   }
 
+  private final class ScanMainQuest extends MainQuest<Pair<Tower.TowerType, Target>> {
+    private ScanMainQuest(Closure<Pair<Tower.TowerType, Target>> closure) {
+      super(closure);
+      this.description = "scan";
+    }
+
+    @Override
+    public final Pair<Tower.TowerType, Target> pursue() throws Exception {
+      return prototype.scan();
+    }
+  }
+
   private final class SetHealthBarImageMainQuest extends MainQuest<Tower> {
     private Image[] healthbarimage;
 
@@ -670,18 +682,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     @Override
     public final Double pursue() throws Exception {
       return Tower.getAngle(one, two);
-    }
-  }
-
-  private final class ScanMainQuest extends MainQuest<Pair<Tower.TowerType, EnemyDoubleDaemon>> {
-    private ScanMainQuest(Closure<Pair<Tower.TowerType, EnemyDoubleDaemon>> closure) {
-      super(closure);
-      this.description = "scan";
-    }
-
-    @Override
-    public final Pair<Tower.TowerType, EnemyDoubleDaemon> pursue() throws Exception {
-      return prototype.scan();
     }
   }
 

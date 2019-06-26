@@ -1437,8 +1437,7 @@ public class Game {
                                                 throw new IllegalStateException("Could not destroy tower");
                                         }).queueStop();
 
-                                    }
-                            );
+                                    });
                         }
 
                         enemyDoubleDaemon.reload(this::onReturn);

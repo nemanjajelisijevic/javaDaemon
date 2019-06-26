@@ -33,15 +33,15 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
-
   protected EagerMainQuestDaemonEngine goToDaemonEngine;
+
+  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
 
   public EnemyDoubleDaemon(Consumer consumer, Enemy prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
-    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
+    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -96,12 +96,13 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
-  public TowerDaemon getTarget() {
-    return prototype.getTarget();
-  }
-
   public Image[] getSprite() {
     return prototype.getSprite();
+  }
+
+  public EnemyDoubleDaemon setTarget(Target target) {
+    prototype.setTarget(target);
+    return this;
   }
 
   @Override
@@ -137,6 +138,10 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon clearVelocity() {
     prototype.clearVelocity();
     return this;
+  }
+
+  public Target getTarget() {
+    return prototype.getTarget();
   }
 
   public EnemyDoubleDaemon setParalyzed(boolean paralyzed) {
@@ -195,11 +200,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return prototype.getSize();
   }
 
-  public EnemyDoubleDaemon setTarget(TowerDaemon target) {
-    prototype.setTarget(target);
-    return this;
-  }
-
   public EnemyDoubleDaemon setPreviousField(Pair<Integer, Integer> previousfield) {
     prototype.setPreviousField(previousfield);
     return this;
@@ -228,13 +228,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
    * Prototype method {@link com.daemonize.game.Enemy#pushSprite} */
   public EnemyDoubleDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
     mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Enemy#reload} */
-  public EnemyDoubleDaemon reload(Runnable retRun) {
-    reloadDaemonEngine.pursueQuest(new ReloadMainQuest(retRun).setConsumer(reloadDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -278,6 +271,13 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon setDirectionAndMove(float x, float y, float velocityint,
       Closure<Boolean> closure) {
     mainDaemonEngine.pursueQuest(new SetDirectionAndMoveMainQuest(x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Enemy#reload} */
+  public EnemyDoubleDaemon reload(Closure<Target> closure) {
+    reloadDaemonEngine.pursueQuest(new ReloadMainQuest(closure).setConsumer(reloadDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -469,19 +469,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     }
   }
 
-  private final class ReloadMainQuest extends VoidMainQuest {
-    private ReloadMainQuest(Runnable retRun) {
-      super(retRun);
-      this.description = "reload";
-    }
-
-    @Override
-    public final Void pursue() throws Exception {
-      prototype.reload();
-      return null;
-    }
-  }
-
   private final class AnimateEnemyMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateEnemyMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
       super(closure);
@@ -577,6 +564,18 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     @Override
     public final Boolean pursue() throws Exception {
       return prototype.setDirectionAndMove(x, y, velocityint);
+    }
+  }
+
+  private final class ReloadMainQuest extends MainQuest<Target> {
+    private ReloadMainQuest(Closure<Target> closure) {
+      super(closure);
+      this.description = "reload";
+    }
+
+    @Override
+    public final Target pursue() throws Exception {
+      return prototype.reload();
     }
   }
 

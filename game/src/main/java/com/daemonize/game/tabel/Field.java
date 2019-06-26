@@ -1,7 +1,5 @@
 package com.daemonize.game.tabel;
 
-import com.daemonize.game.TowerDaemon;
-
 public class Field<T> implements  IHeapItem , Comparable {
     float centerX;
     float centerY;
