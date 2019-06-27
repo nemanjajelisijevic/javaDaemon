@@ -556,30 +556,36 @@ public class Game {
 
                 //green tower
                 Image[] greenTowerI = new Image[36];
-                for (int i = 0; i < 36; i++)
-                    greenTowerI[i] = imageManager.loadImageFromAssets("greenLS00" + i + "0.png", width, height);
+                for (int i = 0; i < 36; i++) {
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    if (i % 10 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
+                    greenTowerI[i] = imageManager.loadImageFromAssets("greenLS00" + i + "0.png", width, height);
                 }
 
                 Image[] greenTowerII = new Image[36];
-                for (int i = 0; i < 36; i++)
-                    greenTowerII[i] = imageManager.loadImageFromAssets("lsII" + i + "0.png", width, height);
+                for (int i = 0; i < 36; i++) {
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    if (i % 10 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
+                    greenTowerII[i] = imageManager.loadImageFromAssets("lsII" + i + "0.png", width, height);
                 }
 
                 Image[] greenTowerIII = new Image[36];
-                for (int i = 0; i < 36; i++)
-                    greenTowerIII[i] = imageManager.loadImageFromAssets("lsIII" + i + "0.png", width, height);
+                for (int i = 0; i < 36; i++) {
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    if (i % 10 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
+                    greenTowerIII[i] = imageManager.loadImageFromAssets("lsIII" + i + "0.png", width, height);
                 }
 
                 greenTower = new ArrayList<>(3);
@@ -594,30 +600,36 @@ public class Game {
 
                 //red tower
                 Image[] redTowerI = new Image[36];
-                for (int i = 0; i < 36; i++)
-                    redTowerI[i] = imageManager.loadImageFromAssets("rmI" + i + "0.png", width, height);
+                for (int i = 0; i < 36; i++) {
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    if (i % 10 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
+                    redTowerI[i] = imageManager.loadImageFromAssets("rmI" + i + "0.png", width, height);
                 }
 
                 Image[] redTowerII = new Image[36];
-                for (int i = 0; i < 36; i++)
-                    redTowerII[i] = imageManager.loadImageFromAssets("rmII" + i + "0.png", width, height);
+                for (int i = 0; i < 36; i++) {
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    if (i % 10 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
+                    redTowerII[i] = imageManager.loadImageFromAssets("rmII" + i + "0.png", width, height);
                 }
 
                 Image[] redTowerIII = new Image[36];
-                for (int i = 0; i < 36; i++)
-                    redTowerIII[i] = imageManager.loadImageFromAssets("rmIII" + i + "0.png", width, height);
+                for (int i = 0; i < 36; i++) {
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    if (i % 10 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
+                    redTowerIII[i] = imageManager.loadImageFromAssets("rmIII" + i + "0.png", width, height);
                 }
 
                 redTower = new ArrayList<>(3);
