@@ -796,7 +796,11 @@ public class Game {
 
                 TowerDaemon tow = towerUpgradeDialogue.getTower();
 
+                System.err.println(DaemonUtils.tag() + tow.getName() + "\nDaemon State: " + tow.getEnginesState().toString() + "\n" + tow.toString() + "\n\n");
+
                 tow.levelUp();
+
+                System.err.println(DaemonUtils.tag() + tow.getName() + "\nDaemon State: " + tow.getEnginesState().toString()  + "\n" + "After Level Up:\n" + tow.toString() + "\n\n");
 
                 Image[] currentSprite = null;
 
@@ -814,7 +818,11 @@ public class Game {
 
                 tow.setRotationSprite(currentSprite);
 
-                towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, new MultiViewAnimateClosure()::onReturn);
+                towerSpriteUpgrader.daemonize(()->{
+                        GenericNode<Pair<ImageMover.PositionedImage, ImageView>> ret = tow.getPrototype().updateSprite();
+                        System.err.println(DaemonUtils.tag() + tow.getName() + "\nDaemon State: " + tow.getEnginesState().toString()  + "\n"  + "After Update Sprite:\n" + tow.toString());
+                        return ret;
+                    }, new MultiViewAnimateClosure()::onReturn);
 
                 renderer.consume(()->upgradeButton.disable().setImage(upgradeButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
@@ -1512,6 +1520,9 @@ public class Game {
         TowerDaemon tow = field.getObject();
 
         if (tow != null) {//upgrade existing tower
+
+            System.err.println(DaemonUtils.tag() + "\nClick on tower: " + tow.getName() + "\nTower DaemonState: " + tow.getEnginesState().toString() + "\nTower state:\n" + tow.toString() + "\n");
+
             if (!towerUpgradeDialogue.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
                 //pause();
                 Tower.TowerLevel currLvl = tow.getTowerLevel();

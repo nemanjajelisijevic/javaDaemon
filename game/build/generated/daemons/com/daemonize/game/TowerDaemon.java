@@ -134,6 +134,10 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return prototype.getVelocity();
   }
 
+  public String toString() {
+    return prototype.toString();
+  }
+
   @Override
   public boolean isParalyzed() {
     return prototype.isParalyzed();
