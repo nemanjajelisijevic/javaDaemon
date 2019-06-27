@@ -1766,9 +1766,8 @@ public class Game {
         float targetX = target.getLastCoordinates().getFirst();
         float targetY = target.getLastCoordinates().getSecond();
 
-        if(rotate) {
+        if (rotate)
             bulletDoubleDaemon.rotate(bulletRotateAngle, ()->{});
-        }
 
         bulletDoubleDaemon.goTo(targetX, targetY, velocity, ret -> {
 
