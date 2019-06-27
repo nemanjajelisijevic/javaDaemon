@@ -837,7 +837,6 @@ public class Game {
                 });
             });
 
-
             Button closeButton = new Button("Close", closeButtonImage);
             closeButton.onClick(()->{
                 renderer.consume(()->closeButton.disable().setImage(closeButtonImagePressed));
@@ -1326,7 +1325,6 @@ public class Game {
                 EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy->enemy.setMaxHp(enemyHp).setHp(enemyHp));
 
                 System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + ", STATES: " + enemyDoubleDaemon.getEnginesState().toString());
-
                 System.out.println(DaemonUtils.tag() + "Enemy counter: " + enemyCounter);
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());
                 System.out.println(DaemonUtils.tag() + "Enemy state: " + enemyDoubleDaemon.getEnginesState().get(enemyDoubleDaemon.getEnginesState().size() - 1));
@@ -1367,10 +1365,11 @@ public class Game {
                                             field.setObject(null);
 
                                             //remove tower from grid and recalculate path
-                                            if (grid.destroyTower(field.getRow(), field.getColumn())) {
+                                            if (grid.destroyTower(field.getRow(), field.getColumn()))
                                                 renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
-                                            } else
+                                            else
                                                 throw new IllegalStateException("Could not destroy tower");
+
                                         }).queueStop();
                                     });
                         }
