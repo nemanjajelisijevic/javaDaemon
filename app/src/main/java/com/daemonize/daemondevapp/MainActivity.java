@@ -1,9 +1,7 @@
 package com.daemonize.daemondevapp;
 
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -12,13 +10,8 @@ import android.view.WindowManager;
 
 
 import com.daemonize.game.Game;
-import com.daemonize.game.images.Image;
-import com.daemonize.game.images.imageloader.ImageLoader;
-import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.game.images.imageloader.ImageManager;
 import com.daemonize.game.renderer.Renderer2D;
-
-
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,12 +43,12 @@ public class MainActivity extends AppCompatActivity {
 
         //renderer init
         Renderer2D renderer = new AndroidSurfaceViewRenderer(surfaceView);
-        ImageLoader imageLoader = new AndroidImageLoader(this);
+        ImageManager imageManager = new AndroidImageManager(this);
 
         int rows = 6;
         int columns = 9;
 
-        game = new Game(renderer, imageLoader, borderX, borderY, rows, columns,50,50);
+        game = new Game(renderer, imageManager, borderX, borderY, rows, columns,50,50);
 
         if(!game.isRunning())
             game.run();

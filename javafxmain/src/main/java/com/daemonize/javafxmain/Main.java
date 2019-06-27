@@ -1,13 +1,9 @@
 package com.daemonize.javafxmain;
 
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.game.Game;
 
-import com.daemonize.game.images.Image;
-import com.daemonize.game.images.imageloader.ImageLoader;
+import com.daemonize.game.images.imageloader.ImageManager;
 import com.daemonize.game.renderer.Renderer2D;
-
-import java.io.IOException;
 
 import javafx.application.Application;
 
@@ -20,7 +16,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 
 public class Main extends Application {
@@ -54,9 +49,9 @@ public class Main extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         Renderer2D renderer = new JavaFXRenderer(gc, borderX, borderY);
-        ImageLoader imageLoader = new JavaFxImageLoader("");
+        ImageManager imageManager = new JavaFxImageManager("");
 
-        game = new Game(renderer, imageLoader, borderX, borderY, rows, columns,50,50);
+        game = new Game(renderer, imageManager, borderX, borderY, rows, columns,50,50);
 
         Group root = new Group(canvas);
         primaryStage.setTitle("Tower Defense");

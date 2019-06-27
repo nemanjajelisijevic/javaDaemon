@@ -10,7 +10,7 @@ import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
 import com.daemonize.game.images.Image;
 
-import com.daemonize.game.images.imageloader.ImageLoader;
+import com.daemonize.game.images.imageloader.ImageManager;
 import com.daemonize.game.renderer.Renderer2D;
 import com.daemonize.game.repo.QueuedEntityRepo;
 import com.daemonize.game.repo.StackedEntityRepo;
@@ -54,7 +54,7 @@ public class Game {
     private DaemonConsumer gameConsumer;
 
     //image loader
-    private ImageLoader imageLoader;
+    private ImageManager imageManager;
 
     //state holder
     private DaemonChainScript stateChain = new DaemonChainScript();
@@ -228,11 +228,12 @@ public class Game {
         @Override
         public void onReturn(Return<ImageMover.PositionedImage> aReturn) {
             ImageMover.PositionedImage posBmp = aReturn.runtimeCheckAndGet();
-            view.setAbsoluteX(posBmp.positionX);
-            view.setAbsoluteY(posBmp.positionY);
-            view.setImage(posBmp.image);
+            view.setAbsoluteX(posBmp.positionX)
+                .setAbsoluteY(posBmp.positionY)
+                .setImage(posBmp.image);
         }
     }
+
     private static class MultiViewAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
@@ -248,7 +249,7 @@ public class Game {
     //construct
     public Game(
             Renderer2D renderer,
-            ImageLoader imageLoader,
+            ImageManager imageManager,
             int borderX,
             int borderY,
             int rows,
@@ -257,7 +258,7 @@ public class Game {
             float gridY
     ) {
         this.renderer = renderer;
-        this.imageLoader = imageLoader;
+        this.imageManager = imageManager;
         this.borderX = borderX;
         this.borderY = borderY;
         this.scene = new Scene2D();
@@ -368,12 +369,12 @@ public class Game {
 
             try {
 
-                backgroundImage = imageLoader.loadImageFromAssets("maphi.jpg", borderX, borderY);
+                backgroundImage = imageManager.loadImageFromAssets("maphi.jpg", borderX, borderY);
 
                 //laser views init
                 laserViews = new ArrayList<>(laserViewNo);
 
-                Image[] loadingSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png", borderX / 150, borderX / 150)};
+                Image[] loadingSprite = new Image[] {imageManager.loadImageFromAssets("greenPhoton.png", borderX / 150, borderX / 150)};
 
                 int startX = borderX / 5;
                 int endX = borderX * 4 / 5;
@@ -414,11 +415,11 @@ public class Game {
                 int width = gridWidth/columns;
                 int height = width; //160
 
-                fieldImage = imageLoader.loadImageFromAssets("greenOctagon.png", width, height);
-                fieldImageTower = imageLoader.loadImageFromAssets("blueOctagon.png", width, height);
-                fieldImageTowerDen = imageLoader.loadImageFromAssets("redOctagon.png", width, height);
+                fieldImage = imageManager.loadImageFromAssets("greenOctagon.png", width, height);
+                fieldImageTower = imageManager.loadImageFromAssets("blueOctagon.png", width, height);
+                fieldImageTowerDen = imageManager.loadImageFromAssets("redOctagon.png", width, height);
 
-                fieldGreenDiagonal = imageLoader.loadImageFromAssets("greenDiagonal.png", width * 2 / 3, height * 2 / 3);
+                fieldGreenDiagonal = imageManager.loadImageFromAssets("greenDiagonal.png", width * 2 / 3, height * 2 / 3);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -431,26 +432,26 @@ public class Game {
                 int scoreHeight = borderY / 5;
                 int selectionHeight = borderY / 2;
 
-                upgradeButtonImage = imageLoader.loadImageFromAssets("ButtonUpgrade.png",borderX / 6,borderY / 10);
-                upgradeButtonImagePressed = imageLoader.loadImageFromAssets("ButtonUpgradePressed.png",borderX / 6,borderY / 10);
+                upgradeButtonImage = imageManager.loadImageFromAssets("ButtonUpgrade.png",borderX / 6,borderY / 10);
+                upgradeButtonImagePressed = imageManager.loadImageFromAssets("ButtonUpgradePressed.png",borderX / 6,borderY / 10);
 
-                closeButtonImage = imageLoader.loadImageFromAssets("ButtonX.png",borderX / 20,borderY /  10);
-                closeButtonImagePressed = imageLoader.loadImageFromAssets("ButtonXPressed.png",borderX / 20,borderY /  10);
+                closeButtonImage = imageManager.loadImageFromAssets("ButtonX.png",borderX / 20,borderY /  10);
+                closeButtonImagePressed = imageManager.loadImageFromAssets("ButtonXPressed.png",borderX / 20,borderY /  10);
 
-                saleButtonImage = imageLoader.loadImageFromAssets("ButtonSale.png",borderX / 6,borderY / 10);
-                saleButtonImagePressed = imageLoader.loadImageFromAssets("ButtonSalePressed.png",borderX / 6,borderY / 10);
+                saleButtonImage = imageManager.loadImageFromAssets("ButtonSale.png",borderX / 6,borderY / 10);
+                saleButtonImagePressed = imageManager.loadImageFromAssets("ButtonSalePressed.png",borderX / 6,borderY / 10);
 
-                selection = imageLoader.loadImageFromAssets("greenOctagon.png", selectionWidth, selectionWidth);
-                deselection = imageLoader.loadImageFromAssets("redOctagon.png", selectionWidth, selectionWidth);
+                selection = imageManager.loadImageFromAssets("greenOctagon.png", selectionWidth, selectionWidth);
+                deselection = imageManager.loadImageFromAssets("redOctagon.png", selectionWidth, selectionWidth);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene();
                 }
 
-                scoreBackGrImage = imageLoader.loadImageFromAssets("SmallBox.png", scoreWidth, scoreHeight);
+                scoreBackGrImage = imageManager.loadImageFromAssets("SmallBox.png", scoreWidth, scoreHeight);
 
-                laserSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png",  width / 10, width / 10)};
+                laserSprite = new Image[] {imageManager.loadImageFromAssets("greenPhoton.png",  width / 10, width / 10)};
 
                 //init enemy sprite
                 enemySprite = new Image[36];
@@ -461,7 +462,7 @@ public class Game {
                 }
 
                 for (int i = 0; i < 36; i++)
-                    enemySprite[i] = imageLoader.loadImageFromAssets("plane" + i + "0.png", width, height);
+                    enemySprite[i] = imageManager.loadImageFromAssets("plane" + i + "0.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -471,16 +472,16 @@ public class Game {
                 //bullet sprite
                 int bulletSize0 = width / 8;//20;
                 bulletSprite = new Image[4];
-                bulletSprite[0] = imageLoader.loadImageFromAssets("thebarnstarRed.png", bulletSize0, bulletSize0);
-                bulletSprite[1] = imageLoader.loadImageFromAssets("thebarnstarRed90.png", bulletSize0, bulletSize0);
-                bulletSprite[2] = imageLoader.loadImageFromAssets("thebarnstarRed180.png", bulletSize0, bulletSize0);
-                bulletSprite[3] = imageLoader.loadImageFromAssets("thebarnstarRed270.png", bulletSize0, bulletSize0);
+                bulletSprite[0] = imageManager.loadImageFromAssets("thebarnstarRed.png", bulletSize0, bulletSize0);
+                bulletSprite[1] = imageManager.loadImageFromAssets("thebarnstarRed90.png", bulletSize0, bulletSize0);
+                bulletSprite[2] = imageManager.loadImageFromAssets("thebarnstarRed180.png", bulletSize0, bulletSize0);
+                bulletSprite[3] = imageManager.loadImageFromAssets("thebarnstarRed270.png", bulletSize0, bulletSize0);
 
                 int bulletSize = width / 3;//60;
                 bulletSpriteRocket = new Image[36];
 
                 for (int i = 0; i < 36; i++)
-                    bulletSpriteRocket[i] = imageLoader.loadImageFromAssets("rocket" + i + "0.png", bulletSize, bulletSize);
+                    bulletSpriteRocket[i] = imageManager.loadImageFromAssets("rocket" + i + "0.png", bulletSize, bulletSize);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -489,149 +490,54 @@ public class Game {
 
                 //explosion sprite
                 explodeSprite = new Image[33];
-                explodeSprite[0] = imageLoader.loadImageFromAssets("Explosion1.png", width, height);
-                explodeSprite[1] = imageLoader.loadImageFromAssets("Explosion2.png", width, height);
-                explodeSprite[2] = imageLoader.loadImageFromAssets("Explosion3.png", width, height);
-                explodeSprite[3] = imageLoader.loadImageFromAssets("Explosion4.png", width, height);
-                explodeSprite[4] = imageLoader.loadImageFromAssets("Explosion5.png", width, height);
-                explodeSprite[5] = imageLoader.loadImageFromAssets("Explosion6.png", width, height);
-                explodeSprite[6] = imageLoader.loadImageFromAssets("Explosion7.png", width, height);
-                explodeSprite[7] = imageLoader.loadImageFromAssets("Explosion8.png", width, height);
-                explodeSprite[8] = imageLoader.loadImageFromAssets("Explosion9.png", width, height);
-                explodeSprite[9] = imageLoader.loadImageFromAssets("Explosion10.png", width, height);
+                for (int i = 0; i < explodeSprite.length; ++i) {
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
-                }
+                    if (i % 10 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
 
-                explodeSprite[10] = imageLoader.loadImageFromAssets("Explosion11.png", width, height);
-                explodeSprite[11] = imageLoader.loadImageFromAssets("Explosion12.png", width, height);
-                explodeSprite[12] = imageLoader.loadImageFromAssets("Explosion13.png", width, height);
-                explodeSprite[13] = imageLoader.loadImageFromAssets("Explosion14.png", width, height);
-                explodeSprite[14] = imageLoader.loadImageFromAssets("Explosion15.png", width, height);
-                explodeSprite[15] = imageLoader.loadImageFromAssets("Explosion16.png", width, height);
-                explodeSprite[16] = imageLoader.loadImageFromAssets("Explosion17.png", width, height);
-                explodeSprite[17] = imageLoader.loadImageFromAssets("Explosion18.png", width, height);
-                explodeSprite[18] = imageLoader.loadImageFromAssets("Explosion19.png", width, height);
-                explodeSprite[19] = imageLoader.loadImageFromAssets("Explosion20.png", width, height);
-
-                explodeSprite[20] = imageLoader.loadImageFromAssets("Explosion21.png", width, height);
-                explodeSprite[21] = imageLoader.loadImageFromAssets("Explosion22.png", width, height);
-                explodeSprite[22] = imageLoader.loadImageFromAssets("Explosion23.png", width, height);
-                explodeSprite[23] = imageLoader.loadImageFromAssets("Explosion24.png", width, height);
-                explodeSprite[24] = imageLoader.loadImageFromAssets("Explosion25.png", width, height);
-                explodeSprite[25] = imageLoader.loadImageFromAssets("Explosion26.png", width, height);
-                explodeSprite[26] = imageLoader.loadImageFromAssets("Explosion27.png", width, height);
-                explodeSprite[27] = imageLoader.loadImageFromAssets("Explosion28.png", width, height);
-                explodeSprite[28] = imageLoader.loadImageFromAssets("Explosion29.png", width, height);
-                explodeSprite[29] = imageLoader.loadImageFromAssets("Explosion30.png", width, height);
-
-                explodeSprite[30] = imageLoader.loadImageFromAssets("Explosion31.png", width, height);
-                explodeSprite[31] = imageLoader.loadImageFromAssets("Explosion32.png", width, height);
-                explodeSprite[32] = imageLoader.loadImageFromAssets("Explosion33.png", width, height);
-
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    explodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", width, height);
                 }
 
                 int miniWidth = width / 3;
                 int miniHeight = height / 3;
 
                 rocketExplodeSprite = new Image[33];
-                rocketExplodeSprite[0] = imageLoader.loadImageFromAssets("Explosion1.png", miniWidth, miniHeight);
-                rocketExplodeSprite[1] = imageLoader.loadImageFromAssets("Explosion2.png", miniWidth, miniHeight);
-                rocketExplodeSprite[2] = imageLoader.loadImageFromAssets("Explosion3.png", miniWidth, miniHeight);
-                rocketExplodeSprite[3] = imageLoader.loadImageFromAssets("Explosion4.png", miniWidth, miniHeight);
-                rocketExplodeSprite[4] = imageLoader.loadImageFromAssets("Explosion5.png", miniWidth, miniHeight);
-                rocketExplodeSprite[5] = imageLoader.loadImageFromAssets("Explosion6.png", miniWidth, miniHeight);
-                rocketExplodeSprite[6] = imageLoader.loadImageFromAssets("Explosion7.png", miniWidth, miniHeight);
-                rocketExplodeSprite[7] = imageLoader.loadImageFromAssets("Explosion8.png", miniWidth, miniHeight);
-                rocketExplodeSprite[8] = imageLoader.loadImageFromAssets("Explosion9.png", miniWidth, miniHeight);
-                rocketExplodeSprite[9] = imageLoader.loadImageFromAssets("Explosion10.png", miniWidth, miniHeight);
+                for (int i = 0; i < rocketExplodeSprite.length; ++i) {
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    if (i % 10 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
+                    rocketExplodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", miniWidth, miniHeight);
                 }
 
-                rocketExplodeSprite[10] = imageLoader.loadImageFromAssets("Explosion11.png", miniWidth, miniHeight);
-                rocketExplodeSprite[11] = imageLoader.loadImageFromAssets("Explosion12.png", miniWidth, miniHeight);
-                rocketExplodeSprite[12] = imageLoader.loadImageFromAssets("Explosion13.png", miniWidth, miniHeight);
-                rocketExplodeSprite[13] = imageLoader.loadImageFromAssets("Explosion14.png", miniWidth, miniHeight);
-                rocketExplodeSprite[14] = imageLoader.loadImageFromAssets("Explosion15.png", miniWidth, miniHeight);
-                rocketExplodeSprite[15] = imageLoader.loadImageFromAssets("Explosion16.png", miniWidth, miniHeight);
-                rocketExplodeSprite[16] = imageLoader.loadImageFromAssets("Explosion17.png", miniWidth, miniHeight);
-                rocketExplodeSprite[17] = imageLoader.loadImageFromAssets("Explosion18.png", miniWidth, miniHeight);
-                rocketExplodeSprite[18] = imageLoader.loadImageFromAssets("Explosion19.png", miniWidth, miniHeight);
-                rocketExplodeSprite[19] = imageLoader.loadImageFromAssets("Explosion20.png", miniWidth, miniHeight);
-
-                rocketExplodeSprite[20] = imageLoader.loadImageFromAssets("Explosion21.png", miniWidth, miniHeight);
-                rocketExplodeSprite[21] = imageLoader.loadImageFromAssets("Explosion22.png", miniWidth, miniHeight);
-                rocketExplodeSprite[22] = imageLoader.loadImageFromAssets("Explosion23.png", miniWidth, miniHeight);
-                rocketExplodeSprite[23] = imageLoader.loadImageFromAssets("Explosion24.png", miniWidth, miniHeight);
-                rocketExplodeSprite[24] = imageLoader.loadImageFromAssets("Explosion25.png", miniWidth, miniHeight);
-                rocketExplodeSprite[25] = imageLoader.loadImageFromAssets("Explosion26.png", miniWidth, miniHeight);
-                rocketExplodeSprite[26] = imageLoader.loadImageFromAssets("Explosion27.png", miniWidth, miniHeight);
-                rocketExplodeSprite[27] = imageLoader.loadImageFromAssets("Explosion28.png", miniWidth, miniHeight);
-                rocketExplodeSprite[28] = imageLoader.loadImageFromAssets("Explosion29.png", miniWidth, miniHeight);
-                rocketExplodeSprite[29] = imageLoader.loadImageFromAssets("Explosion30.png", miniWidth, miniHeight);
-
-                rocketExplodeSprite[30] = imageLoader.loadImageFromAssets("Explosion31.png", miniWidth, miniHeight);
-                rocketExplodeSprite[31] = imageLoader.loadImageFromAssets("Explosion32.png", miniWidth, miniHeight);
-                rocketExplodeSprite[32] = imageLoader.loadImageFromAssets("Explosion33.png", miniWidth, miniHeight);
-
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
-                }
 
                 miniExplodeSprite = new Image[20];
-                miniExplodeSprite[0] = imageLoader.loadImageFromAssets("Bild-000001.png", miniWidth, miniHeight);
-                miniExplodeSprite[1] = imageLoader.loadImageFromAssets("Bild-000002.png", miniWidth, miniHeight);
-                miniExplodeSprite[2] = imageLoader.loadImageFromAssets("Bild-000003.png", miniWidth, miniHeight);
-                miniExplodeSprite[3] = imageLoader.loadImageFromAssets("Bild-000004.png", miniWidth, miniHeight);
-                miniExplodeSprite[4] = imageLoader.loadImageFromAssets("Bild-000005.png", miniWidth, miniHeight);
-                miniExplodeSprite[5] = imageLoader.loadImageFromAssets("Bild-000006.png", miniWidth, miniHeight);
-                miniExplodeSprite[6] = imageLoader.loadImageFromAssets("Bild-000007.png", miniWidth, miniHeight);
-                miniExplodeSprite[7] = imageLoader.loadImageFromAssets("Bild-000008.png", miniWidth, miniHeight);
-                miniExplodeSprite[8] = imageLoader.loadImageFromAssets("Bild-000009.png", miniWidth, miniHeight);
-                miniExplodeSprite[9] = imageLoader.loadImageFromAssets("Bild-0000010.png", miniWidth, miniHeight);
+                for (int i = 0; i < miniExplodeSprite.length; ++i) {
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
-                }
+                    if (i % 5 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
 
-                miniExplodeSprite[10] = imageLoader.loadImageFromAssets("Bild-000011.png", miniWidth, miniHeight);
-                miniExplodeSprite[11] = imageLoader.loadImageFromAssets("Bild-000012.png", miniWidth, miniHeight);
-                miniExplodeSprite[12] = imageLoader.loadImageFromAssets("Bild-000013.png", miniWidth, miniHeight);
-                miniExplodeSprite[13] = imageLoader.loadImageFromAssets("Bild-000014.png", miniWidth, miniHeight);
-                miniExplodeSprite[14] = imageLoader.loadImageFromAssets("Bild-000015.png", miniWidth, miniHeight);
-                miniExplodeSprite[15] = imageLoader.loadImageFromAssets("Bild-000016.png", miniWidth, miniHeight);
-                miniExplodeSprite[16] = imageLoader.loadImageFromAssets("Bild-000017.png", miniWidth, miniHeight);
-                miniExplodeSprite[17] = imageLoader.loadImageFromAssets("Bild-000018.png", miniWidth, miniHeight);
-                miniExplodeSprite[18] = imageLoader.loadImageFromAssets("Bild-000019.png", miniWidth, miniHeight);
-                miniExplodeSprite[19] = imageLoader.loadImageFromAssets("Bild-000020.png", miniWidth, miniHeight);
-
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
+                    miniExplodeSprite[i] = imageManager.loadImageFromAssets("Bild-0000" + (i < 10 ? "0" + (i + 1) : (i + 1)) + ".png", miniWidth, miniHeight);
                 }
 
                 // blue tower
                 Image[] blueTowerI = new Image[36];
                 for (int i = 0; i < 36; i++)
-                    blueTowerI[i] = imageLoader.loadImageFromAssets("mg" + i + "0.png", width, height);
+                    blueTowerI[i] = imageManager.loadImageFromAssets("mg" + i + "0.png", width, height);
 
                 Image[] blueTowerII = new Image[36];
                 for (int i = 0; i < 36; i++)
-                    blueTowerII[i] = imageLoader.loadImageFromAssets("bgII" + i + "0.png", width, height);
+                    blueTowerII[i] = imageManager.loadImageFromAssets("bgII" + i + "0.png", width, height);
 
                 Image[] blueTowerIII = new Image[36];
                 for (int i = 0; i < 36; i++)
-                    blueTowerIII[i] = imageLoader.loadImageFromAssets("bgIII" + i + "0.png", width, height);
+                    blueTowerIII[i] = imageManager.loadImageFromAssets("bgIII" + i + "0.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -651,7 +557,7 @@ public class Game {
                 //green tower
                 Image[] greenTowerI = new Image[36];
                 for (int i = 0; i < 36; i++)
-                    greenTowerI[i] = imageLoader.loadImageFromAssets("greenLS00" + i + "0.png", width, height);
+                    greenTowerI[i] = imageManager.loadImageFromAssets("greenLS00" + i + "0.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -660,7 +566,7 @@ public class Game {
 
                 Image[] greenTowerII = new Image[36];
                 for (int i = 0; i < 36; i++)
-                    greenTowerII[i] = imageLoader.loadImageFromAssets("lsII" + i + "0.png", width, height);
+                    greenTowerII[i] = imageManager.loadImageFromAssets("lsII" + i + "0.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -669,7 +575,7 @@ public class Game {
 
                 Image[] greenTowerIII = new Image[36];
                 for (int i = 0; i < 36; i++)
-                    greenTowerIII[i] = imageLoader.loadImageFromAssets("lsIII" + i + "0.png", width, height);
+                    greenTowerIII[i] = imageManager.loadImageFromAssets("lsIII" + i + "0.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -689,7 +595,7 @@ public class Game {
                 //red tower
                 Image[] redTowerI = new Image[36];
                 for (int i = 0; i < 36; i++)
-                    redTowerI[i] = imageLoader.loadImageFromAssets("rmI" + i + "0.png", width, height);
+                    redTowerI[i] = imageManager.loadImageFromAssets("rmI" + i + "0.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -698,7 +604,7 @@ public class Game {
 
                 Image[] redTowerII = new Image[36];
                 for (int i = 0; i < 36; i++)
-                    redTowerII[i] = imageLoader.loadImageFromAssets("rmII" + i + "0.png", width, height);
+                    redTowerII[i] = imageManager.loadImageFromAssets("rmII" + i + "0.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -707,7 +613,7 @@ public class Game {
 
                 Image[] redTowerIII = new Image[36];
                 for (int i = 0; i < 36; i++)
-                    redTowerIII[i] = imageLoader.loadImageFromAssets("rmIII" + i + "0.png", width, height);
+                    redTowerIII[i] = imageManager.loadImageFromAssets("rmIII" + i + "0.png", width, height);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -728,24 +634,23 @@ public class Game {
                 int height_hp = height / 5;//30;
 
                 healthBarSprite = new Image[10];
-                healthBarSprite[0] = imageLoader.loadImageFromAssets("health_bar_10.png", width_hp, height_hp);
-                healthBarSprite[1] = imageLoader.loadImageFromAssets("health_bar_20.png", width_hp, height_hp);
-                healthBarSprite[2] = imageLoader.loadImageFromAssets("health_bar_30.png", width_hp, height_hp);
-                healthBarSprite[3] = imageLoader.loadImageFromAssets("health_bar_40.png", width_hp, height_hp);
-                healthBarSprite[4] = imageLoader.loadImageFromAssets("health_bar_50.png", width_hp, height_hp);
-                healthBarSprite[5] = imageLoader.loadImageFromAssets("health_bar_60.png", width_hp, height_hp);
-                healthBarSprite[6] = imageLoader.loadImageFromAssets("health_bar_70.png", width_hp, height_hp);
-                healthBarSprite[7] = imageLoader.loadImageFromAssets("health_bar_80.png", width_hp, height_hp);
-                healthBarSprite[8] = imageLoader.loadImageFromAssets("health_bar_90.png", width_hp, height_hp);
-                healthBarSprite[9] = imageLoader.loadImageFromAssets("health_bar_100.png", width_hp, height_hp);
+                for (int i = 0; i < healthBarSprite.length; ++i) {
+
+                    if (i % 5 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
+                    healthBarSprite[i] = imageManager.loadImageFromAssets("health_bar_" + (i + 1) + "0.png", width_hp, height_hp);
+                }
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene();
                 }
 
-                Image score = imageLoader.loadImageFromAssets("SmallBox.png", 300, 150);
-                Image titleScore = imageLoader.loadImageFromAssets("HealthBar.png", 300, 70);
+                Image score = imageManager.loadImageFromAssets("SmallBox.png", 300, 150);
+                Image titleScore = imageManager.loadImageFromAssets("HealthBar.png", 300, 70);
 
                 int numWidth = width / 3;//50;
                 int numHeight = width / 2;//70;
@@ -755,20 +660,20 @@ public class Game {
                     renderer.drawScene();
                 }
 
-                dollarSign = imageLoader.loadImageFromAssets("money.png", numWidth / 2, numHeight / 2);
+                dollarSign = imageManager.loadImageFromAssets("money.png", numWidth / 2, numHeight / 2);
 
                 scorenumbersImages = new Image[10];
 
-                scorenumbersImages[0] = imageLoader.loadImageFromAssets("0.png", numWidth, numHeight);
-                scorenumbersImages[1] = imageLoader.loadImageFromAssets("1.png", numWidth, numHeight);
-                scorenumbersImages[2] = imageLoader.loadImageFromAssets("2.png", numWidth, numHeight);
-                scorenumbersImages[3] = imageLoader.loadImageFromAssets("3.png", numWidth, numHeight);
-                scorenumbersImages[4] = imageLoader.loadImageFromAssets("4.png", numWidth, numHeight);
-                scorenumbersImages[5] = imageLoader.loadImageFromAssets("5.png", numWidth, numHeight);
-                scorenumbersImages[6] = imageLoader.loadImageFromAssets("6.png", numWidth, numHeight);
-                scorenumbersImages[7] = imageLoader.loadImageFromAssets("7.png", numWidth, numHeight);
-                scorenumbersImages[8] = imageLoader.loadImageFromAssets("8.png", numWidth, numHeight);
-                scorenumbersImages[9] = imageLoader.loadImageFromAssets("9.png", numWidth, numHeight);
+                scorenumbersImages[0] = imageManager.loadImageFromAssets("0.png", numWidth, numHeight);
+                scorenumbersImages[1] = imageManager.loadImageFromAssets("1.png", numWidth, numHeight);
+                scorenumbersImages[2] = imageManager.loadImageFromAssets("2.png", numWidth, numHeight);
+                scorenumbersImages[3] = imageManager.loadImageFromAssets("3.png", numWidth, numHeight);
+                scorenumbersImages[4] = imageManager.loadImageFromAssets("4.png", numWidth, numHeight);
+                scorenumbersImages[5] = imageManager.loadImageFromAssets("5.png", numWidth, numHeight);
+                scorenumbersImages[6] = imageManager.loadImageFromAssets("6.png", numWidth, numHeight);
+                scorenumbersImages[7] = imageManager.loadImageFromAssets("7.png", numWidth, numHeight);
+                scorenumbersImages[8] = imageManager.loadImageFromAssets("8.png", numWidth, numHeight);
+                scorenumbersImages[9] = imageManager.loadImageFromAssets("9.png", numWidth, numHeight);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -777,16 +682,16 @@ public class Game {
 
                 moneyNumbersImages = new Image[10];
 
-                moneyNumbersImages[0] = imageLoader.loadImageFromAssets("0.png", numWidth / 2, numHeight / 2);
-                moneyNumbersImages[1] = imageLoader.loadImageFromAssets("1.png", numWidth / 2, numHeight / 2);
-                moneyNumbersImages[2] = imageLoader.loadImageFromAssets("2.png", numWidth / 2, numHeight / 2);
-                moneyNumbersImages[3] = imageLoader.loadImageFromAssets("3.png", numWidth / 2, numHeight / 2);
-                moneyNumbersImages[4] = imageLoader.loadImageFromAssets("4.png", numWidth / 2, numHeight / 2);
-                moneyNumbersImages[5] = imageLoader.loadImageFromAssets("5.png", numWidth / 2, numHeight / 2);
-                moneyNumbersImages[6] = imageLoader.loadImageFromAssets("6.png", numWidth / 2, numHeight / 2);
-                moneyNumbersImages[7] = imageLoader.loadImageFromAssets("7.png", numWidth / 2, numHeight / 2);
-                moneyNumbersImages[8] = imageLoader.loadImageFromAssets("8.png", numWidth / 2, numHeight / 2);
-                moneyNumbersImages[9] = imageLoader.loadImageFromAssets("9.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[0] = imageManager.loadImageFromAssets("0.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[1] = imageManager.loadImageFromAssets("1.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[2] = imageManager.loadImageFromAssets("2.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[3] = imageManager.loadImageFromAssets("3.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[4] = imageManager.loadImageFromAssets("4.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[5] = imageManager.loadImageFromAssets("5.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[6] = imageManager.loadImageFromAssets("6.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[7] = imageManager.loadImageFromAssets("7.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[8] = imageManager.loadImageFromAssets("8.png", numWidth / 2, numHeight / 2);
+                moneyNumbersImages[9] = imageManager.loadImageFromAssets("9.png", numWidth / 2, numHeight / 2);
 
                 int upgradeDialogBackrgoundImageWidth = borderX / 3;
                 int upgradeDialogBackgroundImageHeight = (borderY * 16 / 50);
@@ -798,19 +703,19 @@ public class Game {
 
                 Image[] dialogUpgradeTower1 = new Image[3];
 
-                dialogUpgradeTower1[0] = imageLoader.loadImageFromAssets("mgleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
-                dialogUpgradeTower1[1] = imageLoader.loadImageFromAssets("mgleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
-                dialogUpgradeTower1[2] = imageLoader.loadImageFromAssets("mgleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower1[0] = imageManager.loadImageFromAssets("mgleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower1[1] = imageManager.loadImageFromAssets("mgleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower1[2] = imageManager.loadImageFromAssets("mgleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
 
                 Image[] dialogUpgradeTower2 = new Image[3];
-                dialogUpgradeTower2[0] = imageLoader.loadImageFromAssets("rcleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
-                dialogUpgradeTower2[1] = imageLoader.loadImageFromAssets("rcleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
-                dialogUpgradeTower2[2] = imageLoader.loadImageFromAssets("rcleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower2[0] = imageManager.loadImageFromAssets("rcleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower2[1] = imageManager.loadImageFromAssets("rcleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower2[2] = imageManager.loadImageFromAssets("rcleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
 
                 Image[] dialogUpgradeTower3 = new Image[3];
-                dialogUpgradeTower3[0] = imageLoader.loadImageFromAssets("lsleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
-                dialogUpgradeTower3[1] = imageLoader.loadImageFromAssets("lsleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
-                dialogUpgradeTower3[2] = imageLoader.loadImageFromAssets("lsleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower3[0] = imageManager.loadImageFromAssets("lsleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower3[1] = imageManager.loadImageFromAssets("lsleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
+                dialogUpgradeTower3[2] = imageManager.loadImageFromAssets("lsleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -841,7 +746,7 @@ public class Game {
                 for(ImageView view: laserViews)
                     view.hide();
 
-                laserSprite = new Image[] {imageLoader.loadImageFromAssets("greenPhoton.png",  width / 15, width / 15)};
+                laserSprite = new Image[] {imageManager.loadImageFromAssets("greenPhoton.png",  width / 15, width / 15)};
 
                 renderer.drawScene();
 
@@ -1039,7 +944,7 @@ public class Game {
             //diagonal views
             diagonalMatrix = new ImageView[rows - 1][columns - 1];
 
-            for (int j = 0; j < rows - 1; ++j ) {
+            for (int j = 0; j < rows - 1; ++j )
                 for (int i = 0; i < columns - 1; ++i)
                     diagonalMatrix[j][i] = scene.addImageView(new ImageViewImpl("Grid [" + j + "][" + i +"]"))
                      .setAbsoluteX(grid.getGrid()[j][i].getCenterX() + gridViewMatrix[j][i].getImage().getWidth() / 2)
@@ -1047,12 +952,12 @@ public class Game {
                      .setImage(fieldGreenDiagonal)
                      .setZindex(3)
                      .hide();
-            }
+
 
             //tower hp views
             towerHpViwes = new ImageView[rows][columns];
 
-            for (int j = 0; j < rows; ++j ) {
+            for (int j = 0; j < rows; ++j )
                 for (int i = 0; i < columns; ++i) {
                     String towerName = "Tower[" + i + "][" + j + "]";
                     towerHpViwes[j][i] = scene.addImageView(
@@ -1064,7 +969,6 @@ public class Game {
                                     .setZindex(10)
                     );
                 }
-            }
 
             //enemy repo init
             enemyRepo = new QueuedEntityRepo<EnemyDoubleDaemon>() {
