@@ -43,4 +43,9 @@ public class DaemonCountingSemaphore {
             lock.unlock();
         }
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getName() + " - counter: " + counter + "\n   Lock : " + lock.toString() + "\n    Condition: " + condition.toString();
+    }
 }

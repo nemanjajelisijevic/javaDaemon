@@ -7,19 +7,19 @@ public class DaemonSemaphore {
 
         private ReentrantLock lock = new ReentrantLock();
         private Condition condition = lock.newCondition();
-        private volatile boolean flag = true;
+        private volatile boolean flag = false;
 
         public DaemonSemaphore() {}
 
         public void stop(){
             lock.lock();
-            flag = false;
+            flag = true;
             lock.unlock();
         }
 
         public void go() {
             lock.lock();
-            flag = true;
+            flag = false;
             condition.signalAll();
             lock.unlock();
         }
@@ -27,10 +27,16 @@ public class DaemonSemaphore {
         public void await() throws InterruptedException {
             lock.lock();
             try {
-                while(!flag)
+                while(flag)
                     condition.await();
             } finally {
                 lock.unlock();
             }
         }
+
+    @Override
+    public String toString() {
+        return this.getClass().getName() + " - Blocking: " + flag + "\n    Lock : " + lock.toString() + "\n    Condition: " + condition.toString();
+    }
+
 }
