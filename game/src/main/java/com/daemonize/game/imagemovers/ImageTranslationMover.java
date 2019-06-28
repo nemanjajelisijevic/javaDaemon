@@ -3,10 +3,7 @@ package com.daemonize.game.imagemovers;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.game.Enemy;
-import com.daemonize.game.MoneyHandler;
 import com.daemonize.game.Pair;
 import com.daemonize.game.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.game.imagemovers.spriteiterators.SpriteIterator;
@@ -29,6 +26,10 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     protected float borderY1;
     protected float borderY2;
 
+    protected SpriteIterator spriteIterator;
+    protected float initVelocity;
+    protected volatile Velocity velocity;
+
     private Consumer outOfBordersConsumer;
     private Runnable outOfBordersClosure;
     private PositionedImage ret = new PositionedImage();
@@ -50,11 +51,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     public float getdXY() {
         return dXY;
     }
-
-    protected SpriteIterator spriteIterator;
-    protected float initVelocity;
-
-    protected volatile Velocity velocity;
 
     @CallingThread
     public void clearVelocity() {
@@ -192,15 +188,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         animateSemaphore.await();
 
         ret.image = iterateSprite();
-
-        if (lastX <= (borderX1 + velocity.intensity * velocity.direction.coeficientX * dXY) ||
-                lastX >= (borderX2 - velocity.intensity * velocity.direction.coeficientX * dXY)||
-                lastY <= (borderY1 + velocity.intensity * velocity.direction.coeficientY * dXY) ||
-                lastY >= (borderY2 - velocity.intensity * velocity.direction.coeficientY * dXY)) {
-            outOfBordersConsumer.consume(outOfBordersClosure);
-            animateSemaphore.stop();
-            return null;
-        }
 
         synchronized (this) {
             ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY);

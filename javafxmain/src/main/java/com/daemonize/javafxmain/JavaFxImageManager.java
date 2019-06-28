@@ -19,10 +19,13 @@ public class JavaFxImageManager implements ImageManager {
     }
 
     @Override
-    public Image rescaleImage(Image image, int width, int height) {
-        javafx.scene.image.ImageView imgView = new javafx.scene.image.ImageView((javafx.scene.image.Image)image.getImageImp());
-        imgView.setFitWidth(width);
-        imgView.setFitHeight(height);
+    public Image rescaleImage(Image image, int width, int height) {//TODO FIX
+        javafx.scene.image.Image original = (javafx.scene.image.Image)image.getImageImp();
+        javafx.scene.image.ImageView imgView = new javafx.scene.image.ImageView(original);
+//        imgView.setFitWidth(width);
+//        imgView.setFitHeight(height);
+        imgView.setScaleX(width/original.getWidth());
+        imgView.setScaleY(height/original.getHeight());
         return new JavaFxImage(imgView.getImage());
     }
 }

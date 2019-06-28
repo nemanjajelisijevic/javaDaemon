@@ -24,7 +24,6 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     private volatile float targetY;
 
     private void setTargetCoordinates(float targetX, float targetY) {
-
         this.targetX = targetX;
         this.targetY = targetY;
     }

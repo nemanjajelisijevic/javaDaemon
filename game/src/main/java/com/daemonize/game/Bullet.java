@@ -149,7 +149,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         PositionedImage posImage = super.animate();
 
         if(posImage == null)
-            return null;//TODO fix this : throw new IllegalStateException("Bullet pos image is null");
+            return null;
 
         Direction movingDirection = getVelocity().direction;
 

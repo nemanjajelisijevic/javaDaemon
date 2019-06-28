@@ -511,7 +511,8 @@ public class Game {
                         renderer.drawScene();
                     }
 
-                    rocketExplodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", miniWidth, miniHeight);
+                    rocketExplodeSprite[i] = imageManager.rescaleImage(explodeSprite[i], miniWidth, miniHeight);
+                    //rocketExplodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", miniWidth, miniHeight);
                 }
 
 
@@ -1712,8 +1713,6 @@ public class Game {
                                             enemy.getLastCoordinates().getFirst(),
                                             enemy.getLastCoordinates().getSecond()
                                     );
-
-                                    towerDaemon.setCurrentAngle((int) angle);
 
                                     int lvl = towerDaemon.getTowerLevel().currentLevel;
 
