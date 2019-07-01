@@ -59,29 +59,31 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
     private void loop(){
 
-      BaseQuest currentQuest;
+        System.out.println(DaemonUtils.tag() + "Daemon engine started!");
 
-      while (!state.equals(DaemonState.GONE_DAEMON)) {
+        BaseQuest currentQuest;
 
-        currentQuest = getQuest();
+        while (!state.equals(DaemonState.GONE_DAEMON)) {
 
-        if (currentQuest == null) {
-            if (state.equals(DaemonState.IDLE))//TODO check dis
-                continue;
-          break;
+            currentQuest = getQuest();
+
+            if (currentQuest == null) {
+                if (state.equals(DaemonState.IDLE))//TODO check dis
+                    continue;
+              break;
+            }
+
+            if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null) {
+              break;
+            }
+
+            setState(currentQuest.getState());
+            currentQuest.run();
         }
 
-        if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null) {
-          break;
-        }
-
-        setState(currentQuest.getState());
-        currentQuest.run();
-      }
-
-      System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
-      setState(DaemonState.STOPPED);
-      startStopSemaphore.go();
+        System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
+        setState(DaemonState.STOPPED);
+        startStopSemaphore.go();
     }
 
     @Override
