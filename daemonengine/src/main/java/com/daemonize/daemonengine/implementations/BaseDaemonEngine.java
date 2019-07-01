@@ -5,6 +5,7 @@ import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.BaseQuest;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     private String name = this.getClass().getSimpleName();
 
     protected Thread daemonThread;
+
+    private DaemonSemaphore startStopSemaphore = new DaemonSemaphore();
 
     public D setName(String name) {
       this.name = name;
@@ -77,29 +80,37 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
       }
 
       System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
-
       setState(DaemonState.STOPPED);
+      startStopSemaphore.go();
     }
 
     @Override
-    public D start() {
-      DaemonState initState = getState();
-      if (initState.equals(DaemonState.STOPPED)) {
-        daemonThread = new Thread(new Runnable() {
-          @Override
-          public void run() {
-            loop();
-          }
-        });
-        daemonThread.setName(name);
-        setState(DaemonState.INITIALIZING);
-        daemonThread.start();
-      }
-      return (D) this;
+    public synchronized D start() {
+
+        try {
+            startStopSemaphore.await();
+        } catch (InterruptedException e) {
+            //
+        }
+
+        DaemonState initState = getState();
+        if (initState.equals(DaemonState.STOPPED)) {
+          daemonThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+              loop();
+            }
+          });
+          daemonThread.setName(name);
+          setState(DaemonState.INITIALIZING);
+          daemonThread.start();
+        }
+
+        return (D) this;
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
       if (state != DaemonState.STOPPED) {
         state = DaemonState.GONE_DAEMON;
         if (daemonThread != null
@@ -108,6 +119,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
           daemonThread.interrupt();
         }
       }
+
+      startStopSemaphore.stop();
       daemonThread = null;
     }
 
