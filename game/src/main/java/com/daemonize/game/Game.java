@@ -511,8 +511,8 @@ public class Game {
                         renderer.drawScene();
                     }
 
-                    rocketExplodeSprite[i] = imageManager.rescaleImage(explodeSprite[i], miniWidth, miniHeight);
-                    //rocketExplodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", miniWidth, miniHeight);
+                    //rocketExplodeSprite[i] = imageManager.rescaleImage(explodeSprite[i], miniWidth, miniHeight);
+                    rocketExplodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", miniWidth, miniHeight);
                 }
 
 
