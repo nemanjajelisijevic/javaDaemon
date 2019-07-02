@@ -37,6 +37,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
       return (D) this;
     }
 
+    @Override
     public Consumer getConsumer() {
       return consumer;
     }
