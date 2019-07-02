@@ -456,13 +456,15 @@ public class Game {
                 //init enemy sprite
                 enemySprite = new Image[36];
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
-                }
+                for (int i = 0; i < 36; i++) {
 
-                for (int i = 0; i < 36; i++)
+                    if (i % 8 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
                     enemySprite[i] = imageManager.loadImageFromAssets("plane" + i + "0.png", width, height);
+                }
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -480,12 +482,15 @@ public class Game {
                 int bulletSize = width / 3;//60;
                 bulletSpriteRocket = new Image[36];
 
-                for (int i = 0; i < 36; i++)
+                for (int i = 0; i < 36; i++) {
+
+                    if (i % 10 == 0 && loaderBar.hasNext()) {
+                        loaderBar.next().show();
+                        renderer.drawScene();
+                    }
+
                     bulletSpriteRocket[i] = imageManager.loadImageFromAssets("rocket" + i + "0.png", bulletSize, bulletSize);
 
-                if (loaderBar.hasNext()) {
-                    loaderBar.next().show();
-                    renderer.drawScene();
                 }
 
                 //explosion sprite
