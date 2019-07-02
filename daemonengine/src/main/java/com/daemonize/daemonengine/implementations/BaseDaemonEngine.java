@@ -124,7 +124,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
       }
 
       startStopSemaphore.stop();
-      daemonThread = null;
+      daemonThread = null;//TODO     check this nulling
     }
 
     @Override

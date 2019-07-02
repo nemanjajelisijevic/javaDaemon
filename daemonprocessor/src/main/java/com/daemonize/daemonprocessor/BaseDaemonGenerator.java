@@ -47,6 +47,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
     protected Printer printer;
 
+    @Override
     public void setPrinter(Printer printer) {
         this.printer = printer;
     }

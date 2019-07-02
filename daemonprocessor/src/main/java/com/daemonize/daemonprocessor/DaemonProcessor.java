@@ -145,7 +145,7 @@ public class DaemonProcessor extends AbstractProcessor {
                     }
                 }
 
-                ((BaseDaemonGenerator) generator).setPrinter(new BaseDaemonGenerator.Printer() {
+                generator.setPrinter(new BaseDaemonGenerator.Printer() {
                     @Override
                     public void print(String string) {
                         messager.printMessage(Diagnostic.Kind.NOTE, string);
