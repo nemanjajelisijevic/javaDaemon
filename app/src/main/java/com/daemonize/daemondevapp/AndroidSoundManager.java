@@ -59,7 +59,6 @@ public class AndroidSoundManager implements SoundManager {
             player.setLooping(false);
             player.start();
         } catch (FileNotFoundException e) {
-            System.err.println(e.getLocalizedMessage());
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
