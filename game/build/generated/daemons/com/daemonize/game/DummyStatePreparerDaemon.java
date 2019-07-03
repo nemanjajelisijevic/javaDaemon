@@ -6,6 +6,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
 import java.lang.Exception;
+import java.lang.Integer;
 import java.lang.Override;
 import java.lang.Runnable;
 import java.lang.String;
@@ -65,6 +66,12 @@ public class DummyStatePreparerDaemon implements Daemon<DummyStatePreparerDaemon
   public List<DaemonState> getEnginesState() {
     List<DaemonState> ret = new ArrayList<DaemonState>();
     ret.add(daemonEngine.getState());
+    return ret;
+  }
+
+  public List<Integer> getEnginesQueueSizes() {
+    List<Integer> ret = new ArrayList<Integer>();
+    ret.add(daemonEngine.queueSize());
     return ret;
   }
 

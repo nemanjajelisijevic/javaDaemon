@@ -22,6 +22,13 @@ public class JavaFxSoundManager implements SoundManager {
     public void playSound(File soundFile) {
         Media soundMedia = new Media(soundFile.toURI().toString());
         MediaPlayer player = new MediaPlayer(soundMedia);
+        player.setOnEndOfMedia(new Runnable() {
+            @Override
+            public void run() {
+                player.dispose();
+            }
+        });
         player.play();
+
     }
 }

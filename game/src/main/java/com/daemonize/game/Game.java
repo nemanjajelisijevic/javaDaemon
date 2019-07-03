@@ -17,6 +17,7 @@ import com.daemonize.game.repo.StackedEntityRepo;
 import com.daemonize.game.scene.Scene2D;
 
 import com.daemonize.game.soundmanager.SoundManager;
+import com.daemonize.game.soundmanager.SoundManagerDaemon;
 import com.daemonize.game.tabel.Field;
 import com.daemonize.game.tabel.Grid;
 
@@ -250,8 +251,9 @@ public class Game {
     }
 
     //sound manager
-    SoundManager soundManager;
-    File explosionSound;
+    private SoundManagerDaemon soundManager;
+    private File rocketExplosionSound;
+    private File explosionSound;
 
     //construct
     public Game(
@@ -267,7 +269,7 @@ public class Game {
     ) {
         this.renderer = renderer;
         this.imageManager = imageManager;
-        this.soundManager = soundManager;
+        this.soundManager = new SoundManagerDaemon(gameConsumer,soundManager);
         this.borderX = borderX;
         this.borderY = borderY;
         this.scene = new Scene2D();
@@ -779,6 +781,7 @@ public class Game {
 
                 //sounds init
                 explosionSound = soundManager.loadFile("explosion.wav");
+                rocketExplosionSound = soundManager.loadFile("rocketExplosion.wav");
 
                 gameConsumer.consume(stateChain::next);
 
@@ -1274,6 +1277,7 @@ public class Game {
                 System.out.println(DaemonUtils.tag() + "Image imp: " + view.getImage().getImageImp().toString());
             });
 
+            soundManager.start();
             renderer.setScene(scene).start();
             gameConsumer.consume(stateChain::next);
 
@@ -1897,6 +1901,8 @@ public class Game {
                                     destructionClosure.run();
                             }
 
+                            if (soundManager.getEnginesQueueSizes().get(0) <= 0)
+                                soundManager.playSound(rocketExplosionSound);
                             rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, () -> rocketRepo.add(rocketDoubleDaemon));
                         });
             }

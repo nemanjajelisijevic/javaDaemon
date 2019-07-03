@@ -7,6 +7,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
 import java.lang.Exception;
+import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
 import java.util.ArrayList;
@@ -65,6 +66,12 @@ public class TransientStatePreparerDaemon implements Daemon<TransientStatePrepar
   public List<DaemonState> getEnginesState() {
     List<DaemonState> ret = new ArrayList<DaemonState>();
     ret.add(daemonEngine.getState());
+    return ret;
+  }
+
+  public List<Integer> getEnginesQueueSizes() {
+    List<Integer> ret = new ArrayList<Integer>();
+    ret.add(daemonEngine.queueSize());
     return ret;
   }
 
