@@ -36,7 +36,7 @@ public class AndroidSoundManager implements SoundManager {
         FileOutputStream fos = context.openFileOutput(newName, Context.MODE_PRIVATE);
 
         try {
-            int res = Integer.MAX_VALUE;
+            int res = Integer.MIN_VALUE;
             while ((res = is.read()) != -1) {
                 fos.write(res);
             }
