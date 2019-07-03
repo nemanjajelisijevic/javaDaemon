@@ -13,6 +13,13 @@ import javafx.scene.media.MediaPlayer;
 
 public class JavaFxSoundManager implements SoundManager {
 
+    private volatile boolean playing = false;
+
+    @Override
+    public boolean isPlaying() {
+        return playing;
+    }
+
     @Override
     public File loadFile(String name) throws URISyntaxException {
         return new File(getClass().getResource("/" + name).getPath());
@@ -26,9 +33,10 @@ public class JavaFxSoundManager implements SoundManager {
             @Override
             public void run() {
                 player.dispose();
+                playing = false;
             }
         });
+        playing = true;
         player.play();
-
     }
 }

@@ -347,6 +347,7 @@ public class Game {
         gameConsumer.consume(()-> {
             towerSpriteUpgrader.stop();
             fieldEraserEngine.stop();
+            soundManager.stop();
             moneyDaemon.stop();
             enemyGenerator.stop();
             for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
@@ -780,6 +781,7 @@ public class Game {
                 renderer.drawScene();
 
                 //sounds init
+                soundManager.setConsumer(gameConsumer);
                 explosionSound = soundManager.loadFile("explosion.wav");
                 rocketExplosionSound = soundManager.loadFile("rocketExplosion.wav");
 
@@ -1901,7 +1903,7 @@ public class Game {
                                     destructionClosure.run();
                             }
 
-                            if (soundManager.getEnginesQueueSizes().get(0) <= 0)
+                            if (!soundManager.isPlaying())
                                 soundManager.playSound(rocketExplosionSound);
                             rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, () -> rocketRepo.add(rocketDoubleDaemon));
                         });
