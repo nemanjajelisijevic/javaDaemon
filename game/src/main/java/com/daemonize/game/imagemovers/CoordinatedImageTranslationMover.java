@@ -50,6 +50,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
             return ret;
 
         coordinateLock.lock();
+
         setTargetCoordinates(x, y);
         animateSemaphore.subscribe();
 

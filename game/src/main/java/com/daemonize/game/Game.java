@@ -16,6 +16,7 @@ import com.daemonize.game.repo.QueuedEntityRepo;
 import com.daemonize.game.repo.StackedEntityRepo;
 import com.daemonize.game.scene.Scene2D;
 
+import com.daemonize.game.soundmanager.SoundManager;
 import com.daemonize.game.tabel.Field;
 import com.daemonize.game.tabel.Grid;
 
@@ -32,7 +33,9 @@ import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -246,10 +249,15 @@ public class Game {
         }
     }
 
+    //sound manager
+    SoundManager soundManager;
+    File explosionSound;
+
     //construct
     public Game(
             Renderer2D renderer,
             ImageManager imageManager,
+            SoundManager soundManager,
             int borderX,
             int borderY,
             int rows,
@@ -259,6 +267,7 @@ public class Game {
     ) {
         this.renderer = renderer;
         this.imageManager = imageManager;
+        this.soundManager = soundManager;
         this.borderX = borderX;
         this.borderY = borderY;
         this.scene = new Scene2D();
@@ -768,11 +777,15 @@ public class Game {
 
                 renderer.drawScene();
 
+                //sounds init
+                explosionSound = soundManager.loadFile("explosion.wav");
+
                 gameConsumer.consume(stateChain::next);
 
-            } catch (IOException ex) {
+            } catch (IOException | URISyntaxException ex) {
                 System.err.println(DaemonUtils.tag() + "Could not init game!");
                 ex.printStackTrace();
+                System.exit(1);
             }
 
         }).addState(()-> { //views and dialogs population
@@ -1363,6 +1376,8 @@ public class Game {
                                                 target.getLastCoordinates().getSecond()
                                         );
 
+                                        soundManager.playSound(explosionSound);
+
                                         target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
 
                                             target.setShootable(false);
@@ -1675,6 +1690,8 @@ public class Game {
                             EnemyDoubleDaemon enemy = (EnemyDoubleDaemon) towerTypeAndEnemy.get().getSecond();
 
                             Closure<Integer> bulletClosure = amount -> {
+
+                                soundManager.playSound(explosionSound);
                                 enemyRepo.add(enemy);
                                 moneyDaemon.setAmount(amount.get())
                                         .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
