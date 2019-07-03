@@ -50,21 +50,12 @@ public class AndroidSoundManager implements SoundManager {
 
     @Override
     public void playSound(File soundFile){
-
-
         FileInputStream fis = null;
         try {
-
+            player.reset();
             fis = context.openFileInput(soundFile.getName());
             player.setDataSource(fis.getFD());
-
             player.prepare();
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                }
-            });
             player.setLooping(false);
             player.start();
         } catch (FileNotFoundException e) {
@@ -79,23 +70,6 @@ public class AndroidSoundManager implements SoundManager {
                 } catch (IOException ignore) {
                 }
             }
-
         }
-
-
-//        try {
-//            player.setDataSource(soundFile.toURI());
-//            player.prepare();
-//            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-//                @Override
-//                public void onCompletion(MediaPlayer mp) {
-//                    mp.release();
-//                }
-//            });
-//            player.setLooping(false);
-//            player.start();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 }
