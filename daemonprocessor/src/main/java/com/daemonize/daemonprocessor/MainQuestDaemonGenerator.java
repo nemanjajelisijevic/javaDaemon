@@ -262,6 +262,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonApiMethods.add(generateStartDaemonApiMethod());
             daemonApiMethods.add(generateClearDaemonApiMethod());
             daemonApiMethods.add(generateGetEnginesStateDaemonApiMethod());
+            daemonApiMethods.add(generateGetEnginesQueueSizeDaemonApiMethod());
             daemonApiMethods.add(generateDedicatedEnginesStopDaemonApiMethod());
             daemonApiMethods.add(generateDedicatedEnginesQueueStopDaemonApiMethod());
             daemonApiMethods.add(generateDedicatedEnginesSetNameDaemonApiMethod());
