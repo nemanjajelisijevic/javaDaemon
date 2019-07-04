@@ -776,6 +776,24 @@ public class Game {
                     renderer.drawScene();
                 }
 
+                //sounds init
+                soundManager.setConsumer(gameConsumer);
+                bulletSound = soundManager.loadFile("bullet.wav");
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene();
+                }
+
+                rocketExplosionSound = soundManager.loadFile("rocketExplosion.wav");
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene();
+                }
+
+                bigExplosion = soundManager.loadFile("bigExplosion.wav");
+
                 while (loaderBar.hasNext()){
                     loaderBar.next().show();
                     renderer.drawScene();
@@ -793,12 +811,6 @@ public class Game {
                 laserSprite = new Image[] {imageManager.loadImageFromAssets("greenPhoton.png",  width / 15, width / 15)};
 
                 renderer.drawScene();
-
-                //sounds init
-                soundManager.setConsumer(gameConsumer);
-                bulletSound = soundManager.loadFile("bullet.wav");
-                rocketExplosionSound = soundManager.loadFile("rocketExplosion.wav");
-                bigExplosion = soundManager.loadFile("bigExplosion.wav");
 
                 gameConsumer.consume(stateChain::next);
 
