@@ -1,8 +1,10 @@
 package com.daemonize.daemondevapp;
 
 import android.content.Context;
+import android.media.MediaDataSource;
 import android.media.MediaPlayer;
 
+import com.daemonize.game.soundmanager.SoundException;
 import com.daemonize.game.soundmanager.SoundManager;
 
 import java.io.File;
@@ -43,30 +45,36 @@ public class AndroidSoundManager implements SoundManager {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (fis != null) {
+            if (fis != null)
                 try {
                     fis.close();
-                } catch (IOException ignore) {
-                }
-            }
+                } catch (IOException ignore) {}
         }
     }
 
     @Override
-    public File loadFile(String name) throws URISyntaxException, IOException {
+    public File loadFile(String name) throws SoundException {
 
-        InputStream is = getClass().getResourceAsStream("/" + name);
+        InputStream is = null;
+        FileOutputStream fos = null;
         String newName = "new" + name;
-        FileOutputStream fos = context.openFileOutput(newName, Context.MODE_PRIVATE);
 
         try {
+
+            is = getClass().getResourceAsStream("/" + name);
+            fos = context.openFileOutput(newName, Context.MODE_PRIVATE);
+
             int res = Integer.MIN_VALUE;
-            while ((res = is.read()) != -1) {
+            while ((res = is.read()) != -1)
                 fos.write(res);
-            }
+
+        } catch (Exception e) {
+            throw new SoundException("Unable to load sound file: " + name, e);
         } finally {
-            is.close();
-            fos.close();
+            try {
+                if (is != null) is.close();
+                if (fos != null) fos.close();
+            } catch (IOException ex) {}
         }
 
         return new File(newName);

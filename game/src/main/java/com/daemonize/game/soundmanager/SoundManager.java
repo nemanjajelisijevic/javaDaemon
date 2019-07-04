@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
 public interface SoundManager {
 
     @CallingThread
-    File loadFile(String name) throws URISyntaxException, IOException;
+    File loadFile(String name) throws SoundException;
 
     void playSoundChannel1(File soundFile);
 

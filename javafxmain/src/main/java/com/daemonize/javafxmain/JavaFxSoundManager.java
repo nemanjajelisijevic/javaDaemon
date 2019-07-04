@@ -1,5 +1,6 @@
 package com.daemonize.javafxmain;
 
+import com.daemonize.game.soundmanager.SoundException;
 import com.daemonize.game.soundmanager.SoundManager;
 
 import java.io.File;
@@ -27,7 +28,7 @@ public class JavaFxSoundManager implements SoundManager {
     private Map<File, Clip> soundMap = new TreeMap();
 
     @Override
-    public File loadFile(String name) throws URISyntaxException {
+    public File loadFile(String name) throws SoundException {
         File soundFile = null;
         try {
             soundFile = new File(getClass().getResource("/" + name).getPath());
@@ -48,13 +49,19 @@ public class JavaFxSoundManager implements SoundManager {
     }
 
     protected void playSound(File soundFile) {
-
         Clip clip = soundMap.get(soundFile);
         if (!clip.isRunning()) {
             clip.setFramePosition(0);  // Must always rewind!
             clip.loop(0);
             clip.start();
         }
+    }
+
+    protected void playSoundInterruptibly(File soundFile) {
+        Clip clip = soundMap.get(soundFile);
+        clip.setFramePosition(0);  // Must always rewind!
+        clip.loop(0);
+        clip.start();
     }
 
     @Override
@@ -69,11 +76,11 @@ public class JavaFxSoundManager implements SoundManager {
 
     @Override
     public void playSoundChannel3(File soundFile) {
-        playSound(soundFile);
+        playSoundInterruptibly(soundFile);
     }
 
     @Override
     public void playSoundChannel4(File soundFile) {
-        playSound(soundFile);
+        playSoundInterruptibly(soundFile);
     }
 }

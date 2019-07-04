@@ -6,22 +6,20 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
 import java.io.File;
-import java.io.IOException;
 import java.lang.Exception;
 import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Void;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SoundManagerDaemon implements EagerDaemon<SoundManagerDaemon> {
-  protected EagerMainQuestDaemonEngine playSoundChannel4DaemonEngine;
+  protected EagerMainQuestDaemonEngine playSoundChannel3DaemonEngine;
 
   protected EagerMainQuestDaemonEngine playSoundChannel2DaemonEngine;
 
-  protected EagerMainQuestDaemonEngine playSoundChannel3DaemonEngine;
+  protected EagerMainQuestDaemonEngine playSoundChannel4DaemonEngine;
 
   private SoundManager prototype;
 
@@ -29,13 +27,13 @@ public class SoundManagerDaemon implements EagerDaemon<SoundManagerDaemon> {
 
   public SoundManagerDaemon(Consumer consumer, SoundManager prototype) {
     this.daemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
-    this.playSoundChannel4DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel4DaemonEngine");
-    this.playSoundChannel2DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel2DaemonEngine");
     this.playSoundChannel3DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel3DaemonEngine");
+    this.playSoundChannel2DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel2DaemonEngine");
+    this.playSoundChannel4DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel4DaemonEngine");
     this.prototype = prototype;
   }
 
-  public File loadFile(String name) throws URISyntaxException, IOException {
+  public File loadFile(String name) throws SoundException {
     return prototype.loadFile(name);
   }
 

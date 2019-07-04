@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 public class DummySoundManager implements SoundManager {
 
     @Override
-    public File loadFile(String name) throws URISyntaxException, IOException {
+    public File loadFile(String name) throws SoundException {
         return null;
     }
 

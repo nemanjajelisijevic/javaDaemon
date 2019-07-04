@@ -17,6 +17,7 @@ import com.daemonize.game.repo.StackedEntityRepo;
 import com.daemonize.game.scene.Scene2D;
 
 import com.daemonize.game.soundmanager.DummySoundManager;
+import com.daemonize.game.soundmanager.SoundException;
 import com.daemonize.game.soundmanager.SoundManager;
 import com.daemonize.game.soundmanager.SoundManagerDaemon;
 import com.daemonize.game.tabel.Field;
@@ -258,6 +259,11 @@ public class Game {
     private File rocketExplosionSound;
     private File explosionSound;
     private File bigExplosion;
+
+    private Image soundOnImage;
+    private Image soundOffImage;
+
+    private Button soundButton;
 
     //construct
     public Game(
@@ -737,6 +743,9 @@ public class Game {
                     renderer.drawScene();
                 }
 
+                soundOnImage = imageManager.loadImageFromAssets("soundOn.png", numWidth * 3 / 4, numHeight * 3 / 4);
+                soundOffImage = imageManager.loadImageFromAssets("soundOff.png", numWidth * 3 / 4, numHeight * 3 / 4);
+
                 Image[] dialogUpgradeTower1 = new Image[3];
 
                 dialogUpgradeTower1[0] = imageManager.loadImageFromAssets("mgleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
@@ -794,7 +803,7 @@ public class Game {
 
                 gameConsumer.consume(stateChain::next);
 
-            } catch (IOException | URISyntaxException ex) {
+            } catch (IOException | SoundException ex) {
                 System.err.println(DaemonUtils.tag() + "Could not init game!");
                 ex.printStackTrace();
                 System.exit(1);
@@ -821,6 +830,19 @@ public class Game {
                     scene.addImageView(new ImageViewImpl("Money Amount").setZindex(10).setImage(scorenumbersImages[0]).hide()),
                     scene.addImageView(new ImageViewImpl("Dollar Sign").setZindex(10).setImage(dollarSign).hide())
             );
+
+            soundButton =  (Button) new Button("Sound Toggler", soundOnImage).setAbsoluteX(borderX * 9 / 10).setAbsoluteY(borderY / 20).setZindex(20).show();
+            soundButton.onClick(() -> {
+               if (soundButton.getImage().equals(soundOnImage)) {
+                   soundManager.clearAndInterrupt().setPrototype(dummySoundManager);
+                   renderer.consume(() -> soundButton.setImage(soundOffImage));
+               } else {
+                   soundManager.clearAndInterrupt().setPrototype(activeSoundmanager);
+                   renderer.consume(() -> soundButton.setImage(soundOnImage));
+               }
+            });
+
+            scene.addImageView(soundButton);
 
             Button upgradeButton = new Button("Upgrade", upgradeButtonImage);
             upgradeButton.onClick(()->{
@@ -1295,7 +1317,9 @@ public class Game {
             //init controller
             touchController = (x, y) -> {
                 gameConsumer.consume(()-> {
-                    if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
+                    if (soundButton.checkCoordinates(x, y)) {
+
+                    } else if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
                         towerUpgradeDialogue.getTowerUpgrade().checkCoordinates(x, y);
                     else {
 
@@ -1389,7 +1413,7 @@ public class Game {
                                                 target.getLastCoordinates().getSecond()
                                         );
 
-                                        soundManager.playSoundChannel3(bigExplosion);
+                                        soundManager.playSoundChannel4(bigExplosion);
 
                                         target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
 
@@ -1704,7 +1728,7 @@ public class Game {
 
                             Closure<Integer> bulletClosure = amount -> {
 
-                                soundManager.playSoundChannel4(bigExplosion);
+                                soundManager.playSoundChannel3(bigExplosion);
                                 enemyRepo.add(enemy);
                                 moneyDaemon.setAmount(amount.get())
                                         .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
@@ -1815,7 +1839,7 @@ public class Game {
             else
                 destructionClosure.run();
 
-            if (soundManager.getEnginesQueueSizes().get(0) < 1)
+            //if (soundManager.getEnginesQueueSizes().get(0) < 3)
                 soundManager.playSoundChannel1(explosionSound);
             bulletDoubleDaemon.pushSprite(bulletExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
         });
