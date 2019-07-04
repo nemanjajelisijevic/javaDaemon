@@ -742,8 +742,8 @@ public class Game {
                     renderer.drawScene();
                 }
 
-                soundOnImage = imageManager.loadImageFromAssets("soundOn.png", numWidth * 3 / 4, numHeight * 3 / 4);
-                soundOffImage = imageManager.loadImageFromAssets("soundOff.png", numWidth * 3 / 4, numHeight * 3 / 4);
+                soundOnImage = imageManager.loadImageFromAssets("soundOn.png", numWidth * 4 / 5, numHeight * 4 / 5);
+                soundOffImage = imageManager.loadImageFromAssets("soundOff.png", numWidth * 4 / 5, numHeight * 4 / 5);
 
                 Image[] dialogUpgradeTower1 = new Image[3];
 
