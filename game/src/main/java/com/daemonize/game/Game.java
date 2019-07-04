@@ -258,6 +258,7 @@ public class Game {
     private File rocketExplosionSound;
     private File bulletSound;
     private File bigExplosion;
+    private File laserSound;
 
     private Image soundOnImage;
     private Image soundOffImage;
@@ -793,6 +794,13 @@ public class Game {
                 }
 
                 bigExplosion = soundManager.loadFile("bigExplosion.wav");
+
+                if (loaderBar.hasNext()) {
+                    loaderBar.next().show();
+                    renderer.drawScene();
+                }
+
+                laserSound = soundManager.loadFile("laser.wav");
 
                 while (loaderBar.hasNext()){
                     loaderBar.next().show();
@@ -1967,6 +1975,8 @@ public class Game {
             return;
 
         target.setParalyzed(true);
+
+        soundManager.playSoundChannel4(laserSound);
 
         laser.desintegrateTarget(source, target, duration, renderer, ret -> {
 
