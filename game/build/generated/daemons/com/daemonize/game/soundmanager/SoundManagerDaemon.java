@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SoundManagerDaemon implements EagerDaemon<SoundManagerDaemon> {
-  protected EagerMainQuestDaemonEngine playSoundChannel3DaemonEngine;
+  protected EagerMainQuestDaemonEngine playSoundChannel4DaemonEngine;
 
   protected EagerMainQuestDaemonEngine playSoundChannel2DaemonEngine;
 
-  protected EagerMainQuestDaemonEngine playSoundChannel4DaemonEngine;
+  protected EagerMainQuestDaemonEngine playSoundChannel3DaemonEngine;
 
   private SoundManager prototype;
 
@@ -27,9 +27,9 @@ public class SoundManagerDaemon implements EagerDaemon<SoundManagerDaemon> {
 
   public SoundManagerDaemon(Consumer consumer, SoundManager prototype) {
     this.daemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
-    this.playSoundChannel3DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel3DaemonEngine");
-    this.playSoundChannel2DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel2DaemonEngine");
     this.playSoundChannel4DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel4DaemonEngine");
+    this.playSoundChannel2DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel2DaemonEngine");
+    this.playSoundChannel3DaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - playSoundChannel3DaemonEngine");
     this.prototype = prototype;
   }
 

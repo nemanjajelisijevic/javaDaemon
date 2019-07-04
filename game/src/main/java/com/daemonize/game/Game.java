@@ -38,7 +38,6 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -257,7 +256,7 @@ public class Game {
     private SoundManager activeSoundmanager;
     private SoundManager dummySoundManager;
     private File rocketExplosionSound;
-    private File explosionSound;
+    private File bulletSound;
     private File bigExplosion;
 
     private Image soundOnImage;
@@ -797,7 +796,7 @@ public class Game {
 
                 //sounds init
                 soundManager.setConsumer(gameConsumer);
-                explosionSound = soundManager.loadFile("explosion.wav");
+                bulletSound = soundManager.loadFile("bullet.wav");
                 rocketExplosionSound = soundManager.loadFile("rocketExplosion.wav");
                 bigExplosion = soundManager.loadFile("bigExplosion.wav");
 
@@ -1840,7 +1839,7 @@ public class Game {
                 destructionClosure.run();
 
             //if (soundManager.getEnginesQueueSizes().get(0) < 3)
-                soundManager.playSoundChannel1(explosionSound);
+                soundManager.playSoundChannel1(bulletSound);
             bulletDoubleDaemon.pushSprite(bulletExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
         });
     }
