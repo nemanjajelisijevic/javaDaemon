@@ -12,6 +12,12 @@ public class DummySoundManager implements SoundManager {
     }
 
     @Override
+    public void loadBackgroundMusic(String backgroundMusicFile) throws SoundException {}
+
+    @Override
+    public void playBackgroundMusic() {}
+
+    @Override
     public void playSound(File soundFile) {}
 
     @Override

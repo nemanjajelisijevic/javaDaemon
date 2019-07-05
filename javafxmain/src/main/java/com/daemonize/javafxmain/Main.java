@@ -4,6 +4,7 @@ import com.daemonize.game.Game;
 
 import com.daemonize.game.images.imageloader.ImageManager;
 import com.daemonize.game.renderer.Renderer2D;
+import com.daemonize.game.soundmanager.SoundException;
 import com.daemonize.game.soundmanager.SoundManager;
 
 import javafx.application.Application;
@@ -52,7 +53,9 @@ public class Main extends Application {
         Renderer2D renderer = new JavaFXRenderer(gc, borderX, borderY);
         ImageManager imageManager = new JavaFxImageManager("");
 
-        game = new Game(renderer, imageManager, new JavaFxSoundManager(4), borderX, borderY, rows, columns,50,50);
+        SoundManager soundManager = new JavaFxSoundManager(4);
+
+        game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
         Group root = new Group(canvas);
         primaryStage.setTitle("Tower Defense");

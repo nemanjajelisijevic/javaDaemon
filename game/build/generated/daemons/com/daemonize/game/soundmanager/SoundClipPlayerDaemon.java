@@ -24,6 +24,13 @@ public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaem
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.soundmanager.SoundClipPlayer#stopClip} */
+  public SoundClipPlayerDaemon stopClip() {
+    daemonEngine.pursueQuest(new StopClipMainQuest().setConsumer(daemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.soundmanager.SoundClipPlayer#playClip} */
   public SoundClipPlayerDaemon playClip(T soundclip) {
     daemonEngine.pursueQuest(new PlayClipMainQuest(soundclip).setConsumer(daemonEngine.getConsumer()));
@@ -106,6 +113,19 @@ public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaem
   public SoundClipPlayerDaemon clearAndInterrupt() {
     daemonEngine.clearAndInterrupt();
     return this;
+  }
+
+  private final class StopClipMainQuest extends VoidMainQuest {
+    private StopClipMainQuest() {
+      setVoid();
+      this.description = "stopClip";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.stopClip();
+      return null;
+    }
   }
 
   private final class PlayClipMainQuest extends VoidMainQuest {

@@ -9,9 +9,12 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 
 
+import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.game.Game;
 import com.daemonize.game.images.imageloader.ImageManager;
 import com.daemonize.game.renderer.Renderer2D;
+import com.daemonize.game.soundmanager.SoundException;
+import com.daemonize.game.soundmanager.SoundManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +51,19 @@ public class MainActivity extends AppCompatActivity {
         int rows = 6;
         int columns = 9;
 
-        game = new Game(renderer, imageManager, new AndroidSoundManager(this, 16), borderX, borderY, rows, columns,50,50);
+
+        SoundManager soundManager = new AndroidSoundManager(this, 16);
+
+        new MainQuestDaemonEngine(null).daemonize(()->{
+            try {
+                soundManager.loadBackgroundMusic("Tremors.mp3");
+                soundManager.playBackgroundMusic();
+            } catch (SoundException e) {
+                e.printStackTrace();
+            }
+        }).setName("Background Music Loader").start();
+
+        game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
         if(!game.isRunning())
             game.run();

@@ -11,4 +11,6 @@ import java.net.URISyntaxException;
 public interface SoundManager extends DaemonService<SoundManager> {
     File loadFile(String name) throws SoundException;
     void playSound(File soundFile);
+    void loadBackgroundMusic(String backgroundMusicFile) throws SoundException;
+    void playBackgroundMusic();
 }

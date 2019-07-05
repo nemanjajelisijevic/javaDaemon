@@ -21,10 +21,13 @@ import java.util.List;
 
 public class AndroidSoundManager implements SoundManager {
 
-    private List<SoundClipPlayerDaemon<File>> players; //TODO remove SoundClipPlayer and work directly with MediaPlayer
+    private List<SoundClipPlayerDaemon<File>> players; //TODO remove SoundClipPlayer and work directly with Media Player
     protected Context context;
     private int counter = 0;
     private int noOfChannels;
+
+    private SoundClipPlayer<File> backGroundMusicPlayer;
+    private File backgroundMusic;
 
     public AndroidSoundManager(Context cnt, int noOfChannels) {
         this.context = cnt;
@@ -37,6 +40,8 @@ public class AndroidSoundManager implements SoundManager {
         for (int i = 0; i < noOfChannels; ++i) {
             players.add(new SoundClipPlayerDaemon<File>(null, new AndroidSoundClipPlayer(cnt, new MediaPlayer())));
         }
+
+        backGroundMusicPlayer = new AndroidBackgroundMusicPlayer(cnt, new MediaPlayer());
     }
 
     @Override
@@ -87,7 +92,27 @@ public class AndroidSoundManager implements SoundManager {
     @Override
     public void stop() {
         for (SoundClipPlayerDaemon player : players) {
+            player.getPrototype().stopClip();
             player.stop();
         }
+        backGroundMusicPlayer.stopClip();
+    }
+
+    @Override
+    public void loadBackgroundMusic(String backgroundMusic) throws SoundException {
+        try {
+            FileInputStream fis = context.openFileInput("new" + backgroundMusic);
+            this.backgroundMusic = new File("new" + backgroundMusic);
+            if (fis != null) fis.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            File bckMusic = loadFile(backgroundMusic);
+            this.backgroundMusic = bckMusic;
+        }
+    }
+
+    @Override
+    public void playBackgroundMusic() {
+        backGroundMusicPlayer.playClip(backgroundMusic);
     }
 }

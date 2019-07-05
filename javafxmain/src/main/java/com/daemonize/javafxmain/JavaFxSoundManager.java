@@ -51,6 +51,8 @@ public class JavaFxSoundManager implements SoundManager {
     private int noOfChannelsPerClip;
     private Map<File, ClipManager> soundMap = new TreeMap();
 
+    private Clip backGroundMusic;
+
     public JavaFxSoundManager(int noOfChannelsPerClip) {
         if (noOfChannelsPerClip < 1)
             throw new IllegalArgumentException("arg noOfChannelsPerClip can not be less than 1");
@@ -83,6 +85,28 @@ public class JavaFxSoundManager implements SoundManager {
     public void playSound(File soundFile) {
         ClipManager clipManager = soundMap.get(soundFile);
         playClip(clipManager.getClip());
+    }
+
+    @Override
+    public void loadBackgroundMusic(String backgroundMusicFile) throws SoundException {
+        File soundFile = null;
+        try {
+            soundFile = new File(getClass().getResource("/" + backgroundMusicFile).getPath());//TODO remove root slash!!
+            AudioFileFormat format = AudioSystem.getAudioFileFormat(soundFile);
+            Clip soundClip = AudioSystem.getClip();
+            AudioInputStream ais = AudioSystem.getAudioInputStream(soundFile.toURI().toURL());
+            soundClip.loop(Integer.MAX_VALUE);
+            soundClip.open(ais);
+            backGroundMusic = soundClip;
+        } catch (Exception e) {
+            throw new SoundException("Unable to load sound file: " + backgroundMusicFile, e);
+        }
+    }
+
+    @Override
+    public void playBackgroundMusic() {
+        backGroundMusic.setFramePosition(0);  // Must always rewind!
+        backGroundMusic.start();
     }
 
     @Override

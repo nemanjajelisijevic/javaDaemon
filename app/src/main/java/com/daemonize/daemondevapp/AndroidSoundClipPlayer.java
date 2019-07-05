@@ -20,15 +20,14 @@ public class AndroidSoundClipPlayer implements SoundClipPlayer<File> {
         this.player = player;
     }
 
-    @Override
-    public void playClip(File soundClip) {
+    protected void playClip(File soundClip, boolean loop) {
         FileInputStream fis = null;
         try {
             player.reset();
             fis = context.openFileInput(soundClip.getName());
             player.setDataSource(fis.getFD());
             player.prepare();
-            player.setLooping(false);
+            player.setLooping(loop);
             player.start();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -40,5 +39,16 @@ public class AndroidSoundClipPlayer implements SoundClipPlayer<File> {
                     fis.close();
                 } catch (IOException ignore) {}
         }
+    }
+
+    @Override
+    public void playClip(File soundClip) {
+        playClip(soundClip, false);
+    }
+
+    @Override
+    public void stopClip() {
+        if (player.isPlaying())
+            player.stop();
     }
 }
