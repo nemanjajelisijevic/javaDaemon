@@ -12,22 +12,13 @@ public class DummySoundManager implements SoundManager {
     }
 
     @Override
-    public void playSoundChannel1(File soundFile) {
+    public void playSound(File soundFile) {}
 
+    @Override
+    public SoundManager start() {
+        return this;
     }
 
     @Override
-    public void playSoundChannel2(File soundFile) {
-
-    }
-
-    @Override
-    public void playSoundChannel3(File soundFile) {
-
-    }
-
-    @Override
-    public void playSoundChannel4(File soundFile) {
-
-    }
+    public void stop() {}
 }

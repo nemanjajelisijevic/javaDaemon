@@ -19,7 +19,7 @@ import com.daemonize.game.scene.Scene2D;
 import com.daemonize.game.soundmanager.DummySoundManager;
 import com.daemonize.game.soundmanager.SoundException;
 import com.daemonize.game.soundmanager.SoundManager;
-import com.daemonize.game.soundmanager.SoundManagerDaemon;
+//import com.daemonize.game.soundmanager.SoundManagerDaemon;
 import com.daemonize.game.tabel.Field;
 import com.daemonize.game.tabel.Grid;
 
@@ -252,9 +252,10 @@ public class Game {
     }
 
     //sound manager
-    private SoundManagerDaemon soundManager;
-    private SoundManager activeSoundmanager;
+    private SoundManager currentSoundManager;
+    private SoundManager activeSoundManager;
     private SoundManager dummySoundManager;
+
     private File rocketExplosionSound;
     private File bulletSound;
     private File bigExplosion;
@@ -279,9 +280,9 @@ public class Game {
     ) {
         this.renderer = renderer;
         this.imageManager = imageManager;
-        this.activeSoundmanager = soundManager;
+        this.activeSoundManager = soundManager;
         this.dummySoundManager = new DummySoundManager();
-        this.soundManager = new SoundManagerDaemon(gameConsumer, activeSoundmanager);
+        this.currentSoundManager = activeSoundManager;
         this.borderX = borderX;
         this.borderY = borderY;
         this.scene = new Scene2D();
@@ -359,7 +360,7 @@ public class Game {
         gameConsumer.consume(()-> {
             towerSpriteUpgrader.stop();
             fieldEraserEngine.stop();
-            soundManager.stop();
+            activeSoundManager.stop();
             moneyDaemon.stop();
             enemyGenerator.stop();
             for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
@@ -778,29 +779,29 @@ public class Game {
                 }
 
                 //sounds init
-                soundManager.setConsumer(gameConsumer);
-                bulletSound = soundManager.loadFile("bullet.wav");
+                //soundManager.setConsumer(gameConsumer);
+                bulletSound = activeSoundManager.loadFile("bullet.wav");
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene();
                 }
 
-                rocketExplosionSound = soundManager.loadFile("rocketExplosion.wav");
+                rocketExplosionSound = activeSoundManager.loadFile("rocketExplosion.wav");
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene();
                 }
 
-                bigExplosion = soundManager.loadFile("bigExplosion.wav");
+                bigExplosion = activeSoundManager.loadFile("bigExplosion.wav");
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene();
                 }
 
-                laserSound = soundManager.loadFile("laser.wav");
+                laserSound = activeSoundManager.loadFile("laser.wav");
 
                 while (loaderBar.hasNext()){
                     loaderBar.next().show();
@@ -853,10 +854,10 @@ public class Game {
             soundButton =  (Button) new Button("Sound Toggler", soundOnImage).setAbsoluteX(borderX * 9 / 10).setAbsoluteY(borderY / 20).setZindex(20).show();
             soundButton.onClick(() -> {
                if (soundButton.getImage().equals(soundOnImage)) {
-                   soundManager.clearAndInterrupt().setPrototype(dummySoundManager);
+                   currentSoundManager = dummySoundManager;
                    renderer.consume(() -> soundButton.setImage(soundOffImage));
                } else {
-                   soundManager.clearAndInterrupt().setPrototype(activeSoundmanager);
+                   currentSoundManager = activeSoundManager;
                    renderer.consume(() -> soundButton.setImage(soundOnImage));
                }
             });
@@ -1327,7 +1328,7 @@ public class Game {
                 System.out.println(DaemonUtils.tag() + "Image imp: " + view.getImage().getImageImp().toString());
             });
 
-            soundManager.start();
+            activeSoundManager.start();
             renderer.setScene(scene).start();
             gameConsumer.consume(stateChain::next);
 
@@ -1432,7 +1433,7 @@ public class Game {
                                                 target.getLastCoordinates().getSecond()
                                         );
 
-                                        soundManager.playSoundChannel4(bigExplosion);
+                                        currentSoundManager.playSound(bigExplosion);
 
                                         target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
 
@@ -1747,7 +1748,7 @@ public class Game {
 
                             Closure<Integer> bulletClosure = amount -> {
 
-                                soundManager.playSoundChannel3(bigExplosion);
+                                currentSoundManager.playSound(bigExplosion);
                                 enemyRepo.add(enemy);
                                 moneyDaemon.setAmount(amount.get())
                                         .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
@@ -1858,8 +1859,7 @@ public class Game {
             else
                 destructionClosure.run();
 
-            //if (soundManager.getEnginesQueueSizes().get(0) < 3)
-                soundManager.playSoundChannel1(bulletSound);
+            currentSoundManager.playSound(bulletSound);
             bulletDoubleDaemon.pushSprite(bulletExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
         });
     }
@@ -1955,8 +1955,7 @@ public class Game {
                                     destructionClosure.run();
                             }
 
-                            if (soundManager.getEnginesQueueSizes().get(1) < 1)
-                                soundManager.playSoundChannel2(rocketExplosionSound);
+                            currentSoundManager.playSound(rocketExplosionSound);
                             rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, () -> rocketRepo.add(rocketDoubleDaemon));
                         });
             }
@@ -1976,7 +1975,7 @@ public class Game {
 
         target.setParalyzed(true);
 
-        soundManager.playSoundChannel4(laserSound);
+        currentSoundManager.playSound(laserSound);
 
         laser.desintegrateTarget(source, target, duration, renderer, ret -> {
 

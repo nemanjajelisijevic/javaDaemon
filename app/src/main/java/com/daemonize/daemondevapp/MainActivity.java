@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         int rows = 6;
         int columns = 9;
 
-        game = new Game(renderer, imageManager, new AndroidSoundManager(this), borderX, borderY, rows, columns,50,50);
+        game = new Game(renderer, imageManager, new AndroidSoundManager(this, 16), borderX, borderY, rows, columns,50,50);
 
         if(!game.isRunning())
             game.run();

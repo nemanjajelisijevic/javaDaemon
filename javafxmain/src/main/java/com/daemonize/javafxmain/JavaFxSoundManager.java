@@ -1,86 +1,95 @@
 package com.daemonize.javafxmain;
 
+import com.daemonize.game.soundmanager.SoundClipPlayerDaemon;
 import com.daemonize.game.soundmanager.SoundException;
 import com.daemonize.game.soundmanager.SoundManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-
 
 public class JavaFxSoundManager implements SoundManager {
 
-    private Map<File, Clip> soundMap = new TreeMap();
+    private static class ClipManager {
+
+        private List<Clip> soundClipList;
+        private int counter = 0;
+        private int noOfClipsPerSound;
+
+        private ClipManager(int noOfClipsPerSound) {
+            this.noOfClipsPerSound = noOfClipsPerSound;
+            this.soundClipList = new ArrayList<>(noOfClipsPerSound);
+        }
+
+        private void registerSound(File soundFile) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+            for (int i = 0; i < noOfClipsPerSound; ++i) {
+                AudioFileFormat format = AudioSystem.getAudioFileFormat(soundFile);
+                Clip soundClip = AudioSystem.getClip();
+                AudioInputStream ais = AudioSystem.getAudioInputStream(soundFile.toURI().toURL());
+                soundClip.open(ais);
+                soundClipList.add(soundClip);
+            }
+        }
+
+        private Clip getClip() {
+            return soundClipList.get(counter++ % noOfClipsPerSound);
+        }
+    }
+
+    private int counter = 0;
+    private int noOfChannelsPerClip;
+    private Map<File, ClipManager> soundMap = new TreeMap();
+
+    public JavaFxSoundManager(int noOfChannelsPerClip) {
+        if (noOfChannelsPerClip < 1)
+            throw new IllegalArgumentException("arg noOfChannelsPerClip can not be less than 1");
+        this.noOfChannelsPerClip = noOfChannelsPerClip;
+    }
 
     @Override
     public File loadFile(String name) throws SoundException {
         File soundFile = null;
         try {
-            soundFile = new File(getClass().getResource("/" + name).getPath());
-            AudioFileFormat format = AudioSystem.getAudioFileFormat(soundFile);
-            Clip soundClip = AudioSystem.getClip();
-            AudioInputStream ais = AudioSystem.getAudioInputStream(soundFile.toURI().toURL());
-            soundClip.open(ais);
-            soundMap.put(soundFile, soundClip);
-        } catch (UnsupportedAudioFileException | LineUnavailableException e) {
-            e.printStackTrace();
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            soundFile = new File(getClass().getResource("/" + name).getPath());//TODO remove root slash!!
+            ClipManager clipManager = new ClipManager(noOfChannelsPerClip);
+            clipManager.registerSound(soundFile);
+            soundMap.put(soundFile, clipManager);
+        } catch (Exception e) {
+            throw new SoundException("Unable to load sound file: " + name, e);
         }
 
         return soundFile;
     }
 
-    protected void playSound(File soundFile) {
-        Clip clip = soundMap.get(soundFile);
-        if (!clip.isRunning()) {
-            clip.setFramePosition(0);  // Must always rewind!
-            clip.loop(0);
-            clip.start();
-        }
-    }
 
-    protected void playSoundInterruptibly(File soundFile) {
-        Clip clip = soundMap.get(soundFile);
-        clip.setFramePosition(0);  // Must always rewind!
-        clip.loop(0);
-        clip.start();
+    private void playClip(Clip soundClip) {
+        soundClip.setFramePosition(0);  // Must always rewind!
+        soundClip.loop(0);
+        soundClip.start();
     }
 
     @Override
-    public void playSoundChannel1(File soundFile) {
-        playSound(soundFile);
+    public void playSound(File soundFile) {
+        ClipManager clipManager = soundMap.get(soundFile);
+        playClip(clipManager.getClip());
     }
 
     @Override
-    public void playSoundChannel2(File soundFile) {
-        playSound(soundFile);
+    public JavaFxSoundManager start() {
+        return this;
     }
 
     @Override
-    public void playSoundChannel3(File soundFile) {
-        playSoundInterruptibly(soundFile);
-    }
-
-    @Override
-    public void playSoundChannel4(File soundFile) {
-        playSoundInterruptibly(soundFile);
-    }
+    public void stop() {}
 }

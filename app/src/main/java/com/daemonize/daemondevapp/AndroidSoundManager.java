@@ -4,6 +4,8 @@ import android.content.Context;
 import android.media.MediaDataSource;
 import android.media.MediaPlayer;
 
+import com.daemonize.game.soundmanager.SoundClipPlayer;
+import com.daemonize.game.soundmanager.SoundClipPlayerDaemon;
 import com.daemonize.game.soundmanager.SoundException;
 import com.daemonize.game.soundmanager.SoundManager;
 
@@ -14,41 +16,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AndroidSoundManager implements SoundManager {
 
-    private MediaPlayer playerChannel1;
-    private MediaPlayer playerChannel2;
-    private MediaPlayer playerChannel3;
-    private MediaPlayer playerChannel4;
-    private Context context;
+    private List<SoundClipPlayerDaemon<File>> players; //TODO remove SoundClipPlayer and work directly with MediaPlayer
+    protected Context context;
+    private int counter = 0;
+    private int noOfChannels;
 
-    public AndroidSoundManager(Context cnt) {
-        this.playerChannel1 = new MediaPlayer();
-        this.playerChannel2 = new MediaPlayer();
-        this.playerChannel3 = new MediaPlayer();
-        this.playerChannel4 = new MediaPlayer();
+    public AndroidSoundManager(Context cnt, int noOfChannels) {
         this.context = cnt;
-    }
 
-    protected void playSound(MediaPlayer player, File soundFile) {
-        FileInputStream fis = null;
-        try {
-            player.reset();
-            fis = context.openFileInput(soundFile.getName());
-            player.setDataSource(fis.getFD());
-            player.prepare();
-            player.setLooping(false);
-            player.start();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fis != null)
-                try {
-                    fis.close();
-                } catch (IOException ignore) {}
+        if (noOfChannels < 1)
+            throw new IllegalArgumentException("arg noOfChannels can not be less than 1");
+
+        this.noOfChannels = noOfChannels;
+        this.players = new ArrayList<>(noOfChannels);
+        for (int i = 0; i < noOfChannels; ++i) {
+            players.add(new SoundClipPlayerDaemon<File>(null, new AndroidSoundClipPlayer(cnt, new MediaPlayer())));
         }
     }
 
@@ -80,23 +67,27 @@ public class AndroidSoundManager implements SoundManager {
         return new File(newName);
     }
 
-    @Override
-    public void playSoundChannel1(File soundFile){
-        playSound(playerChannel1, soundFile);
+    private void playSound(int channel, File soundFile) {
+        players.get(channel).playClip(soundFile);
     }
 
     @Override
-    public void playSoundChannel2(File soundFile){
-        playSound(playerChannel2, soundFile);
+    public void playSound(File soundFile) {
+        playSound((counter++) % noOfChannels,  soundFile);
     }
 
     @Override
-    public void playSoundChannel3(File soundFile){
-        playSound(playerChannel3, soundFile);
+    public AndroidSoundManager start() {
+        for (SoundClipPlayerDaemon player : players) {
+            player.start();
+        }
+        return this;
     }
 
     @Override
-    public void playSoundChannel4(File soundFile){
-        playSound(playerChannel4, soundFile);
+    public void stop() {
+        for (SoundClipPlayerDaemon player : players) {
+            player.stop();
+        }
     }
 }

@@ -52,7 +52,7 @@ public class Main extends Application {
         Renderer2D renderer = new JavaFXRenderer(gc, borderX, borderY);
         ImageManager imageManager = new JavaFxImageManager("");
 
-        game = new Game(renderer, imageManager, new JavaFxSoundManager(), borderX, borderY, rows, columns,50,50);
+        game = new Game(renderer, imageManager, new JavaFxSoundManager(4), borderX, borderY, rows, columns,50,50);
 
         Group root = new Group(canvas);
         primaryStage.setTitle("Tower Defense");
