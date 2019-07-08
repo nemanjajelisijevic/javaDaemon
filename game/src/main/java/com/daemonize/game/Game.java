@@ -744,8 +744,8 @@ public class Game {
                     renderer.drawScene();
                 }
 
-                soundOnImage = imageManager.loadImageFromAssets("soundOn.png", numWidth * 4 / 5, numHeight * 4 / 5);
-                soundOffImage = imageManager.loadImageFromAssets("soundOff.png", numWidth * 4 / 5, numHeight * 4 / 5);
+                soundOnImage = imageManager.loadImageFromAssets("soundOn.png", numWidth /** 4 / 5*/, numHeight /** 4 / 5*/);
+                soundOffImage = imageManager.loadImageFromAssets("soundOff.png", numWidth /** 4 / 5*/, numHeight /** 4 / 5*/);
 
                 Image[] dialogUpgradeTower1 = new Image[3];
 
@@ -851,7 +851,7 @@ public class Game {
                     scene.addImageView(new ImageViewImpl("Dollar Sign").setZindex(10).setImage(dollarSign).hide())
             );
 
-            soundButton =  (Button) new Button("Sound Toggler", soundOnImage).setAbsoluteX(borderX * 9 / 10).setAbsoluteY(borderY / 20).setZindex(20).show();
+            soundButton =  (Button) new Button("Sound Toggler", soundOnImage).setAbsoluteX(borderX  * 85 / 100).setAbsoluteY(borderY * 30 /100).setZindex(20).show();
             soundButton.onClick(() -> {
                if (soundButton.getImage().equals(soundOnImage)) {
                    currentSoundManager = dummySoundManager;
@@ -1369,7 +1369,7 @@ public class Game {
             renderer.consume(()->
                 infoScore = new InfoTable(
                         borderX * 85 / 100,
-                        borderY / 5,
+                        borderY * 15 / 100,
                         scoreBackGrView,
                         scoreTitleView,
                         viewsNum,
