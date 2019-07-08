@@ -954,6 +954,7 @@ public class Game {
                 renderer.consume(()->saleButton.disable().setImage(saleButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
                     TowerDaemon tower = towerUpgradeDialogue.getTower();
+                    tower.setShootable(false);
                     renderer.consume(tower.getHpView()::hide);
 
                     Field<TowerDaemon> field = grid.getField(
