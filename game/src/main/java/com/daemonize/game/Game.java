@@ -918,6 +918,8 @@ public class Game {
 
                 towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, new MultiViewAnimateClosure()::onReturn);
 
+                currentSoundManager.playSound(towerSelectionSound);
+
                 renderer.consume(()->upgradeButton.disable().setImage(upgradeButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
 
@@ -941,6 +943,7 @@ public class Game {
 
             Button closeButton = new Button("Close", closeButtonImage);
             closeButton.onClick(()->{
+                currentSoundManager.playSound(soundTogglerSound);
                 renderer.consume(()->closeButton.disable().setImage(closeButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
                     renderer.consume(()->closeButton.enable().setImage(closeButtonImage));
@@ -951,6 +954,7 @@ public class Game {
 
             Button saleButton = new Button("Sale", saleButtonImage);
             saleButton.onClick(()->{
+                currentSoundManager.playSound(towerSelectionSound);
                 renderer.consume(()->saleButton.disable().setImage(saleButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
                     TowerDaemon tower = towerUpgradeDialogue.getTower();
