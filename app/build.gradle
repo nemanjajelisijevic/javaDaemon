@@ -5,7 +5,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.daemonize.daemondevapp"
-        minSdkVersion 19
+        minSdkVersion 23 //19
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
