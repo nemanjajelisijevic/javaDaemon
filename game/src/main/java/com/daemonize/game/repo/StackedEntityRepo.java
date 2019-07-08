@@ -4,6 +4,8 @@ import java.util.Stack;
 
 public abstract class StackedEntityRepo<T> implements EntityRepo<Stack<T>, T> {
 
+    private String name;
+
     private Stack<T> stack;
 
     public StackedEntityRepo() {
@@ -22,6 +24,14 @@ public abstract class StackedEntityRepo<T> implements EntityRepo<Stack<T>, T> {
     @Override
     public Stack<T> getStructure() {
         return stack;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override

@@ -96,6 +96,10 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
+  public ImageView getTargetView() {
+    return prototype.getTargetView();
+  }
+
   public Image[] getSprite() {
     return prototype.getSprite();
   }
@@ -127,6 +131,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   public EnemyDoubleDaemon setHp(int hp) {
     prototype.setHp(hp);
+    return this;
+  }
+
+  public EnemyDoubleDaemon setHpView(ImageView hpview) {
+    prototype.setHpView(hpview);
     return this;
   }
 
@@ -176,6 +185,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   public Pair<Integer, Integer> getPreviousField() {
     return prototype.getPreviousField();
+  }
+
+  public EnemyDoubleDaemon setTargetView(ImageView targetview) {
+    prototype.setTargetView(targetview);
+    return this;
   }
 
   public EnemyDoubleDaemon setOutOfBordersClosure(Runnable closure) {
@@ -235,13 +249,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
    * Prototype method {@link com.daemonize.game.Enemy#animateEnemy} */
   public EnemyDoubleDaemon animateEnemy(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
     mainDaemonEngine.pursueQuest(new AnimateEnemyMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Enemy#setHpView} */
-  public EnemyDoubleDaemon setHpView(ImageView hpview, Closure<Enemy> closure) {
-    mainDaemonEngine.pursueQuest(new SetHpViewMainQuest(hpview, closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -479,21 +486,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
         Exception {
       return prototype.animateEnemy();
-    }
-  }
-
-  private final class SetHpViewMainQuest extends MainQuest<Enemy> {
-    private ImageView hpview;
-
-    private SetHpViewMainQuest(ImageView hpview, Closure<Enemy> closure) {
-      super(closure);
-      this.hpview = hpview;
-      this.description = "setHpView";
-    }
-
-    @Override
-    public final Enemy pursue() throws Exception {
-      return prototype.setHpView(hpview);
     }
   }
 
