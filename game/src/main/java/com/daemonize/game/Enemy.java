@@ -19,6 +19,8 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
 
     private ImageView view;
     private ImageView hpView;
+    private ImageView targetView;
+
     private volatile int hpMax;
     private volatile int hp;
     private volatile boolean shootable = true;
@@ -152,8 +154,20 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         return hpView;
     }
 
+    @CallingThread
     public Enemy setHpView(ImageView hpView) {
         this.hpView = hpView;
+        return this;
+    }
+
+    @CallingThread
+    public ImageView getTargetView() {
+        return targetView;
+    }
+
+    @CallingThread
+    public Enemy setTargetView(ImageView targetView) {
+        this.targetView = targetView;
         return this;
     }
 
