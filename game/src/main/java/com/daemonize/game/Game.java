@@ -266,6 +266,10 @@ public class Game {
 
     private Button soundButton;
 
+    private File soundTogglerSound;
+    private File towerConstructionSound;
+    private File towerSelectionSound;
+
     //construct
     public Game(
             Renderer2D renderer,
@@ -773,6 +777,11 @@ public class Game {
                 greenTowerUpgSprite = dialogUpgradeTower3;
                 dialogueImageTowerUpgrade = redTowerUpgSprite;
 
+
+                soundTogglerSound = activeSoundManager.loadFile("soundTogglerSound.wav");
+                towerConstructionSound = activeSoundManager.loadFile("towerConstructionSound.wav");
+                towerSelectionSound = activeSoundManager.loadFile("towerSelectionSound.wav");
+
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene();
@@ -853,13 +862,14 @@ public class Game {
 
             soundButton =  (Button) new Button("Sound Toggler", soundOnImage).setAbsoluteX(borderX  * 85 / 100).setAbsoluteY(borderY * 30 /100).setZindex(20).show();
             soundButton.onClick(() -> {
-               if (soundButton.getImage().equals(soundOnImage)) {
-                   currentSoundManager = dummySoundManager;
-                   renderer.consume(() -> soundButton.setImage(soundOffImage));
-               } else {
-                   currentSoundManager = activeSoundManager;
-                   renderer.consume(() -> soundButton.setImage(soundOnImage));
-               }
+                activeSoundManager.playSound(soundTogglerSound);
+                if (soundButton.getImage().equals(soundOnImage)) {
+                    currentSoundManager = dummySoundManager;
+                    renderer.consume(() -> soundButton.setImage(soundOffImage));
+                } else {
+                    currentSoundManager = activeSoundManager;
+                    renderer.consume(() -> soundButton.setImage(soundOnImage));
+                }
             });
 
             scene.addImageView(soundButton);
@@ -964,6 +974,7 @@ public class Game {
             Button tow1 = new Button("TowerType1", redTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE1;
                 currentTowerSprite = redTower.get(0);
+                currentSoundManager.playSound(towerSelectionSound);
                 renderer.consume(()->{
                     selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(selection);
                     selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
@@ -974,6 +985,7 @@ public class Game {
             Button tow2 = new Button("TowerType2", blueTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE2;
                 currentTowerSprite = blueTower.get(0);
+                currentSoundManager.playSound(towerSelectionSound);
                 renderer.consume(()->{
                     selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
                     selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(selection);
@@ -985,6 +997,7 @@ public class Game {
             Button tow3 = new Button("TowerType3", greenTower.get(0)[0]).onClick(()->{
                 towerSelect = Tower.TowerType.TYPE3;
                 currentTowerSprite = greenTower.get(0);
+                currentSoundManager.playSound(towerSelectionSound);
                 renderer.consume(()->{
                     selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower1").setImage(deselection);
                     selectTowerDialogue.getSelectTowerDialogue().getViewByName("Tower2").setImage(deselection);
@@ -1697,6 +1710,8 @@ public class Game {
                 String towerName = "Tower[" + field.getColumn() + "][" + field.getRow() + "]";
 
                 towerHpViwes[field.getRow()][field.getColumn()].setImage(healthBarSprite[9]);
+
+                currentSoundManager.playSound(towerConstructionSound);
 
                 Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
                         ? new LaserTower (
