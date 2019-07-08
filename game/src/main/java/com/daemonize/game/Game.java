@@ -1614,6 +1614,7 @@ public class Game {
                                 if (current.getColumn() == columns - 1 && current.getRow() == rows - 1) {
                                     if (score > 0)
                                         renderer.consume(()-> infoScore.setNumbers(--score));
+                                    currentSoundManager.playSound(bigExplosion);
                                     renderer.consume(currentFieldView.setImage(fieldImageTowerDen)::show);
                                     enemyRepo.add(enemyDoubleDaemon);
                                     return;
