@@ -215,6 +215,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
             daemonApiMethods.add(generateGetNameDaemonApiMethod());
             daemonApiMethods.add(mainGenerator.generateSetConsumerDaemonApiMethod());
             daemonApiMethods.add(mainGenerator.generateGetConsumerDaemonApiMethod());
+            daemonApiMethods.add(generateSetUncaughtExceptionHandler());
 
 //        }
 
@@ -259,6 +260,22 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
             builder.addStatement("ret.add(" + dedEngine + ".queueSize())");
 
         return builder.addStatement("return ret").build();
+    }
+
+    @Override
+    public MethodSpec generateSetUncaughtExceptionHandler() {
+        MethodSpec.Builder builder =  MethodSpec.methodBuilder("setUncaughtExceptionHandler")
+                .addAnnotation(Override.class)
+                .addParameter(ClassName.get(Thread.UncaughtExceptionHandler.class), "handler")
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement(mainGenerator.getDaemonEngineString()  + ".setUncaughtExceptionHandler(handler)");
+
+        for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
+            builder.addStatement(dedicatedEngine + ".setUncaughtExceptionHandler(handler)");
+
+        return builder.returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement("return this")
+                .build();
     }
 
     @Override

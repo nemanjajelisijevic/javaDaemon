@@ -22,6 +22,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
     private final Condition closureAvailable = closureLock.newCondition();
     private String name;
     private Thread looperThread;
+    private Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
     public DaemonConsumer(String name) {
         this.name = name;
@@ -35,7 +36,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
         if (closureQueue.size() == 1)
             closureAvailable.signal();
         closureLock.unlock();
-        //if (!ret) throw new IllegalStateException("Could not add to consumers(" + name + ") queue!!!!");
+        if (!ret) throw new IllegalStateException("Could not add to consumers(" + name + ") queue!!!!");
         return ret;
     }
 
@@ -78,6 +79,8 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
             });
             looperThread.setName(name);
             state = DaemonState.INITIALIZING;
+            if (uncaughtExceptionHandler != null)
+                looperThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             looperThread.start();
         }
         return this;
@@ -139,6 +142,13 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
 
     @Override
     public Consumer getConsumer() {
+        return this;
+    }
+
+    @Override
+    public DaemonConsumer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+        this.uncaughtExceptionHandler = handler;
+        looperThread.setUncaughtExceptionHandler(handler);
         return this;
     }
 }

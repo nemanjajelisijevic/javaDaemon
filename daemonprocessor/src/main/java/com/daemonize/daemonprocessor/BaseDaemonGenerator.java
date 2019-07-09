@@ -382,6 +382,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         ret.add(generateGetNameDaemonApiMethod());
         ret.add(generateSetConsumerDaemonApiMethod());
         ret.add(generateGetConsumerDaemonApiMethod());
+        ret.add(generateSetUncaughtExceptionHandler());
 
         return ret;
     }
@@ -481,6 +482,19 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .returns(consumerInterface)
                 .addStatement("return " + daemonEngineString + ".getConsumer()")
+                .build();
+    }
+
+    //setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler)
+
+    public MethodSpec generateSetUncaughtExceptionHandler() {
+        return MethodSpec.methodBuilder("setUncaughtExceptionHandler")
+                .addAnnotation(Override.class)
+                .addParameter(ClassName.get(Thread.UncaughtExceptionHandler.class), "handler")
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement(daemonEngineString + ".setUncaughtExceptionHandler(handler)")
+                .returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement("return this")
                 .build();
     }
 
