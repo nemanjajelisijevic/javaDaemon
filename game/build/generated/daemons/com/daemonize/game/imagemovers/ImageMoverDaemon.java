@@ -16,6 +16,7 @@ import java.lang.Float;
 import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
+import java.lang.Thread;
 import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
@@ -162,6 +163,12 @@ public class ImageMoverDaemon implements Daemon<ImageMoverDaemon>, Movable {
   @Override
   public Consumer getConsumer() {
     return daemonEngine.getConsumer();
+  }
+
+  @Override
+  public ImageMoverDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    daemonEngine.setUncaughtExceptionHandler(handler);
+    return this;
   }
 
   private final class AnimateSideQuest extends SleepSideQuest<ImageMover.PositionedImage> {

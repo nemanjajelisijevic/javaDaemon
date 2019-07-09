@@ -275,6 +275,16 @@ public class Game {
     private File towerConstructionSound;
     private File towerSelectionSound;
 
+    //uncaught exception handler
+    private Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
+        @Override
+        public void uncaughtException(Thread t, Throwable e) {
+            System.err.println("Uncaught exception in: " + t.getName() + ", ID: " + t.getId());
+            e.printStackTrace();
+            System.exit(1);
+        }
+    };
+
     //construct
     public Game(
             Renderer2D renderer,
@@ -1263,7 +1273,7 @@ public class Game {
                                 .setHpView(scene.addImageView(new ImageViewImpl(enemyName + " HP View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(10)))
                                 .setTargetView(scene.addImageView(new ImageViewImpl(enemyName + " Target View").setImage(target).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(10)))
                                 .setHealthBarImage(healthBarSprite)
-                ).setName(enemyName);
+                ).setName(enemyName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 enemy.getPrototype().setBorders(
                         0,
@@ -1297,7 +1307,7 @@ public class Game {
                         ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)))
                                 .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)))
                                 .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)))
-                ).setName(bulletName);
+                ).setName(bulletName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 bulletDoubleDaemon.getPrototype().setBorders(
                         grid.getStartingX(),//TODO fix offset
@@ -1332,7 +1342,7 @@ public class Game {
                         ).setView(scene.addImageView(new ImageViewImpl(rocketName + " View 1").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                                 .setView2(scene.addImageView(new ImageViewImpl(rocketName + " View 2").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                                 .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
-                ).setName(rocketName);
+                ).setName(rocketName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 rocketDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY);
 
@@ -1362,7 +1372,7 @@ public class Game {
                         ).setView(scene.addImageView(new ImageViewImpl(rocketName + " View 1").setImage(enemyMissileSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                                 .setView2(scene.addImageView(new ImageViewImpl(rocketName + " View 2").setImage(enemyMissileSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                                 .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(enemyMissileSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
-                ).setName(rocketName);
+                ).setName(rocketName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 missileDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY);
 
@@ -1383,7 +1393,7 @@ public class Game {
             laser = new LaserBulletDaemon(
                     gameConsumer,
                     new LaserBullet(laserSprite, 40, Pair.create(0F, 0F), bulletDamage, dXY)
-            ).setViews(laserViews);
+            ).setViews(laserViews).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
             laser.setAnimateLaserSideQuest(renderer).setClosure(ret->{
                 for (Pair<ImageView, ImageMover.PositionedImage> viewAndImage : ret.runtimeCheckAndGet())
@@ -1398,6 +1408,7 @@ public class Game {
                     gameConsumer,
                     (MoneyHandler) new MoneyHandler(moneyNumbersImages, dollarSign, dXY).setBorders(0, borderX, 0, borderY)
             ).setName("Money handler Daemon")
+                    .setUncaughtExceptionHandler(uncaughtExceptionHandler)
                     .setCoordinates(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY())
                     .setAmount(0)
                     .setOutOfBordersConsumer(gameConsumer)
@@ -1515,7 +1526,13 @@ public class Game {
 
                         if (target.isShootable()) {
 
-                            renderer.consume(() -> enemyDoubleDaemon.getTargetView().setAbsoluteX(target.getLastCoordinates().getFirst()).setAbsoluteY(target.getLastCoordinates().getSecond()).show());
+                            if (enemyDoubleDaemon.isShootable())
+                                renderer.consume(() ->
+                                        enemyDoubleDaemon.getTargetView()
+                                                .setAbsoluteX(target.getLastCoordinates().getFirst())
+                                                .setAbsoluteY(target.getLastCoordinates().getSecond())
+                                                .show()
+                                );
 
                             fireRocketBullet(
                                     enemyDoubleDaemon.getLastCoordinates(),
@@ -1837,7 +1854,8 @@ public class Game {
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
                         .setName(towerName)
                         .setView(fieldView)
-                        .setShootable(true);
+                        .setShootable(true)
+                        .setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 towers.add(towerDaemon);
                 field.setObject(towerDaemon);

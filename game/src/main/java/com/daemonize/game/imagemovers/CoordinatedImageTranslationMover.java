@@ -46,8 +46,10 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
 
         boolean ret = super.setDirectionAndMove(x, y, velocityInt);
 
-        if (!ret)
+        if (!ret) {
+            System.err.println(DaemonUtils.tag() + "setDirectionandMove returned FALSE!!!!!!!!!!!!!!!!!!!!");
             return ret;
+        }
 
         coordinateLock.lock();
 

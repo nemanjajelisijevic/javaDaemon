@@ -22,6 +22,7 @@ import java.lang.Integer;
 import java.lang.Override;
 import java.lang.Runnable;
 import java.lang.String;
+import java.lang.Thread;
 import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
@@ -342,6 +343,13 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   @Override
   public Consumer getConsumer() {
     return mainDaemonEngine.getConsumer();
+  }
+
+  @Override
+  public LaserBulletDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    mainDaemonEngine.setUncaughtExceptionHandler(handler);
+    sideDaemonEngine.setUncaughtExceptionHandler(handler);
+    return this;
   }
 
   @Override

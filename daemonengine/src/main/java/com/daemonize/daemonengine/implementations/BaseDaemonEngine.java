@@ -146,7 +146,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     @Override
     public D setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
         this.uncaughtExceptionHandler = handler;
-        daemonThread.setUncaughtExceptionHandler(handler);
+        if (daemonThread != null)
+            daemonThread.setUncaughtExceptionHandler(handler);
         return (D) this;
     }
 }
