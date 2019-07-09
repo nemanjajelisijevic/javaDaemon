@@ -1102,6 +1102,8 @@ public class Game {
                         enemy.getTargetView().hide().setAbsoluteX(0).setAbsoluteY(0);
                     });
 
+                    System.err.println(DaemonUtils.tag() + enemy.getEnginesState().toString());
+
                     enemy.pushSprite(explodeSprite, 0, ()->{
                         renderer.consume(()->enemy.getView().hide().setAbsoluteX(0).setAbsoluteY(0));
                         enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
@@ -1418,7 +1420,7 @@ public class Game {
 
             System.out.println(DaemonUtils.tag() + "Scene size: " + scene.getViews().size());
 
-            scene.forEach(view->{
+            scene.forEach(view -> {
                 System.out.println(DaemonUtils.tag() + view.getName());
                 System.out.println(DaemonUtils.tag() + "X: " + view.getAbsoluteX());
                 System.out.println(DaemonUtils.tag() + "Y: " + view.getAbsoluteY());
@@ -1809,6 +1811,7 @@ public class Game {
                         renderer,
                         new MultiViewAnimateClosure(),
                         currentTowerSprite,
+                        healthBarSprite,
                         Pair.create(field.getCenterX(), field.getCenterY()),
                         range,
                         towerSelect,
@@ -1820,6 +1823,7 @@ public class Game {
 
                         :       new Tower(
                         currentTowerSprite,
+                        healthBarSprite,
                         Pair.create(field.getCenterX(), field.getCenterY()),
                         range,
                         towerSelect,
@@ -1827,7 +1831,7 @@ public class Game {
                         towerHp
                 )
                         .setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
-                        .setHealthBarImage(healthBarSprite)
+                        //.setHealthBarImage(healthBarSprite)
                         .setTowerLevel(new Tower.TowerLevel(1,2,1500));
 
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
@@ -1838,84 +1842,87 @@ public class Game {
                 towers.add(towerDaemon);
                 field.setObject(towerDaemon);
 
-                towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
+                towerDaemon.start().setInitTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn).onInterrupt(gameConsumer, () -> {
 
-                towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, Target>>() {
-                    @Override
-                    public void onReturn(Return<Pair<Tower.TowerType, Target>> towerTypeAndEnemy) {
+                    towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
 
-                        long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
+                    towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, Target>>() {
+                        @Override
+                        public void onReturn(Return<Pair<Tower.TowerType, Target>> towerTypeAndEnemy) {
 
-                        if (towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
-                                && towerTypeAndEnemy.runtimeCheckAndGet().getSecond() != null) {
+                            long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
 
-                            Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
-                            EnemyDoubleDaemon enemy = (EnemyDoubleDaemon) towerTypeAndEnemy.get().getSecond();
+                            if (towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
+                                    && towerTypeAndEnemy.runtimeCheckAndGet().getSecond() != null) {
 
-                            Closure<Integer> bulletClosure = amount -> {
+                                Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
+                                EnemyDoubleDaemon enemy = (EnemyDoubleDaemon) towerTypeAndEnemy.get().getSecond();
 
-                                currentSoundManager.playSound(bigExplosion);
-                                enemyRepo.add(enemy);
-                                moneyDaemon.setAmount(amount.get())
-                                        .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
-                                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
+                                Closure<Integer> bulletClosure = amount -> {
 
-                                renderer.consume(()->{
-                                    moneyView.getFirst().show();
-                                    moneyView.getSecond().show();
-                                });
-                            };
+                                    currentSoundManager.playSound(bigExplosion);
+                                    enemyRepo.add(enemy);
+                                    moneyDaemon.setAmount(amount.get())
+                                            .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
+                                            .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
-                            switch (towerType) {
-                                case TYPE1:
-                                    fireBullet(
-                                            towerDaemon.getLastCoordinates(),
-                                            enemy,
-                                            25,
-                                            towerDaemon.getTowerLevel().bulletDamage,
-                                            towerDaemon.getTowerLevel().currentLevel,
-                                            false,
-                                            0,
-                                            bulletSprite,
-                                            miniExplodeSprite,
-                                            ()-> bulletClosure.onReturn(new Return<>(3))
-                                    );
-                                    break;
-                                case TYPE2:
-                                    fireRocketBullet(
-                                            towerDaemon.getLastCoordinates(),
-                                            enemy,
-                                            rocketRepo,
-                                            18,
-                                            towerDaemon.getTowerLevel().bulletDamage,
-                                            towerDaemon.getTowerLevel().currentLevel,
-                                            () -> bulletClosure.onReturn(new Return<>(5))
-                                    );
-                                    break;
-                                case TYPE3:
-                                    double angle = RotatingSpriteImageMover.getAngle(
-                                            towerDaemon.getLastCoordinates().getFirst(),
-                                            towerDaemon.getLastCoordinates().getSecond(),
-                                            enemy.getLastCoordinates().getFirst(),
-                                            enemy.getLastCoordinates().getSecond()
-                                    );
+                                    renderer.consume(()->{
+                                        moneyView.getFirst().show();
+                                        moneyView.getSecond().show();
+                                    });
+                                };
 
-                                    int lvl = towerDaemon.getTowerLevel().currentLevel;
+                                switch (towerType) {
+                                    case TYPE1:
+                                        fireBullet(
+                                                towerDaemon.getLastCoordinates(),
+                                                enemy,
+                                                25,
+                                                towerDaemon.getTowerLevel().bulletDamage,
+                                                towerDaemon.getTowerLevel().currentLevel,
+                                                false,
+                                                0,
+                                                bulletSprite,
+                                                miniExplodeSprite,
+                                                ()-> bulletClosure.onReturn(new Return<>(3))
+                                        );
+                                        break;
+                                    case TYPE2:
+                                        fireRocketBullet(
+                                                towerDaemon.getLastCoordinates(),
+                                                enemy,
+                                                rocketRepo,
+                                                18,
+                                                towerDaemon.getTowerLevel().bulletDamage,
+                                                towerDaemon.getTowerLevel().currentLevel,
+                                                () -> bulletClosure.onReturn(new Return<>(5))
+                                        );
+                                        break;
+                                    case TYPE3:
+                                        double angle = RotatingSpriteImageMover.getAngle(
+                                                towerDaemon.getLastCoordinates().getFirst(),
+                                                towerDaemon.getLastCoordinates().getSecond(),
+                                                enemy.getLastCoordinates().getFirst(),
+                                                enemy.getLastCoordinates().getSecond()
+                                        );
 
-                                    float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
-                                    long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
+                                        int lvl = towerDaemon.getTowerLevel().currentLevel;
 
-                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, () -> bulletClosure.onReturn(new Return<>(1)));
+                                        float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
+                                        long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
-                                    reloadInterval = 4000;
-                                    break;
-                                default:
-                                    throw new IllegalStateException("Tower type does not exist!");
+                                        fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, () -> bulletClosure.onReturn(new Return<>(1)));
+
+                                        reloadInterval = 4000;
+                                        break;
+                                    default:
+                                        throw new IllegalStateException("Tower type does not exist!");
+                                }
                             }
-                        }
 
-                        towerDaemon.reload(reloadInterval, () -> towerDaemon.scan(this::onReturn));
-                    }
+                            towerDaemon.reload(reloadInterval, () -> towerDaemon.scan(this::onReturn));
+                        }
+                    });
                 });
             }
         }

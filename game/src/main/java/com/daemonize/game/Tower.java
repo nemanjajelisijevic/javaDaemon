@@ -77,8 +77,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
             && (Math.abs(target.getLastCoordinates().getFirst() - getLastCoordinates().getFirst()) < range
             && Math.abs(target.getLastCoordinates().getSecond() - getLastCoordinates().getSecond()) < range));
 
-    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
-        super(rotationSprite, 0, startingPos, dXY);
+    public Tower(Image[] rotationSprite, Image[] healthBarImage, Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
+        super(rotationSprite, rotationSprite[18], 0, startingPos, dXY);
         this.ret.positionX = startingPos.getFirst();
         this.ret.positionY = startingPos.getSecond();
         this.range = range;
@@ -89,6 +89,11 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         this.targetLock = new ReentrantLock();
         this.targetCondition = targetLock.newCondition();
         this.animateSemaphore.stop();
+        this.spriteBuffer.setCurrentAngle(180);
+        this.spriteHealthBarImage = healthBarImage;
+        hBar.image = spriteHealthBarImage[0];
+        hBar.positionX = ret.positionX;
+        hBar.positionY = ret.positionY - 2 * hBar.image.getHeight();
     }
 
     @CallingThread
@@ -325,6 +330,27 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         hBar.positionY = ret.positionY - 2 * hBar.image.getHeight();
         root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
         return root;
+    }
+
+    private int initHpCount = 0;
+
+    @SideQuest(SLEEP = 25, interruptible = true)
+    public GenericNode<Pair<PositionedImage, ImageView>> initTower() throws InterruptedException {
+        if (spriteBuffer.getCurrentAngle() != 0) {
+
+            ret.image = spriteBuffer.getDecrementedByStep();
+            GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(ret, view));
+
+            if (initHpCount < spriteHealthBarImage.length) {
+                hBar.image = spriteHealthBarImage[initHpCount++];
+            }
+
+            root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
+
+            return root;
+        }
+
+        throw new InterruptedException();
     }
 
     @SideQuest(SLEEP = 25)

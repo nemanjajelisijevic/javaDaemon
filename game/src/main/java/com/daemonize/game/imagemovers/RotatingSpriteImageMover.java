@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
     protected volatile AngleToBitmapArray spriteBuffer;
-    private volatile Image[] currentRotationSprite;
+    protected volatile Image[] currentRotationSprite;
     private volatile int size;
 
     public void setRotationSprite(Image[] rotationSprite) {
@@ -32,11 +32,12 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
     public RotatingSpriteImageMover(
             Image[] rotationSprite,
+            Image startingImage,
             float velocity,
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos, dXY);
+        super(new Image[]{startingImage}, velocity, startingPos, dXY);
         setRotationSprite(rotationSprite);
     }
 
@@ -47,7 +48,7 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        this(rotationSprite, velocity, startingPos, dXY);
+        this(rotationSprite, Arrays.copyOfRange(rotationSprite, 0, 1)[0], velocity, startingPos, dXY);
         this.animateSemaphore = animateSemaphore;
     }
 

@@ -53,15 +53,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         SoundManager soundManager = new AndroidSoundManager(this, 16);
-
-        new MainQuestDaemonEngine(null).daemonize(()->{
-            try {
-                soundManager.loadBackgroundMusic("Tremors.mp3");
-                soundManager.playBackgroundMusic();
-            } catch (SoundException e) {
-                e.printStackTrace();
-            }
-        }).setName("Background Music Loader").start();
+//
+//        new MainQuestDaemonEngine(null).daemonize(()->{
+//            try {
+//                soundManager.loadBackgroundMusic("Tremors.mp3");
+//                soundManager.playBackgroundMusic();
+//            } catch (SoundException e) {
+//                e.printStackTrace();
+//            }
+//        }).setName("Background Music Loader").start();
 
         game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
