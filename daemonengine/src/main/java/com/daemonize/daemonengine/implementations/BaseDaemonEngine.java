@@ -74,12 +74,13 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
               break;
             }
 
-            if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null) {
+            if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null)
               break;
-            }
 
             setState(currentQuest.getState());
-            currentQuest.run();
+            if (!currentQuest.run())
+                //break;
+                state = DaemonState.GONE_DAEMON;
         }
 
         System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
@@ -119,7 +120,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         if (daemonThread != null
                 && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stopDaemon from daemon thread
                 && daemonThread.isAlive()) {
-          daemonThread.interrupt();
+            daemonThread.interrupt();
         }
       }
 

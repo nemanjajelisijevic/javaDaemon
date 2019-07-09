@@ -20,13 +20,15 @@ public abstract class VoidMainQuest extends MainQuest<Void> {
     }
 
     @Override
-    public void run() {
+    public boolean run() {
         try {
             pursue();
             if (!Thread.currentThread().isInterrupted() && retRun != null)
                 consumer.consume(retRun);
+            return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
+            return true;
         } catch (final Exception ex) {
             final String tag = DaemonUtils.tag();
             consumer.consume(new Runnable() {
@@ -43,6 +45,7 @@ public abstract class VoidMainQuest extends MainQuest<Void> {
                     );
                 }
             });
+            return false;
         }
     }
 }

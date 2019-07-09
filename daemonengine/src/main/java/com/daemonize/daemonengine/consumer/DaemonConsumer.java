@@ -35,6 +35,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
         if (closureQueue.size() == 1)
             closureAvailable.signal();
         closureLock.unlock();
+        //if (!ret) throw new IllegalStateException("Could not add to consumers(" + name + ") queue!!!!");
         return ret;
     }
 
@@ -51,6 +52,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
                 }
                 closure = closureQueue.poll();//TODO null safety
             } catch (InterruptedException ex) {
+                System.out.println(DaemonUtils.tag() + name + " interrupted!");
                 break;
             } finally { //TODO Handle Exceptions
                 closureLock.unlock();
@@ -58,7 +60,6 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
 
             state = DaemonState.CONSUMING;
             closure.run();
-
         }
 
         state = DaemonState.STOPPED;

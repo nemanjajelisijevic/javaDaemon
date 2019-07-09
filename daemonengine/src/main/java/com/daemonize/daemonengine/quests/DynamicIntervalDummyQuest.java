@@ -21,14 +21,16 @@ public class DynamicIntervalDummyQuest extends DummyQuest {
     }
 
     @Override
-    public void run() {
+    public boolean run() {
         try {
             long sleep = intervalRegulator.getSleepInterval();
             if (sleep > 0)
                 Thread.sleep(sleep);
             consumer.consume(closure);
+            return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
+            return true;
         }
     }
 }

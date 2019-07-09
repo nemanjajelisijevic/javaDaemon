@@ -4,7 +4,7 @@ import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 
-public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Runnable, Quest<T> {
+public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T> {
 
   protected DaemonState state;
   protected String description = "";
@@ -68,7 +68,6 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Runnabl
     return isVoid;
   }
 
-  @Override
-  public abstract void run();
+  public abstract boolean run();
 
 }

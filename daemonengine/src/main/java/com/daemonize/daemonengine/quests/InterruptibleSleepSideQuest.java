@@ -1,25 +1,27 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public abstract class SleepSideQuest<T> extends SideQuest<T> {
+public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> {
 
-    protected long sleepInterval;
+    private Consumer onInterruptConsumer;
+    private Runnable onInterruptClosure;
+
+    public void onInterrupt(Consumer consumer, Runnable interruptClosure) {
+        this.onInterruptConsumer = consumer;
+        this.onInterruptClosure = interruptClosure;
+    }
 
     @SuppressWarnings("unchecked")
-    public <K extends SleepSideQuest<T>> K setSleepInterval(long milliseconds) {
-        if (milliseconds < 1)
-            throw new IllegalArgumentException("Sleep interval can not be less than 1");
-        this.sleepInterval = milliseconds;
-        return (K) this;
+    public InterruptibleSleepSideQuest<T> setClosure(Closure<T> closure) {
+        super.setClosure(closure);
+        return this;
     }
 
     @Override
-    public boolean run(){
+    public boolean run() {
         try {
             T result = pursue();
             if (!Thread.currentThread().isInterrupted() && result != null)
@@ -28,7 +30,9 @@ public abstract class SleepSideQuest<T> extends SideQuest<T> {
             return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
-            return true;
+            if (onInterruptConsumer != null && onInterruptClosure != null)
+                onInterruptConsumer.consume(onInterruptClosure);
+            return false;
         } catch (Exception ex) {
             setErrorAndUpdate(ex);
             return false;
