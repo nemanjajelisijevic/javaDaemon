@@ -27,4 +27,7 @@ public class DummySoundManager implements SoundManager {
 
     @Override
     public void stop() {}
+
+    @Override
+    public void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {}
 }

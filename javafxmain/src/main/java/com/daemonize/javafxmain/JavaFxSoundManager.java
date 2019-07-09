@@ -116,4 +116,7 @@ public class JavaFxSoundManager implements SoundManager {
 
     @Override
     public void stop() {}
+
+    @Override
+    public void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {}
 }

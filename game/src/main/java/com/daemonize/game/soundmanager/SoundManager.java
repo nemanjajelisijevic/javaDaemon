@@ -13,4 +13,5 @@ public interface SoundManager extends DaemonService<SoundManager> {
     void playSound(File soundFile);
     void loadBackgroundMusic(String backgroundMusicFile) throws SoundException;
     void playBackgroundMusic();
+    void setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler);
 }
