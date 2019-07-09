@@ -188,6 +188,13 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Bullet#toString} */
+  public BulletDoubleDaemon toString(Closure<String> closure) {
+    mainDaemonEngine.pursueQuest(new ToStringMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Bullet#setView} */
   public BulletDoubleDaemon setView(ImageView view, Closure<Bullet> closure) {
     mainDaemonEngine.pursueQuest(new SetViewMainQuest(view, closure).setConsumer(mainDaemonEngine.getConsumer()));
@@ -418,6 +425,18 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     public final Void pursue() throws Exception {
       prototype.pushSprite(sprite, velocity);
       return null;
+    }
+  }
+
+  private final class ToStringMainQuest extends MainQuest<String> {
+    private ToStringMainQuest(Closure<String> closure) {
+      super(closure);
+      this.description = "toString";
+    }
+
+    @Override
+    public final String pursue() throws Exception {
+      return prototype.toString();
     }
   }
 

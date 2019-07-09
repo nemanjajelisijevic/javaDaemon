@@ -1887,7 +1887,6 @@ public class Game {
                                 EnemyDoubleDaemon enemy = (EnemyDoubleDaemon) towerTypeAndEnemy.get().getSecond();
 
                                 Closure<Integer> bulletClosure = amount -> {
-
                                     currentSoundManager.playSound(bigExplosion);
                                     enemyRepo.add(enemy);
                                     moneyDaemon.setAmount(amount.get())

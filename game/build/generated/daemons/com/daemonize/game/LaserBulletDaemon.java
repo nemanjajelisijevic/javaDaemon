@@ -201,6 +201,13 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Bullet#toString} */
+  public LaserBulletDaemon toString(Closure<String> closure) {
+    mainDaemonEngine.pursueQuest(new ToStringMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.LaserBullet#desintegrateTarget} */
   public LaserBulletDaemon desintegrateTarget(Pair<Float, Float> sourcecoord, Target target,
       long duration, Consumer drawconsumer, Closure<List<ImageView>> closure) {
@@ -457,6 +464,18 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     public final Void pursue() throws Exception {
       prototype.pushSprite(sprite, velocity);
       return null;
+    }
+  }
+
+  private final class ToStringMainQuest extends MainQuest<String> {
+    private ToStringMainQuest(Closure<String> closure) {
+      super(closure);
+      this.description = "toString";
+    }
+
+    @Override
+    public final String pursue() throws Exception {
+      return prototype.toString();
     }
   }
 
