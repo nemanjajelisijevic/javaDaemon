@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.DaemonEngine;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
@@ -276,7 +277,7 @@ public class Game {
     private File towerSelectionSound;
 
     //uncaught exception handler
-    private Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
+    public Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
         @Override
         public void uncaughtException(Thread t, Throwable e) {
             System.err.println("Uncaught exception in: " + t.getName() + ", ID: " + t.getId());
@@ -325,23 +326,10 @@ public class Game {
         return paused;
     }
 
-    public void pause() {
-        gameConsumer.consume(()->{
-            towerSpriteUpgrader.stop();
-            fieldEraserEngine.stop();
-            enemyGenerator.stop();
-            for (EnemyDoubleDaemon enemy : activeEnemies)
-                enemy.pause();
-            for (TowerDaemon tower : towers)
-                tower.pause();
-            for(BulletDoubleDaemon rocket : activeRockets)
-                rocket.pause();
-            for(BulletDoubleDaemon bullet : activeBullets)
-                bullet.pause();
-            renderer.stop();
-            paused = true;
-        });
+    private Runnable onPauseRunnable = () -> {};
 
+    public void pause() {
+        onPauseRunnable.run();
     }
 
     public void cont() { //continueAll
@@ -1445,6 +1433,25 @@ public class Game {
 
         }).addState(()->{//gameState
 
+            //onPause
+            this.onPauseRunnable = () -> {
+                gameConsumer.consume(()->{
+                    towerSpriteUpgrader.stop();
+                    fieldEraserEngine.stop();
+                    enemyGenerator.stop();
+                    for (EnemyDoubleDaemon enemy : activeEnemies)
+                        enemy.pause();
+                    for (TowerDaemon tower : towers)
+                        tower.pause();
+                    for(BulletDoubleDaemon rocket : activeRockets)
+                        rocket.pause();
+                    for(BulletDoubleDaemon bullet : activeBullets)
+                        bullet.pause();
+                    renderer.stop();
+                    paused = true;
+                });
+            };
+
             //init controller
             touchController = (x, y) -> {
                 gameConsumer.consume(()-> {
@@ -2007,7 +2014,7 @@ public class Game {
     ) {
         System.out.println(DaemonUtils.tag() + repo.getName() + " size: " + repo.size());
 
-        BulletDoubleDaemon rocketDoubleDaemon = repo.configureAndGet(rocket-> {
+        BulletDoubleDaemon rocketDoubleDaemon = repo.configureAndGet(rocket -> {
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage);

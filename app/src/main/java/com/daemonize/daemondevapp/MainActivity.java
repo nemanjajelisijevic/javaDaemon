@@ -1,14 +1,20 @@
 package com.daemonize.daemondevapp;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 
+import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.game.Game;
 import com.daemonize.game.images.imageloader.ImageManager;
@@ -64,6 +70,25 @@ public class MainActivity extends AppCompatActivity {
 //        }).setName("Background Music Loader").start();
 
         game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
+
+        game.uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                String exc = Log.getStackTraceString(e);
+                String thread = "Thread name: " + t.getName() + ", id: " + t.getId();
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("message/rfc822");
+                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"nemanja.jelisijevic@yahoo.com"});
+                i.putExtra(Intent.EXTRA_SUBJECT, "App crash");
+                i.putExtra(Intent.EXTRA_TEXT   , thread + "\n\n" + exc);
+                try {
+                    startActivity(Intent.createChooser(i, "Send mail..."));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        };
 
         if(!game.isRunning())
             game.run();
