@@ -60,6 +60,8 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
         mainQuestLock.lock();
         ret = mainQuestQueue.add(quest);
         mainQuestLock.unlock();
+        if (!ret)
+            throw new IllegalStateException("Could not add to daemons(" + getName() + ") mainQuetQueue!!!");
         return ret;
     }
 

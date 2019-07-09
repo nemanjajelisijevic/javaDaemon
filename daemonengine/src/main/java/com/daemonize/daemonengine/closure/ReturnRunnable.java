@@ -51,4 +51,9 @@ public class ReturnRunnable<T> implements Runnable {
     closure.onReturn(ret);
   }
 
+  public ReturnRunnable<T> setInterrupted() {
+      ret.setInterrupted();
+      return this;
+  }
+
 }

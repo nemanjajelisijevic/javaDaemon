@@ -10,6 +10,8 @@ public class Return<T> {
     private volatile Exception error;
     private volatile String daemonDescription;
 
+    private volatile boolean interrupted;
+
     Return(){}
 
     public Return(T result) {
@@ -19,6 +21,14 @@ public class Return<T> {
     void setResult(T result) {
         this.result = result;
         this.error = null;
+    }
+
+    void setInterrupted() {
+        this.interrupted = true;
+    }
+
+    public boolean isInterrupted() {
+        return interrupted;
     }
 
     void setError(Exception error, String daemonDescription) {

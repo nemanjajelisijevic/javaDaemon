@@ -20,6 +20,9 @@ public class AwaitedArraySprite<T> {
 
     public synchronized AwaitedArraySprite<T> setSprite(T[] sprite) {
         this.sprite = sprite;
+        lock.lock();
+        flag = false;
+        lock.unlock();
         return this;
     }
 
@@ -38,7 +41,7 @@ public class AwaitedArraySprite<T> {
             while(!flag)
                 condition.await();
         } finally {
-            flag = false;
+            //flag = false;
             lock.unlock();
         }
     }

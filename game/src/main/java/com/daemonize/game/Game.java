@@ -1987,7 +1987,7 @@ public class Game {
 
         bulletDoubleDaemon.goTo(targetX, targetY, velocity, ret -> {
 
-            if (!ret.runtimeCheckAndGet() || !target.isShootable()) {
+            if (ret.isInterrupted() || !ret.runtimeCheckAndGet() || !target.isShootable()) {
                 bulletRepo.add(bulletDoubleDaemon);
                 return;
             }
@@ -2044,7 +2044,7 @@ public class Game {
 
         rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, ret -> {
 
-            if (!ret.runtimeCheckAndGet()) {
+            if (ret.isInterrupted() || !ret.runtimeCheckAndGet()) {
                 repo.add(rocketDoubleDaemon);
                 return;
             }
@@ -2075,7 +2075,7 @@ public class Game {
                         velocity,
                         ret2 -> {
 
-                            if (!ret2.runtimeCheckAndGet() || !target.isShootable()) {
+                            if (ret2.isInterrupted() || !ret2.runtimeCheckAndGet() || !target.isShootable()) {
                                 repo.add(rocketDoubleDaemon);
                                 return;
                             }
