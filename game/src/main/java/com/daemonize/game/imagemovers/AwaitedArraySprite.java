@@ -18,7 +18,7 @@ public class AwaitedArraySprite<T> {
         this.sprite = sprite;
     }
 
-    public synchronized AwaitedArraySprite<T> setSprite(T[] sprite) {
+    public AwaitedArraySprite<T> setSprite(T[] sprite) {
         this.sprite = sprite;
         lock.lock();
         flag = false;
@@ -26,12 +26,12 @@ public class AwaitedArraySprite<T> {
         return this;
     }
 
-    public synchronized AwaitedArraySprite<T> clearCache() {
+    public AwaitedArraySprite<T> clearCache() {
         sprite = null;
         return this;
     }
 
-    public synchronized boolean isValid() {
+    public boolean isValid() {
         return sprite != null;
     }
 
@@ -59,11 +59,10 @@ public class AwaitedArraySprite<T> {
         }
     }
 
-    public synchronized T getNext() {
+    public T getNext() {
 
-        if (cnt >= sprite.length) {
+        if (cnt >= sprite.length)
             cnt = 0;
-        }
 
         T ret = sprite[cnt++];
 

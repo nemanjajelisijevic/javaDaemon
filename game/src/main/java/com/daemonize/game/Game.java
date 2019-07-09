@@ -1706,6 +1706,7 @@ public class Game {
             towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).setName("Tower Sprite Upgrader").start();
             fieldEraserEngine = new EagerMainQuestDaemonEngine(renderer).setName("Field Eraser").start();
 
+            renderer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             gameConsumer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
         });
     }

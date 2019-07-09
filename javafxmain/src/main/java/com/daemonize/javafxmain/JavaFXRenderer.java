@@ -98,4 +98,9 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         return drawConsumer.consume(runnable);
     }
 
+    @Override
+    public JavaFXRenderer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+        drawConsumer.setUncaughtExceptionHandler(handler);
+        return this;
+    }
 }

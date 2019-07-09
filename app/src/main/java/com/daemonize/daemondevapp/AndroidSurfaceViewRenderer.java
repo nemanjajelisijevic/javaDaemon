@@ -150,4 +150,11 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
     public boolean consume(Runnable runnable) {
         return drawConsumer.consume(runnable);
     }
+
+    @Override
+    public AndroidSurfaceViewRenderer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+        drawThread.setUncaughtExceptionHandler(handler);
+        drawConsumer.setUncaughtExceptionHandler(handler);
+        return this;
+    }
 }
