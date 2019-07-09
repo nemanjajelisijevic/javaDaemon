@@ -1531,7 +1531,7 @@ public class Game {
 
                         TowerDaemon target = (TowerDaemon) ret.runtimeCheckAndGet();
 
-                        if (!ret.isInterrupted() && target.isShootable()) {
+                        if (target.isShootable()) {
 
                             if (enemyDoubleDaemon.isShootable())
                                 renderer.consume(() ->
@@ -1598,7 +1598,7 @@ public class Game {
                             @Override
                             public void onReturn(Return<Boolean> ret) {
 
-                                if (ret.isInterrupted() || !ret.runtimeCheckAndGet()){
+                                if (!ret.runtimeCheckAndGet()){
                                     enemyRepo.add(enemyDoubleDaemon);
                                     return;
                                 }
@@ -1879,7 +1879,7 @@ public class Game {
 
                             long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
 
-                            if (!towerTypeAndEnemy.isInterrupted() && towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
+                            if (towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
                                     && towerTypeAndEnemy.runtimeCheckAndGet().getSecond() != null) {
 
                                 Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
@@ -1989,7 +1989,7 @@ public class Game {
 
         bulletDoubleDaemon.goTo(targetX, targetY, velocity, ret -> {
 
-            if (ret.isInterrupted() || !ret.runtimeCheckAndGet() || !target.isShootable()) {
+            if (!ret.runtimeCheckAndGet() || !target.isShootable()) {
                 bulletRepo.add(bulletDoubleDaemon);
                 return;
             }
@@ -2046,7 +2046,7 @@ public class Game {
 
         rocketDoubleDaemon.rotateAndGoTo(angle, launchX, launchY, 4, ret -> {
 
-            if (ret.isInterrupted() || !ret.runtimeCheckAndGet()) {
+            if (!ret.runtimeCheckAndGet()) {
                 repo.add(rocketDoubleDaemon);
                 return;
             }
@@ -2077,7 +2077,7 @@ public class Game {
                         velocity,
                         ret2 -> {
 
-                            if (ret2.isInterrupted() || !ret2.runtimeCheckAndGet() || !target.isShootable()) {
+                            if (!ret2.runtimeCheckAndGet() || !target.isShootable()) {
                                 repo.add(rocketDoubleDaemon);
                                 return;
                             }

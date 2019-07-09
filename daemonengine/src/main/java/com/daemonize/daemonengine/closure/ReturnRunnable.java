@@ -50,10 +50,4 @@ public class ReturnRunnable<T> implements Runnable {
   public void run() {
     closure.onReturn(ret);
   }
-
-  public ReturnRunnable<T> setInterrupted() {
-      ret.setInterrupted();
-      return this;
-  }
-
 }

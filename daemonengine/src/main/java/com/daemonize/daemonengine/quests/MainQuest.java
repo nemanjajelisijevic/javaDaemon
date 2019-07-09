@@ -24,20 +24,19 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
   @Override
   public boolean run() {
     try {
-      T result = pursue();
-      if (!Thread.currentThread().isInterrupted() && result != null)
-        setResultAndUpdate(result);
-      return true;
+        T result = pursue();
+        if (!Thread.currentThread().isInterrupted() && result != null)
+            setResultAndUpdate(result);
+        return true;
     } catch (InterruptedException ex) {
         System.out.println(DaemonUtils.tag() + description + " interrupted.");
-        consumer.consume(returnRunnable.setInterrupted());
         return true;
     } catch (Exception ex) {
         if (getIsVoid())
             returnRunnable = new ReturnRunnable<>(new Closure<T>() {
               @Override
               public void onReturn(Return<T> ret) {
-                ret.get();
+                ret.runtimeCheckAndGet();
               }
             });
         setErrorAndUpdate(ex);

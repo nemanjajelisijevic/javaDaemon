@@ -68,5 +68,4 @@ public class LaserTower extends Tower {
             targetLock.unlock();
         }
     }
-
 }
