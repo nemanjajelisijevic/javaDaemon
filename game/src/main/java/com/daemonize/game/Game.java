@@ -1531,7 +1531,7 @@ public class Game {
 
                         TowerDaemon target = (TowerDaemon) ret.runtimeCheckAndGet();
 
-                        if (target.isShootable()) {
+                        if (!ret.isInterrupted() && target.isShootable()) {
 
                             if (enemyDoubleDaemon.isShootable())
                                 renderer.consume(() ->
@@ -1598,7 +1598,7 @@ public class Game {
                             @Override
                             public void onReturn(Return<Boolean> ret) {
 
-                                if (!ret.runtimeCheckAndGet()){
+                                if (ret.isInterrupted() || !ret.runtimeCheckAndGet()){
                                     enemyRepo.add(enemyDoubleDaemon);
                                     return;
                                 }
@@ -1705,6 +1705,8 @@ public class Game {
 
             towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).setName("Tower Sprite Upgrader").start();
             fieldEraserEngine = new EagerMainQuestDaemonEngine(renderer).setName("Field Eraser").start();
+
+            gameConsumer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
         });
     }
 
@@ -1877,7 +1879,7 @@ public class Game {
 
                             long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
 
-                            if (towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
+                            if (!towerTypeAndEnemy.isInterrupted() && towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
                                     && towerTypeAndEnemy.runtimeCheckAndGet().getSecond() != null) {
 
                                 Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
