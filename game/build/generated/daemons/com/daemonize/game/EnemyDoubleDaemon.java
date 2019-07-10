@@ -10,6 +10,7 @@ import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.ImageTranslationMover;
 import com.daemonize.game.images.Image;
@@ -34,15 +35,15 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
-
   protected EagerMainQuestDaemonEngine goToDaemonEngine;
+
+  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
 
   public EnemyDoubleDaemon(Consumer consumer, Enemy prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
-    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
+    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -74,17 +75,8 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   @Override
-  public Pair<Float, Float> getLastCoordinates() {
-    return prototype.getLastCoordinates();
-  }
-
-  @Override
   public ImageMover.Velocity getVelocity() {
     return prototype.getVelocity();
-  }
-
-  public Pair<Float, Float> getTargetCoordinates() {
-    return prototype.getTargetCoordinates();
   }
 
   public EnemyDoubleDaemon setShootable(boolean shootable) {
@@ -135,6 +127,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
+  public EnemyDoubleDaemon setPreviousField(Pair<Integer, Integer> previousfield) {
+    prototype.setPreviousField(previousfield);
+    return this;
+  }
+
   public EnemyDoubleDaemon setHpView(ImageView hpview) {
     prototype.setHpView(hpview);
     return this;
@@ -143,6 +140,10 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon setMaxHp(int maxhp) {
     prototype.setMaxHp(maxhp);
     return this;
+  }
+
+  public Pair<Float, Float> getTargetCoordinates() {
+    return prototype.getTargetCoordinates();
   }
 
   public EnemyDoubleDaemon clearVelocity() {
@@ -179,13 +180,14 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return prototype.isShootable();
   }
 
+  @Override
+  public Pair<Float, Float> getLastCoordinates() {
+    return prototype.getLastCoordinates();
+  }
+
   public EnemyDoubleDaemon setView(ImageView view) {
     prototype.setView(view);
     return this;
-  }
-
-  public Pair<Integer, Integer> getPreviousField() {
-    return prototype.getPreviousField();
   }
 
   public EnemyDoubleDaemon setTargetView(ImageView targetview) {
@@ -203,6 +205,10 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
+  public Pair<Integer, Integer> getPreviousField() {
+    return prototype.getPreviousField();
+  }
+
   public ImageView getView() {
     return prototype.getView();
   }
@@ -213,11 +219,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   public int getSize() {
     return prototype.getSize();
-  }
-
-  public EnemyDoubleDaemon setPreviousField(Pair<Integer, Integer> previousfield) {
-    prototype.setPreviousField(previousfield);
-    return this;
   }
 
   public SideQuest getCurrentSideQuest() {

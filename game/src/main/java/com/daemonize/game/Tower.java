@@ -1,6 +1,7 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
@@ -129,6 +130,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return this;
     }
 
+    @CallingThread
     public Tower setHealthBarImage(Image[] healthBarImage) {
         this.spriteHealthBarImage = healthBarImage;
         return this;
@@ -227,7 +229,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
 
     @CallingThread
     @Override
-    public synchronized void setRotationSprite(Image[] rotationSprite) {
+    public void setRotationSprite(Image[] rotationSprite) {
         super.setRotationSprite(rotationSprite);
     }
 
@@ -268,7 +270,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return scanRet;
     }
 
-    protected synchronized void rotateTo(Target target) throws InterruptedException {
+    protected void rotateTo(Target target) throws InterruptedException {
         if (target.isShootable()) {
             animateSemaphore.subscribe();
             try {

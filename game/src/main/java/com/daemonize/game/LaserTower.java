@@ -3,8 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.images.Image;
 import com.daemonize.game.scene.views.ImageView;
 

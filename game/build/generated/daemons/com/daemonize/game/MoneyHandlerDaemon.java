@@ -10,6 +10,7 @@ import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.ImageTranslationMover;
 import com.daemonize.game.images.Image;
@@ -61,16 +62,8 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return prototype.getdXY();
   }
 
-  public Pair<Float, Float> getLastCoordinates() {
-    return prototype.getLastCoordinates();
-  }
-
   public ImageMover.Velocity getVelocity() {
     return prototype.getVelocity();
-  }
-
-  public Pair<Float, Float> getTargetCoordinates() {
-    return prototype.getTargetCoordinates();
   }
 
   public MoneyHandlerDaemon setVelocity(ImageMover.Velocity velocity) {
@@ -85,6 +78,10 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   public MoneyHandlerDaemon setOutOfBordersConsumer(Consumer consumer) {
     prototype.setOutOfBordersConsumer(consumer);
     return this;
+  }
+
+  public Pair<Float, Float> getTargetCoordinates() {
+    return prototype.getTargetCoordinates();
   }
 
   public MoneyHandlerDaemon clearVelocity() {
@@ -105,6 +102,10 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   public MoneyHandlerDaemon cont() {
     prototype.cont();
     return this;
+  }
+
+  public Pair<Float, Float> getLastCoordinates() {
+    return prototype.getLastCoordinates();
   }
 
   public MoneyHandlerDaemon setOutOfBordersClosure(Runnable closure) {
@@ -170,16 +171,16 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.MoneyHandler#setAmount} */
-  public MoneyHandlerDaemon setAmount(int amount) {
-    mainDaemonEngine.pursueQuest(new SetAmountMainQuest(amount).setConsumer(mainDaemonEngine.getConsumer()));
+   * Prototype method {@link com.daemonize.game.MoneyHandler#animateMoney} */
+  public MoneyHandlerDaemon animateMoney(Closure<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> closure) {
+    mainDaemonEngine.pursueQuest(new AnimateMoneyMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.MoneyHandler#animateMoney} */
-  public MoneyHandlerDaemon animateMoney(Closure<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> closure) {
-    mainDaemonEngine.pursueQuest(new AnimateMoneyMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+   * Prototype method {@link com.daemonize.game.MoneyHandler#setAmount} */
+  public MoneyHandlerDaemon setAmount(int amount) {
+    mainDaemonEngine.pursueQuest(new SetAmountMainQuest(amount).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -421,6 +422,19 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     }
   }
 
+  private final class AnimateMoneyMainQuest extends MainQuest<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> {
+    private AnimateMoneyMainQuest(Closure<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> closure) {
+      super(closure);
+      this.description = "animateMoney";
+    }
+
+    @Override
+    public final Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> pursue() throws
+        Exception {
+      return prototype.animateMoney();
+    }
+  }
+
   private final class SetAmountMainQuest extends VoidMainQuest {
     private int amount;
 
@@ -435,19 +449,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     public final Void pursue() throws Exception {
       prototype.setAmount(amount);
       return null;
-    }
-  }
-
-  private final class AnimateMoneyMainQuest extends MainQuest<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> {
-    private AnimateMoneyMainQuest(Closure<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> closure) {
-      super(closure);
-      this.description = "animateMoney";
-    }
-
-    @Override
-    public final Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> pursue() throws
-        Exception {
-      return prototype.animateMoney();
     }
   }
 

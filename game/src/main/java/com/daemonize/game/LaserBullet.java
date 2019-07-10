@@ -1,6 +1,7 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.images.Image;
 import com.daemonize.game.scene.views.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;

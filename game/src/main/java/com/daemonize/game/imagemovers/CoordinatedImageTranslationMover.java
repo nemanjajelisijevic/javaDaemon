@@ -1,11 +1,8 @@
 package com.daemonize.game.imagemovers;
 
 
-import com.daemonize.daemonengine.utils.DaemonSemaphore;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.DedicatedThread;
-import com.daemonize.game.Pair;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.images.Image;
 
 import java.util.concurrent.locks.Condition;

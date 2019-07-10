@@ -11,6 +11,7 @@ import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.quests.VoidQuest;
+import com.daemonize.daemonengine.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;

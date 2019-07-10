@@ -7,6 +7,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonengine.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     protected volatile DaemonState state = DaemonState.STOPPED;
     private Consumer consumer;
     private String name = this.getClass().getSimpleName();
+
+    BaseQuest currentQuest;
 
     protected Thread daemonThread;
     protected Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
@@ -63,8 +66,6 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
         System.out.println(DaemonUtils.tag() + "Daemon engine started!");
 
-        BaseQuest currentQuest;
-
         while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             currentQuest = getQuest();
@@ -82,6 +83,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
             if (!currentQuest.run())
                 //break;
                 state = DaemonState.GONE_DAEMON;
+
+            currentQuest = null;
         }
 
         System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");

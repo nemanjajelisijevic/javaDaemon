@@ -1,13 +1,10 @@
 package com.daemonize.game.tabel;
 
-import com.daemonize.daemonengine.utils.DaemonUtils;
-import com.daemonize.game.Pair;
+import com.daemonize.daemonengine.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Grid<T> {
 

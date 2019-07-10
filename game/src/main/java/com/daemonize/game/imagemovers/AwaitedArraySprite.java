@@ -1,12 +1,14 @@
 package com.daemonize.game.imagemovers;
 
+import com.daemonize.game.images.Image;
+
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AwaitedArraySprite<T> {
+public class AwaitedArraySprite {
 
-    private T[] sprite;
+    private Image[] sprite;
     private int cnt = 0;
     private Lock lock = new ReentrantLock();
     private Condition condition = lock.newCondition();
@@ -14,11 +16,11 @@ public class AwaitedArraySprite<T> {
 
     public AwaitedArraySprite(){}
 
-    public AwaitedArraySprite(T[] sprite) {
+    public AwaitedArraySprite(Image[] sprite) {
         this.sprite = sprite;
     }
 
-    public AwaitedArraySprite<T> setSprite(T[] sprite) {
+    public synchronized AwaitedArraySprite setSprite(Image[] sprite) {
         this.sprite = sprite;
         lock.lock();
         flag = false;
@@ -26,7 +28,7 @@ public class AwaitedArraySprite<T> {
         return this;
     }
 
-    public AwaitedArraySprite<T> clearCache() {
+    public synchronized AwaitedArraySprite clearCache() {
         sprite = null;
         return this;
     }
@@ -59,12 +61,12 @@ public class AwaitedArraySprite<T> {
         }
     }
 
-    public T getNext() {
+    public synchronized Image getNext() {
 
         if (cnt >= sprite.length)
             cnt = 0;
 
-        T ret = sprite[cnt++];
+        Image ret = sprite[cnt++];
 
         if (cnt == sprite.length) {
             lock.lock();

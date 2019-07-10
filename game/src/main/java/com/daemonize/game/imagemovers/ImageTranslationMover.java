@@ -4,7 +4,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.game.Pair;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.game.imagemovers.spriteiterators.SpriteIterator;
 import com.daemonize.game.images.Image;

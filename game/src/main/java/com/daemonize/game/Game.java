@@ -2,10 +2,10 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.DaemonEngine;
-import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
@@ -28,7 +28,6 @@ import com.daemonize.game.scene.views.CompositeImageViewImpl;
 import com.daemonize.game.scene.views.ImageView;
 import com.daemonize.game.scene.views.ImageViewImpl;
 
-import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
@@ -895,7 +894,6 @@ public class Game {
             upgradeButton.onClick(()->{
 
                 TowerDaemon tow = towerUpgradeDialogue.getTower();
-
                 tow.levelUp();
 
                 Image[] currentSprite = null;
@@ -919,6 +917,7 @@ public class Game {
                 currentSoundManager.playSound(towerSelectionSound);
 
                 renderer.consume(()->upgradeButton.disable().setImage(upgradeButtonImagePressed));
+
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
 
                     //tow.cont();
@@ -1175,7 +1174,6 @@ public class Game {
                         for (ImageView view : bullet.getViews())
                             view.hide();
                     });
-                    //bullet.clearAndInterrupt().clearVelocity().popSprite().pause();
                     bullet.clearAndInterrupt().clearVelocity().popSprite();
                     activeBullets.remove(bullet);
                 }
@@ -1204,7 +1202,6 @@ public class Game {
                         for (ImageView view : rocket.getViews())
                             view.hide();
                     });
-                    //rocket.clearAndInterrupt().clearVelocity().popSprite().pause();
                     rocket.clearAndInterrupt().clearVelocity().popSprite();
                     activeRockets.remove(rocket);
                 }
@@ -1232,7 +1229,6 @@ public class Game {
                         for (ImageView view : missile.getViews())
                             view.hide();
                     });
-                    //missile.clearAndInterrupt().clearVelocity().popSprite().pause();
                     missile.clearAndInterrupt().clearVelocity().popSprite();
                 }
 
@@ -1537,7 +1533,9 @@ public class Game {
 
                         TowerDaemon target = (TowerDaemon) ret.runtimeCheckAndGet();
 
-                        if (target.isShootable()) {
+                        if (target.isShootable()
+                            && Math.abs(target.getLastCoordinates().getFirst() - enemyDoubleDaemon.getLastCoordinates().getFirst()) < range
+                            && Math.abs(target.getLastCoordinates().getSecond() - enemyDoubleDaemon.getLastCoordinates().getSecond()) < range) {
 
                             if (enemyDoubleDaemon.isShootable())
                                 renderer.consume(() ->
@@ -1709,8 +1707,8 @@ public class Game {
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
 
-            towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).setName("Tower Sprite Upgrader").start();
-            fieldEraserEngine = new EagerMainQuestDaemonEngine(renderer).setName("Field Eraser").start();
+            towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).setName("Tower Sprite Upgrader").setUncaughtExceptionHandler(uncaughtExceptionHandler).start();
+            fieldEraserEngine = new EagerMainQuestDaemonEngine(renderer).setName("Field Eraser").setUncaughtExceptionHandler(uncaughtExceptionHandler).start();
 
             renderer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             gameConsumer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
@@ -1728,6 +1726,8 @@ public class Game {
         TowerDaemon tow = field.getObject();
 
         if (tow != null) {//upgrade existing tower
+
+            System.err.println("Checking Tower Daemon state: " + tow.getEnginesState().toString());
 
             if (!towerUpgradeDialogue.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
                 //pause();
@@ -1840,31 +1840,34 @@ public class Game {
                 currentSoundManager.playSound(towerConstructionSound);
 
                 Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
-                        ? new LaserTower (
-                        renderer,
-                        new MultiViewAnimateClosure(),
-                        currentTowerSprite,
-                        healthBarSprite,
-                        Pair.create(field.getCenterX(), field.getCenterY()),
-                        range,
-                        towerSelect,
-                        dXY,
-                        towerHp
-                ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
+
+                        ?
+
+                        new LaserTower (
+                            renderer,
+                            new MultiViewAnimateClosure(),
+                            currentTowerSprite,
+                            healthBarSprite,
+                            Pair.create(field.getCenterX(), field.getCenterY()),
+                            range,
+                            towerSelect,
+                            dXY,
+                            towerHp
+                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
                         .setHealthBarImage(healthBarSprite)
                         .setTowerLevel(new Tower.TowerLevel(1,2,1500))
 
-                        :       new Tower(
-                        currentTowerSprite,
-                        healthBarSprite,
-                        Pair.create(field.getCenterX(), field.getCenterY()),
-                        range,
-                        towerSelect,
-                        dXY,
-                        towerHp
-                )
-                        .setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
-                        //.setHealthBarImage(healthBarSprite)
+                        :
+
+                        new Tower(
+                            currentTowerSprite,
+                            healthBarSprite,
+                            Pair.create(field.getCenterX(), field.getCenterY()),
+                            range,
+                            towerSelect,
+                            dXY,
+                            towerHp
+                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
                         .setTowerLevel(new Tower.TowerLevel(1,2,1500));
 
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
@@ -1980,12 +1983,6 @@ public class Game {
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage)
                     .start();
-                    //.setSprite(bulletSprite);
-
-//            if (bullet.getEnginesState().get(bullet.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
-//                bullet.start();
-//            else
-//                bullet.cont();
         });
 
         float targetX = target.getLastCoordinates().getFirst();
@@ -2028,13 +2025,6 @@ public class Game {
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage)
                     .start();
-
-//            if (rocket.getEnginesState().get(0).equals(DaemonState.STOPPED) || rocket.getEnginesState().get(rocket.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
-//                rocket.start();
-//            else
-//                rocket.cont();
-
-
         });
 
         int launchX = getRandomInt(

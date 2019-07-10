@@ -10,6 +10,7 @@ import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.ImageTranslationMover;
 import com.daemonize.game.images.Image;
@@ -61,16 +62,8 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.getdXY();
   }
 
-  public Pair<Float, Float> getLastCoordinates() {
-    return prototype.getLastCoordinates();
-  }
-
   public ImageMover.Velocity getVelocity() {
     return prototype.getVelocity();
-  }
-
-  public Pair<Float, Float> getTargetCoordinates() {
-    return prototype.getTargetCoordinates();
   }
 
   public BulletDoubleDaemon setView3(ImageView view3) {
@@ -111,6 +104,10 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.getDamage();
   }
 
+  public Pair<Float, Float> getTargetCoordinates() {
+    return prototype.getTargetCoordinates();
+  }
+
   public BulletDoubleDaemon clearVelocity() {
     prototype.clearVelocity();
     return this;
@@ -129,6 +126,10 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   public BulletDoubleDaemon cont() {
     prototype.cont();
     return this;
+  }
+
+  public Pair<Float, Float> getLastCoordinates() {
+    return prototype.getLastCoordinates();
   }
 
   public List<ImageView> getViews() {
@@ -167,13 +168,6 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.Bullet#animateBullet} */
-  public BulletDoubleDaemon animateBullet(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
-    mainDaemonEngine.pursueQuest(new AnimateBulletMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
    * Prototype method {@link com.daemonize.game.Bullet#rotate} */
   public BulletDoubleDaemon rotate(int angle, Runnable retRun) {
     mainDaemonEngine.pursueQuest(new RotateMainQuest(angle, retRun).setConsumer(mainDaemonEngine.getConsumer()));
@@ -191,6 +185,13 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
    * Prototype method {@link com.daemonize.game.Bullet#toString} */
   public BulletDoubleDaemon toString(Closure<String> closure) {
     mainDaemonEngine.pursueQuest(new ToStringMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#animateBullet} */
+  public BulletDoubleDaemon animateBullet(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
+    mainDaemonEngine.pursueQuest(new AnimateBulletMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -381,19 +382,6 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     }
   }
 
-  private final class AnimateBulletMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private AnimateBulletMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
-      super(closure);
-      this.description = "animateBullet";
-    }
-
-    @Override
-    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
-        Exception {
-      return prototype.animateBullet();
-    }
-  }
-
   private final class RotateMainQuest extends VoidMainQuest {
     private int angle;
 
@@ -438,6 +426,19 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     @Override
     public final String pursue() throws Exception {
       return prototype.toString();
+    }
+  }
+
+  private final class AnimateBulletMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private AnimateBulletMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
+      super(closure);
+      this.description = "animateBullet";
+    }
+
+    @Override
+    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
+        Exception {
+      return prototype.animateBullet();
     }
   }
 

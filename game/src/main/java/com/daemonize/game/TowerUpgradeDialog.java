@@ -8,7 +8,6 @@ public class TowerUpgradeDialog {
 
     private CompositeImageViewImpl towerUpgrade;
     private TowerDaemon tower;
-    //private Image dialogueImageTowerUpgrade;
 
     public TowerDaemon getTower() {
         return tower;
