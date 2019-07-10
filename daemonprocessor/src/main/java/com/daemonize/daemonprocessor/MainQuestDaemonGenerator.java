@@ -337,8 +337,10 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             if (voidWithRunnable) {
                 mainQuestConstructorBuilder.addParameter(TypeName.get(Runnable.class), "retRun");
                 mainQuestConstructorBuilder.addStatement("super(retRun)");
-            } else
+            } else {
+                mainQuestConstructorBuilder.addStatement("super()");
                 mainQuestConstructorBuilder.addStatement("setVoid()");
+            }
         }
 
         for (Pair<TypeName, String> parameter : prototypeMethodData.getParameters()){

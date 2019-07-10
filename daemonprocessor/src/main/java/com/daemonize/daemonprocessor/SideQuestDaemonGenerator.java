@@ -145,6 +145,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         //SideQuest construct
         MethodSpec.Builder sideQuestConstructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE)
+                .addStatement("super()")
                 .addStatement("this.description = \"$N\"", prototypeMethodData.getMethodName());
 
         if(prototypeMethodData.isVoid()) {
