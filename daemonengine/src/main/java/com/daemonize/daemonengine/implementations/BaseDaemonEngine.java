@@ -18,7 +18,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     private String name = this.getClass().getSimpleName();
 
     protected Thread daemonThread;
-    private Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
+    protected Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
     private DaemonSemaphore startStopSemaphore = new DaemonSemaphore();
 
@@ -59,7 +59,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
     protected abstract BaseQuest getQuest();
 
-    private void loop(){
+    protected void loop(){
 
         System.out.println(DaemonUtils.tag() + "Daemon engine started!");
 
@@ -99,21 +99,24 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         }
 
         DaemonState initState = getState();
-        if (initState.equals(DaemonState.STOPPED)) {
-          daemonThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-              loop();
-            }
-          });
-          daemonThread.setName(name);
-          setState(DaemonState.INITIALIZING);
-          if (uncaughtExceptionHandler != null)
-              daemonThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
-          daemonThread.start();
-        }
+        if (initState.equals(DaemonState.STOPPED))
+            initThread();
 
         return (D) this;
+    }
+
+    protected void initThread() {
+        daemonThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                loop();
+            }
+        });
+        daemonThread.setName(name);
+        setState(DaemonState.INITIALIZING);
+        if (uncaughtExceptionHandler != null)
+            daemonThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+        daemonThread.start();
     }
 
     @Override
