@@ -20,7 +20,6 @@ import com.daemonize.game.scene.Scene2D;
 import com.daemonize.game.soundmanager.DummySoundManager;
 import com.daemonize.game.soundmanager.SoundException;
 import com.daemonize.game.soundmanager.SoundManager;
-//import com.daemonize.game.soundmanager.SoundManagerDaemon;
 import com.daemonize.game.tabel.Field;
 import com.daemonize.game.tabel.Grid;
 
@@ -164,12 +163,13 @@ public class Game {
         enemyGenerateIntervals.add(5000L);
         enemyGenerateIntervals.add(1000L);
         enemyGenerateIntervals.add(2000L);
-        enemyGenerateIntervals.add(10000L);
+        enemyGenerateIntervals.add(1000L);
         enemyGenerateIntervals.add(2000L);
         enemyGenerateIntervals.add(1000L);
-        enemyGenerateIntervals.add(8000L);
+        enemyGenerateIntervals.add(6000L);
         enemyGenerateIntervals.add(500L);
         enemyGenerateIntervals.add(2000L);
+        enemyGenerateIntervals.add(500L);
         enemyGenerateIntervals.add(15000L);
         enemyGenerateIntervalIt = enemyGenerateIntervals.iterator();
     }
@@ -1175,12 +1175,14 @@ public class Game {
                         for (ImageView view : bullet.getViews())
                             view.hide();
                     });
-                    bullet.clearAndInterrupt().clearVelocity().popSprite().pause();
+                    //bullet.clearAndInterrupt().clearVelocity().popSprite().pause();
+                    bullet.clearAndInterrupt().clearVelocity().popSprite();
                     activeBullets.remove(bullet);
                 }
 
                 @Override
                 public void onGet(BulletDoubleDaemon bullet) {
+                    bullet.setSprite(bulletSprite);
                     renderer.consume(()->{
                         for (ImageView view : bullet.getViews()) {
                             view.setAbsoluteX(bullet.getLastCoordinates().getFirst());
@@ -1202,12 +1204,14 @@ public class Game {
                         for (ImageView view : rocket.getViews())
                             view.hide();
                     });
-                    rocket.clearAndInterrupt().clearVelocity().popSprite().pause();
+                    //rocket.clearAndInterrupt().clearVelocity().popSprite().pause();
+                    rocket.clearAndInterrupt().clearVelocity().popSprite();
                     activeRockets.remove(rocket);
                 }
 
                 @Override
                 public void onGet(BulletDoubleDaemon rocket) {
+                    rocket.setSprite(bulletSpriteRocket);
                     renderer.consume(()->{
                         for (ImageView view : rocket.getViews()) {
                             view.setAbsoluteX(rocket.getLastCoordinates().getFirst());
@@ -1228,11 +1232,13 @@ public class Game {
                         for (ImageView view : missile.getViews())
                             view.hide();
                     });
-                    missile.clearAndInterrupt().clearVelocity().popSprite().pause();
+                    //missile.clearAndInterrupt().clearVelocity().popSprite().pause();
+                    missile.clearAndInterrupt().clearVelocity().popSprite();
                 }
 
                 @Override
                 public void onGet(BulletDoubleDaemon missile) {
+                    missile.setSprite(enemyMissileSprite);
                     renderer.consume(()->{
                         for (ImageView view : missile.getViews()) {
                             view.setAbsoluteX(missile.getLastCoordinates().getFirst());
@@ -1973,12 +1979,13 @@ public class Game {
             bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage)
-                    .setSprite(bulletSprite);
+                    .start();
+                    //.setSprite(bulletSprite);
 
-            if (bullet.getEnginesState().get(bullet.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
-                bullet.start();
-            else
-                bullet.cont();
+//            if (bullet.getEnginesState().get(bullet.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
+//                bullet.start();
+//            else
+//                bullet.cont();
         });
 
         float targetX = target.getLastCoordinates().getFirst();
@@ -2019,12 +2026,15 @@ public class Game {
         BulletDoubleDaemon rocketDoubleDaemon = repo.configureAndGet(rocket -> {
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
                     .setLevel(noOfBulletsFired)
-                    .setDamage(bulletDamage);
+                    .setDamage(bulletDamage)
+                    .start();
 
-            if (rocket.getEnginesState().get(rocket.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
-                rocket.start();
-            else
-                rocket.cont();
+//            if (rocket.getEnginesState().get(0).equals(DaemonState.STOPPED) || rocket.getEnginesState().get(rocket.getEnginesState().size() - 1).equals(DaemonState.STOPPED))
+//                rocket.start();
+//            else
+//                rocket.cont();
+
+
         });
 
         int launchX = getRandomInt(
