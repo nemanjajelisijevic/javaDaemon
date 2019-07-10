@@ -129,4 +129,12 @@ public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine>, Daem
         mainQuestDaemonEngine.clear();
         return this;
     }
+
+    @Override
+    public DoubleDaemonEngine setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+        mainQuestDaemonEngine.setUncaughtExceptionHandler(handler);
+        sideQuestDaemonEngine.setUncaughtExceptionHandler(handler);
+        return this;
+    }
+
 }

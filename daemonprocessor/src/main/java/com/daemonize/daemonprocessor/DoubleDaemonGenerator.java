@@ -244,6 +244,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         apiMethods.add(generateSetSideConsumerDaemonApiMethod());
         apiMethods.add(generateSetConsumerDaemonApiMethod());
         apiMethods.add(mainGenerator.generateGetConsumerDaemonApiMethod());
+        apiMethods.add(generateSetUncaughtExceptionHandler());
 
         apiMethods.add(mainGenerator.generateInterruptMethod());
         apiMethods.add(mainGenerator.generateClearAndInterruptMethod());
@@ -324,6 +325,24 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
             builder.addStatement(dedicatedEngine + ".setName(name + \" - " + dedicatedEngine + "\")");
 
         return builder.addStatement("return this").build();
+    }
+
+
+    @Override
+    public MethodSpec generateSetUncaughtExceptionHandler() {
+        MethodSpec.Builder builder =  MethodSpec.methodBuilder("setUncaughtExceptionHandler")
+                .addAnnotation(Override.class)
+                .addParameter(ClassName.get(Thread.UncaughtExceptionHandler.class), "handler")
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement(mainGenerator.getDaemonEngineString()  + ".setUncaughtExceptionHandler(handler)")
+                .addStatement(sideGenerator.getDaemonEngineString()  + ".setUncaughtExceptionHandler(handler)");
+
+        for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
+            builder.addStatement(dedicatedEngine + ".setUncaughtExceptionHandler(handler)");
+
+        return builder.returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement("return this")
+                .build();
     }
 
     public MethodSpec generateSetMainConsumerDaemonApiMethod() {

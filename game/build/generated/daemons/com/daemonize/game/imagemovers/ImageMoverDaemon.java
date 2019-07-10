@@ -16,6 +16,7 @@ import java.lang.Float;
 import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
+import java.lang.Thread;
 import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,8 +165,15 @@ public class ImageMoverDaemon implements Daemon<ImageMoverDaemon>, Movable {
     return daemonEngine.getConsumer();
   }
 
+  @Override
+  public ImageMoverDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    daemonEngine.setUncaughtExceptionHandler(handler);
+    return this;
+  }
+
   private final class AnimateSideQuest extends SleepSideQuest<ImageMover.PositionedImage> {
     private AnimateSideQuest() {
+      super();
       this.description = "animate";
     }
 
@@ -179,6 +187,7 @@ public class ImageMoverDaemon implements Daemon<ImageMoverDaemon>, Movable {
     private float velocity;
 
     private SetVelocityMainQuest(float velocity) {
+      super();
       setVoid();
       this.velocity = velocity;
       this.description = "setVelocity";
@@ -197,6 +206,7 @@ public class ImageMoverDaemon implements Daemon<ImageMoverDaemon>, Movable {
     private float lasty;
 
     private SetCoordinatesMainQuest(float lastx, float lasty) {
+      super();
       setVoid();
       this.lastx = lastx;
       this.lasty = lasty;
@@ -214,6 +224,7 @@ public class ImageMoverDaemon implements Daemon<ImageMoverDaemon>, Movable {
     private ImageMover.Direction direction;
 
     private SetDirectionMainQuest(ImageMover.Direction direction) {
+      super();
       setVoid();
       this.direction = direction;
       this.description = "setDirection";
@@ -264,6 +275,7 @@ public class ImageMoverDaemon implements Daemon<ImageMoverDaemon>, Movable {
     private ImageMover.Velocity velocity;
 
     private SetVelocityIMainQuest(ImageMover.Velocity velocity) {
+      super();
       setVoid();
       this.velocity = velocity;
       this.description = "setVelocity";

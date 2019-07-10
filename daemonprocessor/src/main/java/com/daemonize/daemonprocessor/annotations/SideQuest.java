@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface SideQuest {
     long SLEEP() default 0;
+    boolean interruptible() default false;
 }

@@ -115,4 +115,11 @@ public class AndroidSoundManager implements SoundManager {
     public void playBackgroundMusic() {
         backGroundMusicPlayer.playClip(backgroundMusic);
     }
+
+    @Override
+    public AndroidSoundManager setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+        for(SoundClipPlayerDaemon player : players)
+            player.setUncaughtExceptionHandler(handler);
+        return this;
+    }
 }

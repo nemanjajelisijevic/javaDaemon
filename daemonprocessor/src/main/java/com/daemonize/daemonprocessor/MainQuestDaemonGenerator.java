@@ -269,6 +269,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonApiMethods.add(generateGetNameDaemonApiMethod());
             daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
             daemonApiMethods.add(generateGetConsumerDaemonApiMethod());
+            daemonApiMethods.add(generateSetUncaughtExceptionHandler());
 
         }
 
@@ -336,8 +337,10 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             if (voidWithRunnable) {
                 mainQuestConstructorBuilder.addParameter(TypeName.get(Runnable.class), "retRun");
                 mainQuestConstructorBuilder.addStatement("super(retRun)");
-            } else
+            } else {
+                mainQuestConstructorBuilder.addStatement("super()");
                 mainQuestConstructorBuilder.addStatement("setVoid()");
+            }
         }
 
         for (Pair<TypeName, String> parameter : prototypeMethodData.getParameters()){
@@ -575,10 +578,25 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".setConsumer(consumer)");
 
-
         for (String dedicatedEngine : dedicatedEnginesNameSet)
             builder.addStatement(dedicatedEngine + ".setConsumer(consumer)");
 
        return builder.addStatement("return this").build();
+    }
+
+    @Override
+    public MethodSpec generateSetUncaughtExceptionHandler() {
+        MethodSpec.Builder builder =  MethodSpec.methodBuilder("setUncaughtExceptionHandler")
+                .addAnnotation(Override.class)
+                .addParameter(ClassName.get(Thread.UncaughtExceptionHandler.class), "handler")
+                .addModifiers(Modifier.PUBLIC)
+                .addStatement(getDaemonEngineString()  + ".setUncaughtExceptionHandler(handler)");
+
+        for (String dedicatedEngine : dedicatedEnginesNameSet)
+            builder.addStatement(dedicatedEngine + ".setUncaughtExceptionHandler(handler)");
+
+        return builder.returns(ClassName.get(packageName, daemonSimpleName))
+                .addStatement("return this")
+                .build();
     }
 }

@@ -22,6 +22,7 @@ import java.lang.Integer;
 import java.lang.Override;
 import java.lang.Runnable;
 import java.lang.String;
+import java.lang.Thread;
 import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
@@ -317,6 +318,13 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   @Override
+  public BulletDoubleDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    mainDaemonEngine.setUncaughtExceptionHandler(handler);
+    sideDaemonEngine.setUncaughtExceptionHandler(handler);
+    return this;
+  }
+
+  @Override
   public BulletDoubleDaemon interrupt() {
     mainDaemonEngine.interrupt();
     return this;
@@ -330,6 +338,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
 
   private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateBulletSideQuest() {
+      super();
       this.description = "animateBullet";
     }
 

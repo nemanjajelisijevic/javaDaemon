@@ -18,6 +18,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     private String name = this.getClass().getSimpleName();
 
     protected Thread daemonThread;
+    private Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
     private DaemonSemaphore startStopSemaphore = new DaemonSemaphore();
 
@@ -74,12 +75,13 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
               break;
             }
 
-            if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null) {
+            if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null)
               break;
-            }
 
             setState(currentQuest.getState());
-            currentQuest.run();
+            if (!currentQuest.run())
+                //break;
+                state = DaemonState.GONE_DAEMON;
         }
 
         System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
@@ -106,6 +108,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
           });
           daemonThread.setName(name);
           setState(DaemonState.INITIALIZING);
+          if (uncaughtExceptionHandler != null)
+              daemonThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
           daemonThread.start();
         }
 
@@ -119,7 +123,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         if (daemonThread != null
                 && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stopDaemon from daemon thread
                 && daemonThread.isAlive()) {
-          daemonThread.interrupt();
+            daemonThread.interrupt();
         }
       }
 
@@ -137,5 +141,13 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         List<DaemonState> ret = new ArrayList<>(1);
         ret.add(getState());
         return ret;
+    }
+
+    @Override
+    public D setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+        this.uncaughtExceptionHandler = handler;
+        if (daemonThread != null)
+            daemonThread.setUncaughtExceptionHandler(handler);
+        return (D) this;
     }
 }

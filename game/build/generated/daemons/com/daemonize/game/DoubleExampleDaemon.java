@@ -12,6 +12,7 @@ import java.lang.Integer;
 import java.lang.InterruptedException;
 import java.lang.Override;
 import java.lang.String;
+import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,8 +115,15 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
     return daemonEngine.getConsumer();
   }
 
+  @Override
+  public DoubleExampleDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    daemonEngine.setUncaughtExceptionHandler(handler);
+    return this;
+  }
+
   private final class LogAndReturnSideQuest extends SideQuest<Integer> {
     private LogAndReturnSideQuest() {
+      super();
       this.description = "logAndReturn";
     }
 

@@ -23,6 +23,8 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
     private Set<String> overloadedSideQuestPrototypeMethods = new TreeSet<>();
     private final String SIDE_QUEST_SLEEP = "SleepSideQuest";
+    private final String INTERRUPTIBLE_SIDE_QUEST = "InterruptibleSideQuest";
+    private final String SIDE_QUEST_SLEEP_INTERRUPTIBLE = "InterruptibleSleepSideQuest";
 
     {
         QUEST_TYPE_NAME = "SideQuest";
@@ -107,7 +109,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         return daemonClassBuilder.build();
     }
 
-    private TypeSpec createSideQuest(ExecutableElement prototypeSideQuestMethod, long sleep) {
+    private TypeSpec createSideQuest(ExecutableElement prototypeSideQuestMethod, long sleep, boolean interruptible) {
 
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeSideQuestMethod);
 
@@ -120,7 +122,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         }
 
         //build sideQuestQuest
-        ClassName sideQuestClassName = sleep > 0 ? ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP) : ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME);
+        ClassName sideQuestClassName = sleep > 0 ?( interruptible ? ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP_INTERRUPTIBLE) : ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP)) : (interruptible ? ClassName.get(QUEST_PACKAGE, INTERRUPTIBLE_SIDE_QUEST) : ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME));
         TypeName sideQuestOfRet = ParameterizedTypeName.get(
                 sideQuestClassName,
                 prototypeMethodData.getMethodRetTypeName()
@@ -143,6 +145,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         //SideQuest construct
         MethodSpec.Builder sideQuestConstructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE)
+                .addStatement("super()")
                 .addStatement("this.description = \"$N\"", prototypeMethodData.getMethodName());
 
         if(prototypeMethodData.isVoid()) {
@@ -170,23 +173,39 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         String methodName = sideQuestMethod.getFirst().getSimpleName().toString();
         long sleep = sideQuestMethod.getSecond().SLEEP();
+        boolean interruptible = sideQuestMethod.getSecond().interruptible();
 
         if (sleep < 0)
             throw new IllegalStateException("Sleep annotation parameter on method: " + methodName + " can not be less than 0 ms.");
 
-        TypeSpec sideQuest = createSideQuest(sideQuestMethod.getFirst(), sleep);
+        TypeSpec sideQuest = createSideQuest(sideQuestMethod.getFirst(), sleep, interruptible);
 
         //TODO DRY
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(sideQuestMethod.getFirst());
         TypeName sideQuestOfRet = sleep == 0 ?
-                ParameterizedTypeName.get(
-                        ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME),
-                        prototypeMethodData.getMethodRetTypeName()
-                )
-        : ParameterizedTypeName.get(
-                ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP),
-                prototypeMethodData.getMethodRetTypeName()
-        );
+
+                interruptible ?
+                        ParameterizedTypeName.get(
+                                ClassName.get(QUEST_PACKAGE, INTERRUPTIBLE_SIDE_QUEST),
+                                prototypeMethodData.getMethodRetTypeName()
+                        )
+                        :
+                        ParameterizedTypeName.get(
+                                ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME),
+                                prototypeMethodData.getMethodRetTypeName()
+                        )
+
+        :
+                interruptible ?
+                        ParameterizedTypeName.get(
+                                ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP_INTERRUPTIBLE),
+                                prototypeMethodData.getMethodRetTypeName()
+                        )
+                        :
+                        ParameterizedTypeName.get(
+                                ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP),
+                                prototypeMethodData.getMethodRetTypeName()
+                        );
 
         MethodSpec.Builder sideQuestSetter = MethodSpec.methodBuilder("set" + Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1) + "SideQuest")
                 .addModifiers(Modifier.PUBLIC)

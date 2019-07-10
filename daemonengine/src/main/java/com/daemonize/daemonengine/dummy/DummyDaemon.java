@@ -53,4 +53,8 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
     public DummyDaemon clear() {
         return this;
     }
+
+    public long getCurrentSleepInterval() {
+        return dummyQuest.getSleepInterval();
+    }
 }

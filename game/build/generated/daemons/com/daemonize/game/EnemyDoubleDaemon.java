@@ -22,6 +22,7 @@ import java.lang.Integer;
 import java.lang.Override;
 import java.lang.Runnable;
 import java.lang.String;
+import java.lang.Thread;
 import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
@@ -389,6 +390,15 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   @Override
+  public EnemyDoubleDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    mainDaemonEngine.setUncaughtExceptionHandler(handler);
+    sideDaemonEngine.setUncaughtExceptionHandler(handler);
+    goToDaemonEngine.setUncaughtExceptionHandler(handler);
+    reloadDaemonEngine.setUncaughtExceptionHandler(handler);
+    return this;
+  }
+
+  @Override
   public EnemyDoubleDaemon interrupt() {
     mainDaemonEngine.interrupt();
     goToDaemonEngine.interrupt();
@@ -406,6 +416,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   private final class AnimateEnemySideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateEnemySideQuest() {
+      super();
       this.description = "animateEnemy";
     }
 
@@ -445,6 +456,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     private int angle;
 
     private RotateMainQuest(int angle) {
+      super();
       setVoid();
       this.angle = angle;
       this.description = "rotate";

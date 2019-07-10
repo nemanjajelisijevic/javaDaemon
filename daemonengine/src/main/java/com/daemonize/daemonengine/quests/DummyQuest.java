@@ -13,6 +13,10 @@ public class DummyQuest extends BaseQuest<Void, DummyQuest> {
         return this;
     }
 
+    public long getSleepInterval() {
+        return sleepInterval;
+    }
+
     public DummyQuest() {
         this.state = DaemonState.SIDE_QUEST;
     }
@@ -28,13 +32,15 @@ public class DummyQuest extends BaseQuest<Void, DummyQuest> {
     }
 
     @Override
-    public void run(){
+    public boolean run(){
         try {
             if (sleepInterval > 0)
                 Thread.sleep(sleepInterval);
             consumer.consume(closure);
+            return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
+            return true;
         }
     }
 }

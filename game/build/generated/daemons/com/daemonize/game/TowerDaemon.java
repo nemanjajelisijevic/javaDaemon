@@ -23,6 +23,7 @@ import java.lang.Integer;
 import java.lang.Override;
 import java.lang.Runnable;
 import java.lang.String;
+import java.lang.Thread;
 import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
@@ -443,6 +444,14 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   }
 
   @Override
+  public TowerDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    mainDaemonEngine.setUncaughtExceptionHandler(handler);
+    sideDaemonEngine.setUncaughtExceptionHandler(handler);
+    scanDaemonEngine.setUncaughtExceptionHandler(handler);
+    return this;
+  }
+
+  @Override
   public TowerDaemon interrupt() {
     mainDaemonEngine.interrupt();
     scanDaemonEngine.interrupt();
@@ -458,6 +467,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   private final class AnimateTowerSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateTowerSideQuest() {
+      super();
       this.description = "animateTower";
     }
 
@@ -474,6 +484,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     private float y;
 
     private RotateTowardsMainQuest(float x, float y) {
+      super();
       setVoid();
       this.x = x;
       this.y = y;
@@ -491,6 +502,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     private int targetangle;
 
     private RotateMainQuest(int targetangle) {
+      super();
       setVoid();
       this.targetangle = targetangle;
       this.description = "rotate";

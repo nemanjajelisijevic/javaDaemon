@@ -9,6 +9,7 @@ import java.lang.Exception;
 import java.lang.Integer;
 import java.lang.Override;
 import java.lang.String;
+import java.lang.Thread;
 import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +105,12 @@ public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaem
   }
 
   @Override
+  public SoundClipPlayerDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    daemonEngine.setUncaughtExceptionHandler(handler);
+    return this;
+  }
+
+  @Override
   public SoundClipPlayerDaemon interrupt() {
     daemonEngine.interrupt();
     return this;
@@ -117,6 +124,7 @@ public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaem
 
   private final class StopClipMainQuest extends VoidMainQuest {
     private StopClipMainQuest() {
+      super();
       setVoid();
       this.description = "stopClip";
     }
@@ -132,6 +140,7 @@ public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaem
     private T soundclip;
 
     private PlayClipMainQuest(T soundclip) {
+      super();
       setVoid();
       this.soundclip = soundclip;
       this.description = "playClip";

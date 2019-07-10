@@ -21,6 +21,7 @@ import java.lang.Integer;
 import java.lang.Override;
 import java.lang.Runnable;
 import java.lang.String;
+import java.lang.Thread;
 import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
@@ -269,6 +270,13 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   }
 
   @Override
+  public MoneyHandlerDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    mainDaemonEngine.setUncaughtExceptionHandler(handler);
+    sideDaemonEngine.setUncaughtExceptionHandler(handler);
+    return this;
+  }
+
+  @Override
   public MoneyHandlerDaemon interrupt() {
     mainDaemonEngine.interrupt();
     return this;
@@ -282,6 +290,7 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
 
   private final class AnimateMoneySideQuest extends SleepSideQuest<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> {
     private AnimateMoneySideQuest() {
+      super();
       this.description = "animateMoney";
     }
 
@@ -323,6 +332,7 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     private float velocity;
 
     private PushSpriteMainQuest(Image[] sprite, float velocity) {
+      super();
       setVoid();
       this.sprite = sprite;
       this.velocity = velocity;
@@ -342,6 +352,7 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     private float lasty;
 
     private SetCoordinatesMainQuest(float lastx, float lasty) {
+      super();
       setVoid();
       this.lastx = lastx;
       this.lasty = lasty;
@@ -414,6 +425,7 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     private int amount;
 
     private SetAmountMainQuest(int amount) {
+      super();
       setVoid();
       this.amount = amount;
       this.description = "setAmount";

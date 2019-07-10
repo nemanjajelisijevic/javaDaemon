@@ -50,5 +50,4 @@ public class ReturnRunnable<T> implements Runnable {
   public void run() {
     closure.onReturn(ret);
   }
-
 }

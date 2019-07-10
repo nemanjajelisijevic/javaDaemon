@@ -1,14 +1,20 @@
 package com.daemonize.daemondevapp;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 
+import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.game.Game;
 import com.daemonize.game.images.imageloader.ImageManager;
@@ -53,15 +59,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         SoundManager soundManager = new AndroidSoundManager(this, 16);
-
-        new MainQuestDaemonEngine(null).daemonize(()->{
-            try {
-                soundManager.loadBackgroundMusic("Tremors.mp3");
-                soundManager.playBackgroundMusic();
-            } catch (SoundException e) {
-                e.printStackTrace();
-            }
-        }).setName("Background Music Loader").start();
+//
+//        new MainQuestDaemonEngine(null).daemonize(()->{
+//            try {
+//                soundManager.loadBackgroundMusic("Tremors.mp3");
+//                soundManager.playBackgroundMusic();
+//            } catch (SoundException e) {
+//                e.printStackTrace();
+//            }
+//        }).setName("Background Music Loader").start();
 
         game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
