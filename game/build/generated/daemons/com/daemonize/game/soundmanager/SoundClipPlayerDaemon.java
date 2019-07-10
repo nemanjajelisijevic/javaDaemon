@@ -124,6 +124,7 @@ public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaem
 
   private final class StopClipMainQuest extends VoidMainQuest {
     private StopClipMainQuest() {
+      super();
       setVoid();
       this.description = "stopClip";
     }
@@ -139,6 +140,7 @@ public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaem
     private T soundclip;
 
     private PlayClipMainQuest(T soundclip) {
+      super();
       setVoid();
       this.soundclip = soundclip;
       this.description = "playClip";

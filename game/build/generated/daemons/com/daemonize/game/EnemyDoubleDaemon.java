@@ -416,6 +416,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   private final class AnimateEnemySideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateEnemySideQuest() {
+      super();
       this.description = "animateEnemy";
     }
 
@@ -455,6 +456,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     private int angle;
 
     private RotateMainQuest(int angle) {
+      super();
       setVoid();
       this.angle = angle;
       this.description = "rotate";

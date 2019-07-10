@@ -373,6 +373,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
 
   private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateBulletSideQuest() {
+      super();
       this.description = "animateBullet";
     }
 
@@ -385,6 +386,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
 
   private final class AnimateLaserSideQuest extends SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> {
     private AnimateLaserSideQuest() {
+      super();
       this.description = "animateLaser";
     }
 

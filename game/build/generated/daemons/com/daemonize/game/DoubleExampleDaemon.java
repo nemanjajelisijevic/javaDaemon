@@ -123,6 +123,7 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
 
   private final class LogAndReturnSideQuest extends SideQuest<Integer> {
     private LogAndReturnSideQuest() {
+      super();
       this.description = "logAndReturn";
     }
 

@@ -345,6 +345,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
 
   private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateBulletSideQuest() {
+      super();
       this.description = "animateBullet";
     }
 

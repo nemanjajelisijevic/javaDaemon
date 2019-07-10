@@ -483,6 +483,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   private final class AnimateTowerSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateTowerSideQuest() {
+      super();
       this.description = "animateTower";
     }
 
@@ -495,6 +496,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   private final class InitTowerSideQuest extends InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private InitTowerSideQuest() {
+      super();
       this.description = "initTower";
     }
 
@@ -511,6 +513,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     private float y;
 
     private RotateTowardsMainQuest(float x, float y) {
+      super();
       setVoid();
       this.x = x;
       this.y = y;
@@ -528,6 +531,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     private int targetangle;
 
     private RotateMainQuest(int targetangle) {
+      super();
       setVoid();
       this.targetangle = targetangle;
       this.description = "rotate";
