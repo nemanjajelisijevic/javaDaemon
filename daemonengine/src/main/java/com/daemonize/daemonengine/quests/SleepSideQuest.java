@@ -10,6 +10,11 @@ public abstract class SleepSideQuest<T> extends SideQuest<T> {
 
     protected long sleepInterval;
 
+    public SleepSideQuest() {
+        super();
+        this.sleepInterval = 10;
+    }
+
     @SuppressWarnings("unchecked")
     public <K extends SleepSideQuest<T>> K setSleepInterval(long milliseconds) {
         if (milliseconds < 1)

@@ -9,6 +9,10 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> {
     private Consumer onInterruptConsumer;
     private Runnable onInterruptClosure;
 
+    public InterruptibleSleepSideQuest() {
+        super();
+    }
+
     public void onInterrupt(Consumer consumer, Runnable interruptClosure) {
         this.onInterruptConsumer = consumer;
         this.onInterruptClosure = interruptClosure;
