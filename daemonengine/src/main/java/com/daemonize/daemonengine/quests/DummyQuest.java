@@ -13,6 +13,10 @@ public class DummyQuest extends BaseQuest<Void, DummyQuest> {
         return this;
     }
 
+    public long getSleepInterval() {
+        return sleepInterval;
+    }
+
     public DummyQuest() {
         this.state = DaemonState.SIDE_QUEST;
     }
