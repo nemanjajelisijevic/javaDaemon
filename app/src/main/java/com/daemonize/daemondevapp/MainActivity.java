@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         game.uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
+                e.printStackTrace();
                 String exc = Log.getStackTraceString(e);
                 String thread = "Thread name: " + t.getName() + ", id: " + t.getId();
                 Intent i = new Intent(Intent.ACTION_SEND);

@@ -80,7 +80,7 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
             throw new IllegalStateException("Scene not set!");
 
         if(scene.getViews().isEmpty())
-            throw new IllegalStateException("No views to be drawn. Add some views!");
+            throw new IllegalStateException("No views to be rendered. Add some views!");
 
         if(!scene.isLocked())
             throw new IllegalStateException("Scene not locked!");
