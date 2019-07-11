@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.DaemonEngine;
+import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
@@ -20,6 +21,7 @@ import com.daemonize.game.scene.Scene2D;
 import com.daemonize.game.soundmanager.DummySoundManager;
 import com.daemonize.game.soundmanager.SoundException;
 import com.daemonize.game.soundmanager.SoundManager;
+
 import com.daemonize.game.tabel.Field;
 import com.daemonize.game.tabel.Grid;
 
@@ -910,9 +912,12 @@ public class Game {
                         break;
                 }
 
-                tow.setRotationSprite(currentSprite);
+                Image[] rotSprite = currentSprite;
 
-                towerSpriteUpgrader.daemonize(tow.getPrototype()::updateSprite, new MultiViewAnimateClosure()::onReturn);
+                towerSpriteUpgrader.daemonize(() -> {
+                        tow.setRotationSprite(rotSprite);
+                        return tow.getPrototype().updateSprite();
+                    }, new MultiViewAnimateClosure()::onReturn);
 
                 currentSoundManager.playSound(towerSelectionSound);
 
@@ -935,6 +940,12 @@ public class Game {
 
                     renderer.consume(()->infoScore.setNumbers(score));
                     renderer.consume(()->upgradeButton.enable().setImage(upgradeButtonImage));
+
+                    List<DaemonState> towStates = tow.getEnginesState();
+
+                    if (towStates.get(towStates.size() - 1).equals(DaemonState.STOPPED))
+                        throw new IllegalStateException(tow.getName() + "SIDE Engine Stopped!!!!!!!!!!");
+
                 });
             });
 
@@ -1725,9 +1736,9 @@ public class Game {
 
         TowerDaemon tow = field.getObject();
 
-        if (tow != null) {//upgrade existing tower
+        if (tow != null && tow.getTowerLevel().currentLevel > 0) {//upgrade existing tower
 
-            System.err.println("Checking Tower Daemon state: " + tow.getEnginesState().toString());
+            System.err.println("Checking " + tow.getName() + " state: " + tow.getEnginesState().toString());
 
             if (!towerUpgradeDialogue.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
                 //pause();
@@ -1879,13 +1890,17 @@ public class Game {
                 towers.add(towerDaemon);
                 field.setObject(towerDaemon);
 
-                towerDaemon.start().setInitTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn).onInterrupt(gameConsumer, () -> {
+                towerDaemon.setInitTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn).onInterrupt(gameConsumer, () -> {
 
                     towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
 
                     towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, Target>>() {
                         @Override
                         public void onReturn(Return<Pair<Tower.TowerType, Target>> towerTypeAndEnemy) {
+//
+//                            List<DaemonState> enginesState = towerDaemon.getEnginesState();
+//                            if (enginesState.get(enginesState.size() - 1).equals(DaemonState.STOPPED))
+//                                throw new IllegalStateException(towerDaemon.getName() + "Side engine stopped!!!!!");
 
                             long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
 
@@ -1960,6 +1975,8 @@ public class Game {
                         }
                     });
                 });
+
+                towerDaemon.start();
             }
         }
     }

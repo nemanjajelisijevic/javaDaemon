@@ -43,7 +43,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         }
     }
 
-    private TowerLevel towerLevel = new TowerLevel(1,2,1500);
+    private TowerLevel towerLevel = new TowerLevel(0,0,Integer.MAX_VALUE);
 
     protected ImageView view;
     private ImageView hpView;
@@ -352,6 +352,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
             return root;
         }
 
+        towerLevel = new TowerLevel(1,2,1500);
         throw new InterruptedException();
     }
 

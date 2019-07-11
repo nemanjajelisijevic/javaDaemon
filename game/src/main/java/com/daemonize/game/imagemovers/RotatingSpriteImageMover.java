@@ -2,6 +2,7 @@ package com.daemonize.game.imagemovers;
 
 
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.AngleToBitmapArray;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.images.Image;
@@ -13,8 +14,12 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     protected volatile AngleToBitmapArray spriteBuffer;
     protected volatile Image[] currentRotationSprite;
     private volatile int size;
+    private DaemonSemaphore rotationSpriteSemaphore = new DaemonSemaphore();
 
     public void setRotationSprite(Image[] rotationSprite) {
+
+        rotationSpriteSemaphore.stop();
+
         int currentAngle = spriteBuffer != null ? spriteBuffer.getCurrentAngle() : 0;
         int step = 360 / rotationSprite.length;
         this.spriteBuffer = new AngleToBitmapArray(rotationSprite, step);
@@ -23,6 +28,8 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         popSprite();
         this.spriteBuffer.setCurrentAngle(currentAngle);
         setSprite(new Image[]{spriteBuffer.getCurrent()});
+
+        rotationSpriteSemaphore.go();
     }
 
     public void setCurrentAngle(int currentAngle) {
@@ -60,7 +67,9 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         pushSprite(rotateSprite, velocity.intensity);
     }
 
-    public Image[] getRotationSprite(int targetAngle) throws InterruptedException {
+    protected Image[] getRotationSprite(int targetAngle) throws InterruptedException {
+
+        rotationSpriteSemaphore.await();
 
         int currentAngle = spriteBuffer.getCurrentAngle();
 
