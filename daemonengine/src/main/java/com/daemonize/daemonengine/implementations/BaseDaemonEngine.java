@@ -18,8 +18,6 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     private Consumer consumer;
     private String name = this.getClass().getSimpleName();
 
-    BaseQuest currentQuest;
-
     protected Thread daemonThread;
     protected Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
@@ -66,6 +64,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
         System.out.println(DaemonUtils.tag() + "Daemon engine started!");
 
+        BaseQuest currentQuest;
+
         while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             currentQuest = getQuest();
@@ -81,16 +81,15 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
             setState(currentQuest.getState());
             if (!currentQuest.run())
-                //break;
-                state = DaemonState.GONE_DAEMON;
-
-            currentQuest = null;
+                setDaemonStateOnQuestFail();
         }
 
         System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
         setState(DaemonState.STOPPED);
         startStopSemaphore.go();
     }
+
+    protected abstract void setDaemonStateOnQuestFail();
 
     @Override
     public synchronized D start() {

@@ -50,6 +50,11 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
     }
 
     @Override
+    protected void setDaemonStateOnQuestFail() {
+    
+    }
+
+    @Override
     public DummyDaemon clear() {
         return this;
     }

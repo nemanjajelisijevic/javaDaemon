@@ -3,6 +3,7 @@ package com.daemonize.daemonengine.implementations;
 
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonEngine;
+import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.AnonMainQuest;
@@ -79,6 +80,11 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
         }
         mainQuestLock.unlock();
         return ret;
+    }
+
+    @Override
+    protected void setDaemonStateOnQuestFail() {
+        this.state = DaemonState.GONE_DAEMON;
     }
 
     //@Override

@@ -13,9 +13,10 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> {
         super();
     }
 
-    public void onInterrupt(Consumer consumer, Runnable interruptClosure) {
+    public InterruptibleSleepSideQuest<T> onInterrupt(Consumer consumer, Runnable interruptClosure) {
         this.onInterruptConsumer = consumer;
         this.onInterruptClosure = interruptClosure;
+        return this;
     }
 
     @SuppressWarnings("unchecked")
@@ -36,6 +37,8 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
             if (onInterruptConsumer != null && onInterruptClosure != null)
                 onInterruptConsumer.consume(onInterruptClosure);
+            else
+                throw new IllegalStateException(DaemonUtils.tag() + this.description + " onInterruptConsumer or onInterruptClosure not set!");
             return false;
         } catch (Exception ex) {
             setErrorAndUpdate(ex);

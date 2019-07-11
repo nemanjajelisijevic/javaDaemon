@@ -9,9 +9,12 @@ import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon<SideQuestDaemonEngine> {
 
-  private SideQuest sideQuest;
+  private Queue<SideQuest> sideQuestQueue = new LinkedList<>();
   private DaemonSemaphore sideQuestSemaphore = new DaemonSemaphore();
 
   public SideQuestDaemonEngine(){
@@ -31,18 +34,23 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   @Override
   public void setSideQuest(SideQuest quest) {
-    this.sideQuest = quest;
-    sideQuestSemaphore.go();
+    if (!sideQuestQueue.isEmpty())
+      sideQuestQueue.poll();
+
+    this.sideQuestQueue.add(quest);
+
+    if (sideQuestQueue.size() == 1)
+      sideQuestSemaphore.go();
   }
 
   @Override
   public SideQuest getSideQuest() {
-    return sideQuest;
+    return sideQuestQueue.peek();
   }
 
   @Override
   protected BaseQuest getQuest() {
-    return sideQuest;
+    return sideQuestQueue.peek();
   }
 
   @Override
@@ -66,6 +74,17 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
     if (uncaughtExceptionHandler != null)
       daemonThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
     daemonThread.start();
+  }
+
+  @Override
+  protected void setDaemonStateOnQuestFail() {
+    state = DaemonState.IDLE;
+    sideQuestSemaphore.stop();
+    try {
+      sideQuestSemaphore.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
