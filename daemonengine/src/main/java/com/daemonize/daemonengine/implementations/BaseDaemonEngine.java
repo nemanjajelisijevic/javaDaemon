@@ -79,9 +79,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
             if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null)
               break;
 
-            setState(currentQuest.getState());
-            if (!currentQuest.run())
-                setDaemonStateOnQuestFail();
+            runQuest(currentQuest);
         }
 
         System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
@@ -89,7 +87,10 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         startStopSemaphore.go();
     }
 
-    protected abstract void setDaemonStateOnQuestFail();
+    protected void runQuest(BaseQuest quest) {
+        setState(quest.getState());
+        quest.run();
+    };
 
     @Override
     public synchronized D start() {

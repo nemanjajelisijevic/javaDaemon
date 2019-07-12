@@ -83,8 +83,10 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
     }
 
     @Override
-    protected void setDaemonStateOnQuestFail() {
-        this.state = DaemonState.GONE_DAEMON;
+    protected void runQuest(BaseQuest quest) {
+        if(!quest.run()) {
+            setState(DaemonState.GONE_DAEMON);
+        }
     }
 
     //@Override

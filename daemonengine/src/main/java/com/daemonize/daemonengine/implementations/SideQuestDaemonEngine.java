@@ -4,22 +4,28 @@ package com.daemonize.daemonengine.implementations;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.SideQuestDaemon;
 import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.quests.InterruptibleQuest;
+import com.daemonize.daemonengine.quests.InterruptibleSideQuest;
+import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
-import com.daemonize.daemonengine.utils.DaemonSemaphore;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon<SideQuestDaemonEngine> {
 
-  private Queue<SideQuest> sideQuestQueue = new LinkedList<>();
-  private DaemonSemaphore sideQuestSemaphore = new DaemonSemaphore().setName("Side Quest Waiter");
+  private SideQuest currentSideQuest;
+
+  private Lock sideQuestLock = new ReentrantLock();
+  private Condition sideQuestCondition = sideQuestLock.newCondition();
 
   public SideQuestDaemonEngine(){
     super();
-    sideQuestSemaphore.stop();
   }
 
   public <T> SideQuest<T> setSideQuest(Consumer consumer, final Quest<T> sideQuest) {
@@ -34,23 +40,20 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   @Override
   public void setSideQuest(SideQuest quest) {
-    if (!sideQuestQueue.isEmpty())
-      sideQuestQueue.poll();
-
-    this.sideQuestQueue.add(quest);
-
-    if (sideQuestQueue.size() == 1)
-      sideQuestSemaphore.go();
+    sideQuestLock.lock();
+    currentSideQuest = quest;
+    sideQuestCondition.signal();
+    sideQuestLock.unlock();
   }
 
   @Override
   public SideQuest getSideQuest() {
-    return sideQuestQueue.peek();
+    return currentSideQuest;
   }
 
   @Override
   protected BaseQuest getQuest() {
-    return sideQuestQueue.peek();
+    return currentSideQuest;
   }
 
   @Override
@@ -63,9 +66,15 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
     daemonThread = new Thread(new Runnable() {
       @Override
       public void run() {
+        sideQuestLock.lock();
         try {
-          sideQuestSemaphore.await();
-        } catch (InterruptedException e) {}
+          while (currentSideQuest == null)
+            sideQuestCondition.await();
+        } catch (InterruptedException e) {
+        } finally {
+          sideQuestLock.unlock();
+        }
+
         loop();
       }
     });
@@ -77,13 +86,26 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
   }
 
   @Override
-  protected void setDaemonStateOnQuestFail() {
-    state = DaemonState.IDLE;
-    sideQuestSemaphore.stop();
-    try {
-      sideQuestSemaphore.await();
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+  protected void runQuest(BaseQuest quest) {
+    setState(quest.getState());
+    if(!quest.run()) {
+      sideQuestLock.lock();
+      try {
+
+        currentSideQuest = null;
+
+        if (quest instanceof InterruptibleQuest)
+          ((InterruptibleQuest) quest).getOnInterruptRunnable().run();
+
+        while (currentSideQuest == null) {
+          setState(DaemonState.IDLE);
+          sideQuestCondition.await();
+        }
+
+      } catch (InterruptedException e) {
+      } finally {
+        sideQuestLock.unlock();
+      }
     }
   }
 
@@ -95,7 +117,9 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   @Override
   public synchronized void stop() {
-    sideQuestSemaphore.go();
+    sideQuestLock.lock();
+    sideQuestCondition.signal();
+    sideQuestLock.unlock();
     super.stop();
   }
 }
