@@ -42,6 +42,11 @@ public class DaemonCountingLatch {
         }
     }
 
+    public DaemonCountingLatch clear() {
+        counter = 0;
+        return this;
+    }
+
     public String getName() {
         return name;
     }
