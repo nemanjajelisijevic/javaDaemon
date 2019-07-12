@@ -3,14 +3,14 @@ package com.daemonize.daemonengine.utils;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DaemonSimpleSemaphore {
+public class DaemonBinarySemaphore {
 
     private String name = this.getClass().getSimpleName();
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition condition = lock.newCondition();
     private volatile boolean flag = false;
 
-    public DaemonSimpleSemaphore() {}
+    public DaemonBinarySemaphore() {}
 
     public void go() {
         lock.lock();
@@ -30,7 +30,7 @@ public class DaemonSimpleSemaphore {
         }
     }
 
-    public DaemonSimpleSemaphore setName(String name) {
+    public DaemonBinarySemaphore setName(String name) {
         this.name = name;
         return this;
     }
