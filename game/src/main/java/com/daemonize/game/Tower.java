@@ -210,7 +210,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return this;
     }
 
-    private DaemonSemaphore scanSemaphore = new DaemonSemaphore();
+    private DaemonSemaphore scanSemaphore = new DaemonSemaphore().setName("Tower Scan semaphore");
 
     @CallingThread
     public ImageView getView() {

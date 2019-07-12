@@ -1890,17 +1890,13 @@ public class Game {
                 towers.add(towerDaemon);
                 field.setObject(towerDaemon);
 
-                towerDaemon.setInitTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn).onInterrupt(gameConsumer, () -> {
+                towerDaemon.start().setInitTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn).onInterrupt(gameConsumer, () -> {
 
                     towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
 
-                    towerDaemon.start().scan(new Closure<Pair<Tower.TowerType, Target>>() {
+                    towerDaemon.scan(new Closure<Pair<Tower.TowerType, Target>>() {
                         @Override
                         public void onReturn(Return<Pair<Tower.TowerType, Target>> towerTypeAndEnemy) {
-//
-//                            List<DaemonState> enginesState = towerDaemon.getEnginesState();
-//                            if (enginesState.get(enginesState.size() - 1).equals(DaemonState.STOPPED))
-//                                throw new IllegalStateException(towerDaemon.getName() + "Side engine stopped!!!!!");
 
                             long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
 

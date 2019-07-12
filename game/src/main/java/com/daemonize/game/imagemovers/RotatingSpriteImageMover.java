@@ -14,7 +14,7 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     protected volatile AngleToBitmapArray spriteBuffer;
     protected volatile Image[] currentRotationSprite;
     private volatile int size;
-    private DaemonSemaphore rotationSpriteSemaphore = new DaemonSemaphore();
+    private DaemonSemaphore rotationSpriteSemaphore = new DaemonSemaphore().setName("Rotation Sprite Regulator");
 
     public void setRotationSprite(Image[] rotationSprite) {
 

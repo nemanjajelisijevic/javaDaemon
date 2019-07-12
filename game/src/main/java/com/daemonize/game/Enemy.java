@@ -30,7 +30,7 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     private boolean paralyzed = false;
 
     private volatile Target target;
-    private DaemonSemaphore targetSemaphore = new DaemonSemaphore();
+    private DaemonSemaphore targetSemaphore = new DaemonSemaphore().setName("Enemy Target semaphore");
 
     private PositionedImage hBar = new PositionedImage();
 

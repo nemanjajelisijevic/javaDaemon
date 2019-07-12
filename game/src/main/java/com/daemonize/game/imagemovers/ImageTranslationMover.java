@@ -34,8 +34,8 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     private Runnable outOfBordersClosure;
     private PositionedImage ret = new PositionedImage();
 
-    protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore();
-    private DaemonSemaphore pauseSemaphore = new DaemonSemaphore();
+    protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore().setName("Animate Semaphore");
+    private DaemonSemaphore pauseSemaphore = new DaemonSemaphore().setName("Global pause semaphore");
 
     public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
         this.spriteIterator = new BasicSpriteIterator(sprite);
