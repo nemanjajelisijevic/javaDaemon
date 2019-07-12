@@ -21,7 +21,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     protected Thread daemonThread;
     protected Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
-    private DaemonSemaphore startStopSemaphore = new DaemonSemaphore();
+    private DaemonSemaphore startStopSemaphore = new DaemonSemaphore().setName("Start/Stop Daemon Semaphore");
 
     public D setName(String name) {
       this.name = name;

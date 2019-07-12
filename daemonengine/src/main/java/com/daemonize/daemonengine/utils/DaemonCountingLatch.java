@@ -5,9 +5,16 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DaemonCountingLatch {
 
+    private String name = this.getClass().getSimpleName();
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition condition = lock.newCondition();
     private volatile int counter = 0;
+
+    public DaemonCountingLatch() {}
+
+    public DaemonCountingLatch(int startCount) {
+        this.counter = startCount;
+    }
 
     public void subscribe() {
         lock.lock();
@@ -17,7 +24,7 @@ public class DaemonCountingLatch {
 
     public void unsubscribe() {
         lock.lock();
-        if (--counter < 1) {//TODO prevent counter to be less than 0
+        if (--counter < 1) {
             condition.signalAll();
             counter = 0;
         }
@@ -27,7 +34,7 @@ public class DaemonCountingLatch {
     public void await() throws InterruptedException {
         lock.lock();
         try {
-            while(counter != 0) {
+            while(counter > 0) {
                 condition.await();
             }
         } finally {
@@ -35,4 +42,12 @@ public class DaemonCountingLatch {
         }
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public DaemonCountingLatch setName(String name) {
+        this.name = name;
+        return this;
+    }
 }

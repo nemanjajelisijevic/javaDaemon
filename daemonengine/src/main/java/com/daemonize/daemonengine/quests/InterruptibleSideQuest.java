@@ -35,6 +35,8 @@ public abstract class InterruptibleSideQuest<T> extends SideQuest<T> {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
             if (onInterruptConsumer != null && onInterruptClosure != null)
                 onInterruptConsumer.consume(onInterruptClosure);
+            else
+                throw new IllegalStateException(DaemonUtils.tag() + this.description + " onInterruptConsumer or onInterruptClosure not set!");
             return false;
         } catch (Exception ex) {
             setErrorAndUpdate(ex);

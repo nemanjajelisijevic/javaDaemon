@@ -2,6 +2,7 @@ package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> {
@@ -19,7 +20,7 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> {
         return this;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public InterruptibleSleepSideQuest<T> setClosure(Closure<T> closure) {
         super.setClosure(closure);
         return this;
@@ -35,9 +36,9 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> {
             return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
-            if (onInterruptConsumer != null && onInterruptClosure != null)
+            if (onInterruptConsumer != null && onInterruptClosure != null) {
                 onInterruptConsumer.consume(onInterruptClosure);
-            else
+            } else
                 throw new IllegalStateException(DaemonUtils.tag() + this.description + " onInterruptConsumer or onInterruptClosure not set!");
             return false;
         } catch (Exception ex) {

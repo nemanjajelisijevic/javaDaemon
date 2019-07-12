@@ -15,7 +15,7 @@ import java.util.Queue;
 public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon<SideQuestDaemonEngine> {
 
   private Queue<SideQuest> sideQuestQueue = new LinkedList<>();
-  private DaemonSemaphore sideQuestSemaphore = new DaemonSemaphore();
+  private DaemonSemaphore sideQuestSemaphore = new DaemonSemaphore().setName("Side Quest Waiter");
 
   public SideQuestDaemonEngine(){
     super();
