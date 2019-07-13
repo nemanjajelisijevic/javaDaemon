@@ -53,6 +53,18 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   @Override
   protected BaseQuest getQuest() {
+
+    sideQuestLock.lock();
+    try {
+      while (currentSideQuest == null) {
+        setState(DaemonState.IDLE);
+        sideQuestCondition.await();
+      }
+    } catch (InterruptedException ex) {}
+    finally {
+      sideQuestLock.unlock();
+    }
+
     return currentSideQuest;
   }
 
@@ -66,14 +78,14 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
     daemonThread = new Thread(new Runnable() {
       @Override
       public void run() {
-        sideQuestLock.lock();
-        try {
-          while (currentSideQuest == null)
-            sideQuestCondition.await();
-        } catch (InterruptedException e) {
-        } finally {
-          sideQuestLock.unlock();
-        }
+//        sideQuestLock.lock();
+//        try {
+//          while (currentSideQuest == null)
+//            sideQuestCondition.await();
+//        } catch (InterruptedException e) {
+//        } finally {
+//          sideQuestLock.unlock();
+//        }
 
         loop();
       }
