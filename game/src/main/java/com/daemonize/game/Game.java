@@ -941,10 +941,10 @@ public class Game {
                     renderer.consume(()->infoScore.setNumbers(score));
                     renderer.consume(()->upgradeButton.enable().setImage(upgradeButtonImage));
 
-                    List<DaemonState> towStates = tow.getEnginesState();
-
-                    if (towStates.get(towStates.size() - 1).equals(DaemonState.STOPPED))
-                        throw new IllegalStateException(tow.getName() + "SIDE Engine Stopped!!!!!!!!!!");
+//                    List<DaemonState> towStates = tow.getEnginesState();
+//
+//                    if (towStates.get(towStates.size() - 1).equals(DaemonState.STOPPED))
+//                        throw new IllegalStateException(tow.getName() + "SIDE Engine Stopped!!!!!!!!!!");
 
                 });
             });
@@ -1586,11 +1586,14 @@ public class Game {
                                             towers.remove(target);
                                             field.setObject(null);
 
+                                            grid.destroyTower(field.getRow(), field.getColumn());
+                                            renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
+
                                             //remove tower from grid and recalculate path
-                                            if (grid.destroyTower(field.getRow(), field.getColumn()))
-                                                renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
-                                            else
-                                                throw new IllegalStateException("Could not destroy tower");
+//                                            if (grid.destroyTower(field.getRow(), field.getColumn()))
+//                                                renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
+//                                            else
+//                                                throw new IllegalStateException("Could not destroy tower[" + field.getRow() + "][" + field.getColumn() + "]");
 
                                         }).queueStop();
                                     });

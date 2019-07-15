@@ -1,6 +1,7 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
@@ -359,7 +360,9 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateTower() throws InterruptedException {
         try {
+            //System.err.println(DaemonUtils.timedTag() + "About to await on Animate Semaphore");
             animateSemaphore.await();
+            //System.err.println(DaemonUtils.timedTag() + "Done waiting on Animate Semaphore");
             return updateSprite();
         } catch (InterruptedException ex) {
             return null;

@@ -43,20 +43,7 @@ public class AwaitedArraySprite {
             while(!flag)
                 condition.await();
         } finally {
-            //flag = false;
-            lock.unlock();
-        }
-    }
-
-    public void await(Runnable action) throws InterruptedException {
-        lock.lock();
-        try {
-            while(!flag)
-                condition.await();
-        } finally {
             flag = false;
-            if (action != null)
-                action.run();
             lock.unlock();
         }
     }
