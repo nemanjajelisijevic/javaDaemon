@@ -2,6 +2,7 @@ package com.daemonize.daemonengine.implementations;
 
 
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.SideQuestDaemon;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.InterruptibleQuest;
@@ -17,7 +18,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon<SideQuestDaemonEngine> {
+public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon<SideQuestDaemonEngine>, EagerDaemon<SideQuestDaemonEngine> {
 
   private SideQuest currentSideQuest;
 
@@ -74,37 +75,13 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
   }
 
   @Override
-  protected void initThread() {
-    daemonThread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-//        sideQuestLock.lock();
-//        try {
-//          while (currentSideQuest == null)
-//            sideQuestCondition.await();
-//        } catch (InterruptedException e) {
-//        } finally {
-//          sideQuestLock.unlock();
-//        }
-
-        loop();
-      }
-    });
-    daemonThread.setName(getName());
-    setState(DaemonState.INITIALIZING);
-    if (uncaughtExceptionHandler != null)
-      daemonThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
-    daemonThread.start();
-  }
-
-  @Override
   protected void runQuest(BaseQuest quest) {
     setState(quest.getState());
     if(!quest.run()) {
       sideQuestLock.lock();
       try {
 
-        currentSideQuest = null;
+        currentSideQuest = null; //TODO check if nulling is neccessary
 
         if (quest instanceof InterruptibleQuest)
           ((InterruptibleQuest) quest).getOnInterruptRunnable().run();
@@ -133,5 +110,25 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
     sideQuestCondition.signal();
     sideQuestLock.unlock();
     super.stop();
+  }
+
+  @Override
+  public SideQuestDaemonEngine interrupt() {
+    if (!state.equals(DaemonState.STOPPED) && !state.equals(DaemonState.IDLE)) {
+      if (daemonThread != null
+              && !Thread.currentThread().equals(daemonThread)
+              && daemonThread.isAlive()) {
+        daemonThread.interrupt();
+      }
+    }
+    return this;
+  }
+
+  @Override
+  public SideQuestDaemonEngine clearAndInterrupt() {
+    sideQuestLock.lock();
+    currentSideQuest = null;
+    sideQuestLock.unlock();
+    return interrupt();
   }
 }
