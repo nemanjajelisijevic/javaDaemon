@@ -99,12 +99,6 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
   }
 
   @Override
-  public synchronized SideQuestDaemonEngine start() {
-    super.start();
-    return this;
-  }
-
-  @Override
   public synchronized void stop() {
     sideQuestLock.lock();
     sideQuestCondition.signal();
