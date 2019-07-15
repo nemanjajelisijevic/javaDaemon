@@ -20,10 +20,10 @@ public class TowerUpgradeDialog {
 
     public TowerUpgradeDialog(int absX, int absY, Image dialogueImageTowerUpgrade,
                               Button upgradeButton, Button closeButton, Button saleButton,
-                              float width,float height) {
+                              float width,float height, int zIndex) {
 
         //this.dialogueImageTowerUpgrade = dialogueImageTowerUpgradeLevel;
-        towerUpgrade = new CompositeImageViewImpl("Root", absX,absY,10, width, height);
+        towerUpgrade = new CompositeImageViewImpl("Root", absX,absY,zIndex, width, height);
         towerUpgrade.addChild(new CompositeImageViewImpl("TowerView", width / 2, height/ 2, dialogueImageTowerUpgrade));
         float h = height / 2 + dialogueImageTowerUpgrade.getHeight()/2;
         towerUpgrade.addChild(upgradeButton.setRelativeX(width - upgradeButton.getWidth() / 2)

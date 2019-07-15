@@ -20,16 +20,18 @@ public class AwaitedArraySprite {
         this.sprite = sprite;
     }
 
-    public synchronized AwaitedArraySprite setSprite(Image[] sprite) {
-        this.sprite = sprite;
+    public AwaitedArraySprite setSprite(Image[] sprite) {
         lock.lock();
+        this.sprite = sprite;
         flag = false;
         lock.unlock();
         return this;
     }
 
-    public synchronized AwaitedArraySprite clearCache() {
+    public AwaitedArraySprite clearCache() {
+        lock.lock();
         sprite = null;
+        lock.unlock();
         return this;
     }
 
@@ -48,7 +50,9 @@ public class AwaitedArraySprite {
         }
     }
 
-    public synchronized Image getNext() {
+    public Image getNext() {
+
+        lock.lock();
 
         if (cnt >= sprite.length)
             cnt = 0;
@@ -56,12 +60,13 @@ public class AwaitedArraySprite {
         Image ret = sprite[cnt++];
 
         if (cnt == sprite.length) {
-            lock.lock();
+
             flag = true;
             condition.signal();
-            lock.unlock();
             cnt = 0;
         }
+
+        lock.unlock();
 
         return ret;
     }

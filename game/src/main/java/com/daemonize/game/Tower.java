@@ -165,12 +165,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         boolean ret = false;
         targetLock.lock();
         if (!targetQueue.contains(target)) {
-            if (targetQueue.isEmpty()) {
-                ret = targetQueue.add(target);
-                targetCondition.signalAll();
-            } else {
-                ret = targetQueue.add(target);
-            }
+            ret = targetQueue.add(target);
+            targetCondition.signalAll();
         }
         targetLock.unlock();
         return ret;
@@ -189,7 +185,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
                 towerLevel.reloadInterval -=500;
                 break;
             }
-            case 3: { //top level
+            case 3: {//top level
                 towerLevel.bulletDamage += 5;
                 towerLevel.reloadInterval -= 800;
                 break;

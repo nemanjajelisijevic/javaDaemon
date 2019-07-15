@@ -35,15 +35,15 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
-
   protected EagerMainQuestDaemonEngine goToDaemonEngine;
+
+  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
 
   public EnemyDoubleDaemon(Consumer consumer, Enemy prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
-    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
+    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -125,6 +125,10 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon setHp(int hp) {
     prototype.setHp(hp);
     return this;
+  }
+
+  public ImageView getParalyzedView() {
+    return prototype.getParalyzedView();
   }
 
   public EnemyDoubleDaemon setPreviousField(Pair<Integer, Integer> previousfield) {
@@ -221,6 +225,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return prototype.getSize();
   }
 
+  public EnemyDoubleDaemon setParalyzedView(ImageView paralyzedview) {
+    prototype.setParalyzedView(paralyzedview);
+    return this;
+  }
+
   public SideQuest getCurrentSideQuest() {
     return this.sideDaemonEngine.getSideQuest();
   }
@@ -230,6 +239,13 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon setBorders(float x1, float x2, float y1, float y2,
       Closure<ImageTranslationMover> closure) {
     mainDaemonEngine.pursueQuest(new SetBordersMainQuest(x1, x2, y1, y2, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Enemy#setParalyzedImage} */
+  public EnemyDoubleDaemon setParalyzedImage(Image paralyzedimage, Closure<Enemy> closure) {
+    mainDaemonEngine.pursueQuest(new SetParalyzedImageMainQuest(paralyzedimage, closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -450,6 +466,21 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     @Override
     public final ImageTranslationMover pursue() throws Exception {
       return prototype.setBorders(x1, x2, y1, y2);
+    }
+  }
+
+  private final class SetParalyzedImageMainQuest extends MainQuest<Enemy> {
+    private Image paralyzedimage;
+
+    private SetParalyzedImageMainQuest(Image paralyzedimage, Closure<Enemy> closure) {
+      super(closure);
+      this.paralyzedimage = paralyzedimage;
+      this.description = "setParalyzedImage";
+    }
+
+    @Override
+    public final Enemy pursue() throws Exception {
+      return prototype.setParalyzedImage(paralyzedimage);
     }
   }
 

@@ -154,6 +154,8 @@ public class Game {
     private Image[] healthBarSprite;
     private Image[] enemyMissileSprite;
 
+    private Image paralyzed;
+
     private Image target;
 
     private DummyDaemon enemyGenerator;
@@ -485,6 +487,8 @@ public class Game {
                 scoreBackGrImage = imageManager.loadImageFromAssets("SmallBox.png", scoreWidth, scoreHeight);
 
                 laserSprite = new Image[] {imageManager.loadImageFromAssets("greenPhoton.png",  width / 10, width / 10)};
+
+                paralyzed = imageManager.loadImageFromAssets("paralyzed1.png", width, height);
 
                 //init enemy sprite
                 enemySprite = new Image[36];
@@ -1000,7 +1004,8 @@ public class Game {
                     closeButton,
                     saleButton,
                     borderX / 3,
-                    borderY / 2
+                    borderY / 2,
+                    20
             );
 
             Button tow1 = new Button("TowerType1", redTower.get(0)[0]).onClick(()->{
@@ -1108,6 +1113,7 @@ public class Game {
                     renderer.consume(()->{
                         enemy.getHpView().hide().setAbsoluteX(0).setAbsoluteY(0);
                         enemy.getTargetView().hide().setAbsoluteX(0).setAbsoluteY(0);
+                        enemy.getParalyzedView().hide().setAbsoluteX(0).setAbsoluteY(0);
                     });
 
                     System.err.println(DaemonUtils.tag() + enemy.getEnginesState().toString());
@@ -1274,7 +1280,10 @@ public class Game {
                                 .setHpView(scene.addImageView(new ImageViewImpl(enemyName + " HP View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(10)))
                                 .setTargetView(scene.addImageView(new ImageViewImpl(enemyName + " Target View").setImage(target).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(10)))
                                 .setHealthBarImage(healthBarSprite)
-                ).setName(enemyName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
+                                .setParalyzedImage(paralyzed)
+                ).setParalyzedView(scene.addImageView(new ImageViewImpl(enemyName + " Paralyzed View").setImage(paralyzed).setAbsoluteX(0).setAbsoluteY(0).setZindex(11).hide()))
+                .setName(enemyName)
+                .setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 enemy.getPrototype().setBorders(
                         0,
@@ -1588,13 +1597,6 @@ public class Game {
 
                                             grid.destroyTower(field.getRow(), field.getColumn());
                                             renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
-
-                                            //remove tower from grid and recalculate path
-//                                            if (grid.destroyTower(field.getRow(), field.getColumn()))
-//                                                renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
-//                                            else
-//                                                throw new IllegalStateException("Could not destroy tower[" + field.getRow() + "][" + field.getColumn() + "]");
-
                                         }).queueStop();
                                     });
                         }
@@ -1741,7 +1743,7 @@ public class Game {
 
         if (tow != null && tow.getTowerLevel().currentLevel > 0) {//upgrade existing tower
 
-            System.err.println("Checking " + tow.getName() + " state: " + tow.getEnginesState().toString());
+            //System.err.println("Checking " + tow.getName() + " state: " + tow.getEnginesState().toString() + ", prototype: " + tow.toString());
 
             if (!towerUpgradeDialogue.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
                 //pause();
@@ -2143,16 +2145,20 @@ public class Game {
                 target.setVelocity(velocity);
 
                 if (enemyParalyizer.queueSize() == 0) {
+                    renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().show());
                     enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), () -> {
                         target.setParalyzed(false);
+                        renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().hide());
                         if (target.isShootable())
                             target.setVelocity(enemyVelocity);
                     });
                 } else {
+                    renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().show());
                     new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(()->{
                         System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
                         Thread.sleep(enemyParalyzingInterval);
                     },()->{
+                        renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().hide());
                         target.setParalyzed(false);
                         if (target.isShootable())
                             target.setVelocity(enemyVelocity);

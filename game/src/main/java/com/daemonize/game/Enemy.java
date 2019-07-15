@@ -21,11 +21,13 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     private ImageView view;
     private ImageView hpView;
     private ImageView targetView;
+    private ImageView paralyzedView;
 
     private volatile int hpMax;
     private volatile int hp;
     private volatile boolean shootable = true;
     private Image[] spriteHealthBarImage;
+    //private Image paralyzedImage;
 
     private boolean paralyzed = false;
 
@@ -33,12 +35,23 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     private DaemonSemaphore targetSemaphore = new DaemonSemaphore().setName("Enemy Target semaphore");
 
     private PositionedImage hBar = new PositionedImage();
+    private PositionedImage paralyzedPosImage = new PositionedImage();
 
     public Enemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
         super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
         this.hp = hp;
         this.hpMax = hp;
         this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
+    }
+
+    @CallingThread
+    public ImageView getParalyzedView() {
+        return paralyzedView;
+    }
+
+    @CallingThread
+    public void setParalyzedView(ImageView paralyzedView) {
+        this.paralyzedView = paralyzedView;
     }
 
     @CallingThread
@@ -97,6 +110,11 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
 
     public Enemy setHealthBarImage(Image[] healthBarImage) {
         this.spriteHealthBarImage = healthBarImage;
+        return this;
+    }
+
+    public Enemy setParalyzedImage(Image paralyzedImage) {
+        this.paralyzedPosImage.image = paralyzedImage;
         return this;
     }
 
@@ -209,6 +227,11 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         hBar.positionY = lastCoord.getSecond() - 2 * hBar.image.getHeight();
         root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
 
+        if (paralyzed) {
+            paralyzedPosImage.positionX = enemyPosBmp.positionX;
+            paralyzedPosImage.positionY = enemyPosBmp.positionY;
+            root.addChild(new GenericNode<>(Pair.create(paralyzedPosImage, paralyzedView)));
+        }
         return root;
     }
 }
