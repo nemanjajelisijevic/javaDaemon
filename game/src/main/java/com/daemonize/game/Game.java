@@ -866,15 +866,15 @@ public class Game {
             backgroundView = scene.addImageView(new ImageViewImpl("Background").setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
 
             //dialogues and ui views
-            scoreBackGrView = new ImageViewImpl("Score Background").setImage(scoreBackGrImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(3).show();
-            scoreTitleView = new ImageViewImpl("Score Title").setAbsoluteX(0).setAbsoluteY(0).setZindex(4).show();
+            scoreBackGrView = new ImageViewImpl("Score Background").setImage(scoreBackGrImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(3);
+            scoreTitleView = new ImageViewImpl("Score Title").setAbsoluteX(0).setAbsoluteY(0).setZindex(4);
 
             viewsNum = new ImageView[5];
-            viewsNum[0] = new ImageViewImpl("Score 1. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
-            viewsNum[1] = new ImageViewImpl("Score 2. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
-            viewsNum[2] = new ImageViewImpl("Score 3. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
-            viewsNum[3] = new ImageViewImpl("Score 4. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
-            viewsNum[4] = new ImageViewImpl("Score 5. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5).show();
+            viewsNum[0] = new ImageViewImpl("Score 1. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5);
+            viewsNum[1] = new ImageViewImpl("Score 2. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5);
+            viewsNum[2] = new ImageViewImpl("Score 3. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5);
+            viewsNum[3] = new ImageViewImpl("Score 4. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5);
+            viewsNum[4] = new ImageViewImpl("Score 5. digit").setImage(scorenumbersImages[0]).setAbsoluteX(0).setAbsoluteY(0).setZindex(5);
 
             //money views
             moneyView = Pair.create(
@@ -2129,12 +2129,20 @@ public class Game {
             Runnable destructionClosure
     ) {
 
-        if (target.isParalyzed())
+        if (!target.isShootable() || target.isParalyzed())
             return;
 
         target.setParalyzed(true);
 
         currentSoundManager.playSound(laserSound);
+
+
+        Runnable paralyzerClosure = () -> {
+            target.setParalyzed(false);
+            renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().hide());
+            if (target.isShootable())
+                target.setVelocity(enemyVelocity);
+        };
 
         laser.desintegrateTarget(source, target, duration, renderer, ret -> {
 
@@ -2146,23 +2154,13 @@ public class Game {
 
                 if (enemyParalyizer.queueSize() == 0) {
                     renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().show());
-                    enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), () -> {
-                        target.setParalyzed(false);
-                        renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().hide());
-                        if (target.isShootable())
-                            target.setVelocity(enemyVelocity);
-                    });
+                    enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), paralyzerClosure);
                 } else {
                     renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().show());
                     new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(()->{
                         System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
                         Thread.sleep(enemyParalyzingInterval);
-                    },()->{
-                        renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().hide());
-                        target.setParalyzed(false);
-                        if (target.isShootable())
-                            target.setVelocity(enemyVelocity);
-                    });
+                    },paralyzerClosure);
                 }
 
             } else
