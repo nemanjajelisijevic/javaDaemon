@@ -7,8 +7,6 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements InterruptibleQuest<InterruptibleSideQuest<T>> {
 
-//    protected Consumer onInterruptConsumer;
-//    protected Runnable onInterruptClosure;
     private Runnable onInterruptRunnable;
     private DaemonCountingLatch initLatch = new DaemonCountingLatch(2).setName(this.getClass().getSimpleName() + " init latch");
 
@@ -24,8 +22,6 @@ public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements 
                 consumer.consume(interruptClosure);
             }
         };
-//        this.onInterruptConsumer = consumer;
-//        this.onInterruptClosure = interruptClosure;
         initLatch.unsubscribe();
         return this;
     }
@@ -51,10 +47,6 @@ public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements 
             return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
-//            if (onInterruptConsumer != null && onInterruptClosure != null)
-//                onInterruptConsumer.consume(onInterruptClosure);
-//            else
-//                throw new IllegalStateException(DaemonUtils.tag() + this.description + " onInterruptConsumer or onInterruptClosure not set!");
             initLatch.clear();
             return false;
         } catch (Exception ex) {

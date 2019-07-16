@@ -15,12 +15,11 @@ public abstract class SleepSideQuest<T> extends SideQuest<T> {
         this.sleepInterval = 10;
     }
 
-    @SuppressWarnings("unchecked")
-    public <K extends SleepSideQuest<T>> K setSleepInterval(long milliseconds) {
+    public <Q extends SleepSideQuest<T>> Q setSleepInterval(long milliseconds) {
         if (milliseconds < 1)
             throw new IllegalArgumentException("Sleep interval can not be less than 1");
         this.sleepInterval = milliseconds;
-        return (K) this;
+        return (Q) this;
     }
 
     @Override

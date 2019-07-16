@@ -30,12 +30,7 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
   }
 
   public <T, Q extends SideQuest<T>> Q setSideQuest(Consumer consumer, final Q sideQuest) {
-    setSideQuest((SideQuest) new SideQuest() {
-      @Override
-      public T pursue() throws Exception {
-        return sideQuest.pursue();
-      }
-    }.setConsumer(consumer));
+    setSideQuest(sideQuest.setConsumer(consumer));
     return sideQuest;
   }
 

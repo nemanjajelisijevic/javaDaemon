@@ -8,8 +8,6 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> implements InterruptibleQuest<InterruptibleSleepSideQuest<T>>{
 
-//    private Consumer onInterruptConsumer;
-//    private Runnable onInterruptClosure;
     private Runnable onInterruptRunnable;
     private DaemonCountingLatch initLatch = new DaemonCountingLatch(2).setName(this.getClass().getSimpleName() + " init latch");
 
@@ -29,8 +27,6 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
                 consumer.consume(interruptClosure);
             }
         };
-//        this.onInterruptConsumer = consumer;
-//        this.onInterruptClosure = interruptClosure;
         initLatch.unsubscribe();
         return this;
     }
@@ -39,6 +35,12 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
     public InterruptibleSleepSideQuest<T> setClosure(Closure<T> closure) {
         super.setClosure(closure);
         initLatch.unsubscribe();
+        return this;
+    }
+
+    @Override
+    public InterruptibleSleepSideQuest<T> setSleepInterval(long milliseconds) {
+        super.setSleepInterval(milliseconds);
         return this;
     }
 
@@ -53,10 +55,6 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
             return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
-//            if (onInterruptConsumer != null && onInterruptClosure != null) {
-//                onInterruptConsumer.consume(onInterruptClosure);
-//            } else
-//                throw new IllegalStateException(DaemonUtils.tag() + this.description + " onInterruptConsumer or onInterruptClosure not set!");
             initLatch.clear();
             return false;
         } catch (Exception ex) {
