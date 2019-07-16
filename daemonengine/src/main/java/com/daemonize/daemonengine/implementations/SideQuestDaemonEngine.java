@@ -29,14 +29,14 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
     super();
   }
 
-  public <T> SideQuest<T> setSideQuest(Consumer consumer, final Quest<T> sideQuest) {
+  public <T, Q extends SideQuest<T>> Q setSideQuest(Consumer consumer, final Q sideQuest) {
     setSideQuest((SideQuest) new SideQuest() {
       @Override
       public T pursue() throws Exception {
         return sideQuest.pursue();
       }
     }.setConsumer(consumer));
-    return getSideQuest();
+    return sideQuest;
   }
 
   @Override
