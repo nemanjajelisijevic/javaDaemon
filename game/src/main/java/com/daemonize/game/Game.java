@@ -5,7 +5,10 @@ import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
+import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
+import com.daemonize.daemonengine.quests.InterruptibleSideQuest;
+import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
@@ -929,8 +932,6 @@ public class Game {
 
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
 
-                    //tow.cont();
-
                     CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
 
                     renderer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
@@ -944,12 +945,6 @@ public class Game {
 
                     renderer.consume(()->infoScore.setNumbers(score));
                     renderer.consume(()->upgradeButton.enable().setImage(upgradeButtonImage));
-
-//                    List<DaemonState> towStates = tow.getEnginesState();
-//
-//                    if (towStates.get(towStates.size() - 1).equals(DaemonState.STOPPED))
-//                        throw new IllegalStateException(tow.getName() + "SIDE Engine Stopped!!!!!!!!!!");
-
                 });
             });
 
@@ -1797,29 +1792,37 @@ public class Game {
                     boolean isGeenFieldShown = fieldView.isShowing() && fieldView.getImage().equals(fieldImage);
                     renderer.consume(fieldView.setImage(fieldImageTowerDen)::show);
 
-                    AtomicInteger markerCnt = new AtomicInteger(0);
+                    SideQuestDaemonEngine denyMarker = new SideQuestDaemonEngine().setName("Denied Marker");
+                    denyMarker.start().setSideQuest(renderer, new InterruptibleSleepSideQuest<Boolean>() {
 
-                    DummyDaemon deniedMarker = new DummyDaemon(renderer, 300);
-                    deniedMarker.setClosure(() -> {
+                        private int cnt = 0;
 
-                        if (fieldView.isShowing())
-                            fieldView.hide();
-                        else
-                            fieldView.show();
-
-                        if (markerCnt.intValue() == 6) {
-                            fieldView.setImage(fieldImage);
-                            if (isGeenFieldShown)
-                                fieldView.show();
-                            else
-                                fieldView.hide();
-                            deniedMarker.stop();
-                            deny = false;
+                        @Override
+                        public Boolean pursue() throws Exception {
+                            if (cnt++ <= 6) {
+                                if (cnt % 2 == 0)
+                                    return false;
+                                else
+                                    return true;
+                            } else
+                                throw new InterruptedException();
                         }
+                    }).setSleepInterval(300).setClosure(showDeniedmarker -> {
+                        if (showDeniedmarker.runtimeCheckAndGet())
+                            fieldView.show();
+                        else
+                            fieldView.hide();
+                    }).onInterrupt(renderer, () -> {
+                        denyMarker.stop();
 
-                        markerCnt.incrementAndGet();
+                        deny = false;
+                        fieldView.setImage(fieldImage);
 
-                    }).setName("Denied marker").start();
+                        if (isGeenFieldShown)
+                            fieldView.show();
+                        else
+                            fieldView.hide();
+                    });
                 }
             } else {
 
