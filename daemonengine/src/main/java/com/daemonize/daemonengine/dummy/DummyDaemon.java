@@ -1,5 +1,6 @@
 package com.daemonize.daemonengine.dummy;
 
+import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.DummyQuest;
@@ -47,6 +48,13 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
     public DummyDaemon setSleepInterval(long sleepInMillis) {
         dummyQuest.setSleepInterval(sleepInMillis);
         return this;
+    }
+
+    @Override
+    protected void runQuest(BaseQuest quest) {
+        if(!quest.run()) {
+            setState(DaemonState.GONE_DAEMON);
+        }
     }
 
     @Override

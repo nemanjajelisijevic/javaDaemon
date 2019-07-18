@@ -1,4 +1,4 @@
-package com.daemonize.game;
+package com.daemonize.daemonengine.utils;
 
 import java.util.Objects;
 

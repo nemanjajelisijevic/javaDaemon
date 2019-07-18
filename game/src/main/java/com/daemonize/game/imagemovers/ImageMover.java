@@ -1,14 +1,12 @@
 package com.daemonize.game.imagemovers;
 
 
-import com.daemonize.game.Pair;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.images.Image;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 
-@Daemonize
 public interface ImageMover extends Movable {
 
     class Velocity {

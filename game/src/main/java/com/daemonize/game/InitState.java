@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.appstate.DaemonState;
 import com.daemonize.game.appstate.TransientState1;
 import com.daemonize.game.controller.TouchController;

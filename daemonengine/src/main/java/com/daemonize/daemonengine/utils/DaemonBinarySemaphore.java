@@ -3,47 +3,35 @@ package com.daemonize.daemonengine.utils;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DaemonCountingLatch {
+public class DaemonBinarySemaphore {
 
     private String name = this.getClass().getSimpleName();
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition condition = lock.newCondition();
-    private volatile int counter = 0;
+    private volatile boolean flag = false;
 
-    public DaemonCountingLatch() {}
+    public DaemonBinarySemaphore() {}
 
-    public DaemonCountingLatch(int startCount) {
-        this.counter = startCount;
-    }
-
-    public void subscribe() {
+    public void go() {
         lock.lock();
-        counter++;
-        lock.unlock();
-    }
-
-    public void unsubscribe() {
-        lock.lock();
-        if (--counter < 1) {
-            condition.signalAll();
-            counter = 0;
-        }
+        flag = false;
+        condition.signalAll();
         lock.unlock();
     }
 
     public void await() throws InterruptedException {
         lock.lock();
+        flag = true;
         try {
-            while(counter > 0) {
+            while(flag)
                 condition.await();
-            }
         } finally {
             lock.unlock();
         }
     }
 
-    public DaemonCountingLatch clear() {
-        counter = 0;
+    public DaemonBinarySemaphore setName(String name) {
+        this.name = name;
         return this;
     }
 
@@ -51,8 +39,8 @@ public class DaemonCountingLatch {
         return name;
     }
 
-    public DaemonCountingLatch setName(String name) {
-        this.name = name;
-        return this;
+    @Override
+    public String toString() {
+        return name + " - Blocking: " + flag + "\n    Lock : " + lock.toString() + "\n    Condition: " + condition.toString();
     }
 }

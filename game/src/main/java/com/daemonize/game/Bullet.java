@@ -1,6 +1,7 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.ImageTranslationMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
@@ -182,12 +183,9 @@ public class Bullet extends CoordinatedImageTranslationMover {
         Direction offsetDirPosImage2;
 
         if (movingDirection.coeficientX == lastDirection.coeficientX && movingDirection.coeficientY == lastDirection.coeficientY) {
-
             offsetDirPosImage = lastOffsetDirection;
             offsetDirPosImage2 = lastOffset2Direction;
-
         } else {
-
             double directionAngle = RotatingSpriteImageMover.getAngle(0, 0, movingDirection.coeficientX, movingDirection.coeficientY);
 
             double ortAngle1;
@@ -198,12 +196,11 @@ public class Bullet extends CoordinatedImageTranslationMover {
             offsetDirPosImage = new Direction((float) Math.cos(ortAngle1), (float) (-Math.sin(ortAngle1)));
 
             //+90 deg
-            offsetDirPosImage2 = new Direction( - offsetDirPosImage.coeficientX, - offsetDirPosImage.coeficientY);
+            offsetDirPosImage2 = new Direction( -offsetDirPosImage.coeficientX, -offsetDirPosImage.coeficientY);
 
             lastDirection = movingDirection;
             lastOffsetDirection = offsetDirPosImage;
             lastOffset2Direction = offsetDirPosImage2;
-
         }
 
         posImage1.positionX = posImage.positionX + spaceBetweenBullet * (offsetDirPosImage.coeficientX);
@@ -212,10 +209,14 @@ public class Bullet extends CoordinatedImageTranslationMover {
         posImage2.positionX = posImage.positionX + spaceBetweenBullet * (offsetDirPosImage2.coeficientX);
         posImage2.positionY = posImage.positionY + spaceBetweenBullet * (offsetDirPosImage2.coeficientY);
 
-
         GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(posImage1, view));
         root.addChild(new GenericNode<>(Pair.create(posImage2,view2)));
         return root;
+    }
 
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }
+

@@ -1,12 +1,14 @@
 package com.daemonize.game.imagemovers;
 
+import com.daemonize.game.images.Image;
+
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AwaitedArraySprite<T> {
+public class AwaitedArraySprite {
 
-    private T[] sprite;
+    private Image[] sprite;
     private int cnt = 0;
     private Lock lock = new ReentrantLock();
     private Condition condition = lock.newCondition();
@@ -14,21 +16,26 @@ public class AwaitedArraySprite<T> {
 
     public AwaitedArraySprite(){}
 
-    public AwaitedArraySprite(T[] sprite) {
+    public AwaitedArraySprite(Image[] sprite) {
         this.sprite = sprite;
     }
 
-    public synchronized AwaitedArraySprite<T> setSprite(T[] sprite) {
+    public AwaitedArraySprite setSprite(Image[] sprite) {
+        lock.lock();
         this.sprite = sprite;
+        flag = false;
+        lock.unlock();
         return this;
     }
 
-    public synchronized AwaitedArraySprite<T> clearCache() {
+    public AwaitedArraySprite clearCache() {
+        lock.lock();
         sprite = null;
+        lock.unlock();
         return this;
     }
 
-    public synchronized boolean isValid() {
+    public boolean isValid() {
         return sprite != null;
     }
 
@@ -43,34 +50,23 @@ public class AwaitedArraySprite<T> {
         }
     }
 
-    public void await(Runnable action) throws InterruptedException {
+    public Image getNext() {
+
         lock.lock();
-        try {
-            while(!flag)
-                condition.await();
-        } finally {
-            flag = false;
-            if (action != null)
-                action.run();
-            lock.unlock();
-        }
-    }
 
-    public synchronized T getNext() {
-
-        if (cnt >= sprite.length) {
+        if (cnt >= sprite.length)
             cnt = 0;
-        }
 
-        T ret = sprite[cnt++];
+        Image ret = sprite[cnt++];
 
         if (cnt == sprite.length) {
-            lock.lock();
+
             flag = true;
             condition.signal();
-            lock.unlock();
             cnt = 0;
         }
+
+        lock.unlock();
 
         return ret;
     }

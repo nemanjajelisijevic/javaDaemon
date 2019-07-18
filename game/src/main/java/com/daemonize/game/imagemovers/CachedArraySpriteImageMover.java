@@ -1,15 +1,15 @@
 package com.daemonize.game.imagemovers;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.game.Pair;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.images.Image;
 
 
 public class CachedArraySpriteImageMover extends ImageTranslationMover {
 
-    protected AwaitedArraySprite<Image> cache = new AwaitedArraySprite<>();
+    protected AwaitedArraySprite cache = new AwaitedArraySprite();
 
-    public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
+    public synchronized void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
         animateSemaphore.subscribe();
         this.velocity.intensity = velocity;
         cache.clearCache();

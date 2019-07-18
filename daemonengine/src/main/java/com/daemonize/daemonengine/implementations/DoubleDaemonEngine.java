@@ -11,6 +11,7 @@ import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.quests.VoidQuest;
+import com.daemonize.daemonengine.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +59,9 @@ public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine>, Daem
         return this;
     }
 
-    public <T> SideQuest<T> setSideQuest(Consumer consumer, final Quest<T> sideQuest) {
-        return sideQuestDaemonEngine.setSideQuest(consumer, sideQuest);
+    public <T, Q extends SideQuest<T>> Q setSideQuest(Consumer consumer, final Q sideQuest) {
+        sideQuestDaemonEngine.setSideQuest(consumer, sideQuest);
+        return sideQuest;
     }
 
     @Override

@@ -71,6 +71,26 @@ public class MainActivity extends AppCompatActivity {
 
         game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
+        game.uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread t, Throwable e) {
+                e.printStackTrace();
+                String exc = Log.getStackTraceString(e);
+                String thread = "Thread name: " + t.getName() + ", id: " + t.getId();
+                Intent i = new Intent(Intent.ACTION_SEND);
+                i.setType("message/rfc822");
+                i.putExtra(Intent.EXTRA_EMAIL  , new String[]{"nemanja.jelisijevic@yahoo.com"});
+                i.putExtra(Intent.EXTRA_SUBJECT, "App crash");
+                i.putExtra(Intent.EXTRA_TEXT   , thread + "\n\n" + exc);
+                try {
+                    startActivity(Intent.createChooser(i, "Send mail..."));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        };
+
         if(!game.isRunning())
             game.run();
     }

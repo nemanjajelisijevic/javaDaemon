@@ -32,7 +32,7 @@ public class DummyQuest extends BaseQuest<Void, DummyQuest> {
     }
 
     @Override
-    public boolean run(){
+    public boolean run() {
         try {
             if (sleepInterval > 0)
                 Thread.sleep(sleepInterval);

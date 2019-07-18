@@ -1,13 +1,11 @@
 package com.daemonize.game.tabel;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
-import com.daemonize.game.Pair;
+import com.daemonize.daemonengine.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Grid<T> {
 
@@ -159,7 +157,11 @@ public class Grid<T> {
 
     public boolean destroyTower(int row, int column) {
 
-        if (row == grid.length - 1 && column == grid[row].length - 1) return false;
+        if (row == grid.length - 1 && column == grid[row].length - 1) {
+            System.err.println(DaemonUtils.timedTag() + "Accessing bad field[" + row + "][" + column + "]");
+            return false;
+        }
+
         boolean acceptDestroyTower = false;
         if (!grid[row][column].isWalkable()) {
             for (int i = 0; i < grid.length; i++) {
@@ -171,7 +173,11 @@ public class Grid<T> {
             }
             grid[row][column].setWalkable(true);
             acceptDestroyTower = pathFinding.recalculate(this);
-        }
+
+            if (!acceptDestroyTower)
+                System.err.println(DaemonUtils.timedTag() + "Path finding could not recalculate for destroying field[" + row + "][" + column + "]");
+        } else
+            System.err.println(DaemonUtils.timedTag() + "Field still walkable [" + row + "][" + column + "]");
         return acceptDestroyTower;
     }
 

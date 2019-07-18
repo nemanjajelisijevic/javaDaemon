@@ -4,7 +4,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.game.Pair;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.game.imagemovers.spriteiterators.SpriteIterator;
 import com.daemonize.game.images.Image;
@@ -34,8 +34,8 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     private Runnable outOfBordersClosure;
     private PositionedImage ret = new PositionedImage();
 
-    protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore();
-    private DaemonSemaphore pauseSemaphore = new DaemonSemaphore();
+    protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore().setName("Animate Semaphore");
+    private DaemonSemaphore pauseSemaphore = new DaemonSemaphore().setName("Global pause semaphore");
 
     public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
         this.spriteIterator = new BasicSpriteIterator(sprite);

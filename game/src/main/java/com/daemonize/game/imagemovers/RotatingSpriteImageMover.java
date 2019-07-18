@@ -2,9 +2,9 @@ package com.daemonize.game.imagemovers;
 
 
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
-import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.AngleToBitmapArray;
-import com.daemonize.game.Pair;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.images.Image;
 
 import java.util.Arrays;
@@ -12,10 +12,14 @@ import java.util.Arrays;
 public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
     protected volatile AngleToBitmapArray spriteBuffer;
-    private volatile Image[] currentRotationSprite;
+    protected volatile Image[] currentRotationSprite;
     private volatile int size;
+    private DaemonSemaphore rotationSpriteSemaphore = new DaemonSemaphore().setName("Rotation Sprite Regulator");
 
     public void setRotationSprite(Image[] rotationSprite) {
+
+        rotationSpriteSemaphore.stop();
+
         int currentAngle = spriteBuffer != null ? spriteBuffer.getCurrentAngle() : 0;
         int step = 360 / rotationSprite.length;
         this.spriteBuffer = new AngleToBitmapArray(rotationSprite, step);
@@ -24,6 +28,8 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         popSprite();
         this.spriteBuffer.setCurrentAngle(currentAngle);
         setSprite(new Image[]{spriteBuffer.getCurrent()});
+
+        rotationSpriteSemaphore.go();
     }
 
     public void setCurrentAngle(int currentAngle) {
@@ -32,11 +38,12 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
     public RotatingSpriteImageMover(
             Image[] rotationSprite,
+            Image startingImage,
             float velocity,
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        super(Arrays.copyOf(rotationSprite, 1), velocity, startingPos, dXY);
+        super(new Image[]{startingImage}, velocity, startingPos, dXY);
         setRotationSprite(rotationSprite);
     }
 
@@ -47,7 +54,7 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        this(rotationSprite, velocity, startingPos, dXY);
+        this(rotationSprite, Arrays.copyOfRange(rotationSprite, 0, 1)[0], velocity, startingPos, dXY);
         this.animateSemaphore = animateSemaphore;
     }
 
@@ -60,7 +67,9 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         pushSprite(rotateSprite, velocity.intensity);
     }
 
-    public Image[] getRotationSprite(int targetAngle) throws InterruptedException {
+    protected Image[] getRotationSprite(int targetAngle) throws InterruptedException {
+
+        rotationSpriteSemaphore.await();
 
         int currentAngle = spriteBuffer.getCurrentAngle();
 

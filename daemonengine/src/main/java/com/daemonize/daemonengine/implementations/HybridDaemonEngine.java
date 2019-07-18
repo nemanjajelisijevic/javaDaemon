@@ -17,14 +17,9 @@ public class HybridDaemonEngine extends MainQuestDaemonBaseEngine<HybridDaemonEn
     super(consumer);
   }
 
-  public <T> SideQuest<T> setSideQuest(Consumer consumer, final Quest<T> sideQuest) {
-    this.sideQuest = (SideQuest) new SideQuest() {
-      @Override
-      public T pursue() throws Exception {
-        return sideQuest.pursue();
-      }
-    }.setConsumer(consumer);
-    return this.sideQuest;
+  public <T, Q extends SideQuest<T>> Q setSideQuest(Consumer consumer, final Q sideQuest) {
+    setSideQuest(sideQuest.setConsumer(consumer));
+    return sideQuest;
   }
 
   @Override

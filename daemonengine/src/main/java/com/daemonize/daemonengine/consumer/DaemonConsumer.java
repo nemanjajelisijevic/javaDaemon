@@ -23,6 +23,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
     private String name;
     private Thread looperThread;
     private Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
+    private Runnable closureRunnable;
 
     public DaemonConsumer(String name) {
         this.name = name;
@@ -42,7 +43,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
 
     private void loop() {
 
-        Runnable closure;
+
         while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             try {
@@ -51,7 +52,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
                     state = DaemonState.IDLE;
                     closureAvailable.await();
                 }
-                closure = closureQueue.poll();//TODO null safety
+                closureRunnable = closureQueue.poll();//TODO null safety
             } catch (InterruptedException ex) {
                 System.out.println(DaemonUtils.tag() + name + " interrupted!");
                 break;
@@ -60,7 +61,8 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
             }
 
             state = DaemonState.CONSUMING;
-            closure.run();
+            closureRunnable.run();
+            closureRunnable = null;
         }
 
         state = DaemonState.STOPPED;
@@ -78,6 +80,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
                 }
             });
             looperThread.setName(name);
+            looperThread.setPriority(Thread.MAX_PRIORITY);
             state = DaemonState.INITIALIZING;
             if (uncaughtExceptionHandler != null)
                 looperThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);

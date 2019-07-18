@@ -1,6 +1,8 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
@@ -42,7 +44,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         }
     }
 
-    private TowerLevel towerLevel = new TowerLevel(1,2,1500);
+    private TowerLevel towerLevel = new TowerLevel(0,0,Integer.MAX_VALUE);
 
     protected ImageView view;
     private ImageView hpView;
@@ -77,8 +79,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
             && (Math.abs(target.getLastCoordinates().getFirst() - getLastCoordinates().getFirst()) < range
             && Math.abs(target.getLastCoordinates().getSecond() - getLastCoordinates().getSecond()) < range));
 
-    public Tower(Image[] rotationSprite,  Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
-        super(rotationSprite, 0, startingPos, dXY);
+    public Tower(Image[] rotationSprite, Image[] healthBarImage, Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
+        super(rotationSprite, rotationSprite[18], 0, startingPos, dXY);
         this.ret.positionX = startingPos.getFirst();
         this.ret.positionY = startingPos.getSecond();
         this.range = range;
@@ -89,6 +91,11 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         this.targetLock = new ReentrantLock();
         this.targetCondition = targetLock.newCondition();
         this.animateSemaphore.stop();
+        this.spriteBuffer.setCurrentAngle(180);
+        this.spriteHealthBarImage = healthBarImage;
+        hBar.image = spriteHealthBarImage[0];
+        hBar.positionX = ret.positionX;
+        hBar.positionY = ret.positionY - 2 * hBar.image.getHeight();
     }
 
     @CallingThread
@@ -124,6 +131,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return this;
     }
 
+    @CallingThread
     public Tower setHealthBarImage(Image[] healthBarImage) {
         this.spriteHealthBarImage = healthBarImage;
         return this;
@@ -157,12 +165,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         boolean ret = false;
         targetLock.lock();
         if (!targetQueue.contains(target)) {
-            if (targetQueue.isEmpty()) {
-                ret = targetQueue.add(target);
-                targetCondition.signalAll();
-            } else {
-                ret = targetQueue.add(target);
-            }
+            ret = targetQueue.add(target);
+            targetCondition.signalAll();
         }
         targetLock.unlock();
         return ret;
@@ -181,7 +185,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
                 towerLevel.reloadInterval -=500;
                 break;
             }
-            case 3: { //top level
+            case 3: {//top level
                 towerLevel.bulletDamage += 5;
                 towerLevel.reloadInterval -= 800;
                 break;
@@ -203,7 +207,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return this;
     }
 
-    private DaemonSemaphore scanSemaphore = new DaemonSemaphore();
+    private DaemonSemaphore scanSemaphore = new DaemonSemaphore().setName("Tower Scan semaphore");
 
     @CallingThread
     public ImageView getView() {
@@ -222,7 +226,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
 
     @CallingThread
     @Override
-    public synchronized void setRotationSprite(Image[] rotationSprite) {
+    public void setRotationSprite(Image[] rotationSprite) {
         super.setRotationSprite(rotationSprite);
     }
 
@@ -263,7 +267,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return scanRet;
     }
 
-    protected synchronized void rotateTo(Target target) throws InterruptedException {
+    protected void rotateTo(Target target) throws InterruptedException {
         if (target.isShootable()) {
             animateSemaphore.subscribe();
             try {
@@ -327,10 +331,34 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return root;
     }
 
+    private int initHpCount = 0;
+
+    @SideQuest(SLEEP = 25, interruptible = true)
+    public GenericNode<Pair<PositionedImage, ImageView>> initTower() throws InterruptedException {
+        if (spriteBuffer.getCurrentAngle() != 0) {
+
+            ret.image = spriteBuffer.getDecrementedByStep();
+            GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(ret, view));
+
+            if (initHpCount < spriteHealthBarImage.length) {
+                hBar.image = spriteHealthBarImage[initHpCount++];
+            }
+
+            root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
+
+            return root;
+        }
+
+        towerLevel = new TowerLevel(1,2,1500);
+        throw new InterruptedException();
+    }
+
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateTower() throws InterruptedException {
         try {
+            //System.err.println(DaemonUtils.timedTag() + "About to await on Animate Semaphore");
             animateSemaphore.await();
+            //System.err.println(DaemonUtils.timedTag() + "Done waiting on Animate Semaphore");
             return updateSprite();
         } catch (InterruptedException ex) {
             return null;
