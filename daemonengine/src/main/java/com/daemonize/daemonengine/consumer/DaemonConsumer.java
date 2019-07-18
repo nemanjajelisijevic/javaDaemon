@@ -80,6 +80,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
                 }
             });
             looperThread.setName(name);
+            looperThread.setPriority(Thread.MAX_PRIORITY);
             state = DaemonState.INITIALIZING;
             if (uncaughtExceptionHandler != null)
                 looperThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
