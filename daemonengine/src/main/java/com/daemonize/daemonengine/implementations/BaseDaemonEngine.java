@@ -21,8 +21,6 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     protected Thread daemonThread;
     protected Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
-    private DaemonSemaphore startStopSemaphore = new DaemonSemaphore().setName("Start/Stop Daemon Semaphore");
-
     public D setName(String name) {
       this.name = name;
       return (D) this;
@@ -84,7 +82,6 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
         System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
         setState(DaemonState.STOPPED);
-        startStopSemaphore.go();
     }
 
     protected void runQuest(BaseQuest quest) {
@@ -94,15 +91,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
     @Override
     public synchronized D start() {
-
-        try {
-            startStopSemaphore.await();
-        } catch (InterruptedException e) {
-            //
-        }
-
         DaemonState initState = getState();
-        if (initState.equals(DaemonState.STOPPED))
+        if (initState.equals(DaemonState.STOPPED) || initState.equals(DaemonState.GONE_DAEMON))
             initThread();
 
         return (D) this;
@@ -130,11 +120,9 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
                 && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stopDaemon from daemon thread
                 && daemonThread.isAlive()) {
             daemonThread.interrupt();
+            daemonThread = null;//TODO check this nulling
         }
       }
-
-      startStopSemaphore.stop();
-      daemonThread = null;//TODO     check this nulling
     }
 
     @Override
