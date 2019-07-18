@@ -19,6 +19,4 @@ public interface Daemon<D extends Daemon> extends DaemonService<D> {
   Consumer getConsumer();
 
   D clear();
-
-  D setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler);
 }
