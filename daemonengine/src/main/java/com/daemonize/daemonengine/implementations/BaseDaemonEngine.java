@@ -80,6 +80,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
                 runQuest(currentQuest);
         }
 
+        cleanUp();
         System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
         setState(DaemonState.STOPPED);
     }
@@ -111,6 +112,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
             daemonThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
         daemonThread.start();
     }
+
+    protected void cleanUp() {}
 
     @Override
     public synchronized void stop() {

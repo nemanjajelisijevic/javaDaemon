@@ -64,6 +64,8 @@ public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine>, Daem
         return sideQuest;
     }
 
+
+
     @Override
     public DoubleDaemonEngine interrupt() {
         mainQuestDaemonEngine.interrupt();

@@ -21,11 +21,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> extends BaseDaemonEngine<D> implements DaemonEngine<D> {
 
-    protected final Queue<MainQuest> mainQuestQueue = new LinkedList<>();
+    protected final Queue<MainQuest> mainQuestQueue;
     protected final Lock mainQuestLock = new ReentrantLock();
 
     MainQuestDaemonBaseEngine(Consumer consumer) {
         super(consumer);
+        this.mainQuestQueue = new LinkedList<>();
     }
 
     public <T> D daemonize(Quest<T> quest, Closure<T> closure) {
@@ -84,9 +85,17 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
 
     @Override
     protected void runQuest(BaseQuest quest) {
+        setState(quest.getState());
         if(!quest.run()) {
             setState(DaemonState.GONE_DAEMON);
         }
+    }
+
+    @Override
+    protected void cleanUp() {
+        mainQuestLock.lock();
+        mainQuestQueue.clear();
+        mainQuestLock.unlock();
     }
 
     //@Override

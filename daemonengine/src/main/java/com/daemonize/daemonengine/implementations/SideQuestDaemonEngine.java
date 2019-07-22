@@ -94,6 +94,13 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
   }
 
   @Override
+  protected void cleanUp() {
+    sideQuestLock.lock();
+    currentSideQuest = null;
+    sideQuestLock.unlock();
+  }
+
+  @Override
   public void stop() {
     sideQuestLock.lock();
     sideQuestCondition.signal();
