@@ -7,13 +7,13 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.LogExecutionTime;
+import com.daemonize.daemonprocessor.annotations.Exclude;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.TypeVariableName;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +28,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
 
 
 public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
@@ -175,7 +172,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
             PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
 
-            if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
+            if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData) || method.getAnnotation(Exclude.class) != null) {
                 if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
                     daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? wrapIntfMethod(method) : wrapMethod(method));
                     continue;

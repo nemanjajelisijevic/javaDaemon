@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.Exclude;
 import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.game.images.Image;
@@ -108,11 +109,13 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
 
     private RotatingSpriteImageMover rotationMover;
 
+    @Exclude
     public Enemy setHealthBarImage(Image[] healthBarImage) {
         this.spriteHealthBarImage = healthBarImage;
         return this;
     }
 
+    @Exclude
     public Enemy setParalyzedImage(Image paralyzedImage) {
         this.paralyzedPosImage.image = paralyzedImage;
         return this;
