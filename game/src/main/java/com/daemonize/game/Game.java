@@ -187,7 +187,7 @@ public class Game {
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
-    private int maxEnemies = 100;
+    private int maxEnemies = 80;
     private QueuedEntityRepo<EnemyDoubleDaemon> enemyRepo;
 
     private StackedEntityRepo<BulletDoubleDaemon> enemyMissileRepo;
@@ -1163,6 +1163,9 @@ public class Game {
                 public void onGet(EnemyDoubleDaemon enemy) {
                     System.err.println(DaemonUtils.tag() + "Enemy repo size: " + this.size());
 
+                    System.err.println(DaemonUtils.tag() + enemy.getName() + " STATES: " + enemy.getEnginesState().toString());
+
+                    enemy.setAnimateEnemySideQuest(renderer).setClosure(new MultiViewAnimateClosure());
                     enemy.setShootable(true)
                             .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1F, 0.0F)))
                             .setCoordinates(grid.getStartingX(), grid.getStartingY())

@@ -117,8 +117,9 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return prototype.getSize();
   }
 
-  public boolean addTarget(Target target) {
-    return prototype.addTarget(target);
+  public TowerDaemon addTarget(Target target) {
+    prototype.addTarget(target);
+    return this;
   }
 
   public TowerDaemon setHp(int hp) {
@@ -129,11 +130,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   @Override
   public void setVelocity(float velocity) {
     prototype.setVelocity(velocity);
-  }
-
-  public TowerDaemon contScan() {
-    prototype.contScan();
-    return this;
   }
 
   public float getdXY() {
@@ -194,6 +190,11 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return this;
   }
 
+  public TowerDaemon setDirection(ImageMover.Direction direction) {
+    prototype.setDirection(direction);
+    return this;
+  }
+
   public TowerDaemon pause() {
     prototype.pause();
     return this;
@@ -204,11 +205,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return this;
   }
 
-  public TowerDaemon setDirection(ImageMover.Direction direction) {
-    prototype.setDirection(direction);
-    return this;
-  }
-
   @Override
   public boolean isShootable() {
     return prototype.isShootable();
@@ -216,11 +212,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   public TowerDaemon setTowerLevel(Tower.TowerLevel towerlevel) {
     prototype.setTowerLevel(towerlevel);
-    return this;
-  }
-
-  public TowerDaemon pauseScan() {
-    prototype.pauseScan();
     return this;
   }
 

@@ -14,12 +14,8 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     protected volatile AngleToBitmapArray spriteBuffer;
     protected volatile Image[] currentRotationSprite;
     private volatile int size;
-    private DaemonSemaphore rotationSpriteSemaphore = new DaemonSemaphore().setName("Rotation Sprite Regulator");
 
-    public void setRotationSprite(Image[] rotationSprite) {
-
-        rotationSpriteSemaphore.stop();
-
+    public synchronized void setRotationSprite(Image[] rotationSprite) {
         int currentAngle = spriteBuffer != null ? spriteBuffer.getCurrentAngle() : 0;
         int step = 360 / rotationSprite.length;
         this.spriteBuffer = new AngleToBitmapArray(rotationSprite, step);
@@ -28,8 +24,6 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         popSprite();
         this.spriteBuffer.setCurrentAngle(currentAngle);
         setSprite(new Image[]{spriteBuffer.getCurrent()});
-
-        rotationSpriteSemaphore.go();
     }
 
     public void setCurrentAngle(int currentAngle) {
@@ -67,9 +61,7 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         pushSprite(rotateSprite, velocity.intensity);
     }
 
-    protected Image[] getRotationSprite(int targetAngle) throws InterruptedException {
-
-        rotationSpriteSemaphore.await();
+    protected synchronized Image[] getRotationSprite(int targetAngle) throws InterruptedException {
 
         int currentAngle = spriteBuffer.getCurrentAngle();
 
