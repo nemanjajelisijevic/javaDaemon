@@ -87,7 +87,6 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         this.towertype = type;
         this.hp = hp;
         this.hpMax = hp;
-        //this.targetQueue = new LinkedList<>();
         this.targetLock = new ReentrantLock();
         this.targetCondition = targetLock.newCondition();
         this.animateSemaphore.stop();
@@ -195,8 +194,6 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return this;
     }
 
-    //private DaemonSemaphore scanSemaphore = new DaemonSemaphore().setName("Tower Scan semaphore");
-
     @CallingThread
     public ImageView getView() {
         return view;
@@ -226,21 +223,12 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
 
     @CallingThread
     public void addTarget(Target target) {
-        //boolean ret = false;
         targetLock.lock();
-        try {
-            //if (!targetQueue.contains(target)) {
-            if (this.target == null) {
-                //ret = targetQueue.add(target);
-
-                //if (ret)
-                this.target = target;
-                targetCondition.signalAll();
-            }
-        } finally {
-            targetLock.unlock();
+        if (this.target == null) {
+            this.target = target;
+            targetCondition.signalAll();
         }
-        //return ret;
+        targetLock.unlock();
     }
 
     private Pair<TowerType, Target> scanRet = Pair.create(null, null);
@@ -248,25 +236,18 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
     @DedicatedThread(name = "scan")
     public Pair<TowerType, Target> scan() throws InterruptedException {
 
-        //pause scan semaphore
-        //scanSemaphore.await();
-
-        //Target target;
         scanRet = Pair.create(null, null);
 
         targetLock.lock();
 
         try {
-            //while (targetQueue.isEmpty())
+
             while (this.target == null)
                 targetCondition.await();
-
-            //target = targetQueue.peek();
 
             if (targetTester.test(target)) {
                 scanRet = Pair.create(towertype, target);
             } else
-                //targetQueue.poll();
                 target = null;
 
         } finally {
@@ -362,9 +343,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateTower() throws InterruptedException {
         try {
-            //System.err.println(DaemonUtils.timedTag() + "About to await on Animate Semaphore");
             animateSemaphore.await();
-            //System.err.println(DaemonUtils.timedTag() + "Done waiting on Animate Semaphore");
             return updateSprite();
         } catch (InterruptedException ex) {
             return null;
@@ -380,30 +359,19 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
     @Override
     public String toString() {
         targetLock.lock();
-
-        try {
-            return towerLevel.toString()
+        String ret =  towerLevel.toString()
                     + "\nTowerType: " + towertype
                     + "\nCurrent hp: " + hp + ", Max hp: " + hpMax
                     + "\nShootable: " + shootable
                     + "\nRange: " + range
-                    //+ "\nTargetQueue size: " + targetQueue.size()
                     + "\nTarget available: " + Boolean.toString(this.target != null)
                     + "\nTargetLock: " + targetLock.toString()
                     + "\nTargetCondition: " + targetCondition.toString()
-//                    + "\nTarget: shootable: " + (!targetQueue.isEmpty() ? Boolean.toString(targetQueue.peek().isShootable()) : "NULL") + ", Coord X: " + (!targetQueue.isEmpty() ? targetQueue.peek().getLastCoordinates().getFirst() : "NULL") + ", Coord Y: " + (!targetQueue.isEmpty() ? targetQueue.peek().getLastCoordinates().getSecond() : "NULL")
-//                    + "\nTargetTester returns: " + (!targetQueue.isEmpty() ? targetTester.test(targetQueue.peek()) : "NULL")
-                    + "\nTarget: shootable: " + ((target != null) ? Boolean.toString(target.isShootable()) : "NULL") + ", Coord X: " + ((target != null) ? Float.toString(target.getLastCoordinates().getFirst()) : "NULL") + ", Coord Y: " + ((target != null) ? Float.toString(target.getLastCoordinates().getSecond()) : "NULL")
-//                    + "\nTargetTester returns: " + (target != null)
-//                    ? Boolean.toString(
-//                            targetTester.test(
-//                            target
-//            ))
-//                    : "NULL"
-//                    + "\nScanSemaphore: " + scanSemaphore.toString()
+                    + "\nTarget: shootable: " + ((target != null) ? Boolean.toString(target.isShootable()) : "NULL")
+                    + ", Coord X: " + ((target != null) ? Float.toString(target.getLastCoordinates().getFirst()) : "NULL")
+                    + ", Coord Y: " + ((target != null) ? Float.toString(target.getLastCoordinates().getSecond()) : "NULL")
                     + "\nAnimateSemaphore: " + animateSemaphore.toString();
-        } finally {
-            targetLock.unlock();
-        }
+        targetLock.unlock();
+        return ret;
     }
 }
