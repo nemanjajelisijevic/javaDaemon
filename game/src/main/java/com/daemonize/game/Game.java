@@ -1736,13 +1736,13 @@ public class Game {
 
         TowerDaemon tow = field.getObject();
 
-        if (tow != null && tow.getTowerLevel().currentLevel > 0) {//upgrade existing tower
+        if (tow != null /*&& tow.getTowerLevel().currentLevel > 0*/) {//upgrade existing tower
 
-            //System.err.println("Checking " + tow.getName() + " state: " + tow.getEnginesState().toString() + ", prototype: " + tow.toString());
+            System.err.println("Checking " + tow.getName() + " state: " + tow.getEnginesState().toString() + ", prototype: " + tow.toString());
 
-            if (!towerUpgradeDialogue.getTowerUpgrade().isShowing()) {//if upgrade dialog not shown
-                //pause();
-                Tower.TowerLevel currLvl = tow.getTowerLevel();
+            Tower.TowerLevel currLvl = tow.getTowerLevel();
+
+            if (!towerUpgradeDialogue.getTowerUpgrade().isShowing() && currLvl.currentLevel > 0) {//if upgrade dialog not shown
 
                 towerUpgradeDialogue.setTower(tow);
 
@@ -1874,7 +1874,6 @@ public class Game {
                             towerHp
                         ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
                         .setHealthBarImage(healthBarSprite)
-                        .setTowerLevel(new Tower.TowerLevel(1,2,1500))
 
                         :
 
@@ -1886,8 +1885,7 @@ public class Game {
                             towerSelect,
                             dXY,
                             towerHp
-                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
-                        .setTowerLevel(new Tower.TowerLevel(1,2,1500));
+                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show());
 
                 TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
                         .setName(towerName)

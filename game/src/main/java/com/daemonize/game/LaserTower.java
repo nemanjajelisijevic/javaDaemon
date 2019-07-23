@@ -35,10 +35,12 @@ public class LaserTower extends Tower {
         targetLock.lock();
         try {
 
-            while (targetQueue.isEmpty())
+            //while (targetQueue.isEmpty())
+            while (target == null)
                 targetCondition.await();
 
-            Target target = targetQueue.peek();
+            //Target target = targetQueue.peek();
+            Target target = this.target;
 
             if(target != null && targetTester.test(target)) {
 

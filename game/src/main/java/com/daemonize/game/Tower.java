@@ -64,7 +64,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
 
     private TowerType towertype;
 
-    protected volatile Queue<Target> targetQueue;
+    protected volatile Target target;
     protected Lock targetLock;
     protected Condition targetCondition;
 
@@ -87,7 +87,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         this.towertype = type;
         this.hp = hp;
         this.hpMax = hp;
-        this.targetQueue = new LinkedList<>();
+        //this.targetQueue = new LinkedList<>();
         this.targetLock = new ReentrantLock();
         this.targetCondition = targetLock.newCondition();
         this.animateSemaphore.stop();
@@ -161,18 +161,6 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
     }
 
     @CallingThread
-    public boolean addTarget(Target target) {
-        boolean ret = false;
-        targetLock.lock();
-        if (!targetQueue.contains(target)) {
-            ret = targetQueue.add(target);
-            targetCondition.signalAll();
-        }
-        targetLock.unlock();
-        return ret;
-    }
-
-    @CallingThread
     public float getRange() {
         return range;
     }
@@ -207,7 +195,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         return this;
     }
 
-    private DaemonSemaphore scanSemaphore = new DaemonSemaphore().setName("Tower Scan semaphore");
+    //private DaemonSemaphore scanSemaphore = new DaemonSemaphore().setName("Tower Scan semaphore");
 
     @CallingThread
     public ImageView getView() {
@@ -236,67 +224,85 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         super.pushSprite(sprite, velocity);
     }
 
+    @CallingThread
+    public void addTarget(Target target) {
+        //boolean ret = false;
+        targetLock.lock();
+        try {
+            //if (!targetQueue.contains(target)) {
+            if (this.target == null) {
+                //ret = targetQueue.add(target);
+
+                //if (ret)
+                this.target = target;
+                targetCondition.signalAll();
+            }
+        } finally {
+            targetLock.unlock();
+        }
+        //return ret;
+    }
+
     private Pair<TowerType, Target> scanRet = Pair.create(null, null);
 
     @DedicatedThread(name = "scan")
     public Pair<TowerType, Target> scan() throws InterruptedException {
 
         //pause scan semaphore
-        scanSemaphore.await();
+        //scanSemaphore.await();
 
-        Target target;
+        //Target target;
         scanRet = Pair.create(null, null);
 
         targetLock.lock();
 
         try {
-            while (targetQueue.isEmpty())
+            //while (targetQueue.isEmpty())
+            while (this.target == null)
                 targetCondition.await();
 
-            target = targetQueue.peek();
-            if (targetTester.test(target))
+            //target = targetQueue.peek();
+
+            if (targetTester.test(target)) {
                 scanRet = Pair.create(towertype, target);
-            else
-                targetQueue.poll();
+            } else
+                //targetQueue.poll();
+                target = null;
 
         } finally {
             targetLock.unlock();
         }
 
-        rotateTo(target);
+        if (scanRet.getSecond() != null)
+            rotateTo(scanRet.getSecond());
+
         return scanRet;
     }
 
     protected void rotateTo(Target target) throws InterruptedException {
-        if (target.isShootable()) {
-            animateSemaphore.subscribe();
-            try {
-                rotateTowards(
-                        target.getLastCoordinates().getFirst(),
-                        target.getLastCoordinates().getSecond()
-                );
-            } finally {
-                animateSemaphore.unsubscribe();
-            }
-        }
+        if (target.isShootable())
+            rotateTowards(
+                    target.getLastCoordinates().getFirst(),
+                    target.getLastCoordinates().getSecond()
+            );
     }
 
-    @CallingThread
-    @Override
-    public void pause() {
-        super.pause();
-        pauseScan();
-    }
-
-    @CallingThread
-    @Override
-    public void cont() {
-        super.cont();
-        contScan();
-        targetLock.lock();
-        targetCondition.signalAll();
-        targetLock.unlock();
-    }
+//    @CallingThread
+//    @Override
+//    public void pause() {
+//        super.pause();
+//        pauseScan();
+//    }
+//
+//    @CallingThread
+//    @Override
+//    public void cont() {
+//        super.cont();
+//        contScan();
+//        targetLock.lock();
+//        targetCondition.signalAll();
+//        targetLock.unlock();
+//    }
 
     @CallingThread
     @Override
@@ -304,15 +310,15 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
         super.setCurrentAngle(currentAngle);
     }
 
-    @CallingThread
-    public void pauseScan() {
-        scanSemaphore.stop();
-    }
+//    @CallingThread
+//    public void pauseScan() {
+//        scanSemaphore.stop();
+//    }
 
-    @CallingThread
-    public void contScan() {
-        scanSemaphore.go();
-    }
+//    @CallingThread
+//    public void contScan() {
+//        scanSemaphore.go();
+//    }
 
     protected volatile PositionedImage ret = new PositionedImage();
     private PositionedImage hBar = new PositionedImage();
@@ -373,15 +379,31 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
     @CallingThread
     @Override
     public String toString() {
-        return towerLevel.toString()
-                + "\nTowerType: " + towertype
-                + "\nCurrent hp: " + hp + ", Max hp: " + hpMax
-                + "\nShootable: " + shootable
-                + "\nRange: " + range
-                + "\nTargetQueue size: " + targetQueue.size()
-                + "\nTargetLock: " + targetLock.toString()
-                + "\nTargetCondition: " + targetCondition.toString()
-                + "\nScanSemaphore: " + scanSemaphore.toString()
-                + "\nAnimateSemaphore: " + animateSemaphore.toString();
+        targetLock.lock();
+
+        try {
+            return towerLevel.toString()
+                    + "\nTowerType: " + towertype
+                    + "\nCurrent hp: " + hp + ", Max hp: " + hpMax
+                    + "\nShootable: " + shootable
+                    + "\nRange: " + range
+                    //+ "\nTargetQueue size: " + targetQueue.size()
+                    + "\nTarget available: " + Boolean.toString(this.target != null)
+                    + "\nTargetLock: " + targetLock.toString()
+                    + "\nTargetCondition: " + targetCondition.toString()
+//                    + "\nTarget: shootable: " + (!targetQueue.isEmpty() ? Boolean.toString(targetQueue.peek().isShootable()) : "NULL") + ", Coord X: " + (!targetQueue.isEmpty() ? targetQueue.peek().getLastCoordinates().getFirst() : "NULL") + ", Coord Y: " + (!targetQueue.isEmpty() ? targetQueue.peek().getLastCoordinates().getSecond() : "NULL")
+//                    + "\nTargetTester returns: " + (!targetQueue.isEmpty() ? targetTester.test(targetQueue.peek()) : "NULL")
+                    + "\nTarget: shootable: " + ((target != null) ? Boolean.toString(target.isShootable()) : "NULL") + ", Coord X: " + ((target != null) ? Float.toString(target.getLastCoordinates().getFirst()) : "NULL") + ", Coord Y: " + ((target != null) ? Float.toString(target.getLastCoordinates().getSecond()) : "NULL")
+//                    + "\nTargetTester returns: " + (target != null)
+//                    ? Boolean.toString(
+//                            targetTester.test(
+//                            target
+//            ))
+//                    : "NULL"
+//                    + "\nScanSemaphore: " + scanSemaphore.toString()
+                    + "\nAnimateSemaphore: " + animateSemaphore.toString();
+        } finally {
+            targetLock.unlock();
+        }
     }
 }
