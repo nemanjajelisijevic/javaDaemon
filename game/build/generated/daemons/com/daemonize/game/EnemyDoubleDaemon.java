@@ -243,13 +243,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.Enemy#setParalyzedImage} */
-  public EnemyDoubleDaemon setParalyzedImage(Image paralyzedimage, Closure<Enemy> closure) {
-    mainDaemonEngine.pursueQuest(new SetParalyzedImageMainQuest(paralyzedimage, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
    * Prototype method {@link com.daemonize.game.Enemy#rotate} */
   public EnemyDoubleDaemon rotate(int angle) {
     mainDaemonEngine.pursueQuest(new RotateMainQuest(angle).setConsumer(mainDaemonEngine.getConsumer()));
@@ -267,13 +260,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
    * Prototype method {@link com.daemonize.game.Enemy#animateEnemy} */
   public EnemyDoubleDaemon animateEnemy(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
     mainDaemonEngine.pursueQuest(new AnimateEnemyMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Enemy#setHealthBarImage} */
-  public EnemyDoubleDaemon setHealthBarImage(Image[] healthbarimage, Closure<Enemy> closure) {
-    mainDaemonEngine.pursueQuest(new SetHealthBarImageMainQuest(healthbarimage, closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -469,21 +455,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     }
   }
 
-  private final class SetParalyzedImageMainQuest extends MainQuest<Enemy> {
-    private Image paralyzedimage;
-
-    private SetParalyzedImageMainQuest(Image paralyzedimage, Closure<Enemy> closure) {
-      super(closure);
-      this.paralyzedimage = paralyzedimage;
-      this.description = "setParalyzedImage";
-    }
-
-    @Override
-    public final Enemy pursue() throws Exception {
-      return prototype.setParalyzedImage(paralyzedimage);
-    }
-  }
-
   private final class RotateMainQuest extends VoidMainQuest {
     private int angle;
 
@@ -530,21 +501,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
         Exception {
       return prototype.animateEnemy();
-    }
-  }
-
-  private final class SetHealthBarImageMainQuest extends MainQuest<Enemy> {
-    private Image[] healthbarimage;
-
-    private SetHealthBarImageMainQuest(Image[] healthbarimage, Closure<Enemy> closure) {
-      super(closure);
-      this.healthbarimage = healthbarimage;
-      this.description = "setHealthBarImage";
-    }
-
-    @Override
-    public final Enemy pursue() throws Exception {
-      return prototype.setHealthBarImage(healthbarimage);
     }
   }
 

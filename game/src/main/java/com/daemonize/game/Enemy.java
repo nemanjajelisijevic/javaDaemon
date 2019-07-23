@@ -28,7 +28,6 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     private volatile int hp;
     private volatile boolean shootable = true;
     private Image[] spriteHealthBarImage;
-    //private Image paralyzedImage;
 
     private boolean paralyzed = false;
 
