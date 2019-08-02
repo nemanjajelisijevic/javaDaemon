@@ -7,7 +7,7 @@ import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.game.imagemovers.spriteiterators.SpriteIterator;
-import com.daemonize.game.images.Image;
+import com.daemonize.graphics2d.images.Image;
 
 
 public class ImageTranslationMover implements ImageMover, SpriteIterator {

@@ -1,6 +1,6 @@
 package com.daemonize.game.imagemovers;
 
-import com.daemonize.game.images.Image;
+import com.daemonize.graphics2d.images.Image;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;

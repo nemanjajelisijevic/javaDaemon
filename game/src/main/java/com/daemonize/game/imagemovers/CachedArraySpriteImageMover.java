@@ -2,7 +2,7 @@ package com.daemonize.game.imagemovers;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.images.Image;
+import com.daemonize.graphics2d.images.Image;
 
 
 public class CachedArraySpriteImageMover extends ImageTranslationMover {

@@ -13,7 +13,7 @@ import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.ImageTranslationMover;
-import com.daemonize.game.images.Image;
+import com.daemonize.graphics2d.images.Image;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -48,13 +48,12 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return sideQuest;
   }
 
-  public MoneyHandlerDaemon setVelocity(float velocity) {
-    prototype.setVelocity(velocity);
-    return this;
+  public Image[] getSprite() {
+    return prototype.getSprite();
   }
 
-  public MoneyHandlerDaemon setSprite(Image[] sprite) {
-    prototype.setSprite(sprite);
+  public MoneyHandlerDaemon setVelocity(float velocity) {
+    prototype.setVelocity(velocity);
     return this;
   }
 
@@ -71,10 +70,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return this;
   }
 
-  public Image[] getSprite() {
-    return prototype.getSprite();
-  }
-
   public MoneyHandlerDaemon setOutOfBordersConsumer(Consumer consumer) {
     prototype.setOutOfBordersConsumer(consumer);
     return this;
@@ -86,6 +81,11 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
 
   public MoneyHandlerDaemon clearVelocity() {
     prototype.clearVelocity();
+    return this;
+  }
+
+  public MoneyHandlerDaemon setSprite(Image[] sprite) {
+    prototype.setSprite(sprite);
     return this;
   }
 
@@ -124,6 +124,13 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
 
   public SideQuest getCurrentSideQuest() {
     return this.sideDaemonEngine.getSideQuest();
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.MoneyHandler#iterateSprite} */
+  public MoneyHandlerDaemon iterateSprite(Closure<Image> closure) {
+    mainDaemonEngine.pursueQuest(new IterateSpriteMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
   }
 
   /**
@@ -181,13 +188,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
    * Prototype method {@link com.daemonize.game.MoneyHandler#setAmount} */
   public MoneyHandlerDaemon setAmount(int amount) {
     mainDaemonEngine.pursueQuest(new SetAmountMainQuest(amount).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.MoneyHandler#iterateSprite} */
-  public MoneyHandlerDaemon iterateSprite(Closure<Image> closure) {
-    mainDaemonEngine.pursueQuest(new IterateSpriteMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -299,6 +299,18 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     public final Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> pursue() throws
         Exception {
       return prototype.animateMoney();
+    }
+  }
+
+  private final class IterateSpriteMainQuest extends MainQuest<Image> {
+    private IterateSpriteMainQuest(Closure<Image> closure) {
+      super(closure);
+      this.description = "iterateSprite";
+    }
+
+    @Override
+    public final Image pursue() throws Exception {
+      return prototype.iterateSprite();
     }
   }
 
@@ -449,18 +461,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     public final Void pursue() throws Exception {
       prototype.setAmount(amount);
       return null;
-    }
-  }
-
-  private final class IterateSpriteMainQuest extends MainQuest<Image> {
-    private IterateSpriteMainQuest(Closure<Image> closure) {
-      super(closure);
-      this.description = "iterateSprite";
-    }
-
-    @Override
-    public final Image pursue() throws Exception {
-      return prototype.iterateSprite();
     }
   }
 }

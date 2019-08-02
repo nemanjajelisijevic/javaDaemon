@@ -3,6 +3,7 @@ apply plugin: 'idea'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project (':graphics2d')
     implementation project (':daemonengine')
     implementation project (':daemonprocessor')
     annotationProcessor project(':daemonprocessor')

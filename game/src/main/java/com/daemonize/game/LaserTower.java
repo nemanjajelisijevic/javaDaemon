@@ -4,8 +4,8 @@ import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.images.Image;
-import com.daemonize.game.scene.views.ImageView;
+import com.daemonize.graphics2d.images.Image;
+import com.daemonize.graphics2d.scene.views.ImageView;
 
 
 public class LaserTower extends Tower {

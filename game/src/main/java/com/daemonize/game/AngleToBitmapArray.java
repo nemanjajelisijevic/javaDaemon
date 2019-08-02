@@ -1,8 +1,6 @@
 package com.daemonize.game;
 
-import com.daemonize.game.images.Image;
-
-import java.util.List;
+import com.daemonize.graphics2d.images.Image;
 
 public class AngleToBitmapArray {
 

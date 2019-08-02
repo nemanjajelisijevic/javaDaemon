@@ -13,8 +13,8 @@ import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.ImageTranslationMover;
-import com.daemonize.game.images.Image;
-import com.daemonize.game.scene.views.ImageView;
+import com.daemonize.graphics2d.images.Image;
+import com.daemonize.graphics2d.scene.views.ImageView;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -42,17 +42,17 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   }
 
   /**
-   * Prototype method {@link LaserBullet#animateLaser} */
-  public SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> setAnimateLaserSideQuest(Consumer consumer) {
-    SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> sideQuest = new AnimateLaserSideQuest();
+   * Prototype method {@link Bullet#animateBullet} */
+  public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
+    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest();
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
 
   /**
-   * Prototype method {@link Bullet#animateBullet} */
-  public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
-    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest();
+   * Prototype method {@link LaserBullet#animateLaser} */
+  public SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> setAnimateLaserSideQuest(Consumer consumer) {
+    SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> sideQuest = new AnimateLaserSideQuest();
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -62,8 +62,8 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return this;
   }
 
-  public ImageTranslationMover setSprite(Image[] sprite) {
-    return prototype.setSprite(sprite);
+  public Image[] getSprite() {
+    return prototype.getSprite();
   }
 
   public float getdXY() {
@@ -74,18 +74,9 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return prototype.getVelocity();
   }
 
-  public LaserBulletDaemon setView3(ImageView view3) {
-    prototype.setView3(view3);
-    return this;
-  }
-
   public LaserBulletDaemon setVelocity(ImageMover.Velocity velocity) {
     prototype.setVelocity(velocity);
     return this;
-  }
-
-  public Image[] getSprite() {
-    return prototype.getSprite();
   }
 
   public LaserBulletDaemon setLevel(int level) {
@@ -103,8 +94,17 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return this;
   }
 
+  public List<ImageView> getViews() {
+    return prototype.getViews();
+  }
+
   public LaserBulletDaemon setCurrentAngle(int angle) {
     prototype.setCurrentAngle(angle);
+    return this;
+  }
+
+  public LaserBulletDaemon setView3(ImageView view3) {
+    prototype.setView3(view3);
     return this;
   }
 
@@ -119,6 +119,10 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   public LaserBulletDaemon clearVelocity() {
     prototype.clearVelocity();
     return this;
+  }
+
+  public ImageTranslationMover setSprite(Image[] sprite) {
+    return prototype.setSprite(sprite);
   }
 
   public LaserBulletDaemon setDirection(ImageMover.Direction direction) {
@@ -140,8 +144,9 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return prototype.getLastCoordinates();
   }
 
-  public List<ImageView> getViews() {
-    return prototype.getViews();
+  public LaserBulletDaemon setViews(List<ImageView> views) {
+    prototype.setViews(views);
+    return this;
   }
 
   public LaserBulletDaemon setOutOfBordersClosure(Runnable closure) {
@@ -151,11 +156,6 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
 
   public LaserBulletDaemon popSprite() {
     prototype.popSprite();
-    return this;
-  }
-
-  public LaserBulletDaemon setViews(List<ImageView> views) {
-    prototype.setViews(views);
     return this;
   }
 
@@ -173,6 +173,13 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.LaserBullet#iterateSprite} */
+  public LaserBulletDaemon iterateSprite(Closure<Image> closure) {
+    mainDaemonEngine.pursueQuest(new IterateSpriteMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.imagemovers.ImageTranslationMover#setBorders} */
   public LaserBulletDaemon setBorders(float x1, float x2, float y1, float y2,
       Closure<ImageTranslationMover> closure) {
@@ -181,9 +188,30 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.LaserBullet#animateLaser} */
-  public LaserBulletDaemon animateLaser(Closure<List<Pair<ImageView, ImageMover.PositionedImage>>> closure) {
-    mainDaemonEngine.pursueQuest(new AnimateLaserMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+   * Prototype method {@link com.daemonize.game.Bullet#pushSprite} */
+  public LaserBulletDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#setView} */
+  public LaserBulletDaemon setView(ImageView view, Closure<Bullet> closure) {
+    mainDaemonEngine.pursueQuest(new SetViewMainQuest(view, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#rotate} */
+  public LaserBulletDaemon rotate(int angle, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new RotateMainQuest(angle, retRun).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#toString} */
+  public LaserBulletDaemon toString(Closure<String> closure) {
+    mainDaemonEngine.pursueQuest(new ToStringMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -196,52 +224,10 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.Bullet#rotate} */
-  public LaserBulletDaemon rotate(int angle, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new RotateMainQuest(angle, retRun).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#pushSprite} */
-  public LaserBulletDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#toString} */
-  public LaserBulletDaemon toString(Closure<String> closure) {
-    mainDaemonEngine.pursueQuest(new ToStringMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#animateBullet} */
-  public LaserBulletDaemon animateBullet(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
-    mainDaemonEngine.pursueQuest(new AnimateBulletMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#setView} */
-  public LaserBulletDaemon setView(ImageView view, Closure<Bullet> closure) {
-    mainDaemonEngine.pursueQuest(new SetViewMainQuest(view, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
    * Prototype method {@link com.daemonize.game.Bullet#rotateAndGoTo} */
   public LaserBulletDaemon rotateAndGoTo(int angle, float x, float y, float velocityint,
       Closure<Boolean> closure) {
     mainDaemonEngine.pursueQuest(new RotateAndGoToMainQuest(angle, x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#setView2} */
-  public LaserBulletDaemon setView2(ImageView view2, Closure<Bullet> closure) {
-    mainDaemonEngine.pursueQuest(new SetView2MainQuest(view2, closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -268,9 +254,23 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.LaserBullet#iterateSprite} */
-  public LaserBulletDaemon iterateSprite(Closure<Image> closure) {
-    mainDaemonEngine.pursueQuest(new IterateSpriteMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+   * Prototype method {@link com.daemonize.game.Bullet#animateBullet} */
+  public LaserBulletDaemon animateBullet(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
+    mainDaemonEngine.pursueQuest(new AnimateBulletMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.LaserBullet#animateLaser} */
+  public LaserBulletDaemon animateLaser(Closure<List<Pair<ImageView, ImageMover.PositionedImage>>> closure) {
+    mainDaemonEngine.pursueQuest(new AnimateLaserMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#setView2} */
+  public LaserBulletDaemon setView2(ImageView view2, Closure<Bullet> closure) {
+    mainDaemonEngine.pursueQuest(new SetView2MainQuest(view2, closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -372,6 +372,19 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return this;
   }
 
+  private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private AnimateBulletSideQuest() {
+      super();
+      this.description = "animateBullet";
+    }
+
+    @Override
+    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
+        Exception {
+      return prototype.animateBullet();
+    }
+  }
+
   private final class AnimateLaserSideQuest extends SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> {
     private AnimateLaserSideQuest() {
       super();
@@ -384,16 +397,15 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     }
   }
 
-  private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private AnimateBulletSideQuest() {
-      super();
-      this.description = "animateBullet";
+  private final class IterateSpriteMainQuest extends MainQuest<Image> {
+    private IterateSpriteMainQuest(Closure<Image> closure) {
+      super(closure);
+      this.description = "iterateSprite";
     }
 
     @Override
-    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
-        Exception {
-      return prototype.animateBullet();
+    public final Image pursue() throws Exception {
+      return prototype.iterateSprite();
     }
   }
 
@@ -422,15 +434,65 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     }
   }
 
-  private final class AnimateLaserMainQuest extends MainQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> {
-    private AnimateLaserMainQuest(Closure<List<Pair<ImageView, ImageMover.PositionedImage>>> closure) {
-      super(closure);
-      this.description = "animateLaser";
+  private final class PushSpriteMainQuest extends VoidMainQuest {
+    private Image[] sprite;
+
+    private float velocity;
+
+    private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun) {
+      super(retRun);
+      this.sprite = sprite;
+      this.velocity = velocity;
+      this.description = "pushSprite";
     }
 
     @Override
-    public final List<Pair<ImageView, ImageMover.PositionedImage>> pursue() throws Exception {
-      return prototype.animateLaser();
+    public final Void pursue() throws Exception {
+      prototype.pushSprite(sprite, velocity);
+      return null;
+    }
+  }
+
+  private final class SetViewMainQuest extends MainQuest<Bullet> {
+    private ImageView view;
+
+    private SetViewMainQuest(ImageView view, Closure<Bullet> closure) {
+      super(closure);
+      this.view = view;
+      this.description = "setView";
+    }
+
+    @Override
+    public final Bullet pursue() throws Exception {
+      return prototype.setView(view);
+    }
+  }
+
+  private final class RotateMainQuest extends VoidMainQuest {
+    private int angle;
+
+    private RotateMainQuest(int angle, Runnable retRun) {
+      super(retRun);
+      this.angle = angle;
+      this.description = "rotate";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.rotate(angle);
+      return null;
+    }
+  }
+
+  private final class ToStringMainQuest extends MainQuest<String> {
+    private ToStringMainQuest(Closure<String> closure) {
+      super(closure);
+      this.description = "toString";
+    }
+
+    @Override
+    public final String pursue() throws Exception {
+      return prototype.toString();
     }
   }
 
@@ -459,81 +521,6 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     }
   }
 
-  private final class RotateMainQuest extends VoidMainQuest {
-    private int angle;
-
-    private RotateMainQuest(int angle, Runnable retRun) {
-      super(retRun);
-      this.angle = angle;
-      this.description = "rotate";
-    }
-
-    @Override
-    public final Void pursue() throws Exception {
-      prototype.rotate(angle);
-      return null;
-    }
-  }
-
-  private final class PushSpriteMainQuest extends VoidMainQuest {
-    private Image[] sprite;
-
-    private float velocity;
-
-    private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun) {
-      super(retRun);
-      this.sprite = sprite;
-      this.velocity = velocity;
-      this.description = "pushSprite";
-    }
-
-    @Override
-    public final Void pursue() throws Exception {
-      prototype.pushSprite(sprite, velocity);
-      return null;
-    }
-  }
-
-  private final class ToStringMainQuest extends MainQuest<String> {
-    private ToStringMainQuest(Closure<String> closure) {
-      super(closure);
-      this.description = "toString";
-    }
-
-    @Override
-    public final String pursue() throws Exception {
-      return prototype.toString();
-    }
-  }
-
-  private final class AnimateBulletMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private AnimateBulletMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
-      super(closure);
-      this.description = "animateBullet";
-    }
-
-    @Override
-    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
-        Exception {
-      return prototype.animateBullet();
-    }
-  }
-
-  private final class SetViewMainQuest extends MainQuest<Bullet> {
-    private ImageView view;
-
-    private SetViewMainQuest(ImageView view, Closure<Bullet> closure) {
-      super(closure);
-      this.view = view;
-      this.description = "setView";
-    }
-
-    @Override
-    public final Bullet pursue() throws Exception {
-      return prototype.setView(view);
-    }
-  }
-
   private final class RotateAndGoToMainQuest extends MainQuest<Boolean> {
     private int angle;
 
@@ -556,21 +543,6 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     @Override
     public final Boolean pursue() throws Exception {
       return prototype.rotateAndGoTo(angle, x, y, velocityint);
-    }
-  }
-
-  private final class SetView2MainQuest extends MainQuest<Bullet> {
-    private ImageView view2;
-
-    private SetView2MainQuest(ImageView view2, Closure<Bullet> closure) {
-      super(closure);
-      this.view2 = view2;
-      this.description = "setView2";
-    }
-
-    @Override
-    public final Bullet pursue() throws Exception {
-      return prototype.setView2(view2);
     }
   }
 
@@ -629,15 +601,43 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     }
   }
 
-  private final class IterateSpriteMainQuest extends MainQuest<Image> {
-    private IterateSpriteMainQuest(Closure<Image> closure) {
+  private final class AnimateBulletMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private AnimateBulletMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
       super(closure);
-      this.description = "iterateSprite";
+      this.description = "animateBullet";
     }
 
     @Override
-    public final Image pursue() throws Exception {
-      return prototype.iterateSprite();
+    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
+        Exception {
+      return prototype.animateBullet();
+    }
+  }
+
+  private final class AnimateLaserMainQuest extends MainQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> {
+    private AnimateLaserMainQuest(Closure<List<Pair<ImageView, ImageMover.PositionedImage>>> closure) {
+      super(closure);
+      this.description = "animateLaser";
+    }
+
+    @Override
+    public final List<Pair<ImageView, ImageMover.PositionedImage>> pursue() throws Exception {
+      return prototype.animateLaser();
+    }
+  }
+
+  private final class SetView2MainQuest extends MainQuest<Bullet> {
+    private ImageView view2;
+
+    private SetView2MainQuest(ImageView view2, Closure<Bullet> closure) {
+      super(closure);
+      this.view2 = view2;
+      this.description = "setView2";
+    }
+
+    @Override
+    public final Bullet pursue() throws Exception {
+      return prototype.setView2(view2);
     }
   }
 }

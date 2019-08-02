@@ -2,8 +2,9 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 dependencies {
-    compile project(':daemonengine')
-    compile project(':game')
+    implementation project(':javafxgraphics2d')
+    implementation project(':daemonengine')
+    implementation project(':game')
 }
 
 sourceSets {

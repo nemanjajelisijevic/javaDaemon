@@ -1,6 +1,6 @@
 package com.daemonize.game.imagemovers.spriteiterators;
 
-import com.daemonize.game.images.Image;
+import com.daemonize.graphics2d.images.Image;
 
 public class Sprite {
 

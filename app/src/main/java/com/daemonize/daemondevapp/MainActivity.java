@@ -1,6 +1,5 @@
 package com.daemonize.daemondevapp;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,13 +12,11 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 
-import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
+import com.daemonize.androidgraphics2d.AndroidImageManager;
+import com.daemonize.androidgraphics2d.AndroidSurfaceViewRenderer;
 import com.daemonize.game.Game;
-import com.daemonize.game.images.imageloader.ImageManager;
-import com.daemonize.game.renderer.Renderer2D;
-import com.daemonize.game.soundmanager.SoundException;
+import com.daemonize.graphics2d.images.imageloader.ImageManager;
+import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.game.soundmanager.SoundManager;
 
 public class MainActivity extends AppCompatActivity {

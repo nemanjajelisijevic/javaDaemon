@@ -1,8 +1,8 @@
 package com.daemonize.game;
 
-import com.daemonize.game.images.Image;
-import com.daemonize.game.scene.views.Button;
-import com.daemonize.game.scene.views.CompositeImageViewImpl;
+import com.daemonize.graphics2d.images.Image;
+import com.daemonize.graphics2d.scene.views.Button;
+import com.daemonize.graphics2d.scene.views.CompositeImageViewImpl;
 
 public class TowerSelectDialogue {
 

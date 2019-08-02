@@ -2,24 +2,22 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.DaemonEngine;
-import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
-import com.daemonize.daemonengine.quests.InterruptibleSideQuest;
 import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.imagemovers.ImageMover;
 import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
 
-import com.daemonize.game.images.Image;
+import com.daemonize.graphics2d.images.Image;
 
-import com.daemonize.game.images.imageloader.ImageManager;
-import com.daemonize.game.renderer.Renderer2D;
+import com.daemonize.graphics2d.images.imageloader.ImageManager;
+import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.game.repo.QueuedEntityRepo;
 import com.daemonize.game.repo.StackedEntityRepo;
-import com.daemonize.game.scene.Scene2D;
+import com.daemonize.graphics2d.scene.Scene2D;
 
 import com.daemonize.game.soundmanager.DummySoundManager;
 import com.daemonize.game.soundmanager.SoundException;
@@ -28,10 +26,10 @@ import com.daemonize.game.soundmanager.SoundManager;
 import com.daemonize.game.tabel.Field;
 import com.daemonize.game.tabel.Grid;
 
-import com.daemonize.game.scene.views.Button;
-import com.daemonize.game.scene.views.CompositeImageViewImpl;
-import com.daemonize.game.scene.views.ImageView;
-import com.daemonize.game.scene.views.ImageViewImpl;
+import com.daemonize.graphics2d.scene.views.Button;
+import com.daemonize.graphics2d.scene.views.CompositeImageViewImpl;
+import com.daemonize.graphics2d.scene.views.ImageView;
+import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
@@ -48,7 +46,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Game {
 

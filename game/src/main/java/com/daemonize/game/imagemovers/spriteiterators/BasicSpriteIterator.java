@@ -1,8 +1,7 @@
 package com.daemonize.game.imagemovers.spriteiterators;
 
-import com.daemonize.game.images.Image;
+import com.daemonize.graphics2d.images.Image;
 
-import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 

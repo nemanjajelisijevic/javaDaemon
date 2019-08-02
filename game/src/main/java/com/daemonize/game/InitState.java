@@ -4,11 +4,11 @@ import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.appstate.DaemonState;
 import com.daemonize.game.appstate.TransientState1;
 import com.daemonize.game.controller.TouchController;
-import com.daemonize.game.images.Image;
-import com.daemonize.game.renderer.Renderer2D;
-import com.daemonize.game.scene.Scene2D;
-import com.daemonize.game.scene.views.Button;
-import com.daemonize.game.scene.views.ImageViewImpl;
+import com.daemonize.graphics2d.images.Image;
+import com.daemonize.graphics2d.renderer.Renderer2D;
+import com.daemonize.graphics2d.scene.Scene2D;
+import com.daemonize.graphics2d.scene.views.Button;
+import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 

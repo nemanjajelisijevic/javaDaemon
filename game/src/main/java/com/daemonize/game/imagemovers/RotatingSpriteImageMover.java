@@ -2,10 +2,9 @@ package com.daemonize.game.imagemovers;
 
 
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
-import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.AngleToBitmapArray;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.images.Image;
+import com.daemonize.graphics2d.images.Image;
 
 import java.util.Arrays;
 

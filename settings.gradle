@@ -1,1 +1,1 @@
-include ':app',':daemonengine',':daemonprocessor', ':game', ':javafxmain'
+include ':app',':daemonengine',':daemonprocessor', ':game', ':javafxmain', ':graphics2d', ':androidgraphics2d', ':javafxgraphics2d'
