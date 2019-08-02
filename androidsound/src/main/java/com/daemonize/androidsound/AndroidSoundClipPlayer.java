@@ -1,9 +1,9 @@
-package com.daemonize.daemondevapp;
+package com.daemonize.androidsound;
 
 import android.content.Context;
 import android.media.MediaPlayer;
 
-import com.daemonize.game.soundmanager.SoundClipPlayer;
+import com.daemonize.sound.SoundClipPlayer;
 
 import java.io.File;
 import java.io.FileInputStream;

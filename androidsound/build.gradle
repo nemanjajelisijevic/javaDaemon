@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 
+
 android {
+
     compileSdkVersion 28
 
 
@@ -24,6 +26,6 @@ android {
 }
 
 dependencies {
-    api project (':graphics2d')
-    implementation project (':daemonengine')
+    api project(':sound')
+    implementation project(':daemonengine')
 }

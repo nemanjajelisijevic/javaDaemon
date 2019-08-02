@@ -1,8 +1,8 @@
-package com.daemonize.javafxmain;
+package com.daemonize.javafxsound;
 
-import com.daemonize.game.soundmanager.SoundClipPlayerDaemon;
-import com.daemonize.game.soundmanager.SoundException;
-import com.daemonize.game.soundmanager.SoundManager;
+
+import com.daemonize.sound.SoundException;
+import com.daemonize.sound.SoundManager;
 
 import java.io.File;
 import java.io.IOException;

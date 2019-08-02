@@ -1,8 +1,7 @@
 apply plugin: 'java-library'
 
 dependencies {
-    api project (':graphics2d')
-    //implementation project (':daemonengine')
+    api project(':sound')
 }
 
 sourceCompatibility = "7"

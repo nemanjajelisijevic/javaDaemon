@@ -1,4 +1,4 @@
-package com.daemonize.daemondevapp;
+package com.daemonize.androidsound;
 
 import android.content.Context;
 import android.media.MediaPlayer;

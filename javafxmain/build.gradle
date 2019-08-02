@@ -2,8 +2,8 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 dependencies {
+    implementation project(':javafxsound')
     implementation project(':javafxgraphics2d')
-    implementation project(':daemonengine')
     implementation project(':game')
 }
 

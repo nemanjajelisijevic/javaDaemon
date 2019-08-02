@@ -4,7 +4,7 @@
 //import android.media.MediaDataSource;
 //import android.media.MediaPlayer;
 //
-//import com.daemonize.game.soundmanager.SoundException;
+//import com.daemonize.sound.SoundException;
 //
 //import java.io.File;
 //import java.io.IOException;

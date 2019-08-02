@@ -19,9 +19,6 @@ import com.daemonize.game.repo.QueuedEntityRepo;
 import com.daemonize.game.repo.StackedEntityRepo;
 import com.daemonize.graphics2d.scene.Scene2D;
 
-import com.daemonize.game.soundmanager.DummySoundManager;
-import com.daemonize.game.soundmanager.SoundException;
-import com.daemonize.game.soundmanager.SoundManager;
 
 import com.daemonize.game.tabel.Field;
 import com.daemonize.game.tabel.Grid;
@@ -37,6 +34,9 @@ import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.sound.DummySoundManager;
+import com.daemonize.sound.SoundException;
+import com.daemonize.sound.SoundManager;
 
 import java.io.File;
 import java.io.IOException;

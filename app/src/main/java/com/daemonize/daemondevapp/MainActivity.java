@@ -14,10 +14,11 @@ import android.widget.Toast;
 
 import com.daemonize.androidgraphics2d.AndroidImageManager;
 import com.daemonize.androidgraphics2d.AndroidSurfaceViewRenderer;
+import com.daemonize.androidsound.AndroidSoundManager;
 import com.daemonize.game.Game;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
-import com.daemonize.game.soundmanager.SoundManager;
+import com.daemonize.sound.SoundManager;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,21 +1,18 @@
-package com.daemonize.daemondevapp;
+package com.daemonize.androidsound;
 
 import android.content.Context;
-import android.media.MediaDataSource;
 import android.media.MediaPlayer;
 
-import com.daemonize.game.soundmanager.SoundClipPlayer;
-import com.daemonize.game.soundmanager.SoundClipPlayerDaemon;
-import com.daemonize.game.soundmanager.SoundException;
-import com.daemonize.game.soundmanager.SoundManager;
+
+import com.daemonize.sound.SoundClipPlayer;
+import com.daemonize.sound.SoundException;
+import com.daemonize.sound.SoundManager;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.daemonize.game.soundmanager;
+package com.daemonize.sound;
 
 public class SoundException extends Exception {
 

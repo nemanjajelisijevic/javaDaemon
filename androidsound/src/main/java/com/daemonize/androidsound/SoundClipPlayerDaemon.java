@@ -1,10 +1,12 @@
-package com.daemonize.game.soundmanager;
+package com.daemonize.androidsound;
 
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.sound.SoundClipPlayer;
+
 import java.lang.Exception;
 import java.lang.Integer;
 import java.lang.Override;

@@ -4,9 +4,10 @@ import com.daemonize.game.Game;
 
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
-import com.daemonize.game.soundmanager.SoundManager;
 import com.daemonize.javafxgraphics2d.JavaFXRenderer;
 import com.daemonize.javafxgraphics2d.JavaFxImageManager;
+import com.daemonize.javafxsound.JavaFxSoundManager;
+import com.daemonize.sound.SoundManager;
 
 import javafx.application.Application;
 
