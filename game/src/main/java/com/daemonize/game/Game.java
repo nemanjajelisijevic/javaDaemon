@@ -2120,7 +2120,8 @@ public class Game {
 
                             currentSoundManager.playSound(rocketExplosionSound);
                             rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, () -> repo.add(rocketDoubleDaemon));
-                        });
+                        }
+                );
             }
         });
     }
