@@ -1,6 +1,5 @@
 package com.daemonize.game;
 
-
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
@@ -17,7 +16,6 @@ import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.game.repo.QueuedEntityRepo;
 import com.daemonize.game.repo.StackedEntityRepo;
 import com.daemonize.graphics2d.scene.Scene2D;
-
 
 import com.daemonize.game.tabel.Field;
 import com.daemonize.game.tabel.Grid;
@@ -798,7 +796,6 @@ public class Game {
                 greenTowerUpgSprite = dialogUpgradeTower3;
                 dialogueImageTowerUpgrade = redTowerUpgSprite;
 
-
                 soundTogglerSound = activeSoundManager.loadFile("soundTogglerSound.wav");
                 towerConstructionSound = activeSoundManager.loadFile("towerConstructionSound.wav");
                 towerSelectionSound = activeSoundManager.loadFile("towerSelectionSound.wav");
@@ -953,7 +950,6 @@ public class Game {
                     renderer.consume(towerUpgradeDialogue.getTowerUpgrade()::hide);
                 });
             });
-
 
             Button saleButton = new Button("Sale", saleButtonImage);
             saleButton.onClick(()->{
@@ -1255,6 +1251,7 @@ public class Game {
                     });
                 }
             };
+
             enemyMissileRepo.setName("Missile repo");
 
             //init enemies and fill enemy repo
@@ -1386,7 +1383,6 @@ public class Game {
 
                 enemyMissileRepo.getStructure().push(missileDoubleDaemon);
             }
-
 
             rocketExplosionRange = fieldImage.getWidth();
 
@@ -1676,7 +1672,8 @@ public class Game {
                                         this::onReturn
                                 );
                             }
-                        });
+                        }
+                );
             });
 
             //start enemy generator
@@ -1724,143 +1721,137 @@ public class Game {
         });
     }
 
-    private boolean deny;
+    private void upgradeTower(TowerDaemon tow) {
 
-    private void setTower(float x, float y) {
+        //System.err.println("Checking " + tow.getName() + " state: " + tow.getEnginesState().toString() + ", prototype: " + tow.toString());
 
-        //check if correct field
-        Field<TowerDaemon> field = grid.getField(x, y);
-        if (field == null) return;
+        Tower.TowerLevel currLvl = tow.getTowerLevel();
 
-        TowerDaemon tow = field.getObject();
+        if (!towerUpgradeDialogue.getTowerUpgrade().isShowing() && currLvl.currentLevel > 0) {//if upgrade dialog not shown
 
-        if (tow != null /*&& tow.getTowerLevel().currentLevel > 0*/) {//upgrade existing tower
+            towerUpgradeDialogue.setTower(tow);
 
-            System.err.println("Checking " + tow.getName() + " state: " + tow.getEnginesState().toString() + ", prototype: " + tow.toString());
+            boolean hasSkillsToPayTheBills = score > 3;
 
-            Tower.TowerLevel currLvl = tow.getTowerLevel();
-
-            if (!towerUpgradeDialogue.getTowerUpgrade().isShowing() && currLvl.currentLevel > 0) {//if upgrade dialog not shown
-
-                towerUpgradeDialogue.setTower(tow);
-
-                boolean hasSkillsToPayTheBills = score > 3;
-
-                switch (tow.getTowertype()) {
-                    case TYPE1:
-                        dialogueImageTowerUpgrade = redTowerUpgSprite;
-                        break;
-                    case TYPE2:
-                        dialogueImageTowerUpgrade = blueTowerUpgSprite;
-                        break;
-                    case TYPE3:
-                        dialogueImageTowerUpgrade = greenTowerUpgSprite;
-                        break;
-                }
-
-                //show upgrade dialog
-                renderer.consume(()->{
-
-                    towerUpgradeDialogue.getTowerUpgrade().setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2);
-
-                    towerUpgradeDialogue.getTowerUpgrade()
-                            .getViewByName("TowerView")
-                            .setImage(dialogueImageTowerUpgrade[currLvl.currentLevel - 1]);
-
-                    towerUpgradeDialogue.getTowerUpgrade().show();
-
-                    if (hasSkillsToPayTheBills && tow.getTowerLevel().currentLevel < 3)
-                        towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").show();
-                    else
-                        towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide();
-                });
+            switch (tow.getTowertype()) {
+                case TYPE1:
+                    dialogueImageTowerUpgrade = redTowerUpgSprite;
+                    break;
+                case TYPE2:
+                    dialogueImageTowerUpgrade = blueTowerUpgSprite;
+                    break;
+                case TYPE3:
+                    dialogueImageTowerUpgrade = greenTowerUpgSprite;
+                    break;
             }
 
-        } else { //init and set new tower
+            //show upgrade dialog
+            renderer.consume(()->{
 
-            ImageView fieldView = gridViewMatrix[field.getRow()][field.getColumn()];
+                towerUpgradeDialogue.getTowerUpgrade().setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2);
 
-            //check if selected field is on the last remaining path
-            if (!grid.setTower(field.getRow(), field.getColumn())){
+                towerUpgradeDialogue.getTowerUpgrade()
+                        .getViewByName("TowerView")
+                        .setImage(dialogueImageTowerUpgrade[currLvl.currentLevel - 1]);
 
-                if (!deny) {
+                towerUpgradeDialogue.getTowerUpgrade().show();
 
-                    deny = true;
+                if (hasSkillsToPayTheBills && tow.getTowerLevel().currentLevel < 3)
+                    towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").show();
+                else
+                    towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide();
+            });
+        }
+    }
 
-                    boolean isGeenFieldShown = fieldView.isShowing() && fieldView.getImage().equals(fieldImage);
-                    renderer.consume(fieldView.setImage(fieldImageTowerDen)::show);
+    private boolean deny;
 
-                    SideQuestDaemonEngine denyMarker = new SideQuestDaemonEngine().setName("Denied Marker");
-                    denyMarker.start().setSideQuest(renderer, new InterruptibleSleepSideQuest<Boolean>() {
+    private void setNewTower(Field<TowerDaemon> field) {
 
-                        private int cnt = 0;
+        ImageView fieldView = gridViewMatrix[field.getRow()][field.getColumn()];
 
-                        @Override
-                        public Boolean pursue() throws Exception {
-                            if (cnt++ <= 6) {
-                                if (cnt % 2 == 0)
-                                    return false;
-                                else
-                                    return true;
-                            } else
-                                throw new InterruptedException();
-                        }
-                    }).setSleepInterval(300).setClosure(showDeniedmarker -> {
-                        if (showDeniedmarker.runtimeCheckAndGet())
-                            fieldView.show();
-                        else
-                            fieldView.hide();
-                    }).onInterrupt(renderer, () -> {
-                        denyMarker.stop();
+        //check if selected field is on the last remaining path
+        if (!grid.setTower(field.getRow(), field.getColumn())){
 
-                        deny = false;
-                        fieldView.setImage(fieldImage);
+            if (!deny) {
 
-                        if (isGeenFieldShown)
-                            fieldView.show();
-                        else
-                            fieldView.hide();
-                    });
-                }
-            } else {
+                deny = true;
 
-                {
-                    renderer.consume(fieldView.setImage(currentTowerSprite[0])::show);
+                boolean isGeenFieldShown = fieldView.isShowing() && fieldView.getImage().equals(fieldImage);
+                renderer.consume(fieldView.setImage(fieldImageTowerDen)::show);
 
-                    //hide diagonal views
-                    int fieldRow = field.getRow();
-                    int fieldColumn = field.getColumn();
+                SideQuestDaemonEngine denyMarker = new SideQuestDaemonEngine().setName("Denied Marker");
+                denyMarker.start().setSideQuest(renderer, new InterruptibleSleepSideQuest<Boolean>() {
 
-                    System.out.println(DaemonUtils.tag() + "FIELD ROW: " + fieldRow + ", FIELD COLUMN: " + fieldColumn);
+                    private int cnt = 0;
 
-                    //upper left diagonal
-                    if (fieldRow - 1 >= 0 && fieldColumn - 1 >= 0)
-                        renderer.consume(diagonalMatrix[fieldRow - 1][fieldColumn - 1]::hide);
+                    @Override
+                    public Boolean pursue() throws Exception {
+                        if (cnt++ <= 6) {
+                            if (cnt % 2 == 0)
+                                return false;
+                            else
+                                return true;
+                        } else
+                            throw new InterruptedException();
+                    }
 
-                    //upper right diagonal
-                    if (fieldRow - 1 >= 0 && fieldColumn < columns - 1)
-                        renderer.consume(diagonalMatrix[fieldRow - 1][fieldColumn]::hide);
+                }).setSleepInterval(300).setClosure(showDeniedmarker -> {
+                    if (showDeniedmarker.runtimeCheckAndGet())
+                        fieldView.show();
+                    else
+                        fieldView.hide();
+                }).onInterrupt(renderer, () -> {
+                    denyMarker.stop();
 
-                    //down left diagonal
-                    if (fieldRow < rows - 1 && fieldColumn - 1 >= 0)
-                        renderer.consume(diagonalMatrix[fieldRow][fieldColumn - 1]::hide);
+                    deny = false;
+                    fieldView.setImage(fieldImage);
 
-                    //down right diagonal
-                    if (fieldRow < rows - 1 && fieldColumn < columns - 1)
-                        renderer.consume(diagonalMatrix[fieldRow][fieldColumn]::hide);
-                }
+                    if (isGeenFieldShown)
+                        fieldView.show();
+                    else
+                        fieldView.hide();
+                });
+            }
+        } else {
 
-                String towerName = "Tower[" + field.getColumn() + "][" + field.getRow() + "]";
+            {
+                renderer.consume(fieldView.setImage(currentTowerSprite[0])::show);
 
-                towerHpViwes[field.getRow()][field.getColumn()].setImage(healthBarSprite[9]);
+                //hide diagonal views
+                int fieldRow = field.getRow();
+                int fieldColumn = field.getColumn();
 
-                currentSoundManager.playSound(towerConstructionSound);
+                System.out.println(DaemonUtils.tag() + "FIELD ROW: " + fieldRow + ", FIELD COLUMN: " + fieldColumn);
 
-                Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
+                //upper left diagonal
+                if (fieldRow - 1 >= 0 && fieldColumn - 1 >= 0)
+                    renderer.consume(diagonalMatrix[fieldRow - 1][fieldColumn - 1]::hide);
 
-                        ?
+                //upper right diagonal
+                if (fieldRow - 1 >= 0 && fieldColumn < columns - 1)
+                    renderer.consume(diagonalMatrix[fieldRow - 1][fieldColumn]::hide);
 
-                        new LaserTower (
+                //down left diagonal
+                if (fieldRow < rows - 1 && fieldColumn - 1 >= 0)
+                    renderer.consume(diagonalMatrix[fieldRow][fieldColumn - 1]::hide);
+
+                //down right diagonal
+                if (fieldRow < rows - 1 && fieldColumn < columns - 1)
+                    renderer.consume(diagonalMatrix[fieldRow][fieldColumn]::hide);
+            }
+
+            String towerName = "Tower[" + field.getColumn() + "][" + field.getRow() + "]";
+
+            towerHpViwes[field.getRow()][field.getColumn()].setImage(healthBarSprite[9]);
+
+            currentSoundManager.playSound(towerConstructionSound);
+
+            Tower towerPrototype = towerSelect == Tower.TowerType.TYPE3
+
+                    ?
+
+                    new LaserTower (
                             renderer,
                             new MultiViewAnimateClosure(),
                             currentTowerSprite,
@@ -1870,12 +1861,12 @@ public class Game {
                             towerSelect,
                             dXY,
                             towerHp
-                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
-                        .setHealthBarImage(healthBarSprite)
+                    ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
+                            .setHealthBarImage(healthBarSprite)
 
-                        :
+                    :
 
-                        new Tower(
+                    new Tower(
                             currentTowerSprite,
                             healthBarSprite,
                             Pair.create(field.getCenterX(), field.getCenterY()),
@@ -1883,100 +1874,113 @@ public class Game {
                             towerSelect,
                             dXY,
                             towerHp
-                        ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show());
+                    ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show());
 
-                TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
-                        .setName(towerName)
-                        .setView(fieldView)
-                        .setShootable(true)
-                        .setUncaughtExceptionHandler(uncaughtExceptionHandler);
+            TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
+                    .setName(towerName)
+                    .setView(fieldView)
+                    .setShootable(true)
+                    .setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-                towers.add(towerDaemon);
-                field.setObject(towerDaemon);
+            towers.add(towerDaemon);
+            field.setObject(towerDaemon);
 
-                towerDaemon.start().setInitTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn).onInterrupt(gameConsumer, () -> {
+            towerDaemon.start().setInitTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn).onInterrupt(gameConsumer, () -> {
 
-                    towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
+                towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
 
-                    towerDaemon.scan(new Closure<Pair<Tower.TowerType, Target>>() {
-                        @Override
-                        public void onReturn(Return<Pair<Tower.TowerType, Target>> towerTypeAndEnemy) {
+                towerDaemon.scan(new Closure<Pair<Tower.TowerType, Target>>() {
+                    @Override
+                    public void onReturn(Return<Pair<Tower.TowerType, Target>> towerTypeAndEnemy) {
 
-                            long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
+                        long reloadInterval = towerDaemon.getTowerLevel().reloadInterval;
 
-                            if (towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
-                                    && towerTypeAndEnemy.runtimeCheckAndGet().getSecond() != null) {
+                        if (towerTypeAndEnemy.runtimeCheckAndGet().getFirst() != null
+                                && towerTypeAndEnemy.runtimeCheckAndGet().getSecond() != null) {
 
-                                Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
-                                EnemyDoubleDaemon enemy = (EnemyDoubleDaemon) towerTypeAndEnemy.get().getSecond();
+                            Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
+                            EnemyDoubleDaemon enemy = (EnemyDoubleDaemon) towerTypeAndEnemy.get().getSecond();
 
-                                Closure<Integer> bulletClosure = amount -> {
-                                    currentSoundManager.playSound(bigExplosion);
-                                    enemyRepo.add(enemy);
-                                    moneyDaemon.setAmount(amount.get())
-                                            .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
-                                            .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
+                            Closure<Integer> bulletClosure = amount -> {
+                                currentSoundManager.playSound(bigExplosion);
+                                enemyRepo.add(enemy);
+                                moneyDaemon.setAmount(amount.get())
+                                        .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
+                                        .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
-                                    renderer.consume(()->{
-                                        moneyView.getFirst().show();
-                                        moneyView.getSecond().show();
-                                    });
-                                };
+                                renderer.consume(()->{
+                                    moneyView.getFirst().show();
+                                    moneyView.getSecond().show();
+                                });
+                            };
 
-                                switch (towerType) {
-                                    case TYPE1:
-                                        fireBullet(
-                                                towerDaemon.getLastCoordinates(),
-                                                enemy,
-                                                25,
-                                                towerDaemon.getTowerLevel().bulletDamage,
-                                                towerDaemon.getTowerLevel().currentLevel,
-                                                false,
-                                                0,
-                                                bulletSprite,
-                                                miniExplodeSprite,
-                                                ()-> bulletClosure.onReturn(new Return<>(3))
-                                        );
-                                        break;
-                                    case TYPE2:
-                                        fireRocketBullet(
-                                                towerDaemon.getLastCoordinates(),
-                                                enemy,
-                                                rocketRepo,
-                                                18,
-                                                towerDaemon.getTowerLevel().bulletDamage,
-                                                towerDaemon.getTowerLevel().currentLevel,
-                                                () -> bulletClosure.onReturn(new Return<>(5))
-                                        );
-                                        break;
-                                    case TYPE3:
-                                        double angle = RotatingSpriteImageMover.getAngle(
-                                                towerDaemon.getLastCoordinates().getFirst(),
-                                                towerDaemon.getLastCoordinates().getSecond(),
-                                                enemy.getLastCoordinates().getFirst(),
-                                                enemy.getLastCoordinates().getSecond()
-                                        );
+                            switch (towerType) {
+                                case TYPE1:
+                                    fireBullet(
+                                            towerDaemon.getLastCoordinates(),
+                                            enemy,
+                                            25,
+                                            towerDaemon.getTowerLevel().bulletDamage,
+                                            towerDaemon.getTowerLevel().currentLevel,
+                                            false,
+                                            0,
+                                            bulletSprite,
+                                            miniExplodeSprite,
+                                            ()-> bulletClosure.onReturn(new Return<>(3))
+                                    );
+                                    break;
+                                case TYPE2:
+                                    fireRocketBullet(
+                                            towerDaemon.getLastCoordinates(),
+                                            enemy,
+                                            rocketRepo,
+                                            18,
+                                            towerDaemon.getTowerLevel().bulletDamage,
+                                            towerDaemon.getTowerLevel().currentLevel,
+                                            () -> bulletClosure.onReturn(new Return<>(5))
+                                    );
+                                    break;
+                                case TYPE3:
+                                    double angle = RotatingSpriteImageMover.getAngle(
+                                            towerDaemon.getLastCoordinates().getFirst(),
+                                            towerDaemon.getLastCoordinates().getSecond(),
+                                            enemy.getLastCoordinates().getFirst(),
+                                            enemy.getLastCoordinates().getSecond()
+                                    );
 
-                                        int lvl = towerDaemon.getTowerLevel().currentLevel;
+                                    int lvl = towerDaemon.getTowerLevel().currentLevel;
 
-                                        float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
-                                        long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
+                                    float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
+                                    long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
-                                        fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, () -> bulletClosure.onReturn(new Return<>(1)));
+                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, () -> bulletClosure.onReturn(new Return<>(1)));
 
-                                        reloadInterval = 4000;
-                                        break;
-                                    default:
-                                        throw new IllegalStateException("Tower type does not exist!");
-                                }
+                                    reloadInterval = 4000;
+                                    break;
+                                default:
+                                    throw new IllegalStateException("Tower type does not exist!");
                             }
-
-                            towerDaemon.reload(reloadInterval, () -> towerDaemon.scan(this::onReturn));
                         }
-                    });
+
+                        towerDaemon.reload(reloadInterval, () -> towerDaemon.scan(this::onReturn));
+                    }
                 });
-            }
+            });
         }
+    }
+
+    private void setTower(float x, float y) {
+
+        //check if correct field
+        Field<TowerDaemon> field = grid.getField(x, y);
+        if (field == null) return;
+
+        TowerDaemon tow = field.getObject();
+
+        if (tow != null ) //upgrade existing tower
+            upgradeTower(tow);
+        else  //init and set new tower
+            setNewTower(field);
     }
 
     private void fireBullet(
@@ -2113,7 +2117,8 @@ public class Game {
 
                             currentSoundManager.playSound(rocketExplosionSound);
                             rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, () -> repo.add(rocketDoubleDaemon));
-                        });
+                        }
+                );
             }
         });
     }
