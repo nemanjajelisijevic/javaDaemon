@@ -5,7 +5,6 @@ import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
-import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
 import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.imagemovers.ImageMover;
@@ -177,7 +176,7 @@ public class Game {
         enemyGenerateIntervalIt = enemyGenerateIntervals.iterator();
     }
 
-    private DynamicIntervalDummyQuest.IntervalRegulator enemyGenerationRegulator = () ->
+    private DaemonUtils.IntervalRegulator enemyGenerationRegulator = () ->
             enemyGenerateIntervalIt.hasNext()
                     ? enemyGenerateIntervalIt.next()
                     : (enemyGenerateIntervalIt = enemyGenerateIntervals.iterator()).next();

@@ -6,6 +6,11 @@ import java.util.Date;
 
 public class DaemonUtils {
 
+    @FunctionalInterface
+    public static interface IntervalRegulator {
+        long getSleepInterval();
+    }
+
     public static String tag() {
         return Thread.currentThread().getName() + ", Thread ID: " + Thread.currentThread().getId() + " - ";
     }

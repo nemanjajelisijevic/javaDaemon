@@ -4,14 +4,9 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class DynamicIntervalDummyQuest extends DummyQuest {
 
-    @FunctionalInterface
-    public static interface IntervalRegulator {
-        long getSleepInterval();
-    }
+    private DaemonUtils.IntervalRegulator intervalRegulator;
 
-    private IntervalRegulator intervalRegulator;
-
-    public DynamicIntervalDummyQuest(IntervalRegulator intervalRegulator) {
+    public DynamicIntervalDummyQuest(DaemonUtils.IntervalRegulator intervalRegulator) {
         super();
         this.intervalRegulator = intervalRegulator;
     }

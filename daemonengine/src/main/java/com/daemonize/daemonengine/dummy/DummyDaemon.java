@@ -6,6 +6,7 @@ import com.daemonize.daemonengine.implementations.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.DummyQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
 
@@ -15,7 +16,7 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
         return new DummyDaemon(consumer, sleep);
     }
 
-    public static DummyDaemon create(Consumer consumer, DynamicIntervalDummyQuest.IntervalRegulator intervalRegulator) {
+    public static DummyDaemon create(Consumer consumer, DaemonUtils.IntervalRegulator intervalRegulator) {
         return new DummyDaemon(consumer, intervalRegulator);
     }
 
@@ -29,7 +30,7 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
         dummyQuest = new DummyQuest().setConsumer(consumer).setSleepInterval(sleepInMillis);
     }
 
-    public DummyDaemon(Consumer consumer, DynamicIntervalDummyQuest.IntervalRegulator regulator) {
+    public DummyDaemon(Consumer consumer, DaemonUtils.IntervalRegulator regulator) {
         super(consumer);
         dummyQuest = new DynamicIntervalDummyQuest(regulator).setConsumer(consumer);
     }
