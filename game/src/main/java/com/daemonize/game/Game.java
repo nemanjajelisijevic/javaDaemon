@@ -1111,8 +1111,8 @@ public class Game {
 
                     enemy.pushSprite(explodeSprite, 0, ()->{
                         renderer.consume(()->enemy.getView().hide().setAbsoluteX(0).setAbsoluteY(0));
-                        enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY()).stop();
-                    });
+                        enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY());
+                    }).queueStop();
 
                     activeEnemies.remove(enemy);
 
