@@ -19,10 +19,9 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
     return description;
   }
 
-  @SuppressWarnings("unchecked")
-  public <K extends BaseQuest> K setDescription(String description) {
+  public Q setDescription(String description) {
     this.description = description;
-    return (K) this;
+    return (Q) this;
   }
 
   public ReturnRunnable<T> getReturnRunnable() {
@@ -58,10 +57,9 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
 
   private boolean isVoid = false;
 
-  @SuppressWarnings("unchecked")
-  public <K extends BaseQuest> K setVoid() {
+  public Q setVoid() {
     this.isVoid = true;
-    return (K) this;
+    return (Q) this;
   }
 
   public boolean getIsVoid() {
