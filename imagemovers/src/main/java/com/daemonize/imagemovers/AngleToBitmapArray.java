@@ -1,4 +1,4 @@
-package com.daemonize.game;
+package com.daemonize.imagemovers;
 
 import com.daemonize.graphics2d.images.Image;
 
@@ -66,9 +66,6 @@ public class AngleToBitmapArray {
     }
 
     public Image getByAngle(int degrees) {
-        if (degrees < 0 || degrees > 359) {
-            throw new IllegalArgumentException("Arg degrees must be > 0 && < 360");
-        }
         return array[degrees];
     }
 

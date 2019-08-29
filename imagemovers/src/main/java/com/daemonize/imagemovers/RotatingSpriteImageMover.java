@@ -1,8 +1,8 @@
-package com.daemonize.game.imagemovers;
+package com.daemonize.imagemovers;
 
 
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
-import com.daemonize.game.AngleToBitmapArray;
+import com.daemonize.imagemovers.AngleToBitmapArray;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 

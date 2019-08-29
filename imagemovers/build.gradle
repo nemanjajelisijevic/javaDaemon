@@ -1,0 +1,9 @@
+apply plugin: 'java-library'
+
+dependencies {
+    api project (':graphics2d')
+    api project (':daemonprocessor')
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

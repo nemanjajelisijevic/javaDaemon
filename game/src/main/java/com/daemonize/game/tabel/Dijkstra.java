@@ -12,7 +12,7 @@ public class Dijkstra extends PathFinding {
         Field endNode = grid.getGrid()[grid.startPoint.getFirst()][grid.startPoint.getSecond()];
 
         Field<T>[] heapArray = new Field[grid.getGrid().length * grid.getGrid()[0].length];
-        Heap<Field<T>> openSet = new Heap<>(heapArray) ;
+        Heap<Field<T>> openSet = new Heap<>(heapArray);
         HashSet<Field> closedSet = new HashSet<Field>();
 
         openSet.add(startNode);

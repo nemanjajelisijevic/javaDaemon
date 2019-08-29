@@ -8,8 +8,8 @@ import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
 import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.imagemovers.ImageMover;
-import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
+import com.daemonize.imagemovers.ImageMover;
+import com.daemonize.imagemovers.RotatingSpriteImageMover;
 
 import com.daemonize.graphics2d.images.Image;
 
@@ -1359,7 +1359,6 @@ public class Game {
                 rocketRepo.getStructure().push(rocketDoubleDaemon);
             }
 
-
             //init enemy missiles and fill the repo
             for (int i = 0; i < maxRockets; ++i) {
 
@@ -1977,8 +1976,6 @@ public class Game {
                         }
                     });
                 });
-
-                towerDaemon.start();
             }
         }
     }

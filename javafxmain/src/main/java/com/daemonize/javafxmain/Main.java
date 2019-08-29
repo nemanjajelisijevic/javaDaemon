@@ -44,7 +44,7 @@ public class Main extends Application {
 
         int gridWidth = (borderX * 70) / 100;
 
-        int width = gridWidth/columns;
+        int width = gridWidth / columns;
         int height = width; //160
 
         int borderY = (rows + 2) * height;

@@ -1,7 +1,7 @@
 package com.daemonize.game;
 
-import com.daemonize.game.imagemovers.ImageMover;
-import com.daemonize.game.imagemovers.Movable;
+import com.daemonize.imagemovers.ImageMover;
+import com.daemonize.imagemovers.Movable;
 
 public interface Target<T extends Target> extends Movable {
     boolean isShootable();

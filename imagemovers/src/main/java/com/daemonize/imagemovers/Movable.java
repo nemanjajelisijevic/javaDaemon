@@ -1,4 +1,4 @@
-package com.daemonize.game.imagemovers;
+package com.daemonize.imagemovers;
 
 import com.daemonize.daemonengine.utils.Pair;
 

@@ -1,4 +1,4 @@
-package com.daemonize.game.imagemovers.spriteiterators;
+package com.daemonize.imagemovers.spriteiterators;
 
 import com.daemonize.graphics2d.images.Image;
 

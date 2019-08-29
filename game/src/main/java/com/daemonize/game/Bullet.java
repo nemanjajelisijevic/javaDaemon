@@ -2,9 +2,9 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.imagemovers.CoordinatedImageTranslationMover;
-import com.daemonize.game.imagemovers.ImageTranslationMover;
-import com.daemonize.game.imagemovers.RotatingSpriteImageMover;
+import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
+import com.daemonize.imagemovers.ImageTranslationMover;
+import com.daemonize.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 
