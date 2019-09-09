@@ -3,19 +3,23 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <compositeConfiguration>
-          <compositeBuild compositeDefinitionSource="SCRIPT" />
-        </compositeConfiguration>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/androidgraphics2d" />
+            <option value="$PROJECT_DIR$/androidsound" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/daemonengine" />
             <option value="$PROJECT_DIR$/daemonprocessor" />
             <option value="$PROJECT_DIR$/game" />
+            <option value="$PROJECT_DIR$/graphics2d" />
+            <option value="$PROJECT_DIR$/imagemovers" />
+            <option value="$PROJECT_DIR$/javafxgraphics2d" />
             <option value="$PROJECT_DIR$/javafxmain" />
+            <option value="$PROJECT_DIR$/javafxsound" />
+            <option value="$PROJECT_DIR$/sound" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -1,6 +1,6 @@
 package com.daemonize.sound;
 
-public interface SoundClipPlayer<T> {
-    void playClip(T soundClip);
+public interface SoundClipPlayer {
+    void playClip(SoundClip soundClip);
     void stopClip();
 }

@@ -56,7 +56,7 @@
 //
 //
 //    @Override
-//    public File loadFile(String name) throws SoundException {
+//    public File loadSoundClip(String name) throws SoundException {
 //
 //        InputStream is = null;
 //        File soundFile = null;

@@ -32,10 +32,10 @@ import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.sound.DummySoundManager;
+import com.daemonize.sound.SoundClip;
 import com.daemonize.sound.SoundException;
 import com.daemonize.sound.SoundManager;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -262,19 +262,19 @@ public class Game {
     private SoundManager activeSoundManager;
     private SoundManager dummySoundManager;
 
-    private File rocketExplosionSound;
-    private File bulletSound;
-    private File bigExplosion;
-    private File laserSound;
+    private SoundClip rocketExplosionSound;
+    private SoundClip bulletSound;
+    private SoundClip bigExplosion;
+    private SoundClip laserSound;
 
     private Image soundOnImage;
     private Image soundOffImage;
 
     private Button soundButton;
 
-    private File soundTogglerSound;
-    private File towerConstructionSound;
-    private File towerSelectionSound;
+    private SoundClip soundTogglerSound;
+    private SoundClip towerConstructionSound;
+    private SoundClip towerSelectionSound;
 
     //uncaught exception handler
     public Thread.UncaughtExceptionHandler uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
@@ -796,9 +796,9 @@ public class Game {
                 greenTowerUpgSprite = dialogUpgradeTower3;
                 dialogueImageTowerUpgrade = redTowerUpgSprite;
 
-                soundTogglerSound = activeSoundManager.loadFile("soundTogglerSound.wav");
-                towerConstructionSound = activeSoundManager.loadFile("towerConstructionSound.wav");
-                towerSelectionSound = activeSoundManager.loadFile("towerSelectionSound.wav");
+                soundTogglerSound = activeSoundManager.loadSoundClip("soundTogglerSound.wav");
+                towerConstructionSound = activeSoundManager.loadSoundClip("towerConstructionSound.wav");
+                towerSelectionSound = activeSoundManager.loadSoundClip("towerSelectionSound.wav");
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
@@ -807,28 +807,28 @@ public class Game {
 
                 //sounds init
                 //soundManager.setConsumer(gameConsumer);
-                bulletSound = activeSoundManager.loadFile("bullet.wav");
+                bulletSound = activeSoundManager.loadSoundClip("bullet.wav");
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene();
                 }
 
-                rocketExplosionSound = activeSoundManager.loadFile("rocketExplosion.wav");
+                rocketExplosionSound = activeSoundManager.loadSoundClip("rocketExplosion.wav");
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene();
                 }
 
-                bigExplosion = activeSoundManager.loadFile("bigExplosion.wav");
+                bigExplosion = activeSoundManager.loadSoundClip("bigExplosion.wav");
 
                 if (loaderBar.hasNext()) {
                     loaderBar.next().show();
                     renderer.drawScene();
                 }
 
-                laserSound = activeSoundManager.loadFile("laser.wav");
+                laserSound = activeSoundManager.loadSoundClip("laser.wav");
 
                 while (loaderBar.hasNext()){
                     loaderBar.next().show();

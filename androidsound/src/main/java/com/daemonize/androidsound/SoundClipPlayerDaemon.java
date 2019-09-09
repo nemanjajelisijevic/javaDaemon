@@ -5,6 +5,7 @@ import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.sound.SoundClip;
 import com.daemonize.sound.SoundClipPlayer;
 
 import java.lang.Exception;
@@ -16,12 +17,12 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaemon> {
-  private SoundClipPlayer<T> prototype;
+public class SoundClipPlayerDaemon implements EagerDaemon<SoundClipPlayerDaemon> {
+  private SoundClipPlayer prototype;
 
   protected EagerMainQuestDaemonEngine daemonEngine;
 
-  public SoundClipPlayerDaemon(Consumer consumer, SoundClipPlayer<T> prototype) {
+  public SoundClipPlayerDaemon(Consumer consumer, SoundClipPlayer prototype) {
     this.daemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.prototype = prototype;
   }
@@ -35,16 +36,16 @@ public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaem
 
   /**
    * Prototype method {@link com.daemonize.game.soundmanager.SoundClipPlayer#playClip} */
-  public SoundClipPlayerDaemon playClip(T soundclip) {
-    daemonEngine.pursueQuest(new PlayClipMainQuest(soundclip).setConsumer(daemonEngine.getConsumer()));
+  public SoundClipPlayerDaemon playClip(SoundClip soundclip) {
+    daemonEngine.pursueQuest(new PlayClipMainQuest((AndroidSoundClip)soundclip).setConsumer(daemonEngine.getConsumer()));
     return this;
   }
 
-  public SoundClipPlayer<T> getPrototype() {
+  public SoundClipPlayer getPrototype() {
     return prototype;
   }
 
-  public SoundClipPlayerDaemon setPrototype(SoundClipPlayer<T> prototype) {
+  public SoundClipPlayerDaemon setPrototype(SoundClipPlayer prototype) {
     this.prototype = prototype;
     return this;
   }
@@ -139,9 +140,9 @@ public class SoundClipPlayerDaemon<T> implements EagerDaemon<SoundClipPlayerDaem
   }
 
   private final class PlayClipMainQuest extends VoidMainQuest {
-    private T soundclip;
+    private AndroidSoundClip soundclip;
 
-    private PlayClipMainQuest(T soundclip) {
+    private PlayClipMainQuest(AndroidSoundClip soundclip) {
       super();
       setVoid();
       this.soundclip = soundclip;

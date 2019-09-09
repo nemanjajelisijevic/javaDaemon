@@ -1,12 +1,15 @@
 package com.daemonize.javafxsound;
 
 
+import com.daemonize.sound.SoundClip;
 import com.daemonize.sound.SoundException;
 import com.daemonize.sound.SoundManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,7 +26,7 @@ public class JavaFxSoundManager implements SoundManager {
 
     private static class ClipManager {
 
-        private List<Clip> soundClipList;
+        private List<JavaFxSoundClip> soundClipList;
         private int counter = 0;
         private int noOfClipsPerSound;
 
@@ -38,18 +41,18 @@ public class JavaFxSoundManager implements SoundManager {
                 Clip soundClip = AudioSystem.getClip();
                 AudioInputStream ais = AudioSystem.getAudioInputStream(soundFile.toURI().toURL());
                 soundClip.open(ais);
-                soundClipList.add(soundClip);
+                soundClipList.add(new JavaFxSoundClip(soundClip));
             }
         }
 
-        private Clip getClip() {
+        private JavaFxSoundClip getClip() {
             return soundClipList.get(counter++ % noOfClipsPerSound);
         }
     }
 
     private int counter = 0;
     private int noOfChannelsPerClip;
-    private Map<File, ClipManager> soundMap = new TreeMap();
+    private Map<SoundClip, ClipManager> soundMap = new Hashtable<>();// TODO this map is not really needed
 
     private Clip backGroundMusic;
 
@@ -60,18 +63,17 @@ public class JavaFxSoundManager implements SoundManager {
     }
 
     @Override
-    public File loadFile(String name) throws SoundException {
-        File soundFile = null;
+    public SoundClip loadSoundClip(String name) throws SoundException {
+        ClipManager clipManager = null;
         try {
-            soundFile = new File(getClass().getResource("/" + name).getPath());//TODO remove root slash!!
-            ClipManager clipManager = new ClipManager(noOfChannelsPerClip);
-            clipManager.registerSound(soundFile);
-            soundMap.put(soundFile, clipManager);
+            clipManager = new ClipManager(noOfChannelsPerClip);
+            clipManager.registerSound(new File(getClass().getResource("/" + name).getPath()));//TODO remove root slash!!
+            soundMap.put(clipManager.soundClipList.get(0), clipManager);
         } catch (Exception e) {
             throw new SoundException("Unable to load sound file: " + name, e);
         }
 
-        return soundFile;
+        return clipManager.soundClipList.get(0);
     }
 
 
@@ -82,31 +84,8 @@ public class JavaFxSoundManager implements SoundManager {
     }
 
     @Override
-    public void playSound(File soundFile) {
-        ClipManager clipManager = soundMap.get(soundFile);
-        playClip(clipManager.getClip());
-    }
-
-    @Override
-    public void loadBackgroundMusic(String backgroundMusicFile) throws SoundException {
-        File soundFile = null;
-        try {
-            soundFile = new File(getClass().getResource("/" + backgroundMusicFile).getPath());//TODO remove root slash!!
-            AudioFileFormat format = AudioSystem.getAudioFileFormat(soundFile);
-            Clip soundClip = AudioSystem.getClip();
-            AudioInputStream ais = AudioSystem.getAudioInputStream(soundFile.toURI().toURL());
-            soundClip.loop(Integer.MAX_VALUE);
-            soundClip.open(ais);
-            backGroundMusic = soundClip;
-        } catch (Exception e) {
-            throw new SoundException("Unable to load sound file: " + backgroundMusicFile, e);
-        }
-    }
-
-    @Override
-    public void playBackgroundMusic() {
-        backGroundMusic.setFramePosition(0);  // Must always rewind!
-        backGroundMusic.start();
+    public void playSound(SoundClip soundClip) {
+        playClip(soundMap.get(soundClip).getClip().getImplementation());
     }
 
     @Override

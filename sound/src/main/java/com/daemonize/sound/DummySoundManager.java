@@ -5,18 +5,12 @@ import java.io.File;
 public class DummySoundManager implements SoundManager {
 
     @Override
-    public File loadFile(String name) throws SoundException {
+    public SoundClip loadSoundClip(String name) throws SoundException {
         return null;
     }
 
     @Override
-    public void loadBackgroundMusic(String backgroundMusicFile) throws SoundException {}
-
-    @Override
-    public void playBackgroundMusic() {}
-
-    @Override
-    public void playSound(File soundFile) {}
+    public void playSound(SoundClip soundClip) {}
 
     @Override
     public SoundManager start() {

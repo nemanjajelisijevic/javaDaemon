@@ -3,6 +3,7 @@ package com.daemonize.androidsound;
 import android.content.Context;
 import android.media.MediaPlayer;
 
+import com.daemonize.sound.SoundClip;
 import com.daemonize.sound.SoundClipPlayer;
 
 import java.io.File;
@@ -10,7 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class AndroidSoundClipPlayer implements SoundClipPlayer<File> {
+public class AndroidSoundClipPlayer implements SoundClipPlayer {
 
     private Context context;
     private MediaPlayer player;
@@ -20,11 +21,11 @@ public class AndroidSoundClipPlayer implements SoundClipPlayer<File> {
         this.player = player;
     }
 
-    protected void playClip(File soundClip, boolean loop) {
+    protected void playClip(AndroidSoundClip soundClip, boolean loop) {
         FileInputStream fis = null;
         try {
             player.reset();
-            fis = context.openFileInput(soundClip.getName());
+            fis = context.openFileInput(soundClip.getImplementation().getName());
             player.setDataSource(fis.getFD());
             player.prepare();
             player.setLooping(loop);
@@ -42,8 +43,8 @@ public class AndroidSoundClipPlayer implements SoundClipPlayer<File> {
     }
 
     @Override
-    public void playClip(File soundClip) {
-        playClip(soundClip, false);
+    public void playClip(SoundClip soundClip) {
+        playClip((AndroidSoundClip) soundClip, false);
     }
 
     @Override

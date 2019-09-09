@@ -2,12 +2,8 @@ package com.daemonize.sound;
 
 import com.daemonize.daemonengine.DaemonService;
 
-import java.io.File;
-
-public interface SoundManager extends DaemonService<SoundManager> {
-    File loadFile(String name) throws SoundException;
-    void playSound(File soundFile);
-    void loadBackgroundMusic(String backgroundMusicFile) throws SoundException;
-    void playBackgroundMusic();
+public interface SoundManager<T extends SoundClip> extends DaemonService<SoundManager> {
+    T loadSoundClip(String name) throws SoundException;
+    void playSound(T soundClip);
     SoundManager setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler);
 }
