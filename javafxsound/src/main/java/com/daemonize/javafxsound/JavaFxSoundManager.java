@@ -52,9 +52,7 @@ public class JavaFxSoundManager implements SoundManager {
 
     private int counter = 0;
     private int noOfChannelsPerClip;
-    private Map<SoundClip, ClipManager> soundMap = new Hashtable<>();// TODO this map is not really needed
-
-    private Clip backGroundMusic;
+    private Map<SoundClip, ClipManager> soundMap = new HashMap<>();// TODO this map is not really needed
 
     public JavaFxSoundManager(int noOfChannelsPerClip) {
         if (noOfChannelsPerClip < 1)
