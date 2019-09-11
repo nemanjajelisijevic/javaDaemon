@@ -328,7 +328,7 @@ public class Game {
         URL url = this.getClass().getProtectionDomain().getCodeSource().getLocation();
         try {
             String jarPath = URLDecoder.decode(url.getFile(), "UTF-8");
-            activeSoundManager.setResourceLocation(jarPath, true);
+            activeSoundManager.setJarResourceLocation(jarPath, "");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

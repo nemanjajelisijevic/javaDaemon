@@ -78,8 +78,13 @@ public class AndroidSoundManager implements SoundManager<AndroidSoundClip> {
     }
 
     @Override
-    public void setResourceLocation(String path, boolean jar) {
+    public void setResourceLocation(String path) {
         //TODO check this
+    }
+
+    @Override
+    public void setJarResourceLocation(String jarResourceLocation, String jarInternalLocation) {
+
     }
 
     @Override

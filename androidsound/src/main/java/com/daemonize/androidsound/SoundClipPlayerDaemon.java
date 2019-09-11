@@ -28,14 +28,14 @@ public class SoundClipPlayerDaemon implements EagerDaemon<SoundClipPlayerDaemon>
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.soundmanager.SoundClipPlayer#stopClip} */
+   * Prototype method {@link com.daemonize.sound.SoundClipPlayer#stopClip} */
   public SoundClipPlayerDaemon stopClip() {
     daemonEngine.pursueQuest(new StopClipMainQuest().setConsumer(daemonEngine.getConsumer()));
     return this;
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.soundmanager.SoundClipPlayer#playClip} */
+   * Prototype method {@link com.daemonize.sound.SoundClipPlayer#playClip} */
   public SoundClipPlayerDaemon playClip(SoundClip soundclip) {
     daemonEngine.pursueQuest(new PlayClipMainQuest((AndroidSoundClip)soundclip).setConsumer(daemonEngine.getConsumer()));
     return this;

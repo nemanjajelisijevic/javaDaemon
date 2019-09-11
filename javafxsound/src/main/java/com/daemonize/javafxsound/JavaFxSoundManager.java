@@ -110,10 +110,20 @@ public class JavaFxSoundManager implements SoundManager {
     public void stop() {}
 
     @Override
-    public void setResourceLocation(String path, boolean jar) {
+    public void setResourceLocation(String path) {
         resourceLocation = path;
-        if (jar && resourceLocation != null && !resourceLocation.isEmpty())
-            resourceLocation += "!";
+    }
+
+    @Override
+    public void setJarResourceLocation(String jarResourceLocation, String jarInternalLocation) {
+        resourceLocation = jarResourceLocation
+                + (!jarInternalLocation.isEmpty() ? "!/" : "!" )
+                + (!jarInternalLocation.isEmpty() && jarInternalLocation.charAt(0) == '/'
+                    ? jarInternalLocation.substring(1)
+                    : jarInternalLocation);
+
+        if (resourceLocation.endsWith("/"))
+            resourceLocation = resourceLocation.substring(0, resourceLocation.length() - 1);
     }
 
     @Override
