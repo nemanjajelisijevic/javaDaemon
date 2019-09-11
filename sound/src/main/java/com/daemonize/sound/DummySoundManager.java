@@ -21,6 +21,9 @@ public class DummySoundManager implements SoundManager {
     public void stop() {}
 
     @Override
+    public void setResourceLocation(String path, boolean jar) {}
+
+    @Override
     public DummySoundManager setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
         return this;
     }

@@ -1,18 +1,19 @@
 package com.daemonize.javafxsound;
 
-
 import com.daemonize.sound.SoundClip;
 import com.daemonize.sound.SoundException;
 import com.daemonize.sound.SoundManager;
 
+import java.io.BufferedInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -35,11 +36,19 @@ public class JavaFxSoundManager implements SoundManager {
             this.soundClipList = new ArrayList<>(noOfClipsPerSound);
         }
 
+        private void registerSound(String soundFile) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+            for (int i = 0; i < noOfClipsPerSound; ++i) {
+                Clip soundClip = AudioSystem.getClip();
+                AudioInputStream ais = AudioSystem.getAudioInputStream(new URL("jar:file://" + soundFile));
+                soundClip.open(ais);
+                soundClipList.add(new JavaFxSoundClip(soundClip));
+            }
+        }
+
         private void registerSound(File soundFile) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
             for (int i = 0; i < noOfClipsPerSound; ++i) {
-                AudioFileFormat format = AudioSystem.getAudioFileFormat(soundFile);
                 Clip soundClip = AudioSystem.getClip();
-                AudioInputStream ais = AudioSystem.getAudioInputStream(soundFile.toURI().toURL());
+                AudioInputStream ais = AudioSystem.getAudioInputStream(soundFile.toURL().openStream());
                 soundClip.open(ais);
                 soundClipList.add(new JavaFxSoundClip(soundClip));
             }
@@ -50,6 +59,7 @@ public class JavaFxSoundManager implements SoundManager {
         }
     }
 
+    private String resourceLocation;
     private int counter = 0;
     private int noOfChannelsPerClip;
     private Map<SoundClip, ClipManager> soundMap = new HashMap<>();// TODO this map is not really needed
@@ -62,10 +72,16 @@ public class JavaFxSoundManager implements SoundManager {
 
     @Override
     public SoundClip loadSoundClip(String name) throws SoundException {
+        return loadSoundClipAsFile(name);
+    }
+
+    private SoundClip loadSoundClipAsFile(String name) throws SoundException {
         ClipManager clipManager = null;
         try {
             clipManager = new ClipManager(noOfChannelsPerClip);
-            clipManager.registerSound(new File(getClass().getResource("/" + name).getPath()));//TODO remove root slash!!
+            String path = getClass().getResource("/" + name).getPath();
+            clipManager.registerSound(new File(path));//TODO remove root slash!!
+            //clipManager.registerSound(resourceLocation + "/" + name);
             soundMap.put(clipManager.soundClipList.get(0), clipManager);
         } catch (Exception e) {
             throw new SoundException("Unable to load sound file: " + name, e);
@@ -74,9 +90,8 @@ public class JavaFxSoundManager implements SoundManager {
         return clipManager.soundClipList.get(0);
     }
 
-
     private void playClip(Clip soundClip) {
-        soundClip.setFramePosition(0);  // Must always rewind!
+        soundClip.setFramePosition(0);  //Must always rewind!
         soundClip.loop(0);
         soundClip.start();
     }
@@ -93,6 +108,13 @@ public class JavaFxSoundManager implements SoundManager {
 
     @Override
     public void stop() {}
+
+    @Override
+    public void setResourceLocation(String path, boolean jar) {
+        resourceLocation = path;
+        if (jar && resourceLocation != null && !resourceLocation.isEmpty())
+            resourceLocation += "!";
+    }
 
     @Override
     public JavaFxSoundManager setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {

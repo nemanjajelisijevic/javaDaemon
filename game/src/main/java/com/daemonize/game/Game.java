@@ -37,6 +37,9 @@ import com.daemonize.sound.SoundException;
 import com.daemonize.sound.SoundManager;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -320,6 +323,15 @@ public class Game {
         );
 
         this.dXY = ((float) borderX) / 1000;
+
+        //TODO following is for Windows packaging
+        URL url = this.getClass().getProtectionDomain().getCodeSource().getLocation();
+        try {
+            String jarPath = URLDecoder.decode(url.getFile(), "UTF-8");
+            activeSoundManager.setResourceLocation(jarPath, true);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean isPaused() {

@@ -3,7 +3,6 @@ package com.daemonize.androidsound;
 import android.content.Context;
 import android.media.MediaPlayer;
 
-
 import com.daemonize.sound.SoundClipPlayer;
 import com.daemonize.sound.SoundException;
 import com.daemonize.sound.SoundManager;
@@ -39,26 +38,16 @@ public class AndroidSoundManager implements SoundManager<AndroidSoundClip> {
     @Override
     public AndroidSoundClip loadSoundClip(String name) throws SoundException {
 
-        InputStream is = null;
-        FileOutputStream fos = null;
         String newName = "new" + name;
-
-        try {
-
-            is = getClass().getResourceAsStream("/" + name);
-            fos = context.openFileOutput(newName, Context.MODE_PRIVATE);
-
+        try (
+                InputStream is = getClass().getResourceAsStream("/" + name);
+                FileOutputStream fos = context.openFileOutput(newName, Context.MODE_PRIVATE)
+        ){
             int res = Integer.MIN_VALUE;
             while ((res = is.read()) != -1)
                 fos.write(res);
-
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new SoundException("Unable to load sound file: " + name, e);
-        } finally {
-            try {
-                if (is != null) is.close();
-                if (fos != null) fos.close();
-            } catch (IOException ex) {}
         }
 
         return new AndroidSoundClip(new File(newName));
@@ -75,9 +64,8 @@ public class AndroidSoundManager implements SoundManager<AndroidSoundClip> {
 
     @Override
     public AndroidSoundManager start() {
-        for (SoundClipPlayerDaemon player : players) {
+        for (SoundClipPlayerDaemon player : players)
             player.start();
-        }
         return this;
     }
 
@@ -87,6 +75,11 @@ public class AndroidSoundManager implements SoundManager<AndroidSoundClip> {
             player.getPrototype().stopClip();
             player.stop();
         }
+    }
+
+    @Override
+    public void setResourceLocation(String path, boolean jar) {
+        //TODO check this
     }
 
     @Override
