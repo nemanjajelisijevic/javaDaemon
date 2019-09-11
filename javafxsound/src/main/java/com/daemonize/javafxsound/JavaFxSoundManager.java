@@ -119,8 +119,7 @@ public class JavaFxSoundManager implements SoundManager {
         resourceLocation = jarResourceLocation
                 + (!jarInternalLocation.isEmpty() ? "!/" : "!" )
                 + (!jarInternalLocation.isEmpty() && jarInternalLocation.charAt(0) == '/'
-                    ? jarInternalLocation.substring(1)
-                    : jarInternalLocation);
+                    ? jarInternalLocation.substring(1) : jarInternalLocation);
 
         if (resourceLocation.endsWith("/"))
             resourceLocation = resourceLocation.substring(0, resourceLocation.length() - 1);
