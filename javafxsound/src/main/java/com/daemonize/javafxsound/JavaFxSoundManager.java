@@ -107,7 +107,9 @@ public class JavaFxSoundManager implements SoundManager {
     }
 
     @Override
-    public void stop() {}
+    public void stop() {
+        //TODO close clips
+    }
 
     @Override
     public void setResourceLocation(String path) {
