@@ -9,12 +9,12 @@ import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
 import com.daemonize.graphics2d.scene.views.Button;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 
 public class InitState extends DaemonState<InitState> {
 
-    @Daemonize
+    @Daemon
     public static class DummyStatePreparer {
         @GenerateRunnable
         public void prepareSummyScene() throws InterruptedException {

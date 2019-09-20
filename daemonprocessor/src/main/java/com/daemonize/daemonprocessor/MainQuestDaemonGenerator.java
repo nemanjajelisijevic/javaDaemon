@@ -3,6 +3,7 @@ package com.daemonize.daemonprocessor;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
@@ -70,9 +71,9 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     public MainQuestDaemonGenerator(TypeElement classElement) {
         this(
                 classElement,
-                classElement.getAnnotation(Daemonize.class).eager(),
-                classElement.getAnnotation(Daemonize.class).consumer(),
-                classElement.getAnnotation(Daemonize.class).markDaemonMethods()
+                classElement.getAnnotation(Daemon.class).eager(),
+                classElement.getAnnotation(Daemon.class).consumer(),
+                classElement.getAnnotation(Daemon.class).markDaemonMethods()
         );
     }
 
@@ -99,14 +100,14 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         this.daemonEngineClass = ClassName.get(daemonPackage, daemonEngineSimpleName);
         this.dedicatedThreadEngines = new HashMap<>();
 
-        List<Pair<ExecutableElement, DedicatedThread>> dedicatedThreadMethods =
+        List<Pair<ExecutableElement, String>> dedicatedThreadMethods =
                 BaseDaemonGenerator.getDedicatedThreadMethods(getPublicClassMethodsWithBaseClasses(classElement));
 
-        for (Pair<ExecutableElement, DedicatedThread> dedicatedThreadMethod : dedicatedThreadMethods) {
+        for (Pair<ExecutableElement, String> dedicatedThreadMethod : dedicatedThreadMethods) {
 
-            String daemonEngineDedicatedString = dedicatedThreadMethod.getSecond().name().isEmpty() ?
+            String daemonEngineDedicatedString = dedicatedThreadMethod.getSecond().isEmpty() ?
                         dedicatedThreadMethod.getFirst().getSimpleName().toString() + daemonConcatEngineString :
-                        dedicatedThreadMethod.getSecond().name() + daemonConcatEngineString;
+                        dedicatedThreadMethod.getSecond() + daemonConcatEngineString;
 
             FieldSpec dedicatedEngineFieldSpec = FieldSpec.builder(daemonEngineClass, daemonEngineDedicatedString).addModifiers(Modifier.PROTECTED).build();
 
@@ -140,27 +141,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         implementInterfaces(daemonClassBuilder, daemonClassName.box());
 
-//        for (TypeElement intf : interfaces) {
-//            TypeMirror intfMirror = intf.asType();
-
-//            List<? extends TypeParameterElement> typeParams = intf.getTypeParameters();
-
-//            if (!typeParams.isEmpty()) {
-//
-//                for (TypeParameterElement type : typeParams) {
-//                    daemonClassBuilder.addTypeVariable(TypeVariableName.get(type));
-//                }
-//            }
-//            daemonClassBuilder.addSuperinterface(TypeName.get(intf.asType()));
-//        }
-
-
-//        for (TypeElement intf : interfaces)
-//            daemonClassBuilder.addSuperinterface(TypeName.get(intf.asType()));
-
-
-//        daemonClassBuilder.addSuperinterfaces(TypeName.get(interfaces);
-
         if (consumerDaemon)
             daemonClassBuilder.addSuperinterface(consumerInterface);
 
@@ -172,9 +152,36 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
             PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
 
+//            Daemonize daemonizeAnnotation = method.getAnnotation(Daemonize.class);
+//
+//            if (daemonizeAnnotation == null) {
+//                daemonClassBuilder.addMethod(
+//                        overriddenMethods.contains(overridenMethodData)
+//                                ? wrapMethod(method, true)
+//                                : wrapMethod(method, false)
+//                );
+//                continue;
+//            } else {
+//                if (daemonizeAnnotation.dedicatedThread() && dedicatedThreadEngines.containsKey(method)) {
+//                    mainQuestsAndApiMethods.put(
+//                            createMainQuest(method),
+//                            createApiMethod(
+//                                    method,
+//                                    dedicatedThreadEngines.get(method).getFirst()
+//                            )
+//                    );
+//                } else {
+//                    mainQuestsAndApiMethods.put(
+//                            createMainQuest(method),
+//                            createApiMethod(method, daemonEngineString)
+//                    );
+//                }
+//            }
+
+
             if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData) || method.getAnnotation(Exclude.class) != null) {
                 if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
-                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? wrapIntfMethod(method) : wrapMethod(method));
+                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? wrapMethod(method, true) : wrapMethod(method, false));
                     continue;
                 }
                 continue;

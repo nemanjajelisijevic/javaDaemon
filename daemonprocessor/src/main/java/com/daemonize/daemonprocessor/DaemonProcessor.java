@@ -1,7 +1,7 @@
 package com.daemonize.daemonprocessor;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.JavaFile;
@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -29,7 +28,7 @@ import javax.tools.Diagnostic;
 
 @SupportedAnnotationTypes(
         {
-                "com.daemonize.daemonprocessor.annotations.Daemonize",
+                "com.daemonize.daemonprocessor.annotations.Daemon",
                 "com.daemonize.daemonprocessor.annotations.SideQuest",
                 "com.daemonize.daemonprocessor.annotations.CallingThread",
                 "com.daemonize.daemonprocessor.annotations.DedicatedThread"
@@ -54,7 +53,7 @@ public class DaemonProcessor extends AbstractProcessor {
         messager.printMessage(Diagnostic.Kind.NOTE, "Starting DaemonProcessor...");
 
         Collection<? extends Element> annotatedElements =
-                roundEnvironment.getElementsAnnotatedWith(Daemonize.class);
+                roundEnvironment.getElementsAnnotatedWith(Daemon.class);
 
         if (annotatedElements.isEmpty()) {
             messager.printMessage(Diagnostic.Kind.NOTE, "No annotated classes");
@@ -69,7 +68,7 @@ public class DaemonProcessor extends AbstractProcessor {
                         Diagnostic.Kind.ERROR,
                         "Error processing element: "
                                 + classElement.getSimpleName()
-                                + " - @Daemonize can only be applied to a class or an interface."
+                                + " - @Daemon can only be applied to a class or an interface."
                 );
                 return true;
 
@@ -81,7 +80,7 @@ public class DaemonProcessor extends AbstractProcessor {
                 );
 
                 List<ExecutableElement> publicPrototypeMethods =
-                        classElement.getAnnotation(Daemonize.class).daemonizeBaseMethods() ?
+                        classElement.getAnnotation(Daemon.class).daemonizeBaseMethods() ?
                                 BaseDaemonGenerator.getPublicClassMethodsWithBaseClasses(classElement) :
                                 BaseDaemonGenerator.getPublicClassMethods(classElement);
 
@@ -118,7 +117,7 @@ public class DaemonProcessor extends AbstractProcessor {
                     } else if (publicPrototypeMethods.size() > sideQuestMethods.size()) {
 
                         // double threaded daemon
-                        if (classElement.getAnnotation(Daemonize.class).doubleDaemonize()) {
+                        if (classElement.getAnnotation(Daemon.class).doubleDaemonize()) {
 
                             generator = new DoubleDaemonGenerator(((TypeElement) classElement));
 

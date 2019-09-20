@@ -1,15 +1,12 @@
 package com.daemonize.daemonprocessor.annotations;
 
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 public @interface Daemonize {
-    boolean eager() default false;
-    boolean doubleDaemonize() default false;
-    String className() default "";
-    boolean consumer() default false;
-    boolean daemonizeBaseMethods() default true;
-    boolean markDaemonMethods() default false;
+    boolean dedicatedThread() default false;
+    String name() default "";
+    boolean consumerArg() default false;
+    boolean generateRunnable() default false;
 }

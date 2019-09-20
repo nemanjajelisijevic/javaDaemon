@@ -1,7 +1,7 @@
 package com.daemonize.daemonprocessor;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Exclude;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
@@ -34,8 +34,8 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
         this.mainGenerator = new MainQuestDaemonGenerator(
                 classElement,
                 true,
-                classElement.getAnnotation(Daemonize.class).consumer(),
-                classElement.getAnnotation(Daemonize.class).markDaemonMethods()
+                classElement.getAnnotation(Daemon.class).consumer(),
+                classElement.getAnnotation(Daemon.class).markDaemonMethods()
         );
         this.sideGenerator = new SideQuestDaemonGenerator(classElement);
 
@@ -192,7 +192,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 continue;
 
             if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
-                daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? mainGenerator.wrapIntfMethod(method) : mainGenerator.wrapMethod(method));
+                daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? mainGenerator.wrapMethod(method, true) : mainGenerator.wrapMethod(method, false));
                 continue;
             }
 

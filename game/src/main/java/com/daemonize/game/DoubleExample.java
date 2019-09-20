@@ -2,15 +2,12 @@ package com.daemonize.game;
 
 //import android.util.Log;
 
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.DedicatedThread;
-import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
-@Daemonize
+@Daemon
 public class DoubleExample {
 
     private volatile int cnt;

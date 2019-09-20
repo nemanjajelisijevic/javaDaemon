@@ -82,7 +82,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
                 && Math.abs(lastCoord.getSecond() - targetY)  <= velocity.intensity * getdXY()) {
             coordinateLock.lock();
             coordinatesReached = true;
-            setTargetCoordinates(Float.MIN_VALUE, Float.MIN_VALUE);
+            setTargetCoordinates(Float.NaN, Float.NaN);
             coordinateReachedCondition.signal();
             coordinateLock.unlock();
             return null;

@@ -2,7 +2,7 @@ package com.daemonize.daemonprocessor;
 
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Exclude;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
@@ -37,8 +37,8 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         this.mainGenerator = new MainQuestDaemonGenerator(
                 classElement,
                 false,
-                classElement.getAnnotation(Daemonize.class).consumer(),
-                classElement.getAnnotation(Daemonize.class).markDaemonMethods()
+                classElement.getAnnotation(Daemon.class).consumer(),
+                classElement.getAnnotation(Daemon.class).markDaemonMethods()
         );
         this.sideGenerator = new SideQuestDaemonGenerator(classElement);
 
@@ -156,7 +156,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
 
             if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData) || method.getAnnotation(Exclude.class) != null) {
                 if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
-                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? mainGenerator.wrapIntfMethod(method) : mainGenerator.wrapMethod(method));
+                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? mainGenerator.wrapMethod(method, true) : mainGenerator.wrapMethod(method, false));
                     continue;
                 }
                 continue;

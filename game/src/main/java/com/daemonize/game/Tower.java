@@ -8,7 +8,7 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
@@ -18,7 +18,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 
-@Daemonize(doubleDaemonize = true)
+@Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true)
 public class Tower extends RotatingSpriteImageMover implements Target<Tower> {
 
     public static class TowerLevel {

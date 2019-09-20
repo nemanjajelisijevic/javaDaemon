@@ -8,7 +8,7 @@ import com.daemonize.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
@@ -16,7 +16,7 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import java.util.Arrays;
 
 
-@Daemonize(doubleDaemonize = true, className = "EnemyDoubleDaemon")
+@Daemon(doubleDaemonize = true, className = "EnemyDoubleDaemon", implementPrototypeInterfaces = true)
 public class Enemy extends CoordinatedImageTranslationMover implements Target<Enemy> {
 
     private ImageView view;

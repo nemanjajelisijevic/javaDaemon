@@ -7,14 +7,14 @@ import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingLatch;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-@Daemonize(doubleDaemonize = true, daemonizeBaseMethods = true)
+@Daemon(doubleDaemonize = true, daemonizeBaseMethods = true)
 public class LaserBullet extends Bullet {
 
     protected List<ImageView> views;

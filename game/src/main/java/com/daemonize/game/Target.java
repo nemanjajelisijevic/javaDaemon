@@ -3,15 +3,7 @@ package com.daemonize.game;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.Movable;
 
-public interface Target<T extends Target> extends Movable {
+public interface Target<T extends Target> extends Movable, Mortal<T>, Paralyzable<T> {
     boolean isShootable();
     T setShootable(boolean shootable);
-    int getHp();
-    T setHp(int hp);
-    T setMaxHp(int maxHp);
-    int getMaxHp();
-    boolean isParalyzed();
-    T setParalyzed(boolean paralyzed);
-    void setVelocity(float velocity);
-    ImageMover.Velocity getVelocity();
 }

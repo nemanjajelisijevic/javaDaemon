@@ -1,6 +1,7 @@
 package com.daemonize.daemonprocessor;
 
 
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.LogExecutionTime;
@@ -20,7 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.Consumer;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -31,11 +31,9 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.NoType;
 import javax.lang.model.type.TypeMirror;
 
 
-import static javax.lang.model.type.TypeKind.NONE;
 import static javax.lang.model.type.TypeKind.VOID;
 
 public abstract class BaseDaemonGenerator implements DaemonGenerator {
@@ -153,13 +151,14 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         interfaces = new ArrayList<>();
         overriddenMethods = new HashSet<>();
 
-        for (TypeMirror intf : classElement.getInterfaces()) {
-            TypeElement intfElement = (TypeElement) ((DeclaredType) intf).asElement();
-            interfaces.add(intfElement);
-            populateOverridenMethods(intf);
-        }
+        if (classElement.getAnnotation(Daemon.class).implementPrototypeInterfaces())
+            for (TypeMirror intf : classElement.getInterfaces()) {
+                TypeElement intfElement = (TypeElement) ((DeclaredType) intf).asElement();
+                interfaces.add(intfElement);
+                populateOverridenMethods(intf);
+            }
 
-        String name = classElement.getAnnotation(Daemonize.class).className();
+        String name = classElement.getAnnotation(Daemon.class).className();
         this.daemonSimpleName = name.isEmpty() ? prototypeClassSimpleName + "Daemon" : name;
 
     }
@@ -266,75 +265,39 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     }
 
     public static List<Pair<ExecutableElement, SideQuest>> getSideQuestMethods(List<ExecutableElement> publicMethods) {
-
         List<Pair<ExecutableElement, SideQuest>> ret = new ArrayList<>();
-
         for (ExecutableElement method : publicMethods) {
-            if (method.getAnnotation(SideQuest.class) != null) {
+            if (method.getAnnotation(SideQuest.class) != null)
                 ret.add(Pair.create(method, method.getAnnotation(SideQuest.class)));
-            }
         }
-
         return ret;
     }
 
-    public static List<Pair<ExecutableElement, DedicatedThread>> getDedicatedThreadMethods(List<ExecutableElement> publicMethods) {
-
-        List<Pair<ExecutableElement, DedicatedThread>> ret = new ArrayList<>();
-
+    public static List<Pair<ExecutableElement, String>> getDedicatedThreadMethods(List<ExecutableElement> publicMethods) {
+        List<Pair<ExecutableElement, String>> ret = new ArrayList<>();
         for (ExecutableElement method : publicMethods) {
-            if (method.getAnnotation(DedicatedThread.class) != null) {
-                ret.add(Pair.create(method, method.getAnnotation(DedicatedThread.class)));
+            if (method.getAnnotation(DedicatedThread.class) != null)
+                ret.add(Pair.create(method, method.getAnnotation(DedicatedThread.class).name()));
+            else {
+
+                Daemonize annotation = method.getAnnotation(Daemonize.class);
+                if (annotation != null && annotation.dedicatedThread())
+                    ret.add(Pair.create(method, annotation.name()));
             }
         }
-
         return ret;
     }
 
-    public MethodSpec wrapIntfMethod(ExecutableElement prototypeMethod){
-
-        PrototypeMethodData methodData = new PrototypeMethodData(prototypeMethod);
-        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(
-                prototypeMethod.getSimpleName().toString()
-        ).addModifiers(Modifier.PUBLIC).addAnnotation(Override.class);
-
-        methodBuilder = BaseDaemonGenerator.addTypeParameters(prototypeMethod, methodBuilder);
-
-        for(Pair<TypeName, String> param : methodData.getParameters()) {
-            methodBuilder.addParameter(param.getFirst(), param.getSecond());
-        }
-
-        for ( TypeMirror exception : prototypeMethod.getThrownTypes()) {
-            methodBuilder.addException(TypeName.get(exception));
-        }
-
-        if (methodData.getMethodRetTypeName().equals(TypeName.get(prototypeMethod.getEnclosingElement().asType()))) {
-            methodBuilder.returns(ClassName.get(packageName, daemonSimpleName)).addStatement("prototype."
-                    + prototypeMethod.getSimpleName().toString()
-                    + "(" + methodData.getArguments()
-                    + ")").addStatement("return this");
-        } else if (methodData.isVoid()) {
-            methodBuilder.returns(void.class).addStatement("prototype."
-                    + prototypeMethod.getSimpleName().toString()
-                    + "(" + methodData.getArguments()
-                    + ")");
-        } else
-            methodBuilder.returns(TypeName.get(prototypeMethod.getReturnType())).addStatement(
-                    "return prototype."
-                            + prototypeMethod.getSimpleName().toString()
-                            + "(" + methodData.getArguments()
-                            + ")");
-
-        return methodBuilder.build();
-    }
-
-    public MethodSpec wrapMethod(ExecutableElement prototypeMethod){
+    public MethodSpec wrapMethod(ExecutableElement prototypeMethod, boolean implementIntf){
 
         PrototypeMethodData methodData = new PrototypeMethodData(prototypeMethod);
         MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(
                 prototypeMethod.getSimpleName().toString()
         ).addModifiers(Modifier.PUBLIC);
 
+        if(implementIntf)
+            methodBuilder.addAnnotation(Override.class);
+
         methodBuilder = BaseDaemonGenerator.addTypeParameters(prototypeMethod, methodBuilder);
 
         for(Pair<TypeName, String> param : methodData.getParameters()) {
@@ -351,10 +314,17 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                     + "(" + methodData.getArguments()
                     + ")").addStatement("return this");
         } else if (methodData.isVoid()) {
-            methodBuilder.returns(ClassName.get(packageName, daemonSimpleName)).addStatement("prototype."
-                    + prototypeMethod.getSimpleName().toString()
-                    + "(" + methodData.getArguments()
-                    + ")").addStatement("return this");
+            if (implementIntf) {
+                methodBuilder.returns(void.class).addStatement("prototype."
+                        + prototypeMethod.getSimpleName().toString()
+                        + "(" + methodData.getArguments()
+                        + ")");
+            } else {
+                methodBuilder.returns(ClassName.get(packageName, daemonSimpleName)).addStatement("prototype."
+                        + prototypeMethod.getSimpleName().toString()
+                        + "(" + methodData.getArguments()
+                        + ")").addStatement("return this");
+            }
         } else
             methodBuilder.returns(TypeName.get(prototypeMethod.getReturnType())).addStatement(
                     "return prototype."

@@ -1,13 +1,13 @@
 package com.daemonize.game;
 
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.graphics2d.images.Image;
 
 
-@Daemonize(doubleDaemonize = true, daemonizeBaseMethods = true)
+@Daemon(doubleDaemonize = true, daemonizeBaseMethods = true)
 public class MoneyHandler extends CoordinatedImageTranslationMover  {
 
     private volatile int amount;

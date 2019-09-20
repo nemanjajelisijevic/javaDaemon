@@ -45,7 +45,7 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
 
   //************** METHODS TO UPDATE THE CONSUMER **************************************************/
 
-  public final boolean setResultAndUpdate(T result) {
+  public boolean setResultAndUpdate(T result) {
     return consumer.consume(returnRunnable.setResult(result));
   }
 

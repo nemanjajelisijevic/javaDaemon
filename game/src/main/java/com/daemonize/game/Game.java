@@ -1546,7 +1546,14 @@ public class Game {
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());
                 System.out.println(DaemonUtils.tag() + "Enemy state: " + enemyDoubleDaemon.getEnginesState().get(enemyDoubleDaemon.getEnginesState().size() - 1));
 
-                enemyDoubleDaemon.setTarget(null).reload(new Closure<Target>() {
+                int firstAngle = (int) RotatingSpriteImageMover.getAngle(
+                        enemyDoubleDaemon.getLastCoordinates().getFirst(),
+                        enemyDoubleDaemon.getLastCoordinates().getSecond(),
+                        firstField.getCenterX(),
+                        firstField.getCenterY()
+                );
+
+                enemyDoubleDaemon.setTarget(null).rotate(firstAngle).reload(new Closure<Target>() {
                     @Override
                     public void onReturn(Return<Target> ret) {
 
@@ -1599,19 +1606,13 @@ public class Game {
                                             grid.destroyTower(field.getRow(), field.getColumn());
                                             renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
                                         }).queueStop();
-                                    });
+                                    }
+                            );
                         }
 
                         enemyDoubleDaemon.reload(this::onReturn);
                     }
-                }).rotate(
-                        (int) RotatingSpriteImageMover.getAngle(
-                                enemyDoubleDaemon.getLastCoordinates().getFirst(),
-                                enemyDoubleDaemon.getLastCoordinates().getSecond(),
-                                firstField.getCenterX(),
-                                firstField.getCenterY()
-                        )
-                ).goTo(
+                }).goTo(
                         firstField.getCenterX(),
                         firstField.getCenterY(),
                         enemyVelocity,
@@ -1808,8 +1809,8 @@ public class Game {
                             throw new InterruptedException();
                     }
 
-                }).setSleepInterval(300).setClosure(showDeniedmarker -> {
-                    if (showDeniedmarker.runtimeCheckAndGet())
+                }).setSleepInterval(300).setClosure(showDeniedMarker -> {
+                    if (showDeniedMarker.runtimeCheckAndGet())
                         fieldView.show();
                     else
                         fieldView.hide();

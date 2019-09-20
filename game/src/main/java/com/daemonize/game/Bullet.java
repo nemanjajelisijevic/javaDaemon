@@ -9,7 +9,7 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@Daemonize(doubleDaemonize = true, daemonizeBaseMethods = true, className = "BulletDoubleDaemon")
+@Daemon(doubleDaemonize = true, daemonizeBaseMethods = true, className = "BulletDoubleDaemon")
 public class Bullet extends CoordinatedImageTranslationMover {
 
     private ImageView view;
