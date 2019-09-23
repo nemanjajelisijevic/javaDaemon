@@ -49,21 +49,36 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return sideQuest;
   }
 
-  public BulletDoubleDaemon setVelocity(float velocity) {
+  public BulletDoubleDaemon popSprite() {
+    prototype.popSprite();
+    return this;
+  }
+
+  public Pair<Float, Float> getTargetCoordinates() {
+    return prototype.getTargetCoordinates();
+  }
+
+  public BulletDoubleDaemon setVelocity(ImageMover.Velocity velocity) {
     prototype.setVelocity(velocity);
     return this;
   }
 
-  public Image[] getSprite() {
-    return prototype.getSprite();
+  public BulletDoubleDaemon setView3(ImageView view3) {
+    prototype.setView3(view3);
+    return this;
   }
 
-  public ImageMover.Velocity getVelocity() {
-    return prototype.getVelocity();
+  public int getSize() {
+    return prototype.getSize();
   }
 
-  public float getdXY() {
-    return prototype.getdXY();
+  public int getDamage() {
+    return prototype.getDamage();
+  }
+
+  public BulletDoubleDaemon setLevel(int level) {
+    prototype.setLevel(level);
+    return this;
   }
 
   public BulletDoubleDaemon setDirection(ImageMover.Direction direction) {
@@ -71,8 +86,62 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return this;
   }
 
-  public BulletDoubleDaemon setLevel(int level) {
-    prototype.setLevel(level);
+  public BulletDoubleDaemon setDamage(int damage) {
+    prototype.setDamage(damage);
+    return this;
+  }
+
+  public BulletDoubleDaemon setVelocity(float velocity) {
+    prototype.setVelocity(velocity);
+    return this;
+  }
+
+  public float getdXY() {
+    return prototype.getdXY();
+  }
+
+  public List<ImageView> getViews() {
+    return prototype.getViews();
+  }
+
+  public BulletDoubleDaemon pause() {
+    prototype.pause();
+    return this;
+  }
+
+  public BulletDoubleDaemon setCurrentAngle(int angle) {
+    prototype.setCurrentAngle(angle);
+    return this;
+  }
+
+  public BulletDoubleDaemon setOutOfBordersClosure(Runnable closure) {
+    prototype.setOutOfBordersClosure(closure);
+    return this;
+  }
+
+  public ImageMover.Velocity getVelocity() {
+    return prototype.getVelocity();
+  }
+
+  public Pair<Float, Float> getLastCoordinates() {
+    return prototype.getLastCoordinates();
+  }
+
+  public ImageTranslationMover setSprite(Image[] sprite) {
+    return prototype.setSprite(sprite);
+  }
+
+  public Image[] getSprite() {
+    return prototype.getSprite();
+  }
+
+  public BulletDoubleDaemon cont() {
+    prototype.cont();
+    return this;
+  }
+
+  public BulletDoubleDaemon clearVelocity() {
+    prototype.clearVelocity();
     return this;
   }
 
@@ -86,84 +155,8 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return this;
   }
 
-  public List<ImageView> getViews() {
-    return prototype.getViews();
-  }
-
-  public BulletDoubleDaemon setCurrentAngle(int angle) {
-    prototype.setCurrentAngle(angle);
-    return this;
-  }
-
-  public BulletDoubleDaemon setView3(ImageView view3) {
-    prototype.setView3(view3);
-    return this;
-  }
-
-  public int getDamage() {
-    return prototype.getDamage();
-  }
-
-  public BulletDoubleDaemon setVelocity(ImageMover.Velocity velocity) {
-    prototype.setVelocity(velocity);
-    return this;
-  }
-
-  public Pair<Float, Float> getTargetCoordinates() {
-    return prototype.getTargetCoordinates();
-  }
-
-  public BulletDoubleDaemon clearVelocity() {
-    prototype.clearVelocity();
-    return this;
-  }
-
-  public BulletDoubleDaemon pause() {
-    prototype.pause();
-    return this;
-  }
-
-  public BulletDoubleDaemon cont() {
-    prototype.cont();
-    return this;
-  }
-
-  public Pair<Float, Float> getLastCoordinates() {
-    return prototype.getLastCoordinates();
-  }
-
-  public ImageTranslationMover setSprite(Image[] sprite) {
-    return prototype.setSprite(sprite);
-  }
-
-  public BulletDoubleDaemon setOutOfBordersClosure(Runnable closure) {
-    prototype.setOutOfBordersClosure(closure);
-    return this;
-  }
-
-  public BulletDoubleDaemon popSprite() {
-    prototype.popSprite();
-    return this;
-  }
-
-  public BulletDoubleDaemon setDamage(int damage) {
-    prototype.setDamage(damage);
-    return this;
-  }
-
-  public int getSize() {
-    return prototype.getSize();
-  }
-
   public SideQuest getCurrentSideQuest() {
     return this.sideDaemonEngine.getSideQuest();
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#iterateSprite} */
-  public BulletDoubleDaemon iterateSprite(Closure<Image> closure) {
-    mainDaemonEngine.pursueQuest(new IterateSpriteMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
   }
 
   /**
@@ -174,60 +167,9 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.Bullet#animateBullet} */
-  public BulletDoubleDaemon animateBullet(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
-    mainDaemonEngine.pursueQuest(new AnimateBulletMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#setView} */
-  public BulletDoubleDaemon setView(ImageView view, Closure<Bullet> closure) {
-    mainDaemonEngine.pursueQuest(new SetViewMainQuest(view, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
    * Prototype method {@link com.daemonize.game.Bullet#rotate} */
   public BulletDoubleDaemon rotate(int angle, Runnable retRun) {
     mainDaemonEngine.pursueQuest(new RotateMainQuest(angle, retRun).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#toString} */
-  public BulletDoubleDaemon toString(Closure<String> closure) {
-    mainDaemonEngine.pursueQuest(new ToStringMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#rotateAndGoTo} */
-  public BulletDoubleDaemon rotateAndGoTo(int angle, float x, float y, float velocityint,
-      Closure<Boolean> closure) {
-    mainDaemonEngine.pursueQuest(new RotateAndGoToMainQuest(angle, x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
-  public BulletDoubleDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
-    mainDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.imagemovers.ImageTranslationMover#setDirectionAndMove} */
-  public BulletDoubleDaemon setDirectionAndMove(float x, float y, float velocityint,
-      Closure<Boolean> closure) {
-    mainDaemonEngine.pursueQuest(new SetDirectionAndMoveMainQuest(x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#animate} */
-  public BulletDoubleDaemon animate(Closure<ImageMover.PositionedImage> closure) {
-    mainDaemonEngine.pursueQuest(new AnimateMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -240,9 +182,67 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   /**
+   * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#animate} */
+  public BulletDoubleDaemon animate(Closure<ImageMover.PositionedImage> closure) {
+    mainDaemonEngine.pursueQuest(new AnimateMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#toString} */
+  public BulletDoubleDaemon toString(Closure<String> closure) {
+    mainDaemonEngine.pursueQuest(new ToStringMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Bullet#setView2} */
   public BulletDoubleDaemon setView2(ImageView view2, Closure<Bullet> closure) {
     mainDaemonEngine.pursueQuest(new SetView2MainQuest(view2, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
+  public BulletDoubleDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#iterateSprite} */
+  public BulletDoubleDaemon iterateSprite(Closure<Image> closure) {
+    mainDaemonEngine.pursueQuest(new IterateSpriteMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#setView} */
+  public BulletDoubleDaemon setView(ImageView view, Closure<Bullet> closure) {
+    mainDaemonEngine.pursueQuest(new SetViewMainQuest(view, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#animateBullet} */
+  public BulletDoubleDaemon animateBullet(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
+    mainDaemonEngine.pursueQuest(new AnimateBulletMainQuest(closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.imagemovers.ImageTranslationMover#setDirectionAndMove} */
+  public BulletDoubleDaemon setDirectionAndMove(float x, float y, float velocityint,
+      Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new SetDirectionAndMoveMainQuest(x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Bullet#rotateAndGoTo} */
+  public BulletDoubleDaemon rotateAndGoTo(int angle, float x, float y, float velocityint,
+      Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new RotateAndGoToMainQuest(angle, x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -357,18 +357,6 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     }
   }
 
-  private final class IterateSpriteMainQuest extends MainQuest<Image> {
-    private IterateSpriteMainQuest(Closure<Image> closure) {
-      super(closure);
-      this.description = "iterateSprite";
-    }
-
-    @Override
-    public final Image pursue() throws Exception {
-      return prototype.iterateSprite();
-    }
-  }
-
   private final class PushSpriteMainQuest extends VoidMainQuest {
     private Image[] sprite;
 
@@ -388,34 +376,6 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     }
   }
 
-  private final class AnimateBulletMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private AnimateBulletMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
-      super(closure);
-      this.description = "animateBullet";
-    }
-
-    @Override
-    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
-        Exception {
-      return prototype.animateBullet();
-    }
-  }
-
-  private final class SetViewMainQuest extends MainQuest<Bullet> {
-    private ImageView view;
-
-    private SetViewMainQuest(ImageView view, Closure<Bullet> closure) {
-      super(closure);
-      this.view = view;
-      this.description = "setView";
-    }
-
-    @Override
-    public final Bullet pursue() throws Exception {
-      return prototype.setView(view);
-    }
-  }
-
   private final class RotateMainQuest extends VoidMainQuest {
     private int angle;
 
@@ -429,98 +389,6 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     public final Void pursue() throws Exception {
       prototype.rotate(angle);
       return null;
-    }
-  }
-
-  private final class ToStringMainQuest extends MainQuest<String> {
-    private ToStringMainQuest(Closure<String> closure) {
-      super(closure);
-      this.description = "toString";
-    }
-
-    @Override
-    public final String pursue() throws Exception {
-      return prototype.toString();
-    }
-  }
-
-  private final class RotateAndGoToMainQuest extends MainQuest<Boolean> {
-    private int angle;
-
-    private float x;
-
-    private float y;
-
-    private float velocityint;
-
-    private RotateAndGoToMainQuest(int angle, float x, float y, float velocityint,
-        Closure<Boolean> closure) {
-      super(closure);
-      this.angle = angle;
-      this.x = x;
-      this.y = y;
-      this.velocityint = velocityint;
-      this.description = "rotateAndGoTo";
-    }
-
-    @Override
-    public final Boolean pursue() throws Exception {
-      return prototype.rotateAndGoTo(angle, x, y, velocityint);
-    }
-  }
-
-  private final class GoToMainQuest extends MainQuest<Boolean> {
-    private float x;
-
-    private float y;
-
-    private float velocityint;
-
-    private GoToMainQuest(float x, float y, float velocityint, Closure<Boolean> closure) {
-      super(closure);
-      this.x = x;
-      this.y = y;
-      this.velocityint = velocityint;
-      this.description = "goTo";
-    }
-
-    @Override
-    public final Boolean pursue() throws Exception {
-      return prototype.goTo(x, y, velocityint);
-    }
-  }
-
-  private final class SetDirectionAndMoveMainQuest extends MainQuest<Boolean> {
-    private float x;
-
-    private float y;
-
-    private float velocityint;
-
-    private SetDirectionAndMoveMainQuest(float x, float y, float velocityint,
-        Closure<Boolean> closure) {
-      super(closure);
-      this.x = x;
-      this.y = y;
-      this.velocityint = velocityint;
-      this.description = "setDirectionAndMove";
-    }
-
-    @Override
-    public final Boolean pursue() throws Exception {
-      return prototype.setDirectionAndMove(x, y, velocityint);
-    }
-  }
-
-  private final class AnimateMainQuest extends MainQuest<ImageMover.PositionedImage> {
-    private AnimateMainQuest(Closure<ImageMover.PositionedImage> closure) {
-      super(closure);
-      this.description = "animate";
-    }
-
-    @Override
-    public final ImageMover.PositionedImage pursue() throws Exception {
-      return prototype.animate();
     }
   }
 
@@ -549,6 +417,30 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     }
   }
 
+  private final class AnimateMainQuest extends MainQuest<ImageMover.PositionedImage> {
+    private AnimateMainQuest(Closure<ImageMover.PositionedImage> closure) {
+      super(closure);
+      this.description = "animate";
+    }
+
+    @Override
+    public final ImageMover.PositionedImage pursue() throws Exception {
+      return prototype.animate();
+    }
+  }
+
+  private final class ToStringMainQuest extends MainQuest<String> {
+    private ToStringMainQuest(Closure<String> closure) {
+      super(closure);
+      this.description = "toString";
+    }
+
+    @Override
+    public final String pursue() throws Exception {
+      return prototype.toString();
+    }
+  }
+
   private final class SetView2MainQuest extends MainQuest<Bullet> {
     private ImageView view2;
 
@@ -561,6 +453,114 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     @Override
     public final Bullet pursue() throws Exception {
       return prototype.setView2(view2);
+    }
+  }
+
+  private final class GoToMainQuest extends MainQuest<Boolean> {
+    private float x;
+
+    private float y;
+
+    private float velocityint;
+
+    private GoToMainQuest(float x, float y, float velocityint, Closure<Boolean> closure) {
+      super(closure);
+      this.x = x;
+      this.y = y;
+      this.velocityint = velocityint;
+      this.description = "goTo";
+    }
+
+    @Override
+    public final Boolean pursue() throws Exception {
+      return prototype.goTo(x, y, velocityint);
+    }
+  }
+
+  private final class IterateSpriteMainQuest extends MainQuest<Image> {
+    private IterateSpriteMainQuest(Closure<Image> closure) {
+      super(closure);
+      this.description = "iterateSprite";
+    }
+
+    @Override
+    public final Image pursue() throws Exception {
+      return prototype.iterateSprite();
+    }
+  }
+
+  private final class SetViewMainQuest extends MainQuest<Bullet> {
+    private ImageView view;
+
+    private SetViewMainQuest(ImageView view, Closure<Bullet> closure) {
+      super(closure);
+      this.view = view;
+      this.description = "setView";
+    }
+
+    @Override
+    public final Bullet pursue() throws Exception {
+      return prototype.setView(view);
+    }
+  }
+
+  private final class AnimateBulletMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private AnimateBulletMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
+      super(closure);
+      this.description = "animateBullet";
+    }
+
+    @Override
+    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
+        Exception {
+      return prototype.animateBullet();
+    }
+  }
+
+  private final class SetDirectionAndMoveMainQuest extends MainQuest<Boolean> {
+    private float x;
+
+    private float y;
+
+    private float velocityint;
+
+    private SetDirectionAndMoveMainQuest(float x, float y, float velocityint,
+        Closure<Boolean> closure) {
+      super(closure);
+      this.x = x;
+      this.y = y;
+      this.velocityint = velocityint;
+      this.description = "setDirectionAndMove";
+    }
+
+    @Override
+    public final Boolean pursue() throws Exception {
+      return prototype.setDirectionAndMove(x, y, velocityint);
+    }
+  }
+
+  private final class RotateAndGoToMainQuest extends MainQuest<Boolean> {
+    private int angle;
+
+    private float x;
+
+    private float y;
+
+    private float velocityint;
+
+    private RotateAndGoToMainQuest(int angle, float x, float y, float velocityint,
+        Closure<Boolean> closure) {
+      super(closure);
+      this.angle = angle;
+      this.x = x;
+      this.y = y;
+      this.velocityint = velocityint;
+      this.description = "rotateAndGoTo";
+    }
+
+    @Override
+    public final Boolean pursue() throws Exception {
+      return prototype.rotateAndGoTo(angle, x, y, velocityint);
     }
   }
 }

@@ -600,8 +600,8 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
             else {
                 PrototypeMethodData rhs = (PrototypeMethodData) obj;
                 if (this.methodName.equals(rhs.methodName) &&
-                        this.methodRetTypeName.equals(rhs.methodRetTypeName) &&
-                        this.closureOfRet.equals(rhs.closureOfRet) &&
+//                        this.methodRetTypeName.equals(rhs.methodRetTypeName) &&
+//                        this.closureOfRet.equals(rhs.closureOfRet) &&
                         this.parametersType.equals(rhs.parametersType))
                     return true;
                 else
@@ -611,7 +611,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
         @Override
         public int hashCode() {
-            return Objects.hash(methodName, methodRetTypeName, closureOfRet, parametersType);
+            return Objects.hash(methodName, /*methodRetTypeName, closureOfRet,*/ parametersType);
         }
     }
 
