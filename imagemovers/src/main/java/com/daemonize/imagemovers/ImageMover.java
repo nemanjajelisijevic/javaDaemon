@@ -3,7 +3,6 @@ package com.daemonize.imagemovers;
 
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 
@@ -51,11 +50,9 @@ public interface ImageMover extends Movable {
         }
     }
 
-    @CallingThread
     @Override
     Pair<Float, Float> getLastCoordinates();
 
-    @CallingThread
     Velocity getVelocity();
 
     void setCoordinates(float lastX, float lastY);
@@ -68,7 +65,6 @@ public interface ImageMover extends Movable {
 
     void setVelocity(float velocity);
 
-    @CallingThread
     <K extends ImageMover> K setBorders(float x1, float x2, float y1, float y2);
 
     @SideQuest(SLEEP = 25)

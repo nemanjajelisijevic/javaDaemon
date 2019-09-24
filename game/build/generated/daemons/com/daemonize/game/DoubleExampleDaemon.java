@@ -7,9 +7,9 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.HybridDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
+import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Integer;
-import java.lang.InterruptedException;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Thread;
@@ -38,14 +38,14 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
     return sideQuest;
   }
 
-  public boolean increment() throws InterruptedException {
-    return prototype.increment();
+  public int logAndReturn() {
+    return prototype.logAndReturn();
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.DoubleExample#logAndReturn} */
-  public DoubleExampleDaemon logAndReturn(Closure<Integer> closure) {
-    daemonEngine.pursueQuest(new LogAndReturnMainQuest(closure).setConsumer(daemonEngine.getConsumer()));
+   * Prototype method {@link com.daemonize.game.DoubleExample#increment} */
+  public DoubleExampleDaemon increment(Consumer consumer, Closure<Boolean> closure) {
+    daemonEngine.pursueQuest(new IncrementMainQuest(closure).setConsumer(consumer));
     return this;
   }
 
@@ -133,15 +133,15 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
     }
   }
 
-  private final class LogAndReturnMainQuest extends MainQuest<Integer> {
-    private LogAndReturnMainQuest(Closure<Integer> closure) {
+  private final class IncrementMainQuest extends MainQuest<Boolean> {
+    private IncrementMainQuest(Closure<Boolean> closure) {
       super(closure);
-      this.description = "logAndReturn";
+      this.description = "increment";
     }
 
     @Override
-    public final Integer pursue() throws Exception {
-      return prototype.logAndReturn();
+    public final Boolean pursue() throws Exception {
+      return prototype.increment();
     }
   }
 }

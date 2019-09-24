@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
@@ -38,36 +39,30 @@ public class Bullet extends CoordinatedImageTranslationMover {
         this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
     }
 
-    @CallingThread
     @Override
     public ImageTranslationMover setSprite(Image[] sprite) {
         rotationMover.setRotationSprite(sprite); //TODO fixx!!!
         return super.setSprite(sprite);
     }
 
-    @CallingThread
     @Override
     public void setVelocity(Velocity velocity) {
         super.setVelocity(velocity);
     }
 
-    @CallingThread
     @Override
     public void setVelocity(float velocity) {
         super.setVelocity(velocity);
     }
 
-    @CallingThread
     public void setCurrentAngle(int angle) {
         rotationMover.setCurrentAngle(angle);
     }
 
-    @CallingThread
     public int getDamage() {
         return damage;
     }
 
-    @CallingThread
     public void setDamage(int damage) {
         this.damage = damage;
     }
@@ -82,13 +77,11 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return this;
     }
 
-    @CallingThread
     public Bullet setView3(ImageView view3) {
         this.view3 = view3;
         return this;
     }
 
-    @CallingThread
     public List<ImageView> getViews() {
         List<ImageView> lst = new ArrayList<>(level);
         switch (level){
@@ -108,31 +101,30 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return lst;
     }
 
-    @CallingThread
     public void setLevel(int level) {
         if (level >=1 &&  level <= 3) {
             this.level = level;
         }
     }
 
-    @GenerateRunnable
+    @Daemonize(generateRunnable = true)
     @Override
     public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
         this.velocity.intensity = velocity;
         rotationMover.pushSprite(sprite, velocity);
     }
 
-    @CallingThread
     @Override
     public void popSprite() {
         rotationMover.popSprite();
     }
 
-    @GenerateRunnable
+    @Daemonize(generateRunnable = true)
     public void rotate(int angle) throws InterruptedException {
         rotationMover.rotate(angle);
     }
 
+    @Daemonize
     public boolean rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
         clearVelocity();
         rotationMover.rotate(angle);

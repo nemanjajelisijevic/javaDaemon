@@ -5,6 +5,7 @@ package com.daemonize.game;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemon;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 @Daemon
@@ -22,8 +23,8 @@ public class DoubleExample {
 //    }
 
     //@DedicatedThread(name = "FUCK")
-    @CallingThread
-    @ConsumerArg
+    //@ConsumerArg
+    @Daemonize(consumerArg = true)
     public synchronized boolean increment() throws InterruptedException {
         Thread.sleep(5000);
         //Log.d(DaemonUtils.tag(), "INSIDE DoubleExample increment COUNTER: " + Integer.toString(++cnt));

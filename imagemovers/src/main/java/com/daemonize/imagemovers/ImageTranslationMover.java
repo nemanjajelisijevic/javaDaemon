@@ -3,7 +3,6 @@ package com.daemonize.imagemovers;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
@@ -47,57 +46,48 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         animateSemaphore.stop();
     }
 
-    @CallingThread
     public float getdXY() {
         return dXY;
     }
 
-    @CallingThread
     public void clearVelocity() {
         velocity.intensity = 0;
         velocity.direction.coeficientX = 0;
         velocity.direction.coeficientY = 0;
     }
 
-    @CallingThread
     @Override
     public Image [] getSprite() {
         return spriteIterator.getSprite();
     }
 
-    @CallingThread
     @Override
     public int getSize() {
         return spriteIterator.getSize();
     }
 
-    @CallingThread
     @Override
     public ImageTranslationMover setSprite(Image[] sprite) {
         spriteIterator.setSprite(sprite);
         return this;
     }
 
-    @CallingThread
     @Override
     public Pair<Float, Float> getLastCoordinates() {
         return Pair.create(lastX, lastY);
     }
 
-    @CallingThread
     @Override
     public Velocity getVelocity() {
         return velocity;
     }
 
-    @CallingThread
     @Override
     public synchronized void setCoordinates(float lastX, float lastY) {
         this.lastX = lastX;
         this.lastY = lastY;
     }
 
-    @CallingThread
     @Override
     public Image iterateSprite() {
         Image ret = spriteIterator.iterateSprite();
@@ -108,19 +98,16 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return ret;
     }
 
-    @CallingThread
     @Override
     public void setDirection(Direction direction) {
         this.velocity.direction = direction;
     }
 
-    @CallingThread
     @Override
     public void setVelocity(Velocity velocity) {
         this.velocity = velocity;
     }
 
-    @CallingThread
     @Override
     public void setVelocity(float velocity) {
         this.velocity.intensity = velocity;
@@ -161,22 +148,18 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return this;
     }
 
-    @CallingThread
     public void pause(){
         pauseSemaphore.stop();
     }
 
-    @CallingThread
     public void cont(){
         pauseSemaphore.go();
     }
 
-    @CallingThread
     public void setOutOfBordersConsumer(Consumer consumer) {
         this.outOfBordersConsumer = consumer;
     }
 
-    @CallingThread
     public void setOutOfBordersClosure(Runnable closure) {
         this.outOfBordersClosure = closure;
     }

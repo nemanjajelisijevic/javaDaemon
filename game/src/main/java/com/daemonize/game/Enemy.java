@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.Exclude;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
@@ -44,22 +45,18 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
     }
 
-    @CallingThread
     public ImageView getParalyzedView() {
         return paralyzedView;
     }
 
-    @CallingThread
     public void setParalyzedView(ImageView paralyzedView) {
         this.paralyzedView = paralyzedView;
     }
 
-    @CallingThread
     public Target getTarget() {
         return target;
     }
 
-    @CallingThread
     public void setTarget(Target target) {
         this.target = target;
 
@@ -69,7 +66,8 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
             targetSemaphore.go();
     }
 
-    @DedicatedThread
+    //@DedicatedThread
+    @Daemonize(dedicatedThread = true)
     public Target reload() throws InterruptedException {
         Thread.sleep(400);
         targetSemaphore.await();
@@ -81,13 +79,11 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         super.setVelocity(velocity);
     }
 
-    @CallingThread
     @Override
     public boolean isParalyzed() {
         return paralyzed;
     }
 
-    @CallingThread
     @Override
     public Enemy setParalyzed(boolean paralyzed) {
         this.paralyzed = paralyzed;
@@ -96,12 +92,10 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
 
     private Pair<Integer, Integer> previousField;
 
-    @CallingThread
     public Pair<Integer, Integer> getPreviousField() {
         return previousField;
     }
 
-    @CallingThread
     public void setPreviousField(Pair<Integer, Integer> previousField) {
         this.previousField = previousField;
     }
@@ -120,89 +114,80 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         return this;
     }
 
-    @CallingThread
     @Override
     public boolean isShootable() {
         return shootable;
     }
 
-    @CallingThread
     @Override
     public Enemy setShootable(boolean shootable) {
         this.shootable = shootable;
         return this;
     }
 
-    @CallingThread
     @Override
     public int getHp() {
         return hp;
     }
 
-    @CallingThread
     @Override
     public int getMaxHp() {
         return hpMax;
     }
 
-    @CallingThread
     @Override
     public Enemy setHp(int hp) {
         this.hp = hp;
         return this;
     }
 
-    @CallingThread
     @Override
     public Enemy setMaxHp(int maxHp) {
         this.hpMax = maxHp;
         return this;
     }
 
-    @CallingThread
     public ImageView getView() {
         return view;
     }
 
-    @CallingThread
     public Enemy setView(ImageView view) {
         this.view = view;
         return this;
     }
 
-    @CallingThread
     public ImageView getHpView() {
         return hpView;
     }
 
-    @CallingThread
     public Enemy setHpView(ImageView hpView) {
         this.hpView = hpView;
         return this;
     }
 
-    @CallingThread
     public ImageView getTargetView() {
         return targetView;
     }
 
-    @CallingThread
     public Enemy setTargetView(ImageView targetView) {
         this.targetView = targetView;
         return this;
     }
 
-    @GenerateRunnable
+    //@GenerateRunnable
+    @Daemonize(generateRunnable = true)
     @Override
     public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
         rotationMover.pushSprite(sprite, velocity);
     }
 
+    @Daemonize
     public void rotate(int angle) throws InterruptedException {
         rotationMover.rotate(angle);
     }
 
-    @DedicatedThread
+    //@DedicatedThread
+    @Daemonize(dedicatedThread = true)
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);

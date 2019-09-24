@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -25,13 +26,11 @@ public class LaserBullet extends Bullet {
     private volatile boolean fire = false;
     private DaemonCountingLatch phaseLock;
 
-    @CallingThread
     @Override
     public List<ImageView> getViews() {
         return views;
     }
 
-    @CallingThread
     public void setViews(List<ImageView> views) {
         this.views = views;
         this.photonList = new ArrayList<>(views.size());
@@ -47,7 +46,6 @@ public class LaserBullet extends Bullet {
         }
     }
 
-    @CallingThread
     @Override
     public void setCoordinates(float lastX, float lastY) {
         super.setCoordinates(lastX, lastY);
@@ -70,6 +68,7 @@ public class LaserBullet extends Bullet {
         this.phaseLock.subscribe();
     }
 
+    @Daemonize
     public List<ImageView> desintegrateTarget(
             Pair<Float, Float> sourceCoord,
             Target target,

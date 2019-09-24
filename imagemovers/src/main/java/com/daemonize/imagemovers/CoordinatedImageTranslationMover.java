@@ -1,8 +1,7 @@
 package com.daemonize.imagemovers;
 
-
-import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.graphics2d.images.Image;
 
 import java.util.concurrent.locks.Condition;
@@ -25,7 +24,6 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         this.targetY = targetY;
     }
 
-    @CallingThread
     public Pair<Float, Float> getTargetCoordinates() {
         return Pair.create(targetX, targetY);
     }
@@ -39,6 +37,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         super(sprite, velocity, startingPos, dXY);
     }
 
+    @Daemonize
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
 
         boolean ret = super.setDirectionAndMove(x, y, velocityInt);
@@ -64,7 +63,6 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         return ret;
     }
 
-    @CallingThread
     @Override
     public void setCoordinates(float lastX, float lastY) {
         super.setCoordinates(lastX, lastY);

@@ -48,19 +48,8 @@ public class TransientStatePreparerDaemon implements Daemon<TransientStatePrepar
   }
 
   @Override
-  public void stop() {
-    daemonEngine.stop();
-  }
-
-  @Override
   public TransientStatePreparerDaemon clear() {
     daemonEngine.clear();
-    return this;
-  }
-
-  @Override
-  public TransientStatePreparerDaemon queueStop() {
-    daemonEngine.queueStop(this);
     return this;
   }
 
@@ -74,6 +63,17 @@ public class TransientStatePreparerDaemon implements Daemon<TransientStatePrepar
     List<Integer> ret = new ArrayList<Integer>();
     ret.add(daemonEngine.queueSize());
     return ret;
+  }
+
+  @Override
+  public void stop() {
+    daemonEngine.stop();
+  }
+
+  @Override
+  public TransientStatePreparerDaemon queueStop() {
+    daemonEngine.queueStop(this);
+    return this;
   }
 
   @Override

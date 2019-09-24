@@ -4,14 +4,11 @@ import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
-import com.daemonize.daemonengine.quests.VoidMainQuest;
-import java.lang.Exception;
 import java.lang.Integer;
+import java.lang.InterruptedException;
 import java.lang.Override;
-import java.lang.Runnable;
 import java.lang.String;
 import java.lang.Thread;
-import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +22,8 @@ public class DummyStatePreparerDaemon implements Daemon<DummyStatePreparerDaemon
     this.prototype = prototype;
   }
 
-  /**
-   * Prototype method {@link com.daemonize.game.InitState.DummyStatePreparer#prepareSummyScene} */
-  public DummyStatePreparerDaemon prepareSummyScene(Runnable retRun) {
-    daemonEngine.pursueQuest(new PrepareSummySceneMainQuest(retRun).setConsumer(daemonEngine.getConsumer()));
+  public DummyStatePreparerDaemon prepareSummyScene() throws InterruptedException {
+    prototype.prepareSummyScene();
     return this;
   }
 
@@ -48,19 +43,8 @@ public class DummyStatePreparerDaemon implements Daemon<DummyStatePreparerDaemon
   }
 
   @Override
-  public void stop() {
-    daemonEngine.stop();
-  }
-
-  @Override
   public DummyStatePreparerDaemon clear() {
     daemonEngine.clear();
-    return this;
-  }
-
-  @Override
-  public DummyStatePreparerDaemon queueStop() {
-    daemonEngine.queueStop(this);
     return this;
   }
 
@@ -74,6 +58,17 @@ public class DummyStatePreparerDaemon implements Daemon<DummyStatePreparerDaemon
     List<Integer> ret = new ArrayList<Integer>();
     ret.add(daemonEngine.queueSize());
     return ret;
+  }
+
+  @Override
+  public void stop() {
+    daemonEngine.stop();
+  }
+
+  @Override
+  public DummyStatePreparerDaemon queueStop() {
+    daemonEngine.queueStop(this);
+    return this;
   }
 
   @Override
@@ -102,18 +97,5 @@ public class DummyStatePreparerDaemon implements Daemon<DummyStatePreparerDaemon
   public DummyStatePreparerDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
     daemonEngine.setUncaughtExceptionHandler(handler);
     return this;
-  }
-
-  private final class PrepareSummySceneMainQuest extends VoidMainQuest {
-    private PrepareSummySceneMainQuest(Runnable retRun) {
-      super(retRun);
-      this.description = "prepareSummyScene";
-    }
-
-    @Override
-    public final Void pursue() throws Exception {
-      prototype.prepareSummyScene();
-      return null;
-    }
   }
 }

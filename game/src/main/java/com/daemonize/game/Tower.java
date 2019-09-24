@@ -3,6 +3,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
@@ -92,40 +93,33 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         hBar.positionY = ret.positionY - 2 * hBar.image.getHeight();
     }
 
-    @CallingThread
     public int getHp() {
         return hp;
     }
 
-    @CallingThread
     public int getMaxHp() {
         return hpMax;
     }
 
-    @CallingThread
     public Tower setHp(int hp) {
         this.hp = hp;
         return this;
     }
 
-    @CallingThread
     public Tower setMaxHp(int maxHp) {
         this.hpMax = maxHp;
         return this;
     }
 
-    @CallingThread
     public ImageView getHpView() {
         return hpView;
     }
 
-    @CallingThread
     public Tower setHpView(ImageView hpView) {
         this.hpView = hpView;
         return this;
     }
 
-    @CallingThread
     public Tower setHealthBarImage(Image[] healthBarImage) {
         this.spriteHealthBarImage = healthBarImage;
         return this;
@@ -136,14 +130,12 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         return shootable;
     }
 
-    @CallingThread
     @Override
     public Tower setShootable(boolean shootable) {
         this.shootable = shootable;
         return this;
     }
 
-    @CallingThread
     @Override
     public Tower setParalyzed(boolean paralyzed) {
         return this;
@@ -154,12 +146,10 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         return false;
     }
 
-    @CallingThread
     public float getRange() {
         return range;
     }
 
-    @CallingThread
     public void levelUp(){
         switch (++towerLevel.currentLevel) {
             case 2:{//midle level
@@ -178,45 +168,39 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         }
     }
 
-    @CallingThread
     public TowerLevel getTowerLevel() {
         return towerLevel;
     }
 
-    @CallingThread
     public Tower setTowerLevel(TowerLevel towerLevel) {
         this.towerLevel = towerLevel;
         return this;
     }
 
-    @CallingThread
     public ImageView getView() {
         return view;
     }
 
-    @CallingThread
     public void setView(ImageView view) {
         this.view = view;
     }
 
-    @GenerateRunnable
+    @Daemonize(generateRunnable = true)
     public void reload(long millis) throws InterruptedException {
         Thread.sleep(millis);
     }
 
-    @CallingThread
     @Override
     public void setRotationSprite(Image[] rotationSprite) {
         super.setRotationSprite(rotationSprite);
     }
 
-    @GenerateRunnable
+    @Daemonize(generateRunnable = true)
     @Override
     public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
         super.pushSprite(sprite, velocity);
     }
 
-    @CallingThread
     public void addTarget(Target target) {
         targetLock.lock();
         if (this.target == null) {
@@ -228,7 +212,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
     private Pair<TowerType, Target> scanRet = Pair.create(null, null);
 
-    @DedicatedThread(name = "scan")
+    //@DedicatedThread(name = "scan")
+    @Daemonize(dedicatedThread = true, name = "scan")
     public Pair<TowerType, Target> scan() throws InterruptedException {
 
         scanRet = Pair.create(null, null);
@@ -280,7 +265,6 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 //        targetLock.unlock();
 //    }
 
-    @CallingThread
     @Override
     public void setCurrentAngle(int currentAngle) {
         super.setCurrentAngle(currentAngle);
@@ -299,7 +283,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     protected volatile PositionedImage ret = new PositionedImage();
     private PositionedImage hBar = new PositionedImage();
 
-    @ConsumerArg
+    //@ConsumerArg
+    @Daemonize(consumerArg = true)
     public GenericNode<Pair<PositionedImage, ImageView>> updateSprite() {//hack but improves performance
         ret.image = iterateSprite();
         return updateHpSprite(new GenericNode<>(Pair.create(ret, view)));
@@ -345,12 +330,10 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         }
     }
 
-    @CallingThread
     public TowerType getTowertype() {
         return towertype;
     }
 
-    @CallingThread
     @Override
     public String toString() {
         targetLock.lock();

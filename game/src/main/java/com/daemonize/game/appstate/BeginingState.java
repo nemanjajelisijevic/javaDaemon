@@ -1,6 +1,7 @@
 package com.daemonize.game.appstate;
 
 import com.daemonize.daemonprocessor.annotations.Daemon;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 
 public class BeginingState extends DaemonState<BeginingState> {
 
@@ -14,6 +15,7 @@ public class BeginingState extends DaemonState<BeginingState> {
 
     @Daemon
     public static class TransientStatePreparer {
+        @Daemonize
         public TransientState1 prepareTransientState(){
             return new TransientState1((int) 3.14F);
         }
