@@ -11,7 +11,6 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -27,8 +26,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     private final String SIDE_QUEST_SLEEP_INTERRUPTIBLE = "InterruptibleSleepSideQuest";
 
     {
-        QUEST_TYPE_NAME = "SideQuest";
-        daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE;
+        questTypeName = "SideQuest";
         daemonEngineSimpleName = "SideQuestDaemonEngine";
     }
 
@@ -68,7 +66,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         ).addModifiers(Modifier.PRIVATE).build();
 
         ClassName daemonEngineClass = ClassName.get(
-                daemonPackage,
+                DAEMON_ENGINE_IMPL_PACKAGE,
                 daemonEngineSimpleName
         );
 
@@ -98,13 +96,29 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonClassBuilder.addType(initField.getFirst());
         }
 
-        if (autoGenerateApiMethods) {
-            List<MethodSpec> daemonApiMethods = generateDaemonApiMethods();
-            for (MethodSpec apiMethod : daemonApiMethods) {
-                daemonClassBuilder.addMethod(apiMethod);
-            }
-        }
 
+        List<MethodSpec> daemonApiMethods = new ArrayList<>(9);
+
+        daemonApiMethods.add(generateGetPrototypeDaemonApiMethod());
+        daemonApiMethods.add(generateSetPrototypeDaemonApiMethod());
+
+        daemonApiMethods.add(generateStartDaemonApiMethod());
+        daemonApiMethods.add(generateStopDaemonApiMethod());
+        daemonApiMethods.add(generateClearDaemonApiMethod());
+        daemonApiMethods.add(generateQueueStopDaemonApiMethod());
+
+        daemonApiMethods.add(generateGetEnginesStateDaemonApiMethod());
+
+        daemonApiMethods.add(generateSetNameDaemonApiMethod());
+        daemonApiMethods.add(generateGetNameDaemonApiMethod());
+
+        daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
+        daemonApiMethods.add(generateGetConsumerDaemonApiMethod());
+        daemonApiMethods.add(generateSetUncaughtExceptionHandler());
+
+        for (MethodSpec apiMethod : daemonApiMethods) {
+                daemonClassBuilder.addMethod(apiMethod);
+        }
 
         return daemonClassBuilder.build();
     }
@@ -122,7 +136,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         }
 
         //build sideQuestQuest
-        ClassName sideQuestClassName = sleep > 0 ?( interruptible ? ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP_INTERRUPTIBLE) : ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP)) : (interruptible ? ClassName.get(QUEST_PACKAGE, INTERRUPTIBLE_SIDE_QUEST) : ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME));
+        ClassName sideQuestClassName = sleep > 0 ?( interruptible ? ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP_INTERRUPTIBLE) : ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP)) : (interruptible ? ClassName.get(QUEST_PACKAGE, INTERRUPTIBLE_SIDE_QUEST) : ClassName.get(QUEST_PACKAGE, questTypeName));
         TypeName sideQuestOfRet = ParameterizedTypeName.get(
                 sideQuestClassName,
                 prototypeMethodData.getMethodRetTypeName()
@@ -138,7 +152,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         }
         overloadedSideQuestPrototypeMethods.add(sideQuestName);
 
-        TypeSpec.Builder sideQuestBuilder = TypeSpec.classBuilder(sideQuestName + QUEST_TYPE_NAME)
+        TypeSpec.Builder sideQuestBuilder = TypeSpec.classBuilder(sideQuestName + questTypeName)
                 .superclass(sideQuestOfRet)
                 .addModifiers(Modifier.PRIVATE, Modifier.FINAL);
 
@@ -191,7 +205,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                         )
                         :
                         ParameterizedTypeName.get(
-                                ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME),
+                                ClassName.get(QUEST_PACKAGE, questTypeName),
                                 prototypeMethodData.getMethodRetTypeName()
                         )
 
@@ -227,7 +241,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     public MethodSpec generateCurrentSideQuestGetter() {
         return  MethodSpec.methodBuilder("getCurrentSideQuest")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME))
+                .returns(ClassName.get(QUEST_PACKAGE, questTypeName))
                 .addStatement("return this.$N.getSideQuest()", daemonEngineString)
                 .build();
     }

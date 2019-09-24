@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -29,12 +28,8 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-
-
-import static javax.lang.model.type.TypeKind.VOID;
 
 public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
@@ -43,26 +38,56 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         void print(String string);
     }
 
-    protected Printer printer;
-
     @Override
     public void setPrinter(Printer printer) {
         this.printer = printer;
     }
 
-    protected ClassName daemonClassName;
+    //apt logger
+    protected Printer printer;
 
-    protected boolean autoGenerateApiMethods = true;
+    //package constants and literals
+    //closures
+    protected static final String CLOSURE_PACKAGE = "com.daemonize.daemonengine.closure";
+    protected static final String CLOSURE_STRING = "Closure";
 
-    public BaseDaemonGenerator setAutoGenerateApiMethods(boolean autoGenerateApiMethods) {
-        this.autoGenerateApiMethods = autoGenerateApiMethods;
-        return this;
-    }
+    //engine
+    protected static final String DAEMON_ENGINE_PACKAGE_ROOT = "com.daemonize.daemonengine";
+    protected static final String DAEMON_ENGINE_IMPL_PACKAGE = DAEMON_ENGINE_PACKAGE_ROOT + ".implementations";
 
-    protected final String PROTOTYPE_STRING = "prototype";
+    //quests
+    protected static final String QUEST_PACKAGE = "com.daemonize.daemonengine.quests";
+    protected static final String STOP_QUEST_TYPE_NAME = "StopMainQuest";
+    protected final String VOID_QUEST_TYPE_NAME = "VoidMainQuest";
+    protected static final String CONSUME_QUEST_TYPE_NAME = "ConsumeQuest";
+    protected static final String CONSUMER_PACKAGE_ROOT = "com.daemonize.daemonengine.consumer";
 
+    //consumer
+    protected static final String CONSUMER_PACKAGE = "com.daemonize.daemonengine.consumer";
+    protected static final String CONSUMER_INTERFACE_STRING = "Consumer";
+
+    //utils
+    private static final String DAEMONUTILS_PACKAGE = "com.daemonize.daemonengine.utils";
+    protected static final ClassName DAEMON_UTILS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "DaemonUtils");
+    private static final ClassName TIMEUNITS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "TimeUnits");
+
+    protected static final String PROTOTYPE_STRING = "prototype";
+
+    //variants
     protected String daemonEngineString = "daemonEngine";
     protected String daemonConcatEngineString = "DaemonEngine";
+
+    protected ClassName consumer = ClassName.get(CONSUMER_PACKAGE, CONSUMER_INTERFACE_STRING);
+    protected ClassName daemonClassName;
+
+    protected String questTypeName;
+
+    //prtotype and generated daemon class params
+    protected String prototypeClassQualifiedName;
+    protected String prototypeClassSimpleName;
+
+    protected String daemonEngineSimpleName;
+
 
     public BaseDaemonGenerator setDaemonEngineString(String daemonEngineString) {
         this.daemonEngineString = daemonEngineString;
@@ -73,46 +98,29 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         return daemonEngineString;
     }
 
-    protected final String DAEMON_ENGINE_PACKAGE_ROOT = "com.daemonize.daemonengine";
-    protected final String DAEMON_ENGINE_IMPL_PACKAGE = DAEMON_ENGINE_PACKAGE_ROOT + ".implementations";
 
-    protected static final String CLOSURE_PACKAGE = "com.daemonize.daemonengine.closure";
-    protected static final String CLOSURE_STRING = "Closure";
 
-    protected final String QUEST_PACKAGE = "com.daemonize.daemonengine.quests";
-    protected String QUEST_TYPE_NAME;
-    protected final String STOP_QUEST_TYPE_NAME = "StopMainQuest";
 
-    protected final String CONSUMER_PACKAGE = "com.daemonize.daemonengine.consumer";
-    protected final String CONSUMER_INTERFACE_STRING = "Consumer";
 
-    protected ClassName consumer = ClassName.get(CONSUMER_PACKAGE, CONSUMER_INTERFACE_STRING);
 
-    private final String DAEMONUTILS_PACKAGE = "com.daemonize.daemonengine.utils";
-    protected final ClassName DAEMON_UTILS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "DaemonUtils");
-    private final ClassName TIMEUNITS_CLASSNAME = ClassName.get(DAEMONUTILS_PACKAGE, "TimeUnits");
+
 
     protected TypeElement classElement;
 
-    protected String prototypeClassQualifiedName;
-    protected String prototypeClassSimpleName;
+
 
     protected String packageName;
     protected String daemonSimpleName;
 
     protected String returnRunnableType;
 
-    protected String daemonPackage;
-    protected String daemonEngineSimpleName;
 
-    protected final String CONSUME_QUEST_TYPE_NAME = "ConsumeQuest";
-    protected final String CONSUMER_PACKAGE_ROOT = "com.daemonize.daemonengine.consumer";
+
+
 
     protected ClassName consumerInterface = ClassName.get(CONSUMER_PACKAGE_ROOT, "Consumer");
 
-    public String getDaemonPackage() {
-        return daemonPackage;
-    }
+
 
     public String getDaemonEngineSimpleName() {
         return daemonEngineSimpleName;
@@ -279,7 +287,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
             if (method.getAnnotation(DedicatedThread.class) != null)
                 ret.add(Pair.create(method, method.getAnnotation(DedicatedThread.class).name()));
             else {
-
                 Daemonize annotation = method.getAnnotation(Daemonize.class);
                 if (annotation != null && annotation.dedicatedThread())
                     ret.add(Pair.create(method, annotation.name()));
@@ -510,109 +517,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         }
 
         return pursueImplementation.build();
-    }
-
-
-    protected static class PrototypeMethodData {
-
-        private String methodName;
-        private TypeName methodRetTypeName;
-        private boolean isVoid;
-        private TypeName closureOfRet;
-        private String arguments = "";
-        private List<TypeName> parametersType = new ArrayList<>();
-        private List<String> parametersName = new ArrayList<>();
-
-        protected PrototypeMethodData(ExecutableElement prototypeMethod) {
-            methodName = prototypeMethod.getSimpleName().toString();
-            TypeMirror methodReturn = prototypeMethod.getReturnType();
-            methodRetTypeName = TypeName.get(methodReturn);
-            isVoid = methodReturn.getKind().equals(VOID);
-
-            if (methodReturn.getKind().isPrimitive()) {
-                methodRetTypeName = methodRetTypeName.box();
-            } else if (isVoid) {
-                methodRetTypeName = TypeName.get(Void.class);
-            }
-
-            List<? extends VariableElement> methodParameters = prototypeMethod.getParameters();
-
-            closureOfRet = ParameterizedTypeName.get(
-                    ClassName.get(
-                            CLOSURE_PACKAGE,
-                            CLOSURE_STRING
-                    ),
-                    methodRetTypeName
-            );
-
-            StringBuilder argumentBuilder = new StringBuilder();
-
-            for (int i = 0; i < methodParameters.size(); ++i) {
-
-                VariableElement fieldElement = methodParameters.get(i);
-
-                TypeMirror fieldType = fieldElement.asType();
-                String fieldName = fieldElement.getSimpleName().toString().toLowerCase();
-
-                parametersType.add(ClassName.get(fieldType));
-                parametersName.add(fieldName);
-
-                argumentBuilder.append(fieldName);
-                if (i != methodParameters.size() - 1) {
-                    argumentBuilder.append(", ");
-                }
-            }
-
-            arguments = argumentBuilder.toString();
-
-        }
-
-        protected String getMethodName() {
-            return methodName;
-        }
-
-        protected TypeName getMethodRetTypeName() {
-            return methodRetTypeName;
-        }
-
-        protected boolean isVoid() { return isVoid; }
-
-        protected String getArguments() {
-            return arguments;
-        }
-
-        protected List<Pair<TypeName, String>> getParameters() {
-            List<Pair<TypeName, String>> ret  = new ArrayList<>(parametersType.size());
-            for(int i = 0; i < parametersType.size(); ++i) {
-                ret.add(Pair.create(parametersType.get(i), parametersName.get(i)));
-            }
-            return ret;
-        }
-
-        protected TypeName getClosureOfRet() {
-            return closureOfRet;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (!(this instanceof PrototypeMethodData))
-                return false;
-            else {
-                PrototypeMethodData rhs = (PrototypeMethodData) obj;
-                if (this.methodName.equals(rhs.methodName) &&
-//                        this.methodRetTypeName.equals(rhs.methodRetTypeName) &&
-//                        this.closureOfRet.equals(rhs.closureOfRet) &&
-                        this.parametersType.equals(rhs.parametersType))
-                    return true;
-                else
-                    return false;
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(methodName, /*methodRetTypeName, closureOfRet,*/ parametersType);
-        }
     }
 
 

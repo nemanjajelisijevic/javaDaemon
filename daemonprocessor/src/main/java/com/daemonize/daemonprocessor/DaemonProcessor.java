@@ -2,6 +2,7 @@ package com.daemonize.daemonprocessor;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemon;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.JavaFile;
@@ -88,7 +89,7 @@ public class DaemonProcessor extends AbstractProcessor {
                         BaseDaemonGenerator.getSideQuestMethods(publicPrototypeMethods);
 
                 for (Pair<ExecutableElement, SideQuest> sideQuestMethod : sideQuestMethods) {
-                    if (sideQuestMethod.getFirst().getAnnotation(CallingThread.class) != null || sideQuestMethod.getFirst().getAnnotation(DedicatedThread.class) != null)
+                    if (sideQuestMethod.getFirst().getAnnotation(Daemonize.class) != null || sideQuestMethod.getFirst().getAnnotation(DedicatedThread.class) != null)
                         throw new IllegalStateException(
                                 "Error daemonizing class: "
                                         + classElement.getSimpleName().toString()
@@ -124,7 +125,7 @@ public class DaemonProcessor extends AbstractProcessor {
                         } else {
 
                             for(ExecutableElement method : publicPrototypeMethods) {
-                                if(method.getAnnotation(DedicatedThread.class) != null)
+                                if(method.getAnnotation(DedicatedThread.class) != null || (method.getAnnotation(Daemonize.class) != null && method.getAnnotation(Daemonize.class).dedicatedThread()))
                                     throw new IllegalStateException(
                                             "Error daemonizing class: "
                                             + classElement.getSimpleName().toString()

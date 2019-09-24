@@ -3,6 +3,7 @@ package com.daemonize.daemonprocessor;
 
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemon;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.Exclude;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
@@ -28,7 +29,6 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
     protected SideQuestDaemonGenerator sideGenerator;
 
     {
-        daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE;
         daemonEngineSimpleName = "HybridDaemonEngine";
     }
 
@@ -41,9 +41,6 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 classElement.getAnnotation(Daemon.class).markDaemonMethods()
         );
         this.sideGenerator = new SideQuestDaemonGenerator(classElement);
-
-        if(!mainGenerator.getDedicatedThreadEngines().isEmpty())
-            autoGenerateApiMethods = false;
     }
 
     @Override
@@ -58,25 +55,6 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
 
         implementInterfaces(daemonClassBuilder, daemonClassName.box());
 
-//        for (TypeElement intf : interfaces) {
-//            TypeMirror intfMirror = intf.asType();
-//
-// //           List<? extends TypeParameterElement> typeParams = intf.getTypeParameters();
-//
-////            if (!typeParams.isEmpty()) {
-////
-////                for (TypeParameterElement type : typeParams) {
-////                    daemonClassBuilder.addTypeVariable(TypeVariableName.get(type));
-////                }
-////            }
-//            daemonClassBuilder.addSuperinterface(TypeName.get(intf.asType()));
-//        }
-
-//        for (TypeElement intf : interfaces)
-//            daemonClassBuilder.addSuperinterface(TypeName.get(intf.asType()));
-
-        //daemonClassBuilder.addSuperinterfaces(interfaces);
-
         if (mainGenerator.isConsumer())
             daemonClassBuilder.addSuperinterface(consumerInterface);
 
@@ -89,7 +67,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
         ).addModifiers(Modifier.PRIVATE).build();
 
         ClassName daemonEngineClass = ClassName.get(
-                daemonPackage,
+                DAEMON_ENGINE_IMPL_PACKAGE,
                 daemonEngineSimpleName
         );
 
@@ -109,7 +87,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addStatement("this.daemonEngine = new $N(consumer).setName(this.getClass().getSimpleName())", daemonEngineSimpleName);
 
         //add dedicated daemon engines
-        Set<String> dedNameSet = new HashSet<>(mainGenerator.dedicatedEnginesNameSet);
+        Set<String> dedNameSet = new HashSet<>(mainGenerator.getDedicatedEnginesNameSet());
 
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : mainGenerator.getDedicatedThreadEngines().entrySet()) {
             if (dedNameSet.contains(entry.getValue().getFirst())) {
@@ -154,29 +132,60 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
 
             PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
 
-            if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData) || method.getAnnotation(Exclude.class) != null) {
-                if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
-                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? mainGenerator.wrapMethod(method, true) : mainGenerator.wrapMethod(method, false));
-                    continue;
-                }
-                continue;
-            }
+            Daemonize daemonizeAnnotation = method.getAnnotation(Daemonize.class);
 
-            if (mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
-                mainQuestsAndApiMethods.put(
-                        mainGenerator.createMainQuest(method),
-                        mainGenerator.createApiMethod(
-                                method,
-                                mainGenerator.getDedicatedThreadEngines().get(method).getFirst()
-                        )
+            if (daemonizeAnnotation == null) {
+                daemonClassBuilder.addMethod(
+                        overriddenMethods.contains(overridenMethodData)
+                                ? wrapMethod(method, true)
+                                : wrapMethod(method, false)
                 );
+                continue;
             } else {
-                mainQuestsAndApiMethods.put(
-                        mainGenerator.createMainQuest(method),
-                        mainGenerator.createApiMethod(method, daemonEngineString)
-                );
+                if (daemonizeAnnotation.dedicatedThread() && mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
+                    mainQuestsAndApiMethods.put(
+                            mainGenerator.createMainQuest(method),
+                            mainGenerator.createApiMethod(
+                                    method,
+                                    mainGenerator.getDedicatedThreadEngines().get(method).getFirst()
+                            )
+                    );
+                } else {
+                    mainQuestsAndApiMethods.put(
+                            mainGenerator.createMainQuest(method),
+                            mainGenerator.createApiMethod(method, daemonEngineString)
+                    );
+                }
             }
         }
+
+//        for (ExecutableElement method : publicPrototypeMethods) {
+//
+//            PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
+//
+//            if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData) || method.getAnnotation(Exclude.class) != null) {
+//                if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
+//                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? mainGenerator.wrapMethod(method, true) : mainGenerator.wrapMethod(method, false));
+//                    continue;
+//                }
+//                continue;
+//            }
+//
+//            if (mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
+//                mainQuestsAndApiMethods.put(
+//                        mainGenerator.createMainQuest(method),
+//                        mainGenerator.createApiMethod(
+//                                method,
+//                                mainGenerator.getDedicatedThreadEngines().get(method).getFirst()
+//                        )
+//                );
+//            } else {
+//                mainQuestsAndApiMethods.put(
+//                        mainGenerator.createMainQuest(method),
+//                        mainGenerator.createApiMethod(method, daemonEngineString)
+//                );
+//            }
+//        }
 
         //add side quests
         for (Pair<TypeSpec, MethodSpec> sideQuestField : sideQuestFields) {
@@ -238,7 +247,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName), ParameterizedTypeName.get(ClassName.get(ArrayList.class), daemonStateClassName))
                 .addStatement("ret.add(" + mainGenerator.getDaemonEngineString() + ".getState())");
 
-        for (String dedEngine : mainGenerator.dedicatedEnginesNameSet)
+        for (String dedEngine : mainGenerator.getDedicatedEnginesNameSet())
             builder.addStatement("ret.add(" + dedEngine + ".getState())");
 
         return builder.addStatement("return ret").build();
@@ -252,7 +261,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(Integer.class)))
                 .addStatement("ret.add(" + mainGenerator.getDaemonEngineString() + ".queueSize())");
 
-        for (String dedEngine : mainGenerator.dedicatedEnginesNameSet)
+        for (String dedEngine : mainGenerator.getDedicatedEnginesNameSet())
             builder.addStatement("ret.add(" + dedEngine + ".queueSize())");
 
         return builder.addStatement("return ret").build();
@@ -266,7 +275,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement(mainGenerator.getDaemonEngineString()  + ".setUncaughtExceptionHandler(handler)");
 
-        for (String dedicatedEngine : mainGenerator.dedicatedEnginesNameSet)
+        for (String dedicatedEngine : mainGenerator.getDedicatedEnginesNameSet())
             builder.addStatement(dedicatedEngine + ".setUncaughtExceptionHandler(handler)");
 
         return builder.returns(ClassName.get(packageName, daemonSimpleName))

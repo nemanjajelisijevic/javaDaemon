@@ -5,7 +5,6 @@ import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.LogExecutionTime;
 import com.daemonize.daemonprocessor.annotations.Exclude;
@@ -33,39 +32,28 @@ import javax.lang.model.element.TypeElement;
 
 public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements DaemonGenerator {
 
-    private Set<String> overloadedPrototypeMethods = new TreeSet<>();
-    private String currentMainQuestName = "";
     private boolean eager;
-
-    public boolean isEager() {
-        return eager;
-    }
-
-    private final String VOID_QUEST_TYPE_NAME = "VoidMainQuest";
+    private boolean consumerDaemon;
+    private boolean markDaemonMethods;
 
     private ClassName daemonEngineClass;
 
-    private boolean consumerDaemon = false;
-
-    private String CONSUME_QUEST_TYPE_NAME = "ConsumeQuest";
-
-    private boolean markDaemonMethods = false;
-
-    public boolean isConsumer() {
-        return consumerDaemon;
-    }
-
-    public Set<String> dedicatedEnginesNameSet;
+    private Set<String> overloadedPrototypeMethods = new TreeSet<>();
+    private Set<String> dedicatedEnginesNameSet;
     private Map<ExecutableElement, Pair<String, FieldSpec>> dedicatedThreadEngines;
 
-    public Map<ExecutableElement, Pair<String, FieldSpec>> getDedicatedThreadEngines() {
-        return dedicatedThreadEngines;
-    }
+    private String currentMainQuestName = "";
 
     {
-        QUEST_TYPE_NAME = "MainQuest";
-        daemonPackage = DAEMON_ENGINE_IMPL_PACKAGE;
+        questTypeName = "MainQuest";
         daemonEngineSimpleName = "MainQuestDaemonEngine";
+    }
+
+    public Map<ExecutableElement, Pair<String, FieldSpec>> getDedicatedThreadEngines() { return dedicatedThreadEngines; }
+    public Set<String> getDedicatedEnginesNameSet() { return dedicatedEnginesNameSet; }
+    public boolean isEager() { return eager; }
+    public boolean isConsumer() {
+        return consumerDaemon;
     }
 
     public MainQuestDaemonGenerator(TypeElement classElement) {
@@ -86,18 +74,15 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         super(classElement);
 
         this.markDaemonMethods = markDaemonMethods;
-
         this.eager = eager;
+        this.consumerDaemon = consumer;
 
         if(this.eager) {
             daemonEngineSimpleName = "EagerMainQuestDaemonEngine";
-            daemonInterface = ClassName.get(
-                    DAEMON_ENGINE_PACKAGE_ROOT,
-                    "EagerDaemon"
-            );
+            daemonInterface = ClassName.get(DAEMON_ENGINE_PACKAGE_ROOT, "EagerDaemon");
         }
 
-        this.daemonEngineClass = ClassName.get(daemonPackage, daemonEngineSimpleName);
+        this.daemonEngineClass = ClassName.get(DAEMON_ENGINE_IMPL_PACKAGE, daemonEngineSimpleName);
         this.dedicatedThreadEngines = new HashMap<>();
 
         List<Pair<ExecutableElement, String>> dedicatedThreadMethods =
@@ -113,22 +98,15 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
             dedicatedThreadEngines.put(
                     dedicatedThreadMethod.getFirst(),
-                    Pair.create(
-                            daemonEngineDedicatedString,
-                            dedicatedEngineFieldSpec
-                    )
+                    Pair.create(daemonEngineDedicatedString, dedicatedEngineFieldSpec)
             );
         }
 
         dedicatedEnginesNameSet = new HashSet<>();
 
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : dedicatedThreadEngines.entrySet())
-            dedicatedEnginesNameSet.add(entry.getValue().getFirst());
+            getDedicatedEnginesNameSet().add(entry.getValue().getFirst());
 
-        if (!dedicatedThreadMethods.isEmpty())
-            autoGenerateApiMethods = false;
-
-        this.consumerDaemon = consumer;
     }
 
     public TypeSpec generateDaemon(List<ExecutableElement> publicPrototypeMethods) {
@@ -152,56 +130,56 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
             PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
 
-//            Daemonize daemonizeAnnotation = method.getAnnotation(Daemonize.class);
-//
-//            if (daemonizeAnnotation == null) {
-//                daemonClassBuilder.addMethod(
-//                        overriddenMethods.contains(overridenMethodData)
-//                                ? wrapMethod(method, true)
-//                                : wrapMethod(method, false)
-//                );
-//                continue;
-//            } else {
-//                if (daemonizeAnnotation.dedicatedThread() && dedicatedThreadEngines.containsKey(method)) {
-//                    mainQuestsAndApiMethods.put(
-//                            createMainQuest(method),
-//                            createApiMethod(
-//                                    method,
-//                                    dedicatedThreadEngines.get(method).getFirst()
-//                            )
-//                    );
-//                } else {
-//                    mainQuestsAndApiMethods.put(
-//                            createMainQuest(method),
-//                            createApiMethod(method, daemonEngineString)
-//                    );
-//                }
-//            }
+            Daemonize daemonizeAnnotation = method.getAnnotation(Daemonize.class);
 
-
-            if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData) || method.getAnnotation(Exclude.class) != null) {
-                if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
-                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? wrapMethod(method, true) : wrapMethod(method, false));
-                    continue;
-                }
+            if (daemonizeAnnotation == null) {
+                daemonClassBuilder.addMethod(
+                        overriddenMethods.contains(overridenMethodData)
+                                ? wrapMethod(method, true)
+                                : wrapMethod(method, false)
+                );
                 continue;
-            }
-
-            if (dedicatedThreadEngines.containsKey(method)) {
-                mainQuestsAndApiMethods.put(
-                        createMainQuest(method),
-                        createApiMethod(
-                                method,
-                                dedicatedThreadEngines.get(method).getFirst()
-                        )
-                );
             } else {
-                mainQuestsAndApiMethods.put(
-                        createMainQuest(method),
-                        createApiMethod(method, daemonEngineString)
-                );
+                if (daemonizeAnnotation.dedicatedThread() && dedicatedThreadEngines.containsKey(method)) {
+                    mainQuestsAndApiMethods.put(
+                            createMainQuest(method),
+                            createApiMethod(
+                                    method,
+                                    dedicatedThreadEngines.get(method).getFirst()
+                            )
+                    );
+                } else {
+                    mainQuestsAndApiMethods.put(
+                            createMainQuest(method),
+                            createApiMethod(method, daemonEngineString)
+                    );
+                }
             }
         }
+
+
+//            if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData) || method.getAnnotation(Exclude.class) != null) {
+//                if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
+//                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? wrapMethod(method, true) : wrapMethod(method, false));
+//                    continue;
+//                }
+//                continue;
+//            }
+//
+//            if (dedicatedThreadEngines.containsKey(method)) {
+//                mainQuestsAndApiMethods.put(
+//                        createMainQuest(method),
+//                        createApiMethod(
+//                                method,
+//                                dedicatedThreadEngines.get(method).getFirst()
+//                        )
+//                );
+//            } else {
+//                mainQuestsAndApiMethods.put(
+//                        createMainQuest(method),
+//                        createApiMethod(method, daemonEngineString)
+//                );
+//            }
 
         //private fields for prototype
         FieldSpec prototype = FieldSpec.builder(
@@ -222,7 +200,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addParameter(ClassName.get(classElement.asType()), PROTOTYPE_STRING)
                 .addStatement("this." + daemonEngineString + " = new $N(consumer).setName(this.getClass().getSimpleName())", daemonEngineSimpleName);
 
-        Set<String> dedNameSet = new HashSet<>(dedicatedEnginesNameSet);
+        Set<String> dedNameSet = new HashSet<>(getDedicatedEnginesNameSet());
 
         //add dedicated daemon engines
         for (Map.Entry<ExecutableElement, Pair<String, FieldSpec>> entry : dedicatedThreadEngines.entrySet()) {
@@ -253,29 +231,21 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             daemonClassBuilder.addType(entry.getKey());
         }
 
-        List<MethodSpec> daemonApiMethods;
+        List<MethodSpec> daemonApiMethods = new ArrayList<>(9);
 
-        if (autoGenerateApiMethods) {
-             daemonApiMethods = generateDaemonApiMethods();
-        } else {
-
-            daemonApiMethods = new ArrayList<>(9);
-
-            daemonApiMethods.add(generateGetPrototypeDaemonApiMethod());
-            daemonApiMethods.add(generateSetPrototypeDaemonApiMethod());
-            daemonApiMethods.add(generateStartDaemonApiMethod());
-            daemonApiMethods.add(generateClearDaemonApiMethod());
-            daemonApiMethods.add(generateGetEnginesStateDaemonApiMethod());
-            daemonApiMethods.add(generateGetEnginesQueueSizeDaemonApiMethod());
-            daemonApiMethods.add(generateDedicatedEnginesStopDaemonApiMethod());
-            daemonApiMethods.add(generateDedicatedEnginesQueueStopDaemonApiMethod());
-            daemonApiMethods.add(generateDedicatedEnginesSetNameDaemonApiMethod());
-            daemonApiMethods.add(generateGetNameDaemonApiMethod());
-            daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
-            daemonApiMethods.add(generateGetConsumerDaemonApiMethod());
-            daemonApiMethods.add(generateSetUncaughtExceptionHandler());
-
-        }
+        daemonApiMethods.add(generateGetPrototypeDaemonApiMethod());
+        daemonApiMethods.add(generateSetPrototypeDaemonApiMethod());
+        daemonApiMethods.add(generateStartDaemonApiMethod());
+        daemonApiMethods.add(generateClearDaemonApiMethod());
+        daemonApiMethods.add(generateGetEnginesStateDaemonApiMethod());
+        daemonApiMethods.add(generateGetEnginesQueueSizeDaemonApiMethod());
+        daemonApiMethods.add(generateDedicatedEnginesStopDaemonApiMethod());
+        daemonApiMethods.add(generateDedicatedEnginesQueueStopDaemonApiMethod());
+        daemonApiMethods.add(generateDedicatedEnginesSetNameDaemonApiMethod());
+        daemonApiMethods.add(generateGetNameDaemonApiMethod());
+        daemonApiMethods.add(generateSetConsumerDaemonApiMethod());
+        daemonApiMethods.add(generateGetConsumerDaemonApiMethod());
+        daemonApiMethods.add(generateSetUncaughtExceptionHandler());
 
         if (consumerDaemon)
             daemonApiMethods.add(generateConsumeMethod());
@@ -297,9 +267,10 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
 
         boolean voidQuest = prototypeMethodData.isVoid();
-        boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
+        //boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
+        boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(Daemonize.class).generateRunnable();
 
-        ClassName className = voidQuest ? ClassName.get(QUEST_PACKAGE, VOID_QUEST_TYPE_NAME) : ClassName.get(QUEST_PACKAGE, QUEST_TYPE_NAME);
+        ClassName className = voidQuest ? ClassName.get(QUEST_PACKAGE, VOID_QUEST_TYPE_NAME) : ClassName.get(QUEST_PACKAGE, questTypeName);
 
         TypeName mainQuestOfRet = voidQuest ? className : ParameterizedTypeName.get(className, prototypeMethodData.getMethodRetTypeName());
 
@@ -316,7 +287,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         overloadedPrototypeMethods.add(mainQuestName);
 
         TypeSpec.Builder mainQuestBuilder = TypeSpec.classBuilder(
-                mainQuestName + QUEST_TYPE_NAME
+                mainQuestName + questTypeName
         ).superclass(mainQuestOfRet).addModifiers(Modifier.PRIVATE, Modifier.FINAL);
 
         mainQuestBuilder = addTypeParameters(prototypeMethod, mainQuestBuilder);
@@ -386,8 +357,10 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                         prototypeMethod.getSimpleName()
                 );
 
-        boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
-        boolean consumerArg = prototypeMethod.getAnnotation(ConsumerArg.class) != null;
+        //boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
+        boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(Daemonize.class).generateRunnable();
+        //boolean consumerArg = prototypeMethod.getAnnotation(ConsumerArg.class) != null;
+        boolean consumerArg = prototypeMethod.getAnnotation(Daemonize.class).consumerArg();
 
         apiMethodBuilder = addTypeParameters(prototypeMethod, apiMethodBuilder);
 
@@ -405,7 +378,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             apiMethodBuilder.addParameter(prototypeMethodData.getClosureOfRet(),"closure");
             apiMethodBuilder.addStatement(
                     daemonEngineString + ".pursueQuest(new "
-                            + currentMainQuestName + QUEST_TYPE_NAME + "("
+                            + currentMainQuestName + questTypeName + "("
                             + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ")
                             + "closure)"
                             + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer()))")
@@ -419,14 +392,14 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
                 apiMethodBuilder.addStatement(
                         daemonEngineString + ".pursueQuest(new "
-                                + currentMainQuestName + QUEST_TYPE_NAME + "("
+                                + currentMainQuestName + questTypeName + "("
                                 + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ") + "retRun)"
                                 + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer()))")
                 );
             } else
                 apiMethodBuilder.addStatement(
                         daemonEngineString + ".pursueQuest(new "
-                                + currentMainQuestName + QUEST_TYPE_NAME + "("
+                                + currentMainQuestName + questTypeName + "("
                                 + prototypeMethodData.getArguments() + ")"
                                 + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer()))")
                 );
@@ -446,7 +419,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".start()");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             methodSpecBuilder.addStatement(dedicatedEngine + ".start()");
 
         return methodSpecBuilder.addStatement("return this").build();
@@ -459,7 +432,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(void.class)
                 .addStatement(daemonEngineString + ".stop()");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             builder.addStatement(dedicatedEngine + ".stop()");
 
         return builder.build();
@@ -484,7 +457,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".setName(name)");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             builder.addStatement(dedicatedEngine + ".setName(name +\" - " + dedicatedEngine + "\")");
 
 
@@ -510,7 +483,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".interrupt()");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             builder.addStatement(dedicatedEngine + ".interrupt()");
 
 
@@ -525,7 +498,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".clear()");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             builder.addStatement(dedicatedEngine + ".clear()");
 
         return builder.addStatement("return this")
@@ -539,7 +512,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".clearAndInterrupt()");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             builder.addStatement(dedicatedEngine + ".clearAndInterrupt()");
 
         return builder.addStatement("return this")
@@ -553,7 +526,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), daemonStateClassName), ParameterizedTypeName.get(ClassName.get(ArrayList.class), daemonStateClassName))
                 .addStatement("ret.add(" + getDaemonEngineString() + ".getState())");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             builder.addStatement("ret.add(" + dedicatedEngine + ".getState())");
 
         return builder.addStatement("return ret").build();
@@ -566,7 +539,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(Integer.class)))
                 .addStatement("ret.add(" + getDaemonEngineString() + ".queueSize())");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             builder.addStatement("ret.add(" + dedicatedEngine + ".queueSize())");
 
         return builder.addStatement("return ret")
@@ -582,7 +555,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement(daemonEngineString + ".setConsumer(consumer)");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             builder.addStatement(dedicatedEngine + ".setConsumer(consumer)");
 
        return builder.addStatement("return this").build();
@@ -596,11 +569,12 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement(getDaemonEngineString()  + ".setUncaughtExceptionHandler(handler)");
 
-        for (String dedicatedEngine : dedicatedEnginesNameSet)
+        for (String dedicatedEngine : getDedicatedEnginesNameSet())
             builder.addStatement(dedicatedEngine + ".setUncaughtExceptionHandler(handler)");
 
         return builder.returns(ClassName.get(packageName, daemonSimpleName))
                 .addStatement("return this")
                 .build();
     }
+
 }
