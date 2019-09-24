@@ -1670,7 +1670,6 @@ public class Game {
 
                                 //go to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
-
                                 int angle = (int) RotatingSpriteImageMover.getAngle(
                                         current.getCenterX(),
                                         current.getCenterY(),
