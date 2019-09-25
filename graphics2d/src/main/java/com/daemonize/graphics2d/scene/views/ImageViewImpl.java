@@ -4,23 +4,23 @@ import com.daemonize.graphics2d.images.Image;
 
 import java.util.List;
 
-public class ImageViewImpl implements ImageView, Comparable<ImageView> {
+public class ImageViewImpl implements ImageView<ImageViewImpl> {
 
-    protected volatile String viewName;
-    private volatile int zIndex;
-    private volatile boolean showing;
+    volatile String viewName;
+    volatile int zIndex;
+    volatile boolean showing;
 
     private volatile Image image;
 
     //center coords
-    protected float absoluteX;
-    protected float absoluteY;
+    float absoluteX;
+    float absoluteY;
 
-    protected volatile float startingX;
-    protected volatile float startingY;
+    volatile float startingX;
+    volatile float startingY;
 
-    protected float xOffset;//TODO check if this is really neccessary
-    protected float yOffset;//TODO check if this is really neccessary
+    float xOffset;//TODO check if this is really neccessary
+    float yOffset;//TODO check if this is really neccessary
 
     public ImageViewImpl(String name) {
         this.viewName = name;
@@ -82,7 +82,6 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
         return absoluteY + yOffset;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl setZindex(int zindex) {
         this.zIndex = zindex;
@@ -94,15 +93,13 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
         return zIndex;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl setAbsoluteX(float absoluteX) {
         this.absoluteX = absoluteX;
         this.startingX = absoluteX - xOffset;
-        return this;
+        return  this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl setAbsoluteY(float absoluteY) {
         this.absoluteY = absoluteY;
@@ -110,14 +107,12 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl setImageWithoutOffset(Image image) {
         this.image = image;
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl setImage(Image image) {
         this.xOffset = image.getWidth() / 2;
@@ -137,14 +132,12 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
         return absoluteY;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl hide() {
         this.showing = false;
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public ImageViewImpl show() {
         this.showing = true;
@@ -168,10 +161,7 @@ public class ImageViewImpl implements ImageView, Comparable<ImageView> {
 
     @Override
     public int compareTo(ImageView o) {
-        if (o instanceof ImageViewImpl)
-            return Integer.compare(this.zIndex, ((ImageViewImpl) o).zIndex);
-        else
-            return 0;
+        return Integer.compare(this.zIndex, o.getZindex());
     }
 
     public List<ImageView> getAllViews () {

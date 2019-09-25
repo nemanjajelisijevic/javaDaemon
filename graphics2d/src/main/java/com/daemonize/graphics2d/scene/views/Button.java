@@ -3,7 +3,7 @@ package com.daemonize.graphics2d.scene.views;
 
 import com.daemonize.graphics2d.images.Image;
 
-public class Button extends CompositeImageViewImpl implements ClickableImageView<Button> {
+public class Button extends CompositeImageViewImpl {
 
     private Runnable onClickCallback;
     private boolean enabled = true;
@@ -21,7 +21,7 @@ public class Button extends CompositeImageViewImpl implements ClickableImageView
         super(name, absX, absY, z, image);
     }
 
-    @Override
+    //@Override
     public Button onClick(Runnable onclick) {
         this.onClickCallback = onclick;
         return this;

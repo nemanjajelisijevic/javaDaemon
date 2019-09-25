@@ -8,7 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class CompositeImageViewImpl extends ImageViewImpl {
+public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl> {
+
+    private ImageViewImpl view;
 
     protected List<CompositeImageViewImpl> childrenViews;
     private boolean isRoot = false;
@@ -21,7 +23,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     private float relativeY;
 
     private CompositeImageViewImpl(String name, float absX, float absY, int z) {
-        super(name);
+        view = new ImageViewImpl(name);
         childrenViews = new LinkedList<>();
         childMap = new HashMap<>();
         childMap.put(name, this);
@@ -40,26 +42,121 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     //for root without image only!
     public CompositeImageViewImpl(String name, float absX, float absY, int z, float width,float height) {
         this(name, absX, absY, z);
-        this.xOffset = width / 2;
-        this.yOffset = height / 2;
-        this.startingX = this.absoluteX - this.xOffset;
-        this.startingY = this.absoluteY - this.yOffset;
+
+        view.xOffset = width / 2;
+        view.yOffset = height / 2;
+
+        view.startingX = view.absoluteX - view.xOffset;
+        view.startingY = view.absoluteY - view.yOffset;
     }
 
     //for child views
     public CompositeImageViewImpl(String name, Image image) {
-        super(name);
+        view = new ImageViewImpl(name);
         childrenViews = new LinkedList<>();
         this.setImage(image);
     }
 
     //for child views
     public CompositeImageViewImpl(String name, float relX, float relY, Image image) {
-        super(name);
+        view = new ImageViewImpl(name);
         childrenViews = new LinkedList<>();
         this.relativeX = relX;
         this.relativeY = relY;
         this.setImage(image);
+    }
+
+    @Override
+    public String getName() {
+        return view.viewName;
+    }
+
+    @Override
+    public float getAbsoluteX() {
+        return view.absoluteX;
+    }
+
+    @Override
+    public float getAbsoluteY() {
+        return view.absoluteY;
+    }
+
+    @Override
+    public float getStartingX() {
+        return view.startingX;
+    }
+
+    @Override
+    public float getStartingY() {
+        return view.startingY;
+    }
+
+    @Override
+    public float getEndX() {
+        return view.getEndX();
+    }
+
+    @Override
+    public float getEndY() {
+        return view.getEndY();
+    }
+
+    @Override
+    public float getxOffset() {
+        return view.xOffset;
+    }
+
+    @Override
+    public float getyOffset() {
+        return view.yOffset;
+    }
+
+    @Override
+    public float getWidth() {
+        return view.getWidth();
+    }
+
+    @Override
+    public float getHeight() {
+        return view.getHeight();
+    }
+
+    @Override
+    public CompositeImageViewImpl setImageWithoutOffset(Image image) {
+        view.setImageWithoutOffset(image);
+        return this;
+    }
+
+    @Override
+    public CompositeImageViewImpl setImage(Image image) {
+        view.setImage(image);
+        return this;
+    }
+
+    @Override
+    public Image getImage() {
+        return view.getImage();
+    }
+
+    @Override
+    public CompositeImageViewImpl setZindex(int zindex) {
+        view.zIndex = zindex;
+        return this;
+    }
+
+    @Override
+    public int getZindex() {
+        return view.zIndex;
+    }
+
+    @Override
+    public boolean isShowing() {
+        return view.isShowing();
+    }
+
+    @Override
+    public int compareTo(ImageView o) {
+        return Integer.compare(view.zIndex, o.getZindex());
     }
 
     public CompositeImageViewImpl getParent() {
@@ -71,7 +168,6 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     public CompositeImageViewImpl getRoot() {
         if (isRoot)
             return this;
-
         return root;
     }
 
@@ -93,10 +189,11 @@ public class CompositeImageViewImpl extends ImageViewImpl {
         return this;
     }
 
+
     @Override
     public CompositeImageViewImpl setAbsoluteX(float absoluteX) {
-        this.absoluteX = absoluteX;
-        this.startingX = absoluteX - this.xOffset;
+        view.absoluteX = absoluteX;
+        view.startingX = absoluteX - view.xOffset;
         for(CompositeImageViewImpl child : childrenViews) {
             child.setAbsoluteX(this.getStartingX() + child.getRelativeX());
         }
@@ -104,9 +201,9 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     }
 
     @Override
-    public ImageViewImpl setAbsoluteY(float absoluteY) {
-        this.absoluteY = absoluteY;
-        this.startingY = absoluteY - this.yOffset;
+    public CompositeImageViewImpl setAbsoluteY(float absoluteY) {
+        view.absoluteY = absoluteY;
+        view.startingY = absoluteY - view.yOffset;
         for(CompositeImageViewImpl child : childrenViews) {
             child.setAbsoluteY(this.getStartingY() + child.getRelativeY());
         }
@@ -126,7 +223,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
 
     @Override
     public boolean checkCoordinates(float x, float y) {
-        if (super.checkCoordinates(x,y)) {
+        if (view.checkCoordinates(x,y)) {
             for (CompositeImageViewImpl child : getChildrenViews()) {
                 if (child.checkCoordinates(x, y)) {
                     return true;
@@ -140,9 +237,9 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     //@Override
     public void addChild(CompositeImageViewImpl child) {
         if(child.isRoot)
-            throw new IllegalArgumentException("Can not add a child view that is root. Please use non root constructor for this child view(" + child.viewName + ")");
-        child.setAbsoluteX((this.startingX + child.getRelativeX()));//TODO check this -- need this because of root child
-        child.setAbsoluteY((this.startingY + child.getRelativeY()));//TODO check this
+            throw new IllegalArgumentException("Can not add a child view that is root. Please use non root constructor for this child view(" + child.getName() + ")");
+        child.setAbsoluteX((view.startingX + child.getRelativeX()));//TODO check this -- need this because of root child
+        child.setAbsoluteY((view.startingY + child.getRelativeY()));//TODO check this
         child.setZindex(this.getZindex() + 1);
         this.addCh(child);
     }
@@ -150,10 +247,10 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     private void addCh(CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : this.childrenViews){
             if (child.checkRootCoordinates(newChild.getStartingX(), newChild.getStartingY())){
-                newChild.setRelativeX(newChild.getRelativeX() - (child.startingX - this.startingX));
-                newChild.setRelativeY(newChild.getRelativeY() - (child.startingY - this.startingY));
-                newChild.setAbsoluteX((child.startingX + newChild.getRelativeX()));//TODO check this reson to stay duble check
-                newChild.setAbsoluteY((child.startingY + newChild.getRelativeY()));//TODO check this
+                newChild.setRelativeX(newChild.getRelativeX() - (child.getStartingX() - this.view.startingX));
+                newChild.setRelativeY(newChild.getRelativeY() - (child.getStartingY() - this.view.startingY));
+                newChild.setAbsoluteX((child.getStartingX() + newChild.getRelativeX()));//TODO check this reson to stay duble check
+                newChild.setAbsoluteY((child.getStartingY() + newChild.getRelativeY()));//TODO check this
                 newChild.setZindex(child.getZindex() + 1);
                 child.addCh(newChild);
                 return;
@@ -173,7 +270,7 @@ public class CompositeImageViewImpl extends ImageViewImpl {
             newChild.root = temp;
         }
 
-        newChild.root.childMap.put(newChild.viewName, newChild);
+        newChild.root.childMap.put(newChild.getName(), newChild);
         this.childrenViews.add(newChild);
     }
 
@@ -206,15 +303,15 @@ public class CompositeImageViewImpl extends ImageViewImpl {
     }
 
     @Override
-    public ImageViewImpl show() {
-        super.show();
+    public CompositeImageViewImpl show() {
+        view.show();
         showAllViews(this);
         return this;
     }
 
     @Override
-    public ImageViewImpl hide() {
-        super.hide();
+    public CompositeImageViewImpl hide() {
+        view.hide();
         hideAllViews(this);
         return this;
     }
