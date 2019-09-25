@@ -2,7 +2,10 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
@@ -181,7 +184,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         this.view = view;
     }
 
-    @Daemonize(generateRunnable = true)
+    @GenerateRunnable
+    @Daemonize
     public void reload(long millis) throws InterruptedException {
         Thread.sleep(millis);
     }
@@ -191,7 +195,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         super.setRotationSprite(rotationSprite);
     }
 
-    @Daemonize(generateRunnable = true)
+    @Daemonize
+    @GenerateRunnable
     @Override
     public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
         super.pushSprite(sprite, velocity);
@@ -208,8 +213,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
     private Pair<TowerType, Target> scanRet = Pair.create(null, null);
 
-    //@DedicatedThread(name = "scan")
-    @Daemonize(dedicatedThread = true, name = "scan")
+    @DedicatedThread(name = "scan")
+    @Daemonize
     public Pair<TowerType, Target> scan() throws InterruptedException {
 
         scanRet = Pair.create(null, null);
@@ -279,7 +284,6 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     protected volatile PositionedImage ret = new PositionedImage();
     private PositionedImage hBar = new PositionedImage();
 
-    //@ConsumerArg
     @Daemonize(consumerArg = true)
     public GenericNode<Pair<PositionedImage, ImageView>> updateSprite() {//hack but improves performance
         ret.image = iterateSprite();

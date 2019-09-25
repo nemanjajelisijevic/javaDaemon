@@ -4,6 +4,7 @@ package com.daemonize.daemonprocessor;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.Exclude;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
@@ -133,6 +134,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
             PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
 
             Daemonize daemonizeAnnotation = method.getAnnotation(Daemonize.class);
+            DedicatedThread dedicatedThreadAnnotation = method.getAnnotation(DedicatedThread.class);
 
             if (daemonizeAnnotation == null) {
                 daemonClassBuilder.addMethod(
@@ -142,7 +144,7 @@ public class HybridDaemonGenerator extends BaseDaemonGenerator implements Daemon
                 );
                 continue;
             } else {
-                if (daemonizeAnnotation.dedicatedThread() && mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
+                if ((daemonizeAnnotation.dedicatedThread() || (dedicatedThreadAnnotation != null)) && mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
                     mainQuestsAndApiMethods.put(
                             mainGenerator.createMainQuest(method),
                             mainGenerator.createApiMethod(

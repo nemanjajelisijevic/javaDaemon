@@ -5,6 +5,7 @@ import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.LogExecutionTime;
 import com.daemonize.daemonprocessor.annotations.Exclude;
@@ -131,6 +132,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
 
             Daemonize daemonizeAnnotation = method.getAnnotation(Daemonize.class);
+            DedicatedThread dedicatedThreadAnnotation = method.getAnnotation(DedicatedThread.class);
 
             if (daemonizeAnnotation == null) {
                 daemonClassBuilder.addMethod(
@@ -140,7 +142,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 );
                 continue;
             } else {
-                if (daemonizeAnnotation.dedicatedThread() && dedicatedThreadEngines.containsKey(method)) {
+                if ((daemonizeAnnotation.dedicatedThread() || (dedicatedThreadAnnotation != null)) && dedicatedThreadEngines.containsKey(method)) {
                     mainQuestsAndApiMethods.put(
                             createMainQuest(method),
                             createApiMethod(
@@ -267,8 +269,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         PrototypeMethodData prototypeMethodData = new PrototypeMethodData(prototypeMethod);
 
         boolean voidQuest = prototypeMethodData.isVoid();
-        //boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
-        boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(Daemonize.class).generateRunnable();
+        boolean voidWithRunnable = prototypeMethodData.isVoid() && (prototypeMethod.getAnnotation(Daemonize.class).generateRunnable() || prototypeMethod.getAnnotation(GenerateRunnable.class) != null);
 
         ClassName className = voidQuest ? ClassName.get(QUEST_PACKAGE, VOID_QUEST_TYPE_NAME) : ClassName.get(QUEST_PACKAGE, questTypeName);
 
@@ -357,10 +358,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                         prototypeMethod.getSimpleName()
                 );
 
-        //boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(GenerateRunnable.class) != null;
-        boolean voidWithRunnable = prototypeMethodData.isVoid() && prototypeMethod.getAnnotation(Daemonize.class).generateRunnable();
-        //boolean consumerArg = prototypeMethod.getAnnotation(ConsumerArg.class) != null;
-        boolean consumerArg = prototypeMethod.getAnnotation(Daemonize.class).consumerArg();
+        boolean voidWithRunnable = prototypeMethodData.isVoid() && (prototypeMethod.getAnnotation(Daemonize.class).generateRunnable() || prototypeMethod.getAnnotation(GenerateRunnable.class) != null);
+        boolean consumerArg = prototypeMethod.getAnnotation(Daemonize.class).consumerArg() || prototypeMethod.getAnnotation(ConsumerArg.class) != null;
 
         apiMethodBuilder = addTypeParameters(prototypeMethod, apiMethodBuilder);
 

@@ -3,6 +3,7 @@ package com.daemonize.daemonprocessor;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.Exclude;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.squareup.javapoet.ClassName;
@@ -159,6 +160,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
             PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
 
             Daemonize daemonizeAnnotation = method.getAnnotation(Daemonize.class);
+            DedicatedThread dedicatedThreadAnnotation = method.getAnnotation(DedicatedThread.class);
 
             if (daemonizeAnnotation == null) {
                 daemonClassBuilder.addMethod(
@@ -168,7 +170,7 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 );
                 continue;
             } else {
-                if (daemonizeAnnotation.dedicatedThread() && mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
+                if ((daemonizeAnnotation.dedicatedThread() || (dedicatedThreadAnnotation != null)) && mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
                     mainQuestsAndApiMethods.put(
                             mainGenerator.createMainQuest(method),
                             mainGenerator.createApiMethod(
@@ -184,35 +186,6 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
                 }
             }
         }
-
-
-//        for (ExecutableElement method : publicPrototypeMethods) {
-//
-//            PrototypeMethodData overridenMethodData = new PrototypeMethodData(method);
-//
-//            if (method.getAnnotation(Exclude.class) != null)
-//                continue;
-//
-//            if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
-//                daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? mainGenerator.wrapMethod(method, true) : mainGenerator.wrapMethod(method, false));
-//                continue;
-//            }
-//
-//            if (mainGenerator.getDedicatedThreadEngines().containsKey(method)) {
-//                mainQuestsAndApiMethods.put(
-//                        mainGenerator.createMainQuest(method),
-//                        mainGenerator.createApiMethod(
-//                                method,
-//                                mainGenerator.getDedicatedThreadEngines().get(method).getFirst()
-//                        )
-//                );
-//            } else {
-//                mainQuestsAndApiMethods.put(
-//                        mainGenerator.createMainQuest(method),
-//                        mainGenerator.createApiMethod(method, mainGenerator.getDaemonEngineString())
-//                );
-//            }
-//        }
 
         if (!sideQuestFields.isEmpty()) {
             daemonClassBuilder.addMethod(sideGenerator.generateCurrentSideQuestGetter());
