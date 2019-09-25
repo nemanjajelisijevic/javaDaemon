@@ -1448,6 +1448,7 @@ public class Game {
                 System.out.println(DaemonUtils.tag() + "Y: " + view.getAbsoluteY());
                 System.out.println(DaemonUtils.tag() + "Image: "  + view.getImage().toString());
                 System.out.println(DaemonUtils.tag() + "Image imp: " + view.getImage().getImageImp().toString());
+                System.out.println(DaemonUtils.tag() + "Z Index: " + view.getZindex());
             });
 
             activeSoundManager.start();
