@@ -40,12 +40,10 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
     }
 
     //for root without image only!
-    public CompositeImageViewImpl(String name, float absX, float absY, int z, float width,float height) {
+    public CompositeImageViewImpl(String name, float absX, float absY, int z, float width, float height) {
         this(name, absX, absY, z);
-
         view.xOffset = width / 2;
         view.yOffset = height / 2;
-
         view.startingX = view.absoluteX - view.xOffset;
         view.startingY = view.absoluteY - view.yOffset;
     }
@@ -189,7 +187,6 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
         return this;
     }
 
-
     @Override
     public CompositeImageViewImpl setAbsoluteX(float absoluteX) {
         view.absoluteX = absoluteX;
@@ -317,9 +314,8 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
     }
 
     private CompositeImageViewImpl showAllViews(CompositeImageViewImpl compositeImageView) {
-        for (CompositeImageViewImpl child : compositeImageView.getChildrenViews()) {
+        for (CompositeImageViewImpl child : compositeImageView.getChildrenViews())
             child.show();
-        }
         return compositeImageView;
     }
 

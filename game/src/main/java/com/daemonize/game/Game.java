@@ -325,13 +325,13 @@ public class Game {
         this.dXY = ((float) borderX) / 1000;
 
         //TODO following is for Windows packaging
-        URL url = this.getClass().getProtectionDomain().getCodeSource().getLocation();
-        try {
-            String jarPath = URLDecoder.decode(url.getFile(), "UTF-8");
-            activeSoundManager.setJarResourceLocation(jarPath, "");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+//        URL url = this.getClass().getProtectionDomain().getCodeSource().getLocation();
+//        try {
+//            String jarPath = URLDecoder.decode(url.getFile(), "UTF-8");
+//            activeSoundManager.setJarResourceLocation(jarPath, "");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public boolean isPaused() {
@@ -1917,7 +1917,7 @@ public class Game {
                             Closure<Integer> bulletClosure = amount -> {
                                 currentSoundManager.playSound(bigExplosion);
                                 enemyRepo.add(enemy);
-                                moneyDaemon.setAmount(amount.get())
+                                moneyDaemon.clearAndInterrupt().setAmount(amount.get())
                                         .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
                                         .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
