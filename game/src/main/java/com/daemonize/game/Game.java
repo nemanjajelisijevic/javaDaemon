@@ -1458,7 +1458,7 @@ public class Game {
                         if (towerSelect == null)
                             System.out.println("Select" + "please select tower");
                         else
-                            setTower(x, y);
+                            manageTower(x, y);
                     }
                 });
             };
@@ -1947,7 +1947,7 @@ public class Game {
         }
     }
 
-    private void setTower(float x, float y) {
+    private void manageTower(float x, float y) {
 
         //check if correct field
         Field<TowerDaemon> field = grid.getField(x, y);
