@@ -1,6 +1,7 @@
 package com.daemonize.game;
 
 import com.daemonize.daemonengine.DaemonEngine;
+import com.daemonize.daemonengine.closure.BareClosure;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
@@ -1914,10 +1915,10 @@ public class Game {
                             Tower.TowerType towerType = towerTypeAndEnemy.get().getFirst();
                             EnemyDoubleDaemon enemy = (EnemyDoubleDaemon) towerTypeAndEnemy.get().getSecond();
 
-                            Closure<Integer> bulletClosure = amount -> {
+                            BareClosure<Integer> bulletClosure = amount -> {
                                 currentSoundManager.playSound(bigExplosion);
                                 enemyRepo.add(enemy);
-                                moneyDaemon.clearAndInterrupt().setAmount(amount.get())
+                                moneyDaemon.clearAndInterrupt().setAmount(amount)
                                         .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
                                         .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
@@ -1939,7 +1940,7 @@ public class Game {
                                             0,
                                             bulletSprite,
                                             miniExplodeSprite,
-                                            ()-> bulletClosure.onReturn(new Return<>(3))
+                                            ()-> bulletClosure.onReturn(3)
                                     );
                                     break;
                                 case TYPE2:
@@ -1950,7 +1951,7 @@ public class Game {
                                             18,
                                             towerDaemon.getTowerLevel().bulletDamage,
                                             towerDaemon.getTowerLevel().currentLevel,
-                                            () -> bulletClosure.onReturn(new Return<>(5))
+                                            () -> bulletClosure.onReturn(5)
                                     );
                                     break;
                                 case TYPE3:
@@ -1966,7 +1967,7 @@ public class Game {
                                     float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
                                     long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
-                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, () -> bulletClosure.onReturn(new Return<>(1)));
+                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, () -> bulletClosure.onReturn(1));
 
                                     reloadInterval = 4000;
                                     break;
@@ -2154,9 +2155,27 @@ public class Game {
 
         Runnable paralyzerClosure = () -> {
             target.setParalyzed(false);
-            renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().hide());
-            if (target.isShootable())
+
+            EnemyDoubleDaemon enemyTarget = ((EnemyDoubleDaemon) target);
+            renderer.consume(() -> enemyTarget.getParalyzedView().hide());
+
+            if (target.isShootable()) {
                 target.setVelocity(enemyVelocity);
+
+                Pair<Float, Float> currentCoord = enemyTarget.getPrototype().getLastCoordinates();
+                Field<TowerDaemon> current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
+
+                //go to next fields center
+                Field next = grid.getMinWeightOfNeighbors(current);
+                int angle = (int) RotatingSpriteImageMover.getAngle(
+                        current.getCenterX(),
+                        current.getCenterY(),
+                        next.getCenterX(),
+                        next.getCenterY()
+                );
+
+                enemyTarget.rotate(angle).redirect(next.getCenterX(), next.getCenterY());
+            }
         };
 
         laser.desintegrateTarget(source, target, duration, renderer, ret -> {

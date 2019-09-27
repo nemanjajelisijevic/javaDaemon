@@ -234,6 +234,10 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return this;
   }
 
+  public boolean setDirectionToPoint(float x, float y) {
+    return prototype.setDirectionToPoint(x, y);
+  }
+
   public TowerDaemon setBorders(float x1, float x2, float y1, float y2) {
     prototype.setBorders(x1, x2, y1, y2);
     return this;

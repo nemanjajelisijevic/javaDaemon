@@ -58,6 +58,10 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return sideQuest;
   }
 
+  public boolean redirect(float x, float y) {
+    return prototype.redirect(x, y);
+  }
+
   public LaserBulletDaemon popSprite() {
     prototype.popSprite();
     return this;
@@ -93,6 +97,10 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   public LaserBulletDaemon setLevel(int level) {
     prototype.setLevel(level);
     return this;
+  }
+
+  public boolean setDirectionToPoint(float x, float y) {
+    return prototype.setDirectionToPoint(x, y);
   }
 
   public LaserBulletDaemon setBorders(float x1, float x2, float y1, float y2) {

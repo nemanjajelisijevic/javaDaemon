@@ -50,6 +50,10 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return sideQuest;
   }
 
+  public boolean redirect(float x, float y) {
+    return prototype.redirect(x, y);
+  }
+
   public BulletDoubleDaemon popSprite() {
     prototype.popSprite();
     return this;
@@ -80,6 +84,10 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   public BulletDoubleDaemon setLevel(int level) {
     prototype.setLevel(level);
     return this;
+  }
+
+  public boolean setDirectionToPoint(float x, float y) {
+    return prototype.setDirectionToPoint(x, y);
   }
 
   public BulletDoubleDaemon setBorders(float x1, float x2, float y1, float y2) {

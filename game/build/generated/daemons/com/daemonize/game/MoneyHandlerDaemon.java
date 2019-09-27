@@ -46,6 +46,10 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return sideQuest;
   }
 
+  public boolean redirect(float x, float y) {
+    return prototype.redirect(x, y);
+  }
+
   public Pair<Float, Float> getTargetCoordinates() {
     return prototype.getTargetCoordinates();
   }
@@ -72,6 +76,10 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   public Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> animateMoney() throws
       InterruptedException {
     return prototype.animateMoney();
+  }
+
+  public boolean setDirectionToPoint(float x, float y) {
+    return prototype.setDirectionToPoint(x, y);
   }
 
   public MoneyHandlerDaemon setBorders(float x1, float x2, float y1, float y2) {

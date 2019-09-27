@@ -19,7 +19,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     private volatile float targetX;
     private volatile float targetY;
 
-    private void setTargetCoordinates(float targetX, float targetY) {
+    private synchronized void setTargetCoordinates(float targetX, float targetY) {
         this.targetX = targetX;
         this.targetY = targetY;
     }
@@ -37,18 +37,20 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         super(sprite, velocity, startingPos, dXY);
     }
 
+    public boolean redirect(float x, float y) {
+        setTargetCoordinates(x, y);
+        return setDirectionToPoint(x, y);
+    }
+
     @Daemonize
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
 
-        boolean ret = super.setDirectionAndMove(x, y, velocityInt);
-
-        if (!ret) {
-            return ret;
-        }
+        if (!super.setDirectionAndMove(x, y, velocityInt))
+            return false;
 
         coordinateLock.lock();
-
         setTargetCoordinates(x, y);
+
         animateSemaphore.subscribe();
 
         try {
@@ -60,12 +62,13 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
             coordinateLock.unlock();
         }
 
-        return ret;
+        return true;
     }
 
     @Override
     public void setCoordinates(float lastX, float lastY) {
         super.setCoordinates(lastX, lastY);
+
         setTargetCoordinates(Float.MIN_VALUE, Float.MIN_VALUE);
     }
 

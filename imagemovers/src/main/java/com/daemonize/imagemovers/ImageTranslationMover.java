@@ -114,9 +114,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     @Override
-    public boolean setDirectionAndMove(float x, float y, float velocityInt) {
-
-        velocity.intensity = 0;
+    public boolean setDirectionToPoint(float x, float y) {
         velocity.direction.coeficientX = 0;
         velocity.direction.coeficientY = 0;
 
@@ -131,11 +129,19 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         dX = dX / hypotenuse;
         dY = dY / hypotenuse;
 
-        velocity.intensity = velocityInt;
         velocity.direction.coeficientX = (float) dX;
         velocity.direction.coeficientY = (float) dY;
 
         return true;
+    }
+
+    @Override
+    public boolean setDirectionAndMove(float x, float y, float velocityInt) {
+        boolean ret = false;
+        velocity.intensity = 0;
+        ret = setDirectionToPoint(x, y);
+        velocity.intensity = velocityInt;
+        return ret;
     }
 
     @SuppressWarnings("unchecked")

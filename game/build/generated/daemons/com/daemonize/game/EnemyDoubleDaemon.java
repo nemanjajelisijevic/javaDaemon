@@ -35,15 +35,15 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine goToDaemonEngine;
-
   protected EagerMainQuestDaemonEngine reloadDaemonEngine;
+
+  protected EagerMainQuestDaemonEngine goToDaemonEngine;
 
   public EnemyDoubleDaemon(Consumer consumer, Enemy prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
-    this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
     this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
+    this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -65,10 +65,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon setHp(int hp) {
     prototype.setHp(hp);
     return this;
-  }
-
-  public Pair<Float, Float> getTargetCoordinates() {
-    return prototype.getTargetCoordinates();
   }
 
   public EnemyDoubleDaemon popSprite() {
@@ -95,18 +91,8 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   @Override
-  public EnemyDoubleDaemon setShootable(boolean shootable) {
-    prototype.setShootable(shootable);
-    return this;
-  }
-
-  @Override
   public int getMaxHp() {
     return prototype.getMaxHp();
-  }
-
-  public ImageView getView() {
-    return prototype.getView();
   }
 
   @Override
@@ -117,10 +103,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon setPreviousField(Pair<Integer, Integer> previousfield) {
     prototype.setPreviousField(previousfield);
     return this;
-  }
-
-  public Pair<Integer, Integer> getPreviousField() {
-    return prototype.getPreviousField();
   }
 
   @Override
@@ -138,11 +120,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
-  public EnemyDoubleDaemon setBorders(float x1, float x2, float y1, float y2) {
-    prototype.setBorders(x1, x2, y1, y2);
-    return this;
-  }
-
   public EnemyDoubleDaemon setDirection(ImageMover.Direction direction) {
     prototype.setDirection(direction);
     return this;
@@ -157,10 +134,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     prototype.setVelocity(velocity);
   }
 
-  public float getdXY() {
-    return prototype.getdXY();
-  }
-
   public EnemyDoubleDaemon pause() {
     prototype.pause();
     return this;
@@ -171,22 +144,9 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
-  public EnemyDoubleDaemon setParalyzedImage(Image paralyzedimage) {
-    prototype.setParalyzedImage(paralyzedimage);
-    return this;
-  }
-
-  public ImageView getTargetView() {
-    return prototype.getTargetView();
-  }
-
   @Override
   public boolean isParalyzed() {
     return prototype.isParalyzed();
-  }
-
-  public Image iterateSprite() {
-    return prototype.iterateSprite();
   }
 
   public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> animateEnemy() throws
@@ -214,6 +174,72 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
+  public Image[] getSprite() {
+    return prototype.getSprite();
+  }
+
+  public EnemyDoubleDaemon setSprite(Image[] sprite) {
+    prototype.setSprite(sprite);
+    return this;
+  }
+
+  public EnemyDoubleDaemon clearVelocity() {
+    prototype.clearVelocity();
+    return this;
+  }
+
+  public ImageView getHpView() {
+    return prototype.getHpView();
+  }
+
+  public boolean redirect(float x, float y) {
+    return prototype.redirect(x, y);
+  }
+
+  public Pair<Float, Float> getTargetCoordinates() {
+    return prototype.getTargetCoordinates();
+  }
+
+  @Override
+  public EnemyDoubleDaemon setShootable(boolean shootable) {
+    prototype.setShootable(shootable);
+    return this;
+  }
+
+  public ImageView getView() {
+    return prototype.getView();
+  }
+
+  public Pair<Integer, Integer> getPreviousField() {
+    return prototype.getPreviousField();
+  }
+
+  public boolean setDirectionToPoint(float x, float y) {
+    return prototype.setDirectionToPoint(x, y);
+  }
+
+  public EnemyDoubleDaemon setBorders(float x1, float x2, float y1, float y2) {
+    prototype.setBorders(x1, x2, y1, y2);
+    return this;
+  }
+
+  public float getdXY() {
+    return prototype.getdXY();
+  }
+
+  public EnemyDoubleDaemon setParalyzedImage(Image paralyzedimage) {
+    prototype.setParalyzedImage(paralyzedimage);
+    return this;
+  }
+
+  public ImageView getTargetView() {
+    return prototype.getTargetView();
+  }
+
+  public Image iterateSprite() {
+    return prototype.iterateSprite();
+  }
+
   @Override
   public Pair<Float, Float> getLastCoordinates() {
     return prototype.getLastCoordinates();
@@ -224,22 +250,8 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
-  public Image[] getSprite() {
-    return prototype.getSprite();
-  }
-
-  public EnemyDoubleDaemon setSprite(Image[] sprite) {
-    prototype.setSprite(sprite);
-    return this;
-  }
-
   public EnemyDoubleDaemon cont() {
     prototype.cont();
-    return this;
-  }
-
-  public EnemyDoubleDaemon clearVelocity() {
-    prototype.clearVelocity();
     return this;
   }
 
@@ -260,10 +272,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   public boolean setDirectionAndMove(float x, float y, float velocityint) {
     return prototype.setDirectionAndMove(x, y, velocityint);
-  }
-
-  public ImageView getHpView() {
-    return prototype.getHpView();
   }
 
   public SideQuest getCurrentSideQuest() {
