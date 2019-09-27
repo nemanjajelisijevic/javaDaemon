@@ -2152,7 +2152,6 @@ public class Game {
 
         currentSoundManager.playSound(laserSound);
 
-
         Runnable paralyzerClosure = () -> {
             target.setParalyzed(false);
 
@@ -2162,8 +2161,8 @@ public class Game {
             if (target.isShootable()) {
                 target.setVelocity(enemyVelocity);
 
-                Pair<Float, Float> currentCoord = enemyTarget.getPrototype().getLastCoordinates();
-                Field<TowerDaemon> current = grid.getField(currentCoord.getFirst(), currentCoord.getSecond());
+                Pair<Integer, Integer> prevFieldCoord = enemyTarget.getPreviousField();
+                Field<TowerDaemon> current = grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
 
                 //go to next fields center
                 Field next = grid.getMinWeightOfNeighbors(current);
@@ -2194,7 +2193,7 @@ public class Game {
                     new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(()->{
                         System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
                         Thread.sleep(enemyParalyzingInterval);
-                    },paralyzerClosure);
+                    }, paralyzerClosure);
                 }
 
             } else
