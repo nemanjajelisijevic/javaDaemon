@@ -3,7 +3,9 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.Exclude;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.graphics2d.images.Image;
@@ -63,8 +65,8 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
             targetSemaphore.go();
     }
 
-    //@DedicatedThread
-    @Daemonize(dedicatedThread = true)
+    @DedicatedThread
+    @Daemonize
     public Target reload() throws InterruptedException {
         Thread.sleep(400);
         targetSemaphore.await();
@@ -171,8 +173,8 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         return this;
     }
 
-    //@GenerateRunnable
-    @Daemonize(generateRunnable = true)
+    @GenerateRunnable
+    @Daemonize
     @Override
     public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
         rotationMover.pushSprite(sprite, velocity);
@@ -183,8 +185,8 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         rotationMover.rotate(angle);
     }
 
-    //@DedicatedThread
-    @Daemonize(dedicatedThread = true)
+    @DedicatedThread
+    @Daemonize
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);

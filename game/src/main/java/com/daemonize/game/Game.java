@@ -2128,6 +2128,7 @@ public class Game {
                 target.setVelocity(enemyVelocity);
 
                 Pair<Integer, Integer> prevFieldCoord = enemyTarget.getPreviousField();
+
                 Field<TowerDaemon> current = grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
 
                 //go to next fields center
