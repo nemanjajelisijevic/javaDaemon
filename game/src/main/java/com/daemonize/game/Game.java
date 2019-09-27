@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.closure.BareClosure;
+import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
@@ -38,9 +39,6 @@ import com.daemonize.sound.SoundException;
 import com.daemonize.sound.SoundManager;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,6 +47,41 @@ import java.util.Random;
 import java.util.Set;
 
 public class Game {
+
+    //common repo for bullets, rockets and enemy missiles
+    private static class ProjectileStackedRepo extends StackedEntityRepo<BulletDoubleDaemon> {
+
+        private Consumer renderer;
+        private Image[] projectileSprite;
+        public Set<BulletDoubleDaemon> activeProjectiles = new HashSet<>();
+
+        public ProjectileStackedRepo(Consumer renderer, Image[] projectileSprite) {
+            this.renderer = renderer;
+            this.projectileSprite = projectileSprite;
+        }
+
+        @Override
+        public void onAdd(BulletDoubleDaemon projectile) {
+            renderer.consume(() -> {
+                for (ImageView view : projectile.getViews())
+                    view.hide();
+            });
+            projectile.clearAndInterrupt().clearVelocity().popSprite();
+            activeProjectiles.remove(projectile);
+        }
+
+        @Override
+        public void onGet(BulletDoubleDaemon projectile) {
+            projectile.setSprite(projectileSprite);
+            renderer.consume(()->{
+                for (ImageView view : projectile.getViews())
+                    view.setAbsoluteX(projectile.getLastCoordinates().getFirst())
+                            .setAbsoluteY(projectile.getLastCoordinates().getSecond())
+                            .show();
+                activeProjectiles.add(projectile);
+            });
+        }
+    }
 
     //running flag
     private volatile boolean running;
@@ -139,6 +172,10 @@ public class Game {
 
     private EagerMainQuestDaemonEngine towerSpriteUpgrader;
 
+    //tower rockets
+    private int maxRockets = 150;
+    private ProjectileStackedRepo rocketRepo;
+
     //towers dialogue
     private TowerUpgradeDialog towerUpgradeDialogue;
     private TowerSelectDialogue selectTowerDialogue;
@@ -185,10 +222,10 @@ public class Game {
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
+    private ProjectileStackedRepo enemyMissileRepo;
+
     private int maxEnemies = 80;
     private QueuedEntityRepo<EnemyDoubleDaemon> enemyRepo;
-
-    private StackedEntityRepo<BulletDoubleDaemon> enemyMissileRepo;
 
     //explosions
     private Image[] explodeSprite;
@@ -203,13 +240,7 @@ public class Game {
     private int rocketExplosionRange;
 
     private int maxBullets = 150;
-    private StackedEntityRepo<BulletDoubleDaemon> bulletRepo;
-    private Set<BulletDoubleDaemon> activeBullets = new HashSet<>();
-
-    private int maxRockets = 150;
-    private StackedEntityRepo<BulletDoubleDaemon> rocketRepo;
-
-    private Set<BulletDoubleDaemon> activeRockets = new HashSet<>();
+    private ProjectileStackedRepo bulletRepo;
 
     //laser
     private LaserBulletDaemon laser;
@@ -352,10 +383,12 @@ public class Game {
                 enemy.cont();
             for (TowerDaemon tower : towers)
                 tower.cont();
-            for(BulletDoubleDaemon rocket : activeRockets)
+            for(BulletDoubleDaemon rocket : rocketRepo.activeProjectiles)
                 rocket.cont();
-            for(BulletDoubleDaemon bullet : activeBullets)
+            for(BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
                 bullet.cont();
+            for(BulletDoubleDaemon missile : enemyMissileRepo.activeProjectiles)
+                missile.cont();
             renderer.start();
             towerSpriteUpgrader.start();
             fieldEraserEngine.start();
@@ -500,7 +533,7 @@ public class Game {
 
                 paralyzed = imageManager.loadImageFromAssets("paralyzed1.png", width, height);
 
-                //init enemy sprite
+                //init enemy projectileSprite
                 enemySprite = new Image[36];
 
                 for (int i = 0; i < 36; i++) {
@@ -520,7 +553,7 @@ public class Game {
                     renderer.drawScene();
                 }
 
-                //bullet sprite
+                //bullet projectileSprite
                 int bulletSize0 = width / 8;//20;
                 bulletSprite = new Image[4];
                 bulletSprite[0] = imageManager.loadImageFromAssets("thebarnstarRed.png", bulletSize0, bulletSize0);
@@ -554,7 +587,7 @@ public class Game {
                     enemyMissileSprite[i] = imageManager.loadImageFromAssets("enemyMissile" + i + "0.png", bulletSize, bulletSize);
                 }
 
-                //explosion sprite
+                //explosion projectileSprite
                 explodeSprite = new Image[33];
                 for (int i = 0; i < explodeSprite.length; ++i) {
 
@@ -1187,84 +1220,15 @@ public class Game {
             };
 
             //bullet repo init
-            bulletRepo = new StackedEntityRepo<BulletDoubleDaemon>() {
-                @Override
-                public void onAdd(BulletDoubleDaemon bullet) {
-                    renderer.consume(() -> {
-                        for (ImageView view : bullet.getViews())
-                            view.hide();
-                    });
-                    bullet.clearAndInterrupt().clearVelocity().popSprite();
-                    activeBullets.remove(bullet);
-                }
-
-                @Override
-                public void onGet(BulletDoubleDaemon bullet) {
-                    bullet.setSprite(bulletSprite);
-                    renderer.consume(()->{
-                        for (ImageView view : bullet.getViews()) {
-                            view.setAbsoluteX(bullet.getLastCoordinates().getFirst());
-                            view.setAbsoluteY(bullet.getLastCoordinates().getSecond());
-                            view.show();
-                        }
-                    });
-                    activeBullets.add(bullet);
-                }
-            };
-
+            bulletRepo = new ProjectileStackedRepo(renderer, bulletSprite);
             bulletRepo.setName("Bullet repo");
 
             //rocket repo init
-            rocketRepo = new StackedEntityRepo<BulletDoubleDaemon>() {
-                @Override
-                public void onAdd(BulletDoubleDaemon rocket) {
-                    renderer.consume(() -> {
-                        for (ImageView view : rocket.getViews())
-                            view.hide();
-                    });
-                    rocket.clearAndInterrupt().clearVelocity().popSprite();
-                    activeRockets.remove(rocket);
-                }
-
-                @Override
-                public void onGet(BulletDoubleDaemon rocket) {
-                    rocket.setSprite(bulletSpriteRocket);
-                    renderer.consume(()->{
-                        for (ImageView view : rocket.getViews()) {
-                            view.setAbsoluteX(rocket.getLastCoordinates().getFirst());
-                            view.setAbsoluteY(rocket.getLastCoordinates().getSecond());
-                            view.show();
-                        }
-                    });
-                    activeRockets.add(rocket);
-                }
-            };
+            rocketRepo = new ProjectileStackedRepo(renderer, bulletSpriteRocket);
             rocketRepo.setName("Rocket repo");
 
-            //enemy missiles
-            enemyMissileRepo = new StackedEntityRepo<BulletDoubleDaemon>() {
-                @Override
-                public void onAdd(BulletDoubleDaemon missile) {
-                    renderer.consume(() -> {
-                        for (ImageView view : missile.getViews())
-                            view.hide();
-                    });
-                    missile.clearAndInterrupt().clearVelocity().popSprite();
-                }
-
-                @Override
-                public void onGet(BulletDoubleDaemon missile) {
-                    missile.setSprite(enemyMissileSprite);
-                    renderer.consume(()->{
-                        for (ImageView view : missile.getViews()) {
-                            view.setAbsoluteX(missile.getLastCoordinates().getFirst());
-                            view.setAbsoluteY(missile.getLastCoordinates().getSecond());
-                            view.show();
-                        }
-                    });
-                }
-            };
-
+            //enemy missiles repo init
+            enemyMissileRepo = new ProjectileStackedRepo(renderer, enemyMissileSprite);
             enemyMissileRepo.setName("Missile repo");
 
             //init enemies and fill enemy repo
@@ -1468,10 +1432,12 @@ public class Game {
                         enemy.pause();
                     for (TowerDaemon tower : towers)
                         tower.pause();
-                    for(BulletDoubleDaemon rocket : activeRockets)
+                    for(BulletDoubleDaemon rocket : rocketRepo.activeProjectiles)
                         rocket.pause();
-                    for(BulletDoubleDaemon bullet : activeBullets)
+                    for(BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
                         bullet.pause();
+                    for(BulletDoubleDaemon missile : enemyMissileRepo.activeProjectiles)
+                        missile.pause();
                     renderer.stop();
                     paused = true;
                 });
@@ -2149,16 +2115,18 @@ public class Game {
             return;
 
         target.setParalyzed(true);
+        EnemyDoubleDaemon enemyTarget = ((EnemyDoubleDaemon) target);
 
         currentSoundManager.playSound(laserSound);
 
         Runnable paralyzerClosure = () -> {
-            target.setParalyzed(false);
 
-            EnemyDoubleDaemon enemyTarget = ((EnemyDoubleDaemon) target);
+            enemyTarget.setParalyzed(false);
+
             renderer.consume(() -> enemyTarget.getParalyzedView().hide());
 
             if (target.isShootable()) {
+
                 target.setVelocity(enemyVelocity);
 
                 Pair<Integer, Integer> prevFieldCoord = enemyTarget.getPreviousField();
@@ -2166,6 +2134,7 @@ public class Game {
 
                 //go to next fields center
                 Field next = grid.getMinWeightOfNeighbors(current);
+
                 int angle = (int) RotatingSpriteImageMover.getAngle(
                         current.getCenterX(),
                         current.getCenterY(),
@@ -2179,17 +2148,17 @@ public class Game {
 
         laser.desintegrateTarget(source, target, duration, renderer, ret -> {
 
-            int newHp = target.getHp() - laser.getDamage();
+            int newHp = enemyTarget.getHp() - laser.getDamage();
             if (newHp > 0) {
 
-                target.setHp(newHp);
-                target.setVelocity(velocity);
+                enemyTarget.setHp(newHp);
+                enemyTarget.setVelocity(velocity);
 
                 if (enemyParalyizer.queueSize() == 0) {
-                    renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().show());
+                    renderer.consume(() -> enemyTarget.getParalyzedView().show());
                     enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), paralyzerClosure);
                 } else {
-                    renderer.consume(() -> ((EnemyDoubleDaemon) target).getParalyzedView().show());
+                    renderer.consume(() -> enemyTarget.getParalyzedView().show());
                     new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(()->{
                         System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
                         Thread.sleep(enemyParalyzingInterval);
