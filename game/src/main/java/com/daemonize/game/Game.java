@@ -49,13 +49,13 @@ import java.util.Set;
 public class Game {
 
     //common repo for bullets, rockets and enemy missiles
-    private static class ProjectileStackedRepo extends StackedEntityRepo<BulletDoubleDaemon> {
+    private static class ProjectileRepo extends StackedEntityRepo<BulletDoubleDaemon> {
 
         private Consumer renderer;
         private Image[] projectileSprite;
         public Set<BulletDoubleDaemon> activeProjectiles = new HashSet<>();
 
-        public ProjectileStackedRepo(Consumer renderer, Image[] projectileSprite) {
+        public ProjectileRepo(Consumer renderer, Image[] projectileSprite) {
             this.renderer = renderer;
             this.projectileSprite = projectileSprite;
         }
@@ -174,7 +174,7 @@ public class Game {
 
     //tower rockets
     private int maxRockets = 150;
-    private ProjectileStackedRepo rocketRepo;
+    private ProjectileRepo rocketRepo;
 
     //towers dialogue
     private TowerUpgradeDialog towerUpgradeDialogue;
@@ -222,7 +222,7 @@ public class Game {
 
     private Set<EnemyDoubleDaemon> activeEnemies = new HashSet<>();
 
-    private ProjectileStackedRepo enemyMissileRepo;
+    private ProjectileRepo enemyMissileRepo;
 
     private int maxEnemies = 80;
     private QueuedEntityRepo<EnemyDoubleDaemon> enemyRepo;
@@ -240,7 +240,7 @@ public class Game {
     private int rocketExplosionRange;
 
     private int maxBullets = 150;
-    private ProjectileStackedRepo bulletRepo;
+    private ProjectileRepo bulletRepo;
 
     //laser
     private LaserBulletDaemon laser;
@@ -1220,15 +1220,15 @@ public class Game {
             };
 
             //bullet repo init
-            bulletRepo = new ProjectileStackedRepo(renderer, bulletSprite);
+            bulletRepo = new ProjectileRepo(renderer, bulletSprite);
             bulletRepo.setName("Bullet repo");
 
             //rocket repo init
-            rocketRepo = new ProjectileStackedRepo(renderer, bulletSpriteRocket);
+            rocketRepo = new ProjectileRepo(renderer, bulletSpriteRocket);
             rocketRepo.setName("Rocket repo");
 
             //enemy missiles repo init
-            enemyMissileRepo = new ProjectileStackedRepo(renderer, enemyMissileSprite);
+            enemyMissileRepo = new ProjectileRepo(renderer, enemyMissileSprite);
             enemyMissileRepo.setName("Missile repo");
 
             //init enemies and fill enemy repo
