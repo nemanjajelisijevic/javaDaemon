@@ -1703,8 +1703,6 @@ public class Game {
 
     private void upgradeTower(TowerDaemon tow) {
 
-        //System.err.println("Checking " + tow.getName() + " state: " + tow.getEnginesState().toString() + ", prototype: " + tow.toString());
-
         Tower.TowerLevel currLvl = tow.getTowerLevel();
 
         if (!towerUpgradeDialogue.getTowerUpgrade().isShowing() && currLvl.currentLevel > 0) {//if upgrade dialog not shown
