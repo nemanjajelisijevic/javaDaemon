@@ -19,7 +19,7 @@ public class MoneyHandler extends CoordinatedImageTranslationMover  {
     }
 
     public void setAmount(int amount) {
-        if (amount < 0  || amount > 9)
+        if (amount < 0  || amount > 9) //TOD fix boundries
             throw new IllegalArgumentException("Amount must be > 0 && < 10!");
         this.amount = amount;
     }
@@ -34,6 +34,8 @@ public class MoneyHandler extends CoordinatedImageTranslationMover  {
         return getSprite()[amount];
     }
 
+    private Pair<PositionedImage, PositionedImage> ret = Pair.create(null, null);
+
     @SideQuest(SLEEP = 15)
     public Pair<PositionedImage, PositionedImage> animateMoney() throws InterruptedException {
 
@@ -45,6 +47,7 @@ public class MoneyHandler extends CoordinatedImageTranslationMover  {
         currency.positionX = number.positionX + number.image.getWidth() / 2 + currency.image.getWidth() / 2;
         currency.positionY = number.positionY;
 
-        return Pair.create(number, currency);
+        ret.setFirst(number).setSecond(currency);
+        return ret;
     }
 }
