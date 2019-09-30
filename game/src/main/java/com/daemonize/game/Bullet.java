@@ -3,6 +3,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
@@ -17,7 +18,11 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@Daemon(doubleDaemonize = true, daemonizeBaseMethods = true, className = "BulletDoubleDaemon")
+@Daemon(
+        doubleDaemonize = true,
+        daemonizeBaseMethods = true,
+        className = "BulletDoubleDaemon"
+)
 public class Bullet extends CoordinatedImageTranslationMover {
 
     private ImageView view;
@@ -105,7 +110,8 @@ public class Bullet extends CoordinatedImageTranslationMover {
         }
     }
 
-    @Daemonize(generateRunnable = true)
+    @GenerateRunnable
+    @Daemonize
     @Override
     public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
         this.velocity.intensity = velocity;
@@ -117,7 +123,8 @@ public class Bullet extends CoordinatedImageTranslationMover {
         rotationMover.popSprite();
     }
 
-    @Daemonize(generateRunnable = true)
+    @GenerateRunnable
+    @Daemonize
     public void rotate(int angle) throws InterruptedException {
         rotationMover.rotate(angle);
     }
@@ -134,6 +141,21 @@ public class Bullet extends CoordinatedImageTranslationMover {
         return rotationMover.iterateSprite();
     }
 
+    //direction cache
+    private Direction lastDirection = new Direction(0,0);
+    private Direction lastOffsetDirection = new Direction(0,0);
+    private Direction lastOffset2Direction = new Direction(0,0);
+
+    //generic node cache
+    private GenericNode<Pair<PositionedImage, ImageView>> bullet = new GenericNode<>(Pair.create(new PositionedImage(), null));
+    private GenericNode<Pair<PositionedImage, ImageView>> bullet1 = new GenericNode<>(Pair.create(new PositionedImage(), null));
+    private GenericNode<Pair<PositionedImage, ImageView>> bullet2 = new GenericNode<>(Pair.create(new PositionedImage(), null));
+
+    {
+        bullet1.addChild(bullet2);
+        bullet.addChild(bullet1);
+    }
+
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() throws InterruptedException {
 
@@ -144,25 +166,21 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
         Direction movingDirection = getVelocity().direction;
 
-        switch (level){
+        switch (level) {
             case 1:
-                return new GenericNode<>(Pair.create(posImage, view));
+                bullet2.getValue().setFirst(posImage).setSecond(view);
+                return bullet2;
             case 2:
                 return calculateOffsetImage(posImage, movingDirection, spaceBetweenBullets);
             case 3:
-                GenericNode<Pair<PositionedImage,ImageView>> root = calculateOffsetImage(posImage, movingDirection, spaceBetweenBullets);
-                root.addChild(new GenericNode<>(Pair.create(posImage, view3)));
-                return root;
+                bullet.getValue().setFirst(posImage).setSecond(view3);
+                calculateOffsetImage(posImage, movingDirection, spaceBetweenBullets);
+                return bullet;
             default:
                 return null;
         }
 
     }
-
-    //direction cache
-    private Direction lastDirection = new Direction(0,0);
-    private Direction lastOffsetDirection = new Direction(0,0);
-    private Direction lastOffset2Direction = new Direction(0,0);
 
     private GenericNode<Pair<PositionedImage, ImageView>> calculateOffsetImage(PositionedImage posImage, Direction movingDirection, int spaceBetweenBullet){
 
@@ -199,9 +217,9 @@ public class Bullet extends CoordinatedImageTranslationMover {
         posImage2.positionX = posImage.positionX + spaceBetweenBullet * (offsetDirPosImage2.coeficientX);
         posImage2.positionY = posImage.positionY + spaceBetweenBullet * (offsetDirPosImage2.coeficientY);
 
-        GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(posImage1, view));
-        root.addChild(new GenericNode<>(Pair.create(posImage2,view2)));
-        return root;
+        bullet1.getValue().setFirst(posImage1).setSecond(view);
+        bullet2.getValue().setFirst(posImage2).setSecond(view2);
+        return bullet1;
     }
 
     @Override

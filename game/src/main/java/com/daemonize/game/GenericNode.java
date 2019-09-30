@@ -38,6 +38,11 @@ public class GenericNode<T> {
         this.name = name;
     }
 
+    public GenericNode<T> setValue(T value) {
+        this.value = value;
+        return this;
+    }
+
     public boolean addChild(GenericNode<T> child) {
         if (children == null) {
             children = new LinkedList<>();

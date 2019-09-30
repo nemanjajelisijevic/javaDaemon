@@ -1886,6 +1886,8 @@ public class Game {
                                         .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
                                         .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
+                                renderer.consume(()->infoScore.setNumbers(score += amount));
+
                                 renderer.consume(()->{
                                     moneyView.getFirst().show();
                                     moneyView.getSecond().show();
@@ -2129,14 +2131,14 @@ public class Game {
 
                 Pair<Integer, Integer> prevFieldCoord = enemyTarget.getPreviousField();
 
-                Field<TowerDaemon> current = grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
+                Field<TowerDaemon> prevField = (prevFieldCoord == null) ?  grid.getField(0, 0) : grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
 
                 //go to next fields center
-                Field next = grid.getMinWeightOfNeighbors(current);
+                Field next = grid.getMinWeightOfNeighbors(prevField);
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(
-                        current.getCenterX(),
-                        current.getCenterY(),
+                        target.getLastCoordinates().getFirst(),
+                        target.getLastCoordinates().getSecond(),
                         next.getCenterX(),
                         next.getCenterY()
                 );
@@ -2178,6 +2180,6 @@ public class Game {
             moneyView.getSecond().hide();
         });
 
-        renderer.consume(()->infoScore.setNumbers(++score));
+        //renderer.consume(()->infoScore.setNumbers(++score));
     };
 }
