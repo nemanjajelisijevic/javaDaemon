@@ -147,9 +147,9 @@ public class Bullet extends CoordinatedImageTranslationMover {
     private Direction lastOffset2Direction = new Direction(0,0);
 
     //generic node cache
-    private GenericNode<Pair<PositionedImage, ImageView>> bullet = new GenericNode<>(Pair.create(new PositionedImage(), null));
-    private GenericNode<Pair<PositionedImage, ImageView>> bullet1 = new GenericNode<>(Pair.create(new PositionedImage(), null));
-    private GenericNode<Pair<PositionedImage, ImageView>> bullet2 = new GenericNode<>(Pair.create(new PositionedImage(), null));
+    private GenericNode<Pair<PositionedImage, ImageView>> bullet = new GenericNode<>(Pair.create(null, null));
+    private GenericNode<Pair<PositionedImage, ImageView>> bullet1 = new GenericNode<>(Pair.create(null, null));
+    private GenericNode<Pair<PositionedImage, ImageView>> bullet2 = new GenericNode<>(Pair.create(null, null));
 
     {
         bullet1.addChild(bullet2);
