@@ -971,14 +971,14 @@ public class Game {
 
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
 
-                    CompositeImageViewImpl towerView = towerUpgradeDialogue.getTowerUpgrade().getViewByName("TowerView");
+                    CompositeImageViewImpl towerView = towerUpgradeDialogue.getRootView().getViewByName("TowerView");
 
                     renderer.consume(()->towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
 
                     if (score > 2 && tow.getTowerLevel().currentLevel < 3)
-                        renderer.consume(towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade")::show);
+                        renderer.consume(towerUpgradeDialogue.getRootView().getViewByName("Upgrade")::show);
                     else
-                        renderer.consume(towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade")::hide);
+                        renderer.consume(towerUpgradeDialogue.getRootView().getViewByName("Upgrade")::hide);
 
                     score -= 2;
 
@@ -993,7 +993,7 @@ public class Game {
                 renderer.consume(()->closeButton.disable().setImage(closeButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
                     renderer.consume(()->closeButton.enable().setImage(closeButtonImage));
-                    renderer.consume(towerUpgradeDialogue.getTowerUpgrade()::hide);
+                    renderer.consume(towerUpgradeDialogue.getRootView()::hide);
                 });
             });
 
@@ -1022,7 +1022,7 @@ public class Game {
                     if (grid.destroyTower(field.getRow(), field.getColumn())) {
                         renderer.consume(()->{
                             gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide();
-                            towerUpgradeDialogue.getTowerUpgrade().hide();
+                            towerUpgradeDialogue.getRootView().hide();
                             infoScore.setNumbers(++score);
                         });
                     }
@@ -1086,7 +1086,7 @@ public class Game {
                     tow3
             );
 
-            scene.addImageViews(towerUpgradeDialogue.getTowerUpgrade().getAllViews());
+            scene.addImageViews(towerUpgradeDialogue.getRootView().getAllViews());
             scene.addImageViews(selectTowerDialogue.getSelectTowerDialogue().getAllViews());
             scene.addImageView(scoreBackGrView);
 
@@ -1448,8 +1448,8 @@ public class Game {
                 gameConsumer.consume(()-> {
                     if (soundButton.checkCoordinates(x, y)) {
 
-                    } else if (towerUpgradeDialogue.getTowerUpgrade().isShowing())
-                        towerUpgradeDialogue.getTowerUpgrade().checkCoordinates(x, y);
+                    } else if (towerUpgradeDialogue.getRootView().isShowing())
+                        towerUpgradeDialogue.getRootView().checkCoordinates(x, y);
                     else {
 
                         if (selectTowerDialogue.getSelectTowerDialogue().isShowing())
@@ -1705,7 +1705,7 @@ public class Game {
 
         Tower.TowerLevel currLvl = tow.getTowerLevel();
 
-        if (!towerUpgradeDialogue.getTowerUpgrade().isShowing() && currLvl.currentLevel > 0) {//if upgrade dialog not shown
+        if (!towerUpgradeDialogue.getRootView().isShowing() && currLvl.currentLevel > 0) {//if upgrade dialog not shown
 
             towerUpgradeDialogue.setTower(tow);
 
@@ -1726,18 +1726,18 @@ public class Game {
             //show upgrade dialog
             renderer.consume(()->{
 
-                towerUpgradeDialogue.getTowerUpgrade().setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2);
+                towerUpgradeDialogue.getRootView().setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2);
 
-                towerUpgradeDialogue.getTowerUpgrade()
+                towerUpgradeDialogue.getRootView()
                         .getViewByName("TowerView")
                         .setImage(dialogueImageTowerUpgrade[currLvl.currentLevel - 1]);
 
-                towerUpgradeDialogue.getTowerUpgrade().show();
+                towerUpgradeDialogue.getRootView().show();
 
                 if (hasSkillsToPayTheBills && tow.getTowerLevel().currentLevel < 3)
-                    towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").show();
+                    towerUpgradeDialogue.getRootView().getViewByName("Upgrade").show();
                 else
-                    towerUpgradeDialogue.getTowerUpgrade().getViewByName("Upgrade").hide();
+                    towerUpgradeDialogue.getRootView().getViewByName("Upgrade").hide();
             });
         }
     }

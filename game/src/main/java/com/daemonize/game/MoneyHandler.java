@@ -19,7 +19,7 @@ public class MoneyHandler extends CoordinatedImageTranslationMover  {
     }
 
     public void setAmount(int amount) {
-        if (amount < 0  || amount > 9) //TOD fix boundries
+        if (amount < 0  || amount > 9) //TODO fix boundries
             throw new IllegalArgumentException("Amount must be > 0 && < 10!");
         this.amount = amount;
     }

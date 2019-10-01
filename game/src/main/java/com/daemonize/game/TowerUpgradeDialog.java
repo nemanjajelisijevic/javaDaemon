@@ -32,7 +32,7 @@ public class TowerUpgradeDialog {
         towerUpgrade.addChild(closeButton.setRelativeX(width - closeButton.getWidth() / 2).setRelativeY(closeButton.getHeight() / 2));
     }
 
-    public CompositeImageViewImpl getTowerUpgrade() {
+    public CompositeImageViewImpl getRootView() {
         return towerUpgrade;
     }
 }
