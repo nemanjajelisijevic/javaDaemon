@@ -8,6 +8,7 @@ import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import com.daemonize.graphics2d.renderer.DrawConsumer;
 import com.daemonize.graphics2d.renderer.Renderer2D;
@@ -66,10 +67,11 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
 
 
     public AndroidSurfaceViewRenderer(SurfaceView surfaceView) {
+        this.paint = new Paint();
+        surfaceView.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
         this.surfaceHolder = surfaceView.getHolder();
         this.surfaceHolder.addCallback(this);
         this.surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        this.paint = new Paint();
         this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer");
     }
 
