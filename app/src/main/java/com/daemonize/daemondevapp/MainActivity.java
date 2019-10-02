@@ -8,12 +8,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
+//import android.view.TextureView;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 
+import com.daemonize.androidgraphics2d.AndroidHWAccSurfaceViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidImageManager;
 import com.daemonize.androidgraphics2d.AndroidSurfaceViewRenderer;
+import com.daemonize.androidgraphics2d.AndroidTextureViewRenderer;
 import com.daemonize.androidsound.AndroidSoundManager;
 import com.daemonize.game.Game;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
@@ -48,8 +51,13 @@ public class MainActivity extends AppCompatActivity {
         SurfaceView surfaceView = findViewById(R.id.surfaceView);
         surfaceView.setZOrderOnTop(true);
 
+        //TextureView textureView = findViewById(R.id.textureView);
+
+
         //renderer init
-        Renderer2D renderer = new AndroidSurfaceViewRenderer(surfaceView);
+        //Renderer2D renderer = new AndroidSurfaceViewRenderer(surfaceView);
+        Renderer2D renderer = new AndroidHWAccSurfaceViewRenderer(surfaceView);
+        //Renderer2D renderer =  new AndroidTextureViewRenderer(textureView);
         ImageManager imageManager = new AndroidImageManager(this);
 
         int rows = 6;

@@ -4,10 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 
 import com.daemonize.graphics2d.renderer.DrawConsumer;
@@ -19,7 +17,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceViewRenderer>, Runnable, SurfaceHolder.Callback {
+public class AndroidTextureViewRenderer implements Renderer2D<AndroidTextureViewRenderer>, Runnable {
 
     private Scene2D scene;
 
@@ -34,10 +32,10 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
 
     private Paint paint;
     private Canvas canvas;
-    protected SurfaceHolder surfaceHolder;
+    private TextureView textureView;
 
     @Override
-    public AndroidSurfaceViewRenderer setDirty() {
+    public AndroidTextureViewRenderer setDirty() {
         dirtyLock.lock();
         this.dirtyFlag = true;
         dirtyCondition.signal();
@@ -51,32 +49,24 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
     }
 
     @Override
-    public AndroidSurfaceViewRenderer setScene(Scene2D scene) {
+    public AndroidTextureViewRenderer setScene(Scene2D scene) {
         this.scene = scene;
         return this;
     }
 
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {}
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {}
-
-
-    public AndroidSurfaceViewRenderer(SurfaceView surfaceView) {
+    public AndroidTextureViewRenderer(TextureView textureView) {
+        this.textureView = textureView;
         this.paint = new Paint();
-        surfaceView.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
-        this.surfaceHolder = surfaceView.getHolder();
-        this.surfaceHolder.addCallback(this);
-        this.surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+        textureView.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
+//        this.surfaceHolder = surfaceView.getHolder();
+//        this.surfaceHolder.addCallback(this);
+//        this.textureView.setFormat(PixelFormat.TRANSPARENT);
         this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer");
     }
 
     @Override
-    public AndroidSurfaceViewRenderer start() {
+    public AndroidTextureViewRenderer start() {
 
         if(scene.getViews() == null)
             throw new IllegalStateException("Scene not set!");
@@ -119,7 +109,7 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
                 while (!dirtyFlag)
                     dirtyCondition.await();
             } catch (InterruptedException e) {
-             //
+                //
             } finally {
                 dirtyFlag = false;
                 dirtyLock.unlock();
@@ -129,9 +119,9 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
     }
 
     @Override
-    public AndroidSurfaceViewRenderer drawScene() {
-        if (surfaceHolder.getSurface().isValid()) {
-            canvas = getCanvas();
+    public AndroidTextureViewRenderer drawScene() {
+        if (textureView.isAvailable()) {
+            canvas = textureView.lockCanvas();
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             for (ImageView view : scene.getViews()) {
                 if (view.isShowing()) {
@@ -143,13 +133,9 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
                     );
                 }
             }
-            surfaceHolder.unlockCanvasAndPost(canvas);
+            textureView.unlockCanvasAndPost(canvas);
         }
         return this;
-    }
-
-    protected Canvas getCanvas() {
-        return surfaceHolder.lockCanvas();
     }
 
     @Override
@@ -158,9 +144,10 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
     }
 
     @Override
-    public AndroidSurfaceViewRenderer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    public AndroidTextureViewRenderer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
         drawThread.setUncaughtExceptionHandler(handler);
         drawConsumer.setUncaughtExceptionHandler(handler);
         return this;
     }
+
 }
