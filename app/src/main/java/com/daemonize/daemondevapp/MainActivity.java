@@ -1,6 +1,8 @@
 package com.daemonize.daemondevapp;
 
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -9,13 +11,16 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 //import android.view.TextureView;
+import android.view.TextureView;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 
+//import com.daemonize.androidgraphics2d.AndroidHWAccSurfaceViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidHWAccSurfaceViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidImageManager;
-import com.daemonize.androidgraphics2d.AndroidSurfaceViewRenderer;
+//import com.daemonize.androidgraphics2d.AndroidSurfaceViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidTextureViewRenderer;
 import com.daemonize.androidsound.AndroidSoundManager;
 import com.daemonize.game.Game;
@@ -43,21 +48,28 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
 
         int borderX = getResources().getDisplayMetrics().widthPixels;
         int borderY = getResources().getDisplayMetrics().heightPixels;
 
-        SurfaceView surfaceView = findViewById(R.id.surfaceView);
+//        if (Build.VERSION.SDK_INT >= 26) {
+        SurfaceView surfaceView = new SurfaceView(this);
+        surfaceView.setMinimumWidth(borderX);
+        surfaceView.setMinimumHeight(borderY);
+        surfaceView.setVisibility(View.VISIBLE);
         surfaceView.setZOrderOnTop(true);
-
-        //TextureView textureView = findViewById(R.id.textureView);
-
-
-        //renderer init
-        //Renderer2D renderer = new AndroidSurfaceViewRenderer(surfaceView);
+        setContentView(surfaceView);
         Renderer2D renderer = new AndroidHWAccSurfaceViewRenderer(surfaceView);
-        //Renderer2D renderer =  new AndroidTextureViewRenderer(textureView);
+//        } else {
+//            TextureView textureView = new TextureView(this);
+//            textureView.setMinimumWidth(borderX);
+//            textureView.setMinimumHeight(borderY);
+//            textureView.setVisibility(View.VISIBLE);
+//            setContentView(textureView);
+//            renderer =  new AndroidTextureViewRenderer(textureView);
+//        }
+
         ImageManager imageManager = new AndroidImageManager(this);
 
         int rows = 6;

@@ -58,7 +58,7 @@ public class AndroidTextureViewRenderer implements Renderer2D<AndroidTextureView
     public AndroidTextureViewRenderer(TextureView textureView) {
         this.textureView = textureView;
         this.paint = new Paint();
-        textureView.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
+        this.textureView.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
 //        this.surfaceHolder = surfaceView.getHolder();
 //        this.surfaceHolder.addCallback(this);
 //        this.textureView.setFormat(PixelFormat.TRANSPARENT);

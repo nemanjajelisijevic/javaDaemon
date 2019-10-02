@@ -40,7 +40,7 @@
         <!--app:srcCompat="@android:drawable/ic_dialog_email" />-->
 
 
-    <TextView
+<!--    <TextView
         android:id="@+id/response"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="2"
         android:text="HP: 100"
-        android:layout_gravity="top|end"/>
+        android:layout_gravity="top|end"/>-->
 
     <!--<io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"-->
         <!--android:id="@+id/joystickLeft"-->
