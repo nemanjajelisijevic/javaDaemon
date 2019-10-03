@@ -15,14 +15,6 @@ public class CustomHWAView extends View {
         setWillNotDraw(false);
     }
 
-    public CustomHWAView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public CustomHWAView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
     CustomHWAView setRenderer(CustomHWAViewRenderer renderer) {
         this.renderer = renderer;
         return this;
