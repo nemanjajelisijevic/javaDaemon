@@ -67,7 +67,7 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
 
 
     public AndroidSurfaceViewRenderer(SurfaceView surfaceView) {
-        this.paint = new Paint();
+        this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         surfaceView.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
         this.surfaceHolder = surfaceView.getHolder();
         this.surfaceHolder.addCallback(this);
