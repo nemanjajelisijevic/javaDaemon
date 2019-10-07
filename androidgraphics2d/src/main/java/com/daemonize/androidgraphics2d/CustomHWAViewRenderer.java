@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.view.View;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.graphics2d.renderer.DrawConsumer;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
@@ -20,19 +21,20 @@ public class CustomHWAViewRenderer implements Renderer2D<CustomHWAViewRenderer> 
     private volatile boolean dirtyFlag;
     private DrawConsumer drawConsumer;
 
-    private Canvas canvas;
     private Paint paint;
+
+    private Runnable invalidateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            view.invalidate();
+        }
+    };
 
     public CustomHWAViewRenderer(CustomHWAView view) {
         this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         this.view = view.setRenderer(this);
         this.view.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
         this.drawConsumer = new DrawConsumer(this, "CustomHWAViewRenderer draw consumer");
-    }
-
-    public CustomHWAViewRenderer setCanvas(Canvas canvas) {
-        this.canvas = canvas;
-        return this;
     }
 
     @Override
@@ -49,6 +51,7 @@ public class CustomHWAViewRenderer implements Renderer2D<CustomHWAViewRenderer> 
     @Override
     public CustomHWAViewRenderer setDirty() {
         this.dirtyFlag = true;
+        this.view.postOnAnimation(invalidateRunnable);
         return this;
     }
 
@@ -62,18 +65,18 @@ public class CustomHWAViewRenderer implements Renderer2D<CustomHWAViewRenderer> 
         return this;
     }
 
-    CustomHWAViewRenderer drawSceneFromView() {
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            for (ImageView view : scene.getViews()) {
-                if (view.isShowing()) {
-                    canvas.drawBitmap(
-                            ((Bitmap) view.getImage().getImageImp()),
-                            view.getStartingX(),
-                            view.getStartingY(),
-                            paint
-                    );
-                }
+    CustomHWAViewRenderer drawSceneFromView(Canvas canvas) {
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        for (ImageView view : scene.getViews()) {
+            if (view.isShowing()) {
+                canvas.drawBitmap(
+                        ((Bitmap) view.getImage().getImageImp()),
+                        view.getStartingX(),
+                        view.getStartingY(),
+                        paint
+                );
             }
+        }
         return this;
     }
 

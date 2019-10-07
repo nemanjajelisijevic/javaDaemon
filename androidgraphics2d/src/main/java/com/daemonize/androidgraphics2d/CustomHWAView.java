@@ -23,7 +23,6 @@ public class CustomHWAView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         if (renderer != null && renderer.getDirty())
-            renderer.setCanvas(canvas).drawSceneFromView();
-        postInvalidateOnAnimation();
+            renderer.drawSceneFromView(canvas);
     }
 }

@@ -8,12 +8,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 //import android.view.TextureView;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 
 //import com.daemonize.androidgraphics2d.AndroidHWAccSurfaceViewRenderer;
+import com.daemonize.androidgraphics2d.AndroidHWAccSurfaceViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidImageManager;
 //import com.daemonize.androidgraphics2d.AndroidSurfaceViewRenderer;
 import com.daemonize.androidgraphics2d.CustomHWAView;
