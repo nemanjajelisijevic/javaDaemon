@@ -8,18 +8,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 //import android.view.TextureView;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 
 //import com.daemonize.androidgraphics2d.AndroidHWAccSurfaceViewRenderer;
-import com.daemonize.androidgraphics2d.AndroidHWAccSurfaceViewRenderer;
+import com.daemonize.androidgraphics2d.AndroidCustomHWAViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidImageManager;
 //import com.daemonize.androidgraphics2d.AndroidSurfaceViewRenderer;
-import com.daemonize.androidgraphics2d.CustomHWAView;
-import com.daemonize.androidgraphics2d.CustomHWAViewRenderer;
+import com.daemonize.androidgraphics2d.AndroidCustomHWAView;
 import com.daemonize.androidsound.AndroidSoundManager;
 import com.daemonize.game.Game;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
@@ -70,12 +68,12 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
 
-        CustomHWAView customHWAView = new CustomHWAView(this);
+        AndroidCustomHWAView customHWAView = new AndroidCustomHWAView(this);
         customHWAView.setMinimumWidth(borderX);
         customHWAView.setMinimumHeight(borderY);
         customHWAView.setVisibility(View.VISIBLE);
         setContentView(customHWAView);
-        Renderer2D renderer = new CustomHWAViewRenderer(customHWAView);
+        Renderer2D renderer = new AndroidCustomHWAViewRenderer(customHWAView);
 
 
         ImageManager imageManager = new AndroidImageManager(this);

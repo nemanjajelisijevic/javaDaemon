@@ -7,15 +7,14 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.view.View;
 
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.graphics2d.renderer.DrawConsumer;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
 import com.daemonize.graphics2d.scene.views.ImageView;
 
-public class CustomHWAViewRenderer implements Renderer2D<CustomHWAViewRenderer> {
+public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWAViewRenderer> {
 
-    private CustomHWAView view;
+    private AndroidCustomHWAView view;
     private Scene2D scene;
 
     private volatile boolean dirtyFlag;
@@ -30,11 +29,11 @@ public class CustomHWAViewRenderer implements Renderer2D<CustomHWAViewRenderer> 
         }
     };
 
-    public CustomHWAViewRenderer(CustomHWAView view) {
+    public AndroidCustomHWAViewRenderer(AndroidCustomHWAView view) {
         this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         this.view = view.setRenderer(this);
         this.view.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
-        this.drawConsumer = new DrawConsumer(this, "CustomHWAViewRenderer draw consumer");
+        this.drawConsumer = new DrawConsumer(this, "AndroidCustomHWAViewRenderer draw consumer");
     }
 
     @Override
@@ -43,13 +42,13 @@ public class CustomHWAViewRenderer implements Renderer2D<CustomHWAViewRenderer> 
     }
 
     @Override
-    public CustomHWAViewRenderer setScene(Scene2D scene) {
+    public AndroidCustomHWAViewRenderer setScene(Scene2D scene) {
         this.scene = scene;
         return this;
     }
 
     @Override
-    public CustomHWAViewRenderer setDirty() {
+    public AndroidCustomHWAViewRenderer setDirty() {
         this.dirtyFlag = true;
         this.view.postOnAnimation(invalidateRunnable);
         return this;
@@ -60,12 +59,12 @@ public class CustomHWAViewRenderer implements Renderer2D<CustomHWAViewRenderer> 
     }
 
     @Override
-    public CustomHWAViewRenderer drawScene() {
+    public AndroidCustomHWAViewRenderer drawScene() {
         setDirty();
         return this;
     }
 
-    CustomHWAViewRenderer drawSceneFromView(Canvas canvas) {
+    AndroidCustomHWAViewRenderer drawSceneFromView(Canvas canvas) {
         canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         for (ImageView view : scene.getViews()) {
             if (view.isShowing()) {
@@ -86,7 +85,7 @@ public class CustomHWAViewRenderer implements Renderer2D<CustomHWAViewRenderer> 
     }
 
     @Override
-    public CustomHWAViewRenderer start() {
+    public AndroidCustomHWAViewRenderer start() {
         if(scene.getViews() == null)
             throw new IllegalStateException("Scene not set!");
 
@@ -106,7 +105,7 @@ public class CustomHWAViewRenderer implements Renderer2D<CustomHWAViewRenderer> 
     }
 
     @Override
-    public CustomHWAViewRenderer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+    public AndroidCustomHWAViewRenderer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
         drawConsumer.setUncaughtExceptionHandler(handler);
         return null;
     }
