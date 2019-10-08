@@ -36,7 +36,11 @@ public class AwaitedArraySprite {
     }
 
     public boolean isValid() {
-        return sprite != null;
+        boolean ret;
+        lock.lock();
+        ret = sprite != null;
+        lock.unlock();
+        return ret;
     }
 
     public void await() throws InterruptedException {
