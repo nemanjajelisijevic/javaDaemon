@@ -35,11 +35,9 @@ public class LaserTower extends Tower {
         targetLock.lock();
         try {
 
-            //while (targetQueue.isEmpty())
             while (target == null)
                 targetCondition.await();
 
-            //Target target = targetQueue.peek();
             Target target = this.target;
 
             if(target != null && targetTester.test(target)) {
@@ -59,12 +57,16 @@ public class LaserTower extends Tower {
                     for(Image image : retSprite) {
                         ret.image = image;
                         Thread.sleep(25);
-                        renderer.consume(updateRunnable.setResult(updateHpSprite(new GenericNode<>(Pair.create(ret, view)))));
+                        genericRet.getValue().setFirst(ret).setSecond(view);
+                        updateHpSprite();
+                        renderer.consume(updateRunnable.setResult(genericRet));
                     }
             }
 
-            return updateHpSprite(new GenericNode<Pair<PositionedImage, ImageView>>(Pair.create(ret, view)));
+            genericRet.getValue().setFirst(ret).setSecond(view);
+            updateHpSprite();
 
+            return genericRet;
         } finally {
             targetLock.unlock();
         }

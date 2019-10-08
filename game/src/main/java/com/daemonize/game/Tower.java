@@ -283,21 +283,30 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 //    }
 
     protected volatile PositionedImage ret = new PositionedImage();
-    private PositionedImage hBar = new PositionedImage();
+    protected PositionedImage hBar = new PositionedImage();
+
+    protected GenericNode<Pair<PositionedImage, ImageView>> genericRet = new GenericNode<>(Pair.create(null, null));
+    protected GenericNode<Pair<PositionedImage, ImageView>> genericRetHBar = new GenericNode<>(Pair.create(null, null));
+
+    {
+        genericRet.addChild(genericRetHBar);
+    }
 
     @Daemonize(consumerArg = true)
     public GenericNode<Pair<PositionedImage, ImageView>> updateSprite() {//hack but improves performance
         ret.image = iterateSprite();
-        return updateHpSprite(new GenericNode<>(Pair.create(ret, view)));
+        genericRet.getValue().setFirst(ret).setSecond(view);
+        updateHpSprite();
+        return genericRet;
     }
 
-    protected GenericNode<Pair<PositionedImage, ImageView>> updateHpSprite(GenericNode<Pair<PositionedImage, ImageView>> root) {
+    protected void updateHpSprite() {
         hBar.image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
         hBar.positionX = ret.positionX;
         hBar.positionY = ret.positionY - 2 * hBar.image.getHeight();
-        root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
-        return root;
+        genericRetHBar.getValue().setFirst(hBar).setSecond(hpView);
     }
+
 
     private int initHpCount = 0;
 
@@ -306,15 +315,15 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         if (spriteBuffer.getCurrentAngle() != 0) {
 
             ret.image = spriteBuffer.getDecrementedByStep();
-            GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(ret, view));
+
+            genericRet.getValue().setFirst(ret).setSecond(view);
 
             if (initHpCount < spriteHealthBarImage.length) {
                 hBar.image = spriteHealthBarImage[initHpCount++];
             }
 
-            root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
-
-            return root;
+            genericRetHBar.getValue().setFirst(hBar).setSecond(hpView);
+            return genericRet;
         }
 
         towerLevel = new TowerLevel(1,2,1500);
