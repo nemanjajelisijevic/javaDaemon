@@ -16,14 +16,12 @@ public class ReturnRunnable<T> implements Runnable {
     return this;
   }
 
-  @SuppressWarnings("unchecked")
-  public <K extends ReturnRunnable<T>> K setResult(T result) {
+  public ReturnRunnable<T> setResult(T result) {
     ret.setResult(result);
-    return (K) this;
+    return this;
   }
 
-  @SuppressWarnings("unchecked")
-  public <K extends ReturnRunnable> K setError(Exception error, String methodName) {
+  public ReturnRunnable<T> setError(Exception error, String methodName) {
     ret.setError(
             error,
             "\nDaemon: "
@@ -33,7 +31,7 @@ public class ReturnRunnable<T> implements Runnable {
                     + ": "
                     + error.getMessage()
     );
-    return (K) this;
+    return this;
   }
 
   @Override
