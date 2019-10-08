@@ -2,14 +2,13 @@ package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonCountingLatch;
-import com.daemonize.daemonengine.utils.DaemonSemaphore;
+import com.daemonize.daemonengine.utils.DaemonLatch;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> implements InterruptibleQuest<InterruptibleSleepSideQuest<T>>{
 
     private Runnable onInterruptRunnable;
-    private DaemonCountingLatch initLatch = new DaemonCountingLatch(2).setName(this.getClass().getSimpleName() + " init latch");
+    private DaemonLatch initLatch = new DaemonLatch(2).setName(this.getClass().getSimpleName() + " init latch");
 
     public InterruptibleSleepSideQuest() {
         super();
@@ -22,14 +21,14 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
                 consumer.consume(interruptClosure);
             }
         };
-        initLatch.unsubscribe();
+        initLatch.decrement();
         return this;
     }
 
     @Override
     public InterruptibleSleepSideQuest<T> setClosure(Closure<T> closure) {
         super.setClosure(closure);
-        initLatch.unsubscribe();
+        initLatch.decrement();
         return this;
     }
 

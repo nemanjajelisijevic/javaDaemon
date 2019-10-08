@@ -3,26 +3,22 @@ package com.daemonize.daemonengine.utils;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DaemonCountingLatch {
+public class DaemonLatch {
 
     private String name = this.getClass().getSimpleName();
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition condition = lock.newCondition();
-    private volatile int counter = 0;
 
-    public DaemonCountingLatch() {}
+    private volatile int counter;
+    private int startCounter;
 
-    public DaemonCountingLatch(int startCount) {
+
+    public DaemonLatch(int startCount) {
+        this.startCounter = startCount;
         this.counter = startCount;
     }
 
-    public void subscribe() {
-        lock.lock();
-        counter++;
-        lock.unlock();
-    }
-
-    public void unsubscribe() {
+    public void decrement() {
         lock.lock();
         if (--counter < 1) {
             condition.signalAll();
@@ -42,8 +38,25 @@ public class DaemonCountingLatch {
         }
     }
 
-    public DaemonCountingLatch clear() {
+    public DaemonLatch clear() {
+        lock.lock();
         counter = 0;
+        lock.unlock();
+        return this;
+    }
+
+    public DaemonLatch reset(int counter) {
+        lock.lock();
+        this.startCounter = counter;
+        this.counter = counter;
+        lock.unlock();
+        return this;
+    }
+
+    public DaemonLatch reset() {
+        lock.lock();
+        this.counter = this.startCounter;
+        lock.unlock();
         return this;
     }
 
@@ -51,7 +64,7 @@ public class DaemonCountingLatch {
         return name;
     }
 
-    public DaemonCountingLatch setName(String name) {
+    public DaemonLatch setName(String name) {
         this.name = name;
         return this;
     }
