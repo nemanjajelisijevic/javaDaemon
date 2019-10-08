@@ -1,12 +1,12 @@
 package com.daemonize.game;
 
 
+import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonCountingLatch;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
@@ -23,7 +23,7 @@ public class LaserBullet extends Bullet {
     private float[] coefficients;
 
     private volatile boolean fire = false;
-    private DaemonCountingLatch phaseLock;
+    private DaemonCountingSemaphore phaseLock;
 
     @Override
     public List<ImageView> getViews() {
@@ -63,8 +63,7 @@ public class LaserBullet extends Bullet {
             float dXY
     ) {
         super(sprite, velocity, startingPos, damage, 0, dXY);
-        this.phaseLock = new DaemonCountingLatch();
-        this.phaseLock.subscribe();
+        this.phaseLock = new DaemonCountingSemaphore();
     }
 
     @Daemonize
@@ -109,7 +108,7 @@ public class LaserBullet extends Bullet {
         }
 
         fire = true;
-        phaseLock.unsubscribe();
+        phaseLock.subscribe();
 
         try {
             Thread.currentThread().sleep(duration);
@@ -119,7 +118,7 @@ public class LaserBullet extends Bullet {
                 for (ImageView view : views)
                     view.hide();
             });
-            phaseLock.subscribe();
+            phaseLock.unsubscribe();
         }
 
         return views;
