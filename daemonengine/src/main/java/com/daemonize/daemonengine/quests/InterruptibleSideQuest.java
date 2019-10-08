@@ -10,11 +10,6 @@ public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements 
     private Runnable onInterruptRunnable;
     private DaemonCountingLatch initLatch = new DaemonCountingLatch(2).setName(this.getClass().getSimpleName() + " init latch");
 
-    @Override
-    public Runnable getOnInterruptRunnable() {
-        return onInterruptRunnable;
-    }
-
     public InterruptibleSideQuest<T> onInterrupt(final Consumer consumer, final Runnable interruptClosure) {
         this.onInterruptRunnable = new Runnable() {
             @Override
@@ -48,6 +43,7 @@ public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements 
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
             initLatch.clear();
+            onInterruptRunnable.run();
             return false;
         } catch (Exception ex) {
             setErrorAndUpdate(ex);

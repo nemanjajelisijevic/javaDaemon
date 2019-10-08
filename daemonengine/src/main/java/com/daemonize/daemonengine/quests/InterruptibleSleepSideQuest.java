@@ -11,11 +11,6 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
     private Runnable onInterruptRunnable;
     private DaemonCountingLatch initLatch = new DaemonCountingLatch(2).setName(this.getClass().getSimpleName() + " init latch");
 
-    @Override
-    public Runnable getOnInterruptRunnable() {
-        return onInterruptRunnable;
-    }
-
     public InterruptibleSleepSideQuest() {
         super();
     }
@@ -56,6 +51,7 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");
             initLatch.clear();
+            onInterruptRunnable.run();
             return false;
         } catch (Exception ex) {
             setErrorAndUpdate(ex);

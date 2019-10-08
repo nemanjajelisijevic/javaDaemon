@@ -77,16 +77,13 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
       try {
 
         currentSideQuest = null; //TODO check if nulling is neccessary
-
-        if (quest instanceof InterruptibleQuest)
-          ((InterruptibleQuest) quest).getOnInterruptRunnable().run();
-
         while (currentSideQuest == null) {
           setState(DaemonState.IDLE);
           sideQuestCondition.await();
         }
 
       } catch (InterruptedException e) {
+
       } finally {
         sideQuestLock.unlock();
       }
