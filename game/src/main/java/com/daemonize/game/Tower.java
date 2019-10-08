@@ -101,7 +101,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     public Tower setHp(int hp) {
-        this.hp = hp;
+        if (hp <= hpMax)
+            this.hp = hp;
         return this;
     }
 
