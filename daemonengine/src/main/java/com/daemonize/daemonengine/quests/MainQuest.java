@@ -33,11 +33,11 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
         return true;
     } catch (Exception ex) {
         if (getIsVoid())
-            returnRunnable = new ReturnRunnable<>(new Closure<T>() {
-              @Override
-              public void onReturn(Return<T> ret) {
-                ret.runtimeCheckAndGet();
-              }
+            returnRunnable = new ReturnRunnable<T>().setClosure(new Closure<T>() {
+                @Override
+                public void onReturn(Return<T> ret) {
+                    ret.runtimeCheckAndGet();
+                }
             });
         setErrorAndUpdate(ex);
         return false;

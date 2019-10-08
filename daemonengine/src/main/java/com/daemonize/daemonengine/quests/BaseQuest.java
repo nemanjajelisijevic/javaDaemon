@@ -1,18 +1,44 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.closure.AwaitedReturnRunnable;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.utils.DaemonBinarySemaphore;
 
 public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T> {
+
+  @FunctionalInterface
+  interface ClosureWaiter {
+      void awaitClosure() throws InterruptedException;
+  }
 
   protected DaemonState state;
   protected String description = "";
   protected ReturnRunnable<T> returnRunnable;
   protected Consumer consumer;
 
+  private DaemonBinarySemaphore closureWaitingSemaphore;
+
+  protected ClosureWaiter closureWaiter = new ClosureWaiter() {
+    @Override
+    public void awaitClosure() throws InterruptedException {}
+  };
+
   public BaseQuest() {
     this.returnRunnable = new ReturnRunnable<>();
+  }
+
+  public Q setClosureWaitingSemaphore(DaemonBinarySemaphore semaphore) {
+    this.returnRunnable = new AwaitedReturnRunnable<T>(semaphore);
+    this.closureWaitingSemaphore = closureWaitingSemaphore;
+    this.closureWaiter = new ClosureWaiter() {
+      @Override
+      public void awaitClosure() throws InterruptedException {
+        closureWaitingSemaphore.await();
+      }
+    };
+    return (Q) this;
   }
 
   public String getDescription() {
@@ -43,8 +69,6 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
 
   public abstract T pursue() throws Exception;
 
-  //************** METHODS TO UPDATE THE CONSUMER **************************************************/
-
   public boolean setResultAndUpdate(T result) {
     return consumer.consume(returnRunnable.setResult(result));
   }
@@ -52,8 +76,6 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
   public boolean setErrorAndUpdate(Exception error) {
     return consumer.consume(returnRunnable.setError(error, description));
   }
-
-  //************************** Return type should be void *****************************************/
 
   private boolean isVoid = false;
 
