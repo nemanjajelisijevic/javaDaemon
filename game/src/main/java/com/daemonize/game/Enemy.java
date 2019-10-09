@@ -187,7 +187,6 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         rotationMover.rotate(angle);
     }
 
-    @BlockingClosure
     @DedicatedThread
     @Daemonize
     @Override
