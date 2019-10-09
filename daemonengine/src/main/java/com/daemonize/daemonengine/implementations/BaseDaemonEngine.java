@@ -3,11 +3,12 @@ package com.daemonize.daemonengine.implementations;
 
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.LatchClosureWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.utils.DaemonLatch;
 import com.daemonize.daemonengine.utils.DaemonUtils;
-import com.daemonize.daemonengine.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +22,15 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     protected Thread daemonThread;
     protected Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
-    private DaemonLatch closureAwaiter = new DaemonLatch(1);
+    private LatchClosureWaiter closureAwaiter = new LatchClosureWaiter(new DaemonLatch(1));
 
-    public DaemonLatch getClosureAwaiter() {
+    public ClosureWaiter getClosureAwaiter() {
         return closureAwaiter;
     }
 
     public D setName(String name) {
       this.name = name;
-      this.closureAwaiter.setName(name + " closureAwaitingSemaphore");
+      this.closureAwaiter.getDaemonLatch().setName(name + " closureAwaitingLatch");
       return (D) this;
     }
 

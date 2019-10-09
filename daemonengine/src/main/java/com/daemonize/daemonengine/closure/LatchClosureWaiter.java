@@ -1,29 +1,31 @@
 package com.daemonize.daemonengine.closure;
 
-import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.utils.DaemonLatch;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public class LatchClosureWaiter implements ClosureWaiter{
+public class LatchClosureWaiter implements com.daemonize.daemonengine.closure.ClosureWaiter {
 
-    private DaemonLatch closureWaiterLatch;
+    private DaemonLatch daemonLatch;
 
-    public LatchClosureWaiter(DaemonLatch closureWaiterLatch) {
-        this.closureWaiterLatch = closureWaiterLatch;
+    public LatchClosureWaiter(DaemonLatch daemonLatch) {
+        this.daemonLatch = daemonLatch;
+    }
+
+    public DaemonLatch getDaemonLatch() {
+        return daemonLatch;
     }
 
     @Override
     public void reset() {
-        closureWaiterLatch.reset();
+        daemonLatch.reset();
     }
 
     @Override
     public void clear() {
-        closureWaiterLatch.clear();
+        daemonLatch.clear();
     }
 
     @Override
     public void awaitClosure() throws InterruptedException {
-        closureWaiterLatch.await();
+        daemonLatch.await();
     }
 }

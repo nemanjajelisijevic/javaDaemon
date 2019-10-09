@@ -51,7 +51,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
    * Prototype method {@link Enemy#animateEnemy} */
   public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateEnemySideQuest(Consumer consumer) {
     SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateEnemySideQuest();
-    sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
+    sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer).setClosureWaiter(sideDaemonEngine.getClosureAwaiter()));
     return sideQuest;
   }
 
@@ -281,7 +281,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   /**
    * Prototype method {@link com.daemonize.game.Enemy#pushSprite} */
   public EnemyDoubleDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()).setClosureWaitingLatch(mainDaemonEngine.getClosureAwaiter()));
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()).setClosureWaiter(mainDaemonEngine.getClosureAwaiter()));
     return this;
   }
 
@@ -302,7 +302,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   /**
    * Prototype method {@link com.daemonize.game.Enemy#goTo} */
   public EnemyDoubleDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
-    goToDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure).setConsumer(goToDaemonEngine.getConsumer()).setClosureWaitingLatch(goToDaemonEngine.getClosureAwaiter()));
+    goToDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure).setConsumer(goToDaemonEngine.getConsumer()).setClosureWaiter(goToDaemonEngine.getClosureAwaiter()));
     return this;
   }
 

@@ -1,11 +1,9 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.AwaitedVoidReturnRunnable;
-import com.daemonize.daemonengine.closure.LatchClosureWaiter;
-import com.daemonize.daemonengine.closure.ReturnRunnable;
+import com.daemonize.daemonengine.closure.ClosureWaiter;
 import com.daemonize.daemonengine.closure.VoidReturnRunnable;
 import com.daemonize.daemonengine.exceptions.DaemonRuntimeError;
-import com.daemonize.daemonengine.utils.DaemonLatch;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class VoidMainQuest extends MainQuest<Void> {
@@ -21,8 +19,8 @@ public abstract class VoidMainQuest extends MainQuest<Void> {
     }
 
     @Override
-    public VoidMainQuest setClosureWaitingLatch(DaemonLatch latch) {
-        this.closureWaiter = new LatchClosureWaiter(latch);
+    public VoidMainQuest setClosureWaiter(ClosureWaiter closureWaiter) {
+        this.closureWaiter = closureWaiter;
         this.returnRunnable = new AwaitedVoidReturnRunnable(this.closureWaiter).setRetRun(retRun);
         return this;
     }

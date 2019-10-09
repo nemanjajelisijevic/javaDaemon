@@ -358,7 +358,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                             + currentMainQuestName + questTypeName + "("
                             + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ")
                             + "closure)"
-                            + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer())" + (blockingClosure ? ".setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")")
+                            + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer())" + (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")")
 
             );
         } else {
@@ -371,7 +371,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                         daemonEngineString + ".pursueQuest(new "
                                 + currentMainQuestName + questTypeName + "("
                                 + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ") + "retRun)"
-                                + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer())" + (blockingClosure ? ".setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")")
+                                + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer())" + (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")")
                 );
             } else
                 apiMethodBuilder.addStatement(

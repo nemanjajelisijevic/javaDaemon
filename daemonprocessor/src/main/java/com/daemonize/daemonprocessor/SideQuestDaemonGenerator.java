@@ -231,9 +231,9 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addStatement("$T sideQuest = new $N()", sideQuestOfRet, sideQuest);
 
         if (sleep > 0)
-            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L).setConsumer(consumer)" + (blockingClosure ? ".setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")", sleep);
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L).setConsumer(consumer)" + (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")", sleep);
         else
-            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer)" + (blockingClosure ? ".setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")");
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer)" + (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")");
             //sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer).setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter()))");
 
         sideQuestSetter.addStatement("return sideQuest");

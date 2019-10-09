@@ -2,12 +2,9 @@ package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.AwaitedReturnRunnable;
 import com.daemonize.daemonengine.closure.ClosureWaiter;
-import com.daemonize.daemonengine.closure.LatchClosureWaiter;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonLatch;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T> {
 
@@ -33,8 +30,8 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
     this.returnRunnable = new ReturnRunnable<>();
   }
 
-  public Q setClosureWaitingLatch(DaemonLatch latch) {
-    this.closureWaiter = new LatchClosureWaiter(latch);
+  public Q setClosureWaiter(ClosureWaiter closureWaiter) {
+    this.closureWaiter = closureWaiter;
     this.returnRunnable = new AwaitedReturnRunnable<T>(this.closureWaiter).setClosure(this.returnRunnable.getClosure());
     return (Q) this;
   }
