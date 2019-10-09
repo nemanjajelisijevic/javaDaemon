@@ -1,6 +1,7 @@
 package com.daemonize.daemonprocessor;
 
 
+import com.daemonize.daemonprocessor.annotations.BlockingClosure;
 import com.daemonize.daemonprocessor.annotations.CallingThread;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemon;
@@ -158,30 +159,6 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 }
             }
         }
-
-
-//            if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData) || method.getAnnotation(Exclude.class) != null) {
-//                if (method.getAnnotation(CallingThread.class) != null || overriddenMethods.contains(overridenMethodData)) {
-//                    daemonClassBuilder.addMethod(overriddenMethods.contains(overridenMethodData) ? wrapMethod(method, true) : wrapMethod(method, false));
-//                    continue;
-//                }
-//                continue;
-//            }
-//
-//            if (dedicatedThreadEngines.containsKey(method)) {
-//                mainQuestsAndApiMethods.put(
-//                        createMainQuest(method),
-//                        createApiMethod(
-//                                method,
-//                                dedicatedThreadEngines.get(method).getFirst()
-//                        )
-//                );
-//            } else {
-//                mainQuestsAndApiMethods.put(
-//                        createMainQuest(method),
-//                        createApiMethod(method, daemonEngineString)
-//                );
-//            }
 
         //private fields for prototype
         FieldSpec prototype = FieldSpec.builder(
@@ -360,6 +337,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         boolean voidWithRunnable = prototypeMethodData.isVoid() && (prototypeMethod.getAnnotation(Daemonize.class).generateRunnable() || prototypeMethod.getAnnotation(GenerateRunnable.class) != null);
         boolean consumerArg = prototypeMethod.getAnnotation(Daemonize.class).consumerArg() || prototypeMethod.getAnnotation(ConsumerArg.class) != null;
+        boolean blockingClosure = prototypeMethod.getAnnotation(Daemonize.class).blockingClosure() || prototypeMethod.getAnnotation(BlockingClosure.class) != null;
 
         apiMethodBuilder = addTypeParameters(prototypeMethod, apiMethodBuilder);
 
@@ -380,7 +358,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                             + currentMainQuestName + questTypeName + "("
                             + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ")
                             + "closure)"
-                            + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer()))")
+                            + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer())" + (blockingClosure ? ".setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")")
 
             );
         } else {
@@ -393,7 +371,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                         daemonEngineString + ".pursueQuest(new "
                                 + currentMainQuestName + questTypeName + "("
                                 + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ") + "retRun)"
-                                + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer()))")
+                                + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer())" + (blockingClosure ? ".setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")")
                 );
             } else
                 apiMethodBuilder.addStatement(

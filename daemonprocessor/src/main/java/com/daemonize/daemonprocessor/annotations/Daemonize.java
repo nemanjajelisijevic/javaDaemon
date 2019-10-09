@@ -9,4 +9,5 @@ public @interface Daemonize {
     String name() default "";
     boolean consumerArg() default false;
     boolean generateRunnable() default false;
+    boolean blockingClosure() default false;
 }

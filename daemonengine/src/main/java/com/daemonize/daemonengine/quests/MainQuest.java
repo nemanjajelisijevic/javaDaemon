@@ -25,8 +25,11 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
   public boolean run() {
     try {
         T result = pursue();
-        if (!Thread.currentThread().isInterrupted() && result != null)
+        if (!Thread.currentThread().isInterrupted() && result != null) {
+            closureWaiter.reset();
             setResultAndUpdate(result);
+            closureWaiter.awaitClosure();
+        }
         return true;
     } catch (InterruptedException ex) {
         System.out.println(DaemonUtils.tag() + description + " interrupted.");

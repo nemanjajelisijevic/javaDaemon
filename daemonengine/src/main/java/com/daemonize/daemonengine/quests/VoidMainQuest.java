@@ -1,30 +1,41 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.closure.AwaitedVoidReturnRunnable;
+import com.daemonize.daemonengine.closure.LatchClosureWaiter;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
+import com.daemonize.daemonengine.closure.VoidReturnRunnable;
 import com.daemonize.daemonengine.exceptions.DaemonRuntimeError;
+import com.daemonize.daemonengine.utils.DaemonLatch;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class VoidMainQuest extends MainQuest<Void> {
 
     private Runnable retRun;
 
-    public VoidMainQuest setRetRun(Runnable retRun) {
-        this.retRun = retRun;
-        return this;
-    }
-
     public VoidMainQuest() { super(); }
 
     public VoidMainQuest(Runnable retRun) {
         this();
         this.retRun = retRun;
+        this.returnRunnable = new VoidReturnRunnable(retRun);
+    }
+
+    @Override
+    public VoidMainQuest setClosureWaitingLatch(DaemonLatch latch) {
+        this.closureWaiter = new LatchClosureWaiter(latch);
+        this.returnRunnable = new AwaitedVoidReturnRunnable(this.closureWaiter).setRetRun(retRun);
+        return this;
     }
 
     @Override
     public boolean run() {
         try {
             pursue();
-            if (!Thread.currentThread().isInterrupted() && retRun != null)
-                consumer.consume(retRun);
+            if (!Thread.currentThread().isInterrupted() && retRun != null) {
+                closureWaiter.reset();
+                consumer.consume(returnRunnable);
+                closureWaiter.awaitClosure();
+            }
             return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");

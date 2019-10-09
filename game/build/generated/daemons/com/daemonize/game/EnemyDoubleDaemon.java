@@ -281,7 +281,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   /**
    * Prototype method {@link com.daemonize.game.Enemy#pushSprite} */
   public EnemyDoubleDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()).setClosureWaitingLatch(mainDaemonEngine.getClosureAwaiter()));
     return this;
   }
 
@@ -302,7 +302,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   /**
    * Prototype method {@link com.daemonize.game.Enemy#goTo} */
   public EnemyDoubleDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
-    goToDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure).setConsumer(goToDaemonEngine.getConsumer()));
+    goToDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure).setConsumer(goToDaemonEngine.getConsumer()).setClosureWaitingLatch(goToDaemonEngine.getClosureAwaiter()));
     return this;
   }
 

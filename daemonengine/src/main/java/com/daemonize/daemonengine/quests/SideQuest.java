@@ -15,7 +15,6 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
     this.state = DaemonState.SIDE_QUEST;
   }
 
-  @SuppressWarnings("unchecked")
   public SideQuest<T> setClosure(Closure<T> closure) {
     this.returnRunnable.setClosure(closure);
     return this;
@@ -25,8 +24,10 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
   public boolean run(){
     try {
       T result = pursue();
-      if (result != null)
+      if (result != null) {
         setResultAndUpdate(result);
+        //closureWaiter.awaitClosure();
+      }
       return true;
     } catch (InterruptedException ex) {
       System.out.println(DaemonUtils.tag() + description + " interrupted.");

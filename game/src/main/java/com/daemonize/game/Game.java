@@ -1636,7 +1636,7 @@ public class Game {
                                     return;
                                 }
 
-                                //go to next fields center
+                                //reset to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 int angle = (int) RotatingSpriteImageMover.getAngle(
                                         current.getCenterX(),
@@ -2133,7 +2133,7 @@ public class Game {
 
                 Field<TowerDaemon> prevField = (prevFieldCoord == null) ?  grid.getField(0, 0) : grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
 
-                //go to next fields center
+                //reset to next fields center
                 Field next = grid.getMinWeightOfNeighbors(prevField);
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(

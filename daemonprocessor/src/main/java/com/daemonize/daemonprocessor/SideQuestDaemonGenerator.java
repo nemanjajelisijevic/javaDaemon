@@ -232,6 +232,7 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
             sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L).setConsumer(consumer))", sleep);
         else
             sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer))");
+        //sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer).setClosureWaitingSemaphore(" + daemonEngineString + ".getClosureAwaiter()))");
 
         sideQuestSetter.addStatement("return sideQuest");
 

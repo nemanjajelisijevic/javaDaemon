@@ -41,6 +41,7 @@ public class DaemonLatch {
     public DaemonLatch clear() {
         lock.lock();
         counter = 0;
+        condition.signalAll();
         lock.unlock();
         return this;
     }

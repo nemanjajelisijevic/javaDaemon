@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.BlockingClosure;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.Exclude;
@@ -173,6 +174,7 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         return this;
     }
 
+    @BlockingClosure
     @GenerateRunnable
     @Daemonize
     @Override
@@ -185,6 +187,7 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         rotationMover.rotate(angle);
     }
 
+    @BlockingClosure
     @DedicatedThread
     @Daemonize
     @Override
@@ -198,7 +201,9 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     }
 
     @SideQuest(SLEEP = 25)
+    //@SideQuest
     public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() throws InterruptedException {
+
 
         Pair<Float, Float> lastCoord = getLastCoordinates();
 

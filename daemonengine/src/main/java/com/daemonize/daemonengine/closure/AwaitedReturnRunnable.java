@@ -1,18 +1,19 @@
 package com.daemonize.daemonengine.closure;
 
-import com.daemonize.daemonengine.utils.DaemonBinarySemaphore;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class AwaitedReturnRunnable<T> extends ReturnRunnable<T> {
 
-    private DaemonBinarySemaphore semaphore;
+    protected ClosureWaiter closureWaiter;
 
-    public AwaitedReturnRunnable(DaemonBinarySemaphore semaphore) {
-        this.semaphore = semaphore;
+    public AwaitedReturnRunnable(ClosureWaiter closureWaiter) {
+        super();
+        this.closureWaiter = closureWaiter;
     }
 
     @Override
     public void run() {
         super.run();
-        semaphore.go();
+        closureWaiter.clear();
     }
 }

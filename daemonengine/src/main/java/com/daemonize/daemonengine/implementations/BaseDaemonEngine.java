@@ -5,7 +5,7 @@ import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.BaseQuest;
-import com.daemonize.daemonengine.utils.DaemonBinarySemaphore;
+import com.daemonize.daemonengine.utils.DaemonLatch;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 
@@ -21,9 +21,9 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     protected Thread daemonThread;
     protected Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
-    private final DaemonBinarySemaphore closureAwaiter = new DaemonBinarySemaphore();
+    private DaemonLatch closureAwaiter = new DaemonLatch(1);
 
-    public DaemonBinarySemaphore getClosureAwaiter() {
+    public DaemonLatch getClosureAwaiter() {
         return closureAwaiter;
     }
 

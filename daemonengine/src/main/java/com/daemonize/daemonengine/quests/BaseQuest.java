@@ -1,26 +1,30 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.AwaitedReturnRunnable;
+import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.LatchClosureWaiter;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonBinarySemaphore;
+import com.daemonize.daemonengine.utils.DaemonLatch;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T> {
 
-  @FunctionalInterface
-  interface ClosureWaiter {
-      void awaitClosure() throws InterruptedException;
-  }
-
   protected DaemonState state;
   protected String description = "";
+
   protected ReturnRunnable<T> returnRunnable;
   protected Consumer consumer;
 
-  private DaemonBinarySemaphore closureWaitingSemaphore;
-
   protected ClosureWaiter closureWaiter = new ClosureWaiter() {
+
+    @Override
+    public void reset() {}
+
+    @Override
+    public void clear() {}
+
     @Override
     public void awaitClosure() throws InterruptedException {}
   };
@@ -29,15 +33,9 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
     this.returnRunnable = new ReturnRunnable<>();
   }
 
-  public Q setClosureWaitingSemaphore(DaemonBinarySemaphore semaphore) {
-    this.returnRunnable = new AwaitedReturnRunnable<T>(semaphore);
-    this.closureWaitingSemaphore = closureWaitingSemaphore;
-    this.closureWaiter = new ClosureWaiter() {
-      @Override
-      public void awaitClosure() throws InterruptedException {
-        closureWaitingSemaphore.await();
-      }
-    };
+  public Q setClosureWaitingLatch(DaemonLatch latch) {
+    this.closureWaiter = new LatchClosureWaiter(latch);
+    this.returnRunnable = new AwaitedReturnRunnable<T>(this.closureWaiter).setClosure(this.returnRunnable.getClosure());
     return (Q) this;
   }
 

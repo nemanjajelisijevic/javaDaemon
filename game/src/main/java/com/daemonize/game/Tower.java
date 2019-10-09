@@ -279,7 +279,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
 //    @CallingThread
 //    public void contScan() {
-//        scanSemaphore.go();
+//        scanSemaphore.reset();
 //    }
 
     protected volatile PositionedImage ret = new PositionedImage();

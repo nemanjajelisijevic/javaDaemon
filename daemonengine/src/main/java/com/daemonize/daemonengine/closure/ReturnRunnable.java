@@ -16,6 +16,10 @@ public class ReturnRunnable<T> implements Runnable {
     return this;
   }
 
+  public Closure<T> getClosure() {
+    return closure;
+  }
+
   public ReturnRunnable<T> setResult(T result) {
     ret.setResult(result);
     return this;
