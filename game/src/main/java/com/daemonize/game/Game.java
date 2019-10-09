@@ -1550,8 +1550,10 @@ public class Game {
                                     2,
                                     ()->{
 
-                                        if(!target.isShootable())
+                                        if(!target.isShootable()) {
+                                            renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
                                             return;
+                                        }
 
                                         renderer.consume(target.getHpView()::hide);
 
@@ -1567,6 +1569,7 @@ public class Game {
                                         target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
 
                                             target.setShootable(false);
+                                            renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
                                             renderer.consume(target.getView()::hide);
                                             towers.remove(target);
                                             field.setObject(null);

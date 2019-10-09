@@ -197,7 +197,6 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         super.setRotationSprite(rotationSprite);
     }
 
-    @BlockingClosure
     @Daemonize
     @GenerateRunnable
     @Override
