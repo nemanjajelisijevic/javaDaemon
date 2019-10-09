@@ -186,8 +186,10 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
     public Pair<TypeSpec, MethodSpec> createSideQuest(Pair<ExecutableElement, SideQuest> sideQuestMethod) {
 
         String methodName = sideQuestMethod.getFirst().getSimpleName().toString();
+
         long sleep = sideQuestMethod.getSecond().SLEEP();
         boolean interruptible = sideQuestMethod.getSecond().interruptible();
+        boolean blockingClosure = sideQuestMethod.getSecond().blockingClosure();
 
         if (sleep < 0)
             throw new IllegalStateException("Sleep annotation parameter on method: " + methodName + " can not be less than 0 ms.");
@@ -229,10 +231,10 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addStatement("$T sideQuest = new $N()", sideQuestOfRet, sideQuest);
 
         if (sleep > 0)
-            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L).setConsumer(consumer))", sleep);
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L).setConsumer(consumer)" + (blockingClosure ? ".setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")", sleep);
         else
-            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer))");
-        //sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer).setClosureWaitingSemaphore(" + daemonEngineString + ".getClosureAwaiter()))");
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer)" + (blockingClosure ? ".setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")");
+            //sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer).setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter()))");
 
         sideQuestSetter.addStatement("return sideQuest");
 

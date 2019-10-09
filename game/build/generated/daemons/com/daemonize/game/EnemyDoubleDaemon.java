@@ -51,7 +51,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
    * Prototype method {@link Enemy#animateEnemy} */
   public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateEnemySideQuest(Consumer consumer) {
     SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateEnemySideQuest();
-    sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
+    sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer).setClosureWaitingLatch(sideDaemonEngine.getClosureAwaiter()));
     return sideQuest;
   }
 

@@ -25,8 +25,9 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
     try {
       T result = pursue();
       if (result != null) {
+        closureWaiter.reset();
         setResultAndUpdate(result);
-        //closureWaiter.awaitClosure();
+        closureWaiter.awaitClosure();
       }
       return true;
     } catch (InterruptedException ex) {
