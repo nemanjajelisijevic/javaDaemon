@@ -2156,14 +2156,18 @@ public class Game {
                 enemyTarget.setVelocity(velocity);
 
                 if (enemyParalyizer.queueSize() == 0) {
-                    renderer.consume(() -> enemyTarget.getParalyzedView().show());
-                    enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), paralyzerClosure);
+                    if (enemyTarget.isShootable()) {
+                        renderer.consume(() -> enemyTarget.getParalyzedView().show());
+                        enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), paralyzerClosure);
+                    }
                 } else {
-                    renderer.consume(() -> enemyTarget.getParalyzedView().show());
-                    new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(()->{
-                        System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
-                        Thread.sleep(enemyParalyzingInterval);
-                    }, paralyzerClosure);
+                    if (enemyTarget.isShootable()) {
+                        renderer.consume(() -> enemyTarget.getParalyzedView().show());
+                        new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(() -> {
+                            System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
+                            Thread.sleep(enemyParalyzingInterval);
+                        }, paralyzerClosure);
+                    }
                 }
 
             } else

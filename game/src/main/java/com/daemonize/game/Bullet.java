@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.BlockingClosure;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
@@ -110,6 +111,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         }
     }
 
+    @BlockingClosure
     @GenerateRunnable
     @Daemonize
     @Override
@@ -146,7 +148,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
     private Direction lastOffsetDirection = new Direction(0,0);
     private Direction lastOffset2Direction = new Direction(0,0);
 
-    //generic node cache
+    //sidequest return generic node cache
     private GenericNode<Pair<PositionedImage, ImageView>> bullet = new GenericNode<>(Pair.create(null, null));
     private GenericNode<Pair<PositionedImage, ImageView>> bullet1 = new GenericNode<>(Pair.create(null, null));
     private GenericNode<Pair<PositionedImage, ImageView>> bullet2 = new GenericNode<>(Pair.create(null, null));

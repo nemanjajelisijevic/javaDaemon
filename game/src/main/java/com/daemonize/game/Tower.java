@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.BlockingClosure;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
@@ -101,8 +102,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     public Tower setHp(int hp) {
-//        if (hp <= hpMax)
-//            this.hp = hp;
+        if (hp <= hpMax)
+            this.hp = hp;
         return this;
     }
 
@@ -196,6 +197,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         super.setRotationSprite(rotationSprite);
     }
 
+    @BlockingClosure
     @Daemonize
     @GenerateRunnable
     @Override
