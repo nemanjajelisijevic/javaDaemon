@@ -6,7 +6,6 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
 
-import java.util.List;
 import java.util.concurrent.locks.Condition;
 
 public class EagerMainQuestDaemonEngine extends MainQuestDaemonBaseEngine<EagerMainQuestDaemonEngine> implements EagerDaemon<EagerMainQuestDaemonEngine> {

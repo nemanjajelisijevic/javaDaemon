@@ -1,24 +1,27 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.closure.AwaitedReturnRunnable;
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
 
-  protected Closure<T> closure;
-
-  public MainQuest() {
-    super();
+  MainQuest() {
     this.state = DaemonState.MAIN_QUEST;
+    this.returnRunnable = new ReturnRunnable<T>();
   }
 
-  public MainQuest(Closure<T> closure){
-    this();
-    this.closure = closure;
-    this.returnRunnable.setClosure(closure);
+  public MainQuest(Closure<T> closure, ClosureWaiter closureWaiter){
+    this.state = DaemonState.MAIN_QUEST;
+    if (closureWaiter != null) {
+        this.closureWaiter = closureWaiter;
+        this.returnRunnable = new AwaitedReturnRunnable<T>(closureWaiter).setClosure(closure);
+    } else {
+        this.returnRunnable = new ReturnRunnable<T>().setClosure(closure);
+    }
   }
 
   @Override
@@ -26,7 +29,7 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
     try {
         T result = pursue();
         if (!Thread.currentThread().isInterrupted() && result != null) {
-            closureWaiter.reset();
+            closureWaiter.markAwait();
             setResultAndUpdate(result);
             closureWaiter.awaitClosure();
         }
@@ -35,13 +38,6 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
         System.out.println(DaemonUtils.tag() + description + " interrupted.");
         return true;
     } catch (Exception ex) {
-        if (getIsVoid())
-            returnRunnable = new ReturnRunnable<T>().setClosure(new Closure<T>() {
-                @Override
-                public void onReturn(Return<T> ret) {
-                    ret.runtimeCheckAndGet();
-                }
-            });
         setErrorAndUpdate(ex);
         return false;
     }

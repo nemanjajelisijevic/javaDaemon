@@ -70,7 +70,7 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
   }
 
   @Override
-  protected void runQuest(BaseQuest quest) {
+  protected boolean runQuest(BaseQuest quest) {
     setState(quest.getState());
     if(!quest.run()) {
       sideQuestLock.lock();
@@ -86,8 +86,10 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
       } finally {
         sideQuestLock.unlock();
+        return false;
       }
     }
+    return true;
   }
 
   @Override

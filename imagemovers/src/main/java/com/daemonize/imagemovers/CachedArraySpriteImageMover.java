@@ -9,11 +9,11 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
     protected AwaitedArraySprite cache = new AwaitedArraySprite();
 
     public synchronized void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
-        animateSemaphore.subscribe();
         this.velocity.intensity = velocity;
         cache.clearCache();
         cache.setSprite(sprite);
         setSprite(new Image[]{sprite[sprite.length - 1]});
+        animateSemaphore.subscribe();
         try {
             cache.await();
         } finally {

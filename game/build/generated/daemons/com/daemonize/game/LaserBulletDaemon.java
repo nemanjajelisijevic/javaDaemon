@@ -3,13 +3,14 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ClosureWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
+import com.daemonize.daemonengine.quests.ReturnVoidMainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.SleepSideQuest;
-import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
@@ -45,7 +46,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   /**
    * Prototype method {@link LaserBullet#animateLaser} */
   public SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> setAnimateLaserSideQuest(Consumer consumer) {
-    SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> sideQuest = new AnimateLaserSideQuest();
+    SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> sideQuest = new AnimateLaserSideQuest(null);
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -53,7 +54,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   /**
    * Prototype method {@link Bullet#animateBullet} */
   public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
-    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest();
+    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(null);
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -226,28 +227,28 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
    * Prototype method {@link com.daemonize.game.LaserBullet#desintegrateTarget} */
   public LaserBulletDaemon desintegrateTarget(Pair<Float, Float> sourcecoord, Target target,
       long duration, Consumer drawconsumer, Closure<List<ImageView>> closure) {
-    mainDaemonEngine.pursueQuest(new DesintegrateTargetMainQuest(sourcecoord, target, duration, drawconsumer, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new DesintegrateTargetMainQuest(sourcecoord, target, duration, drawconsumer, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
   /**
    * Prototype method {@link com.daemonize.game.Bullet#pushSprite} */
   public LaserBulletDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
   /**
    * Prototype method {@link com.daemonize.game.Bullet#rotate} */
   public LaserBulletDaemon rotate(int angle, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new RotateMainQuest(angle, retRun).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new RotateMainQuest(angle, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
   /**
    * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
   public LaserBulletDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
-    mainDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -255,7 +256,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
    * Prototype method {@link com.daemonize.game.Bullet#rotateAndGoTo} */
   public LaserBulletDaemon rotateAndGoTo(int angle, float x, float y, float velocityint,
       Closure<Boolean> closure) {
-    mainDaemonEngine.pursueQuest(new RotateAndGoToMainQuest(angle, x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new RotateAndGoToMainQuest(angle, x, y, velocityint, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -358,8 +359,8 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   }
 
   private final class AnimateLaserSideQuest extends SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> {
-    private AnimateLaserSideQuest() {
-      super();
+    private AnimateLaserSideQuest(ClosureWaiter closureAwaiter) {
+      super(closureAwaiter);
       this.description = "animateLaser";
     }
 
@@ -370,8 +371,8 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   }
 
   private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private AnimateBulletSideQuest() {
-      super();
+    private AnimateBulletSideQuest(ClosureWaiter closureAwaiter) {
+      super(closureAwaiter);
       this.description = "animateBullet";
     }
 
@@ -392,8 +393,9 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     private Consumer drawconsumer;
 
     private DesintegrateTargetMainQuest(Pair<Float, Float> sourcecoord, Target target,
-        long duration, Consumer drawconsumer, Closure<List<ImageView>> closure) {
-      super(closure);
+        long duration, Consumer drawconsumer, Closure<List<ImageView>> closure,
+        ClosureWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
       this.sourcecoord = sourcecoord;
       this.target = target;
       this.duration = duration;
@@ -407,13 +409,14 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     }
   }
 
-  private final class PushSpriteMainQuest extends VoidMainQuest {
+  private final class PushSpriteMainQuest extends ReturnVoidMainQuest {
     private Image[] sprite;
 
     private float velocity;
 
-    private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun) {
-      super(retRun);
+    private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun,
+        ClosureWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
       this.sprite = sprite;
       this.velocity = velocity;
       this.description = "pushSprite";
@@ -426,11 +429,11 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     }
   }
 
-  private final class RotateMainQuest extends VoidMainQuest {
+  private final class RotateMainQuest extends ReturnVoidMainQuest {
     private int angle;
 
-    private RotateMainQuest(int angle, Runnable retRun) {
-      super(retRun);
+    private RotateMainQuest(int angle, Runnable retRun, ClosureWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
       this.angle = angle;
       this.description = "rotate";
     }
@@ -449,8 +452,9 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
 
     private float velocityint;
 
-    private GoToMainQuest(float x, float y, float velocityint, Closure<Boolean> closure) {
-      super(closure);
+    private GoToMainQuest(float x, float y, float velocityint, Closure<Boolean> closure,
+        ClosureWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
       this.x = x;
       this.y = y;
       this.velocityint = velocityint;
@@ -473,8 +477,8 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     private float velocityint;
 
     private RotateAndGoToMainQuest(int angle, float x, float y, float velocityint,
-        Closure<Boolean> closure) {
-      super(closure);
+        Closure<Boolean> closure, ClosureWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
       this.angle = angle;
       this.x = x;
       this.y = y;

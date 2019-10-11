@@ -12,7 +12,7 @@ public class DynamicIntervalDummyQuest extends DummyQuest {
     }
 
     public DummyQuest setSleepInterval(long milliseconds) {
-        throw new IllegalStateException("Sorry I dont allow kind of sleep setting.");
+        throw new IllegalStateException("Sorry I dont allow this kind of sleep setting.");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class DynamicIntervalDummyQuest extends DummyQuest {
             long sleep = intervalRegulator.getSleepInterval();
             if (sleep > 0)
                 Thread.sleep(sleep);
-            consumer.consume(closure);
+            consumer.consume(returnRunnable);
             return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");

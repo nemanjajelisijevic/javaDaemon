@@ -1,17 +1,28 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.closure.AwaitedReturnRunnable;
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
-import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
 
+  protected ClosureWaiter closureWaiter;
+
   public SideQuest() {
-    super();
+    this(null);
+  }
+
+  public SideQuest(ClosureWaiter closureWaiter) {
+    if (closureWaiter != null) {
+      this.closureWaiter = closureWaiter;
+      this.returnRunnable = new AwaitedReturnRunnable<T>(closureWaiter);
+    } else {
+      this.returnRunnable = new ReturnRunnable<T>();
+    }
     this.state = DaemonState.SIDE_QUEST;
   }
 
@@ -25,7 +36,7 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
     try {
       T result = pursue();
       if (result != null) {
-        closureWaiter.reset();
+        closureWaiter.markAwait();
         setResultAndUpdate(result);
         closureWaiter.awaitClosure();
       }

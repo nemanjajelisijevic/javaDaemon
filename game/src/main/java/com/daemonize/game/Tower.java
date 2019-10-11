@@ -2,8 +2,6 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.daemonprocessor.annotations.BlockingClosure;
-import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
@@ -102,8 +100,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     public Tower setHp(int hp) {
-        if (hp <= hpMax)
-            this.hp = hp;
+//        if (hp <= hpMax)
+//            this.hp = hp;
         return this;
     }
 
@@ -280,7 +278,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
 //    @CallingThread
 //    public void contScan() {
-//        scanSemaphore.reset();
+//        scanSemaphore.markAwait();
 //    }
 
     protected volatile PositionedImage ret = new PositionedImage();

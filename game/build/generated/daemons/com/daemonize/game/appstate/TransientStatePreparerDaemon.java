@@ -3,6 +3,7 @@ package com.daemonize.game.appstate;
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ClosureWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
@@ -17,7 +18,7 @@ import java.util.List;
 public class TransientStatePreparerDaemon implements Daemon<TransientStatePreparerDaemon> {
   private BeginingState.TransientStatePreparer prototype;
 
-  protected MainQuestDaemonEngine daemonEngine;
+  public MainQuestDaemonEngine daemonEngine;
 
   public TransientStatePreparerDaemon(Consumer consumer,
       BeginingState.TransientStatePreparer prototype) {
@@ -28,7 +29,7 @@ public class TransientStatePreparerDaemon implements Daemon<TransientStatePrepar
   /**
    * Prototype method {@link com.daemonize.game.appstate.BeginingState.TransientStatePreparer#prepareTransientState} */
   public TransientStatePreparerDaemon prepareTransientState(Closure<TransientState1> closure) {
-    daemonEngine.pursueQuest(new PrepareTransientStateMainQuest(closure).setConsumer(daemonEngine.getConsumer()));
+    daemonEngine.pursueQuest(new PrepareTransientStateMainQuest(closure, null).setConsumer(daemonEngine.getConsumer()));
     return this;
   }
 
@@ -105,8 +106,9 @@ public class TransientStatePreparerDaemon implements Daemon<TransientStatePrepar
   }
 
   private final class PrepareTransientStateMainQuest extends MainQuest<TransientState1> {
-    private PrepareTransientStateMainQuest(Closure<TransientState1> closure) {
-      super(closure);
+    private PrepareTransientStateMainQuest(Closure<TransientState1> closure,
+        ClosureWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
       this.description = "prepareTransientState";
     }
 

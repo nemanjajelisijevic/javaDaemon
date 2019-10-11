@@ -1,9 +1,8 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.Daemon;
-import com.daemonize.daemonengine.closure.Closure;
 
-public class StopMainQuest extends MainQuest<Void> {
+public class StopMainQuest extends VoidMainQuest {
 
     private Daemon daemon;
 

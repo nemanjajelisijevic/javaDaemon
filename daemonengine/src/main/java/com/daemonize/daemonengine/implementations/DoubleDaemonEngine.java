@@ -3,15 +3,14 @@ package com.daemonize.daemonengine.implementations;
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
-import com.daemonize.daemonengine.SideQuestDaemon;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.AnonMainQuest;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
+import com.daemonize.daemonengine.quests.ReturnVoidMainQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.quests.VoidQuest;
-import com.daemonize.daemonengine.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,29 +26,36 @@ public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine>, Daem
     }
 
     @Override
-    public <T> DoubleDaemonEngine daemonize(Quest<T> quest, Closure<T> closure) {
-        return daemonize(mainQuestDaemonEngine.getConsumer(), quest, closure);
+    public <T> DoubleDaemonEngine daemonize(Quest<T> quest, Closure<T> closure, boolean awaitedClosure) {
+        return daemonize(mainQuestDaemonEngine.getConsumer(), quest, closure, awaitedClosure);
     }
 
     @Override
-    public DoubleDaemonEngine daemonize(final VoidQuest quest, Runnable closure) {
-        return daemonize(mainQuestDaemonEngine.getConsumer(), quest, closure);
+    public DoubleDaemonEngine daemonize(final VoidQuest quest, Runnable closure, boolean awaitedClosure) {
+        return daemonize(mainQuestDaemonEngine.getConsumer(), quest, closure, awaitedClosure);
     }
 
     @Override
     public DoubleDaemonEngine daemonize(final VoidQuest quest) {
-        return daemonize(quest, null);
-    }
-
-    @Override
-    public <T> DoubleDaemonEngine daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
-        mainQuestDaemonEngine.addMainQuest((AnonMainQuest<T>) new AnonMainQuest(quest, closure).setConsumer(consumer)); //TODO check ret
+        mainQuestDaemonEngine.addMainQuest(new VoidMainQuest() {
+            @Override
+            public Void pursue() throws Exception {
+                quest.pursue();
+                return null;
+            }
+        }.setConsumer(mainQuestDaemonEngine.getConsumer()));
         return this;
     }
 
     @Override
-    public DoubleDaemonEngine daemonize(Consumer consumer, final VoidQuest quest, Runnable closure) {
-        mainQuestDaemonEngine.addMainQuest(new VoidMainQuest(closure) {
+    public <T> DoubleDaemonEngine daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure, boolean awaitedClosure) {
+        mainQuestDaemonEngine.addMainQuest((AnonMainQuest<T>) new AnonMainQuest(quest, closure, awaitedClosure ? mainQuestDaemonEngine.getClosureAwaiter() : null).setConsumer(consumer)); //TODO check ret
+        return this;
+    }
+
+    @Override
+    public DoubleDaemonEngine daemonize(Consumer consumer, final VoidQuest quest, Runnable closure, boolean awaitedClosure) {
+        mainQuestDaemonEngine.addMainQuest(new ReturnVoidMainQuest(closure, awaitedClosure ? mainQuestDaemonEngine.getClosureAwaiter() : null) {
             @Override
             public Void pursue() throws Exception {
                 quest.pursue();

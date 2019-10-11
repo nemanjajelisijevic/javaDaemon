@@ -1,12 +1,12 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.closure.VoidReturnRunnable;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class DummyQuest extends BaseQuest<Void, DummyQuest> {
 
     private long sleepInterval;
-    protected Runnable closure;
 
     public DummyQuest setSleepInterval(long milliseconds) {
         this.sleepInterval = milliseconds;
@@ -22,7 +22,7 @@ public class DummyQuest extends BaseQuest<Void, DummyQuest> {
     }
 
     public DummyQuest setClosure(Runnable closure) {
-        this.closure = closure;
+        this.returnRunnable = new VoidReturnRunnable(closure);
         return this;
     }
 
@@ -36,7 +36,7 @@ public class DummyQuest extends BaseQuest<Void, DummyQuest> {
         try {
             if (sleepInterval > 0)
                 Thread.sleep(sleepInterval);
-            consumer.consume(closure);
+            consumer.consume(returnRunnable);
             return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");

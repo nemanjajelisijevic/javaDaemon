@@ -11,15 +11,34 @@ import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.StopMainQuest;
+import com.daemonize.daemonengine.quests.ReturnVoidMainQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.quests.VoidQuest;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> extends BaseDaemonEngine<D> implements DaemonEngine<D> {
+
+    private volatile boolean historyEnabled = true;
+    private List<String> callHistory = new LinkedList<>();
+
+    public D disableCallHistoryRecording() {
+        historyEnabled = false;
+        return (D) this;
+    }
+
+    public D enableCallHistoryRecording() {
+        historyEnabled = true;
+        return (D) this;
+    }
+
+    public List<String> getCallHistory() {
+        return callHistory;
+    }
 
     protected final Queue<MainQuest> mainQuestQueue;
     protected final Lock mainQuestLock = new ReentrantLock();
@@ -29,25 +48,38 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
         this.mainQuestQueue = new LinkedList<>();
     }
 
-    public <T> D daemonize(Quest<T> quest, Closure<T> closure) {
-        return daemonize(getConsumer(), quest, closure);
+    @Override
+    public <T> D daemonize(Quest<T> quest, Closure<T> closure, boolean awaitedClosure) {
+        return daemonize(getConsumer(), quest, closure, awaitedClosure);
     }
 
-    public <T> D daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure) {
-      addMainQuest((AnonMainQuest<T>) new AnonMainQuest(quest, closure).setConsumer(consumer)); //TODO check ret
+    @Override
+    public <T> D daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure, boolean awaitedClosure) {
+      addMainQuest((AnonMainQuest<T>) new AnonMainQuest(quest, closure, awaitedClosure ? getClosureAwaiter() : null).setConsumer(consumer)); //TODO check ret
       return (D) this;
     }
 
-    public D daemonize(final VoidQuest quest, Runnable closure) {
-        return daemonize(getConsumer(), quest, closure);
+    @Override
+    public D daemonize(final VoidQuest quest, Runnable closure, boolean awaitedClosure) {
+        return daemonize(getConsumer(), quest, closure, awaitedClosure);
     }
 
+    @Override
     public D daemonize(final VoidQuest quest) {
-      return daemonize(quest, null);
+        addMainQuest(new VoidMainQuest() {
+            @Override
+            public Void pursue() throws Exception {
+                quest.pursue();
+                return null;
+            }
+        }.setConsumer(consumer));
+        return (D) this;
+      //return daemonize(quest);
     }
 
-    public D daemonize(Consumer consumer, final VoidQuest quest, Runnable closure) {
-      addMainQuest(new VoidMainQuest(closure) {
+    @Override
+    public D daemonize(Consumer consumer, final VoidQuest quest, Runnable closure, boolean awaitedClosure) {
+      addMainQuest(new ReturnVoidMainQuest(closure, awaitedClosure ? getClosureAwaiter() : null) {
           @Override
           public Void pursue() throws Exception {
               quest.pursue();
@@ -84,11 +116,16 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
     }
 
     @Override
-    protected void runQuest(BaseQuest quest) {
+    protected boolean runQuest(BaseQuest quest) {
         setState(quest.getState());
+        if (historyEnabled) callHistory.add(quest.getDescription());
         if(!quest.run()) {
             setState(DaemonState.GONE_DAEMON);
+            if (historyEnabled) callHistory.add(quest.getDescription() + ", success: false\n");
+            return false;
         }
+        if (historyEnabled) callHistory.add(quest.getDescription() + ", success: true\n");
+        return true;
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.daemonprocessor.annotations.BlockingClosure;
+import com.daemonize.daemonprocessor.annotations.AwaitedClosure;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
@@ -111,6 +111,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         }
     }
 
+    @AwaitedClosure
     @GenerateRunnable
     @Daemonize
     @Override
@@ -225,7 +226,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     @Override
     public String toString() {
-        return super.toString();
+        return "Location X: " + getLastCoordinates().getFirst() + ", Y: " + getLastCoordinates().getSecond() + "\n" + super.toString();
     }
 }
 

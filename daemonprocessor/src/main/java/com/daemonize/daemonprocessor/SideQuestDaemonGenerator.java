@@ -159,12 +159,13 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         //SideQuest construct
         MethodSpec.Builder sideQuestConstructorBuilder = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PRIVATE)
-                .addStatement("super()")
+                .addParameter(
+                        ClassName.get(
+                                BaseDaemonGenerator.CLOSURE_PACKAGE,
+                                BaseDaemonGenerator.CLOSURE_WAITER_STRING
+                        ), "closureAwaiter")
+                .addStatement("super(closureAwaiter)")
                 .addStatement("this.description = \"$N\"", prototypeMethodData.getMethodName());
-
-        if(prototypeMethodData.isVoid()) {
-            sideQuestConstructorBuilder.addStatement("setVoid()");
-        }
 
         MethodSpec sideQuestConstructor = sideQuestConstructorBuilder.build();
 
@@ -228,13 +229,12 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addJavadoc("Prototype method {@link $N#$N}", sideQuestMethod.getFirst().getEnclosingElement().getSimpleName(), sideQuestMethod.getFirst().getSimpleName())
                 .addParameter(consumer, "consumer")
                 .returns(sideQuestOfRet)
-                .addStatement("$T sideQuest = new $N()", sideQuestOfRet, sideQuest);
+                .addStatement("$T sideQuest = new $N(" + (blockingClosure ? daemonEngineString + ".getClosureAwaiter()" : "null" ) +  ")", sideQuestOfRet, sideQuest);
 
         if (sleep > 0)
-            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L).setConsumer(consumer)" + (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")", sleep);
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L).setConsumer(consumer))", sleep);
         else
-            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer)" + (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")");
-            //sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer).setClosureWaitingLatch(" + daemonEngineString + ".getClosureAwaiter()))");
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer))");
 
         sideQuestSetter.addStatement("return sideQuest");
 

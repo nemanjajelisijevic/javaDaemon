@@ -4,10 +4,10 @@ package com.daemonize.daemonengine.implementations;
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.ClosureWaiter;
-import com.daemonize.daemonengine.closure.LatchClosureWaiter;
+import com.daemonize.daemonengine.closure.SemaphoreClosureWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.BaseQuest;
-import com.daemonize.daemonengine.utils.DaemonLatch;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
@@ -16,13 +16,13 @@ import java.util.List;
 public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Daemon<D> {
 
     protected volatile DaemonState state = DaemonState.STOPPED;
-    private Consumer consumer;
+    protected Consumer consumer;
     private String name = this.getClass().getSimpleName();
 
     protected Thread daemonThread;
     protected Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
-    private LatchClosureWaiter closureAwaiter = new LatchClosureWaiter(new DaemonLatch(1));
+    private SemaphoreClosureWaiter closureAwaiter = new SemaphoreClosureWaiter();
 
     public ClosureWaiter getClosureAwaiter() {
         return closureAwaiter;
@@ -30,7 +30,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
     public D setName(String name) {
       this.name = name;
-      this.closureAwaiter.getDaemonLatch().setName(name + " closureAwaitingLatch");
+      this.closureAwaiter.setName(name + " closureAwaitingLatch");
       return (D) this;
     }
 
@@ -82,10 +82,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
               break;
             }
 
-            if (!currentQuest.getIsVoid() && currentQuest.getReturnRunnable() == null)
-                setState(DaemonState.GONE_DAEMON);
-            else
-                runQuest(currentQuest);
+            runQuest(currentQuest);
         }
 
         cleanUp();
@@ -93,9 +90,9 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         setState(DaemonState.STOPPED);
     }
 
-    protected void runQuest(BaseQuest quest) {
+    protected boolean runQuest(BaseQuest quest) {
         setState(quest.getState());
-        quest.run();
+        return quest.run();
     };
 
     @Override
@@ -103,7 +100,6 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         DaemonState initState = getState();
         if (initState.equals(DaemonState.STOPPED) || initState.equals(DaemonState.GONE_DAEMON))
             initThread();
-
         return (D) this;
     }
 

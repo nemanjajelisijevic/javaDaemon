@@ -17,7 +17,7 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
   protected ClosureWaiter closureWaiter = new ClosureWaiter() {
 
     @Override
-    public void reset() {}
+    public void markAwait() {}
 
     @Override
     public void clear() {}
@@ -26,16 +26,6 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
     public void awaitClosure() throws InterruptedException {}
   };
 
-  public BaseQuest() {
-    this.returnRunnable = new ReturnRunnable<>();
-  }
-
-  public Q setClosureWaiter(ClosureWaiter closureWaiter) {
-    this.closureWaiter = closureWaiter;
-    this.returnRunnable = new AwaitedReturnRunnable<T>(this.closureWaiter).setClosure(this.returnRunnable.getClosure());
-    return (Q) this;
-  }
-
   public String getDescription() {
     return description;
   }
@@ -43,10 +33,6 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
   public Q setDescription(String description) {
     this.description = description;
     return (Q) this;
-  }
-
-  public ReturnRunnable<T> getReturnRunnable() {
-    return returnRunnable;
   }
 
   public Q setConsumer(Consumer consumer) {
@@ -72,15 +58,8 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
     return consumer.consume(returnRunnable.setError(error, description));
   }
 
-  private boolean isVoid = false;
-
-  public Q setVoid() {
-    this.isVoid = true;
-    return (Q) this;
-  }
-
   public boolean getIsVoid() {
-    return isVoid;
+    return false;
   }
 
   public abstract boolean run();

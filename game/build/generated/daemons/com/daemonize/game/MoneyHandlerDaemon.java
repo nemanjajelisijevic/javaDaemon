@@ -3,6 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ClosureWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
@@ -41,7 +42,7 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   /**
    * Prototype method {@link MoneyHandler#animateMoney} */
   public SleepSideQuest<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> setAnimateMoneySideQuest(Consumer consumer) {
-    SleepSideQuest<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> sideQuest = new AnimateMoneySideQuest();
+    SleepSideQuest<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> sideQuest = new AnimateMoneySideQuest(null);
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(15).setConsumer(consumer));
     return sideQuest;
   }
@@ -172,7 +173,7 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   /**
    * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
   public MoneyHandlerDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
-    mainDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -275,8 +276,8 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   }
 
   private final class AnimateMoneySideQuest extends SleepSideQuest<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> {
-    private AnimateMoneySideQuest() {
-      super();
+    private AnimateMoneySideQuest(ClosureWaiter closureAwaiter) {
+      super(closureAwaiter);
       this.description = "animateMoney";
     }
 
@@ -294,8 +295,9 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
 
     private float velocityint;
 
-    private GoToMainQuest(float x, float y, float velocityint, Closure<Boolean> closure) {
-      super(closure);
+    private GoToMainQuest(float x, float y, float velocityint, Closure<Boolean> closure,
+        ClosureWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
       this.x = x;
       this.y = y;
       this.velocityint = velocityint;

@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.closure.BareClosure;
+import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
@@ -62,11 +63,11 @@ public class Game {
 
         @Override
         public void onAdd(BulletDoubleDaemon projectile) {
+            projectile.clearAndInterrupt().clearVelocity().popSprite();
             renderer.consume(() -> {
                 for (ImageView view : projectile.getViews())
                     view.hide();
             });
-            projectile.clearAndInterrupt().clearVelocity().popSprite();
             activeProjectiles.remove(projectile);
         }
 
@@ -211,7 +212,7 @@ public class Game {
         enemyGenerateIntervals.add(500L);
         enemyGenerateIntervals.add(2000L);
         enemyGenerateIntervals.add(500L);
-        enemyGenerateIntervals.add(15000L);
+        enemyGenerateIntervals.add(30000L);
         enemyGenerateIntervalIt = enemyGenerateIntervals.iterator();
     }
 
@@ -963,7 +964,7 @@ public class Game {
                 towerSpriteUpgrader.daemonize(() -> {
                         tow.setRotationSprite(rotSprite);
                         return tow.getPrototype().updateSprite();
-                    }, new MultiViewAnimateClosure()::onReturn);
+                    }, new MultiViewAnimateClosure()::onReturn, false);
 
                 currentSoundManager.playSound(towerSelectionSound);
 
@@ -984,7 +985,7 @@ public class Game {
 
                     renderer.consume(()->infoScore.setNumbers(score));
                     renderer.consume(()->upgradeButton.enable().setImage(upgradeButtonImage));
-                });
+                }, false);
             });
 
             Button closeButton = new Button("Close", closeButtonImage);
@@ -994,7 +995,7 @@ public class Game {
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
                     renderer.consume(()->closeButton.enable().setImage(closeButtonImage));
                     renderer.consume(towerUpgradeDialogue.getRootView()::hide);
-                });
+                }, false);
             });
 
             Button saleButton = new Button("Sale", saleButtonImage);
@@ -1026,7 +1027,7 @@ public class Game {
                             infoScore.setNumbers(++score);
                         });
                     }
-                });
+                }, false);
             });
 
             towerUpgradeDialogue = new TowerUpgradeDialog(
@@ -1151,7 +1152,7 @@ public class Game {
 
                     System.err.println(DaemonUtils.tag() + enemy.getEnginesState().toString());
 
-                    enemy.pushSprite(explodeSprite, 0, ()->{
+                    enemy.pushSprite(explodeSprite, 0, () ->{
                         renderer.consume(()->enemy.getView().hide().setAbsoluteX(0).setAbsoluteY(0));
                         enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY());
                     }).queueStop();
@@ -1181,18 +1182,65 @@ public class Game {
 
                             } while ((currentErasingField = grid.getMinWeightOfNeighbors(currentErasingField)) != null);
 
-                            if (activeEnemies.isEmpty())
+                            if (activeEnemies.isEmpty()) {
                                 renderer.consume(() -> {
-                                    for (int j = 0; j < rows; ++j )
+                                    for (int j = 0; j < rows; ++j)
                                         for (int i = 0; i < columns; ++i)
                                             if (gridViewMatrix[j][i].getImage().equals(fieldImage) && gridViewMatrix[j][i].isShowing())
                                                 gridViewMatrix[j][i].hide();
 
-                                    for (int j = 0; j < rows - 1; ++j )
+                                    for (int j = 0; j < rows - 1; ++j)
                                         for (int i = 0; i < columns - 1; ++i)
                                             if (diagonalMatrix[j][i].getImage().equals(fieldGreenDiagonal) && diagonalMatrix[j][i].isShowing())
                                                 diagonalMatrix[j][i].hide();
                                 });
+
+                                gameConsumer.consume(()-> {
+                                    System.err.println("******************************************************************************");
+                                    System.err.println("ACTIVE BULLETS: " + bulletRepo.activeProjectiles.size());
+                                    System.err.println("INACTIVE BULLETS: " + bulletRepo.size());
+                                    for (BulletDoubleDaemon bullet : bulletRepo.activeProjectiles) {
+                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
+                                        System.err.println(bullet.getName() + ", ACTIVE STATES CALL HISTORY: " + bullet.mainDaemonEngine.getCallHistory().toString());
+                                        bullet.mainDaemonEngine.disableCallHistoryRecording();
+                                        bullet.pushSprite(bulletSprite, 0, new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                bullet.pushSprite(bulletSprite, 0, this::run);
+                                            }
+                                        });
+                                    }
+
+                                    System.err.println("ACTIVE ROCKETS: " + rocketRepo.activeProjectiles.size());
+                                    System.err.println("INACTIVE ROCKETS: " + rocketRepo.size());
+                                    for (BulletDoubleDaemon bullet : rocketRepo.activeProjectiles) {
+                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
+                                        System.err.println(bullet.getName() + ", ACTIVE STATES CALL HISTORY: " + bullet.mainDaemonEngine.getCallHistory().toString());
+                                        bullet.mainDaemonEngine.disableCallHistoryRecording();
+                                        bullet.pushSprite(bulletSpriteRocket, 0, new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                bullet.pushSprite(bulletSpriteRocket, 0, this::run);
+                                            }
+                                        });
+                                    }
+
+                                    System.err.println("ACTIVE MISSILES: " + enemyMissileRepo.activeProjectiles.size());
+                                    System.err.println("INACTIVE MISSILES: " + enemyMissileRepo.size());
+                                    for (BulletDoubleDaemon bullet : enemyMissileRepo.activeProjectiles) {
+                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
+                                        System.err.println(bullet.getName() + ", ACTIVE STATES CALL HISTORY: " + bullet.mainDaemonEngine.getCallHistory().toString());
+                                        bullet.mainDaemonEngine.disableCallHistoryRecording();
+                                        bullet.pushSprite(enemyMissileSprite, 0, new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                bullet.pushSprite(enemyMissileSprite, 0, this::run);
+                                            }
+                                        });
+                                    }
+                                    System.err.println("******************************************************************************");
+                                });
+                            }
                         });
                     }
                 }
@@ -1567,7 +1615,6 @@ public class Game {
                                         currentSoundManager.playSound(bigExplosion);
 
                                         target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
-
                                             target.setShootable(false);
                                             renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
                                             renderer.consume(target.getView()::hide);
@@ -1639,7 +1686,7 @@ public class Game {
                                     return;
                                 }
 
-                                //reset to next fields center
+                                //markAwait to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 int angle = (int) RotatingSpriteImageMover.getAngle(
                                         current.getCenterX(),
@@ -2007,7 +2054,7 @@ public class Game {
                 destructionClosure.run();
 
             currentSoundManager.playSound(bulletSound);
-            bulletDoubleDaemon.pushSprite(bulletExplodeSprite, 0, ()->bulletRepo.add(bulletDoubleDaemon));
+            bulletDoubleDaemon.pushSprite(bulletExplodeSprite, 0, () -> bulletRepo.add(bulletDoubleDaemon));
         });
     }
 
@@ -2136,7 +2183,7 @@ public class Game {
 
                 Field<TowerDaemon> prevField = (prevFieldCoord == null) ?  grid.getField(0, 0) : grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
 
-                //reset to next fields center
+                //markAwait to next fields center
                 Field next = grid.getMinWeightOfNeighbors(prevField);
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(
@@ -2161,7 +2208,7 @@ public class Game {
                 if (enemyParalyizer.queueSize() == 0) {
                     if (enemyTarget.isShootable()) {
                         renderer.consume(() -> enemyTarget.getParalyzedView().show());
-                        enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), paralyzerClosure);
+                        enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), paralyzerClosure, false);
                     }
                 } else {
                     if (enemyTarget.isShootable()) {
@@ -2169,7 +2216,7 @@ public class Game {
                         new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(() -> {
                             System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
                             Thread.sleep(enemyParalyzingInterval);
-                        }, paralyzerClosure);
+                        }, paralyzerClosure, false);
                     }
                 }
 

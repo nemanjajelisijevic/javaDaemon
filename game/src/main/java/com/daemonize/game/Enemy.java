@@ -2,7 +2,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.daemonprocessor.annotations.BlockingClosure;
+import com.daemonize.daemonprocessor.annotations.AwaitedClosure;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.Exclude;
@@ -174,7 +174,7 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         return this;
     }
 
-    @BlockingClosure
+    @AwaitedClosure
     @GenerateRunnable
     @Daemonize
     @Override

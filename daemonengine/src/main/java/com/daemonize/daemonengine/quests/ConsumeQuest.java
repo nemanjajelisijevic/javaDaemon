@@ -1,19 +1,18 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.closure.VoidReturnRunnable;
 
-public class ConsumeQuest extends MainQuest<Void> {
-
-    private Runnable runnable;
+public class ConsumeQuest extends VoidMainQuest {
 
     public ConsumeQuest(Runnable runnable) {
-        this.runnable = runnable;
+        this.returnRunnable = new VoidReturnRunnable(runnable);
         this.state = DaemonState.CONSUMING;
     }
 
     @Override
     public Void pursue() throws Exception {
-        runnable.run();
+        returnRunnable.run();
         return null;
     }
 }

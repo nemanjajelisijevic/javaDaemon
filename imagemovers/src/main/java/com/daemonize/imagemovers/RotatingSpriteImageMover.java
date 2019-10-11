@@ -64,7 +64,9 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
         int currentAngle = spriteBuffer.getCurrentAngle();
 
-        if (Math.abs(targetAngle - currentAngle) <= spriteBuffer.getStep()) { //TODO check how many steps is the limit?
+        if (currentAngle == targetAngle) {
+            return new Image[]{spriteBuffer.getCurrent()};
+        } else if (Math.abs(targetAngle - currentAngle) <= spriteBuffer.getStep()) { //TODO check how many steps is the limit?
 
             spriteBuffer.setCurrentAngle(targetAngle);
             Image[] last = new Image[1];

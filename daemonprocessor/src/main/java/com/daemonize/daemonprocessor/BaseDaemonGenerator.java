@@ -50,6 +50,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     //closures
     protected static final String CLOSURE_PACKAGE = "com.daemonize.daemonengine.closure";
     protected static final String CLOSURE_STRING = "Closure";
+    protected static final String CLOSURE_WAITER_STRING = "ClosureWaiter";
 
     //engine
     protected static final String DAEMON_ENGINE_PACKAGE_ROOT = "com.daemonize.daemonengine";
@@ -59,6 +60,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     protected static final String QUEST_PACKAGE = "com.daemonize.daemonengine.quests";
     protected static final String STOP_QUEST_TYPE_NAME = "StopMainQuest";
     protected final String VOID_QUEST_TYPE_NAME = "VoidMainQuest";
+    protected final String RETURN_VOID_QUEST_TYPE_NAME = "ReturnVoidMainQuest";
     protected static final String CONSUME_QUEST_TYPE_NAME = "ConsumeQuest";
     protected static final String CONSUMER_PACKAGE_ROOT = "com.daemonize.daemonengine.consumer";
 

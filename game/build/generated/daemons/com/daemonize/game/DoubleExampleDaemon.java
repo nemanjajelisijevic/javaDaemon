@@ -3,6 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.closure.ClosureWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.HybridDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
@@ -33,7 +34,7 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
   /**
    * Prototype method {@link DoubleExample#logAndReturn} */
   public SideQuest<Integer> setLogAndReturnSideQuest(Consumer consumer) {
-    SideQuest<Integer> sideQuest = new LogAndReturnSideQuest();
+    SideQuest<Integer> sideQuest = new LogAndReturnSideQuest(null);
     daemonEngine.setSideQuest(sideQuest.setConsumer(consumer));
     return sideQuest;
   }
@@ -45,7 +46,7 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
   /**
    * Prototype method {@link com.daemonize.game.DoubleExample#increment} */
   public DoubleExampleDaemon increment(Consumer consumer, Closure<Boolean> closure) {
-    daemonEngine.pursueQuest(new IncrementMainQuest(closure).setConsumer(consumer));
+    daemonEngine.pursueQuest(new IncrementMainQuest(closure, null).setConsumer(consumer));
     return this;
   }
 
@@ -122,8 +123,8 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
   }
 
   private final class LogAndReturnSideQuest extends SideQuest<Integer> {
-    private LogAndReturnSideQuest() {
-      super();
+    private LogAndReturnSideQuest(ClosureWaiter closureAwaiter) {
+      super(closureAwaiter);
       this.description = "logAndReturn";
     }
 
@@ -134,8 +135,8 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
   }
 
   private final class IncrementMainQuest extends MainQuest<Boolean> {
-    private IncrementMainQuest(Closure<Boolean> closure) {
-      super(closure);
+    private IncrementMainQuest(Closure<Boolean> closure, ClosureWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
       this.description = "increment";
     }
 

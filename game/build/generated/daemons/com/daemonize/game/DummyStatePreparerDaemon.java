@@ -15,7 +15,7 @@ import java.util.List;
 public class DummyStatePreparerDaemon implements Daemon<DummyStatePreparerDaemon> {
   private InitState.DummyStatePreparer prototype;
 
-  protected MainQuestDaemonEngine daemonEngine;
+  public MainQuestDaemonEngine daemonEngine;
 
   public DummyStatePreparerDaemon(Consumer consumer, InitState.DummyStatePreparer prototype) {
     this.daemonEngine = new MainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());

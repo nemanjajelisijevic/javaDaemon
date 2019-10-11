@@ -1,12 +1,10 @@
 package com.daemonize.daemonengine.implementations;
 
-import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.SideQuestDaemon;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
-import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
 
 public class HybridDaemonEngine extends MainQuestDaemonBaseEngine<HybridDaemonEngine> implements SideQuestDaemon<HybridDaemonEngine> {

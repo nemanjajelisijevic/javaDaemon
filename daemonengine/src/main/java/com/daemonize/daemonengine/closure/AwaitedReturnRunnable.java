@@ -4,7 +4,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class AwaitedReturnRunnable<T> extends ReturnRunnable<T> {
 
-    protected ClosureWaiter closureWaiter;
+    private ClosureWaiter closureWaiter;
 
     public AwaitedReturnRunnable(ClosureWaiter closureWaiter) {
         super();

@@ -1,15 +1,13 @@
 package com.daemonize.daemonprocessor;
 
 
-import com.daemonize.daemonprocessor.annotations.BlockingClosure;
-import com.daemonize.daemonprocessor.annotations.CallingThread;
+import com.daemonize.daemonprocessor.annotations.AwaitedClosure;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.LogExecutionTime;
-import com.daemonize.daemonprocessor.annotations.Exclude;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -168,7 +166,8 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         //private fields for main daemon engine
         FieldSpec daemonEngine = FieldSpec.builder(daemonEngineClass, daemonEngineString)
-                .addModifiers(Modifier.PROTECTED)
+                //.addModifiers(Modifier.PROTECTED)
+                .addModifiers(Modifier.PUBLIC)
                 .build();
 
 
@@ -247,8 +246,9 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         boolean voidQuest = prototypeMethodData.isVoid();
         boolean voidWithRunnable = prototypeMethodData.isVoid() && (prototypeMethod.getAnnotation(Daemonize.class).generateRunnable() || prototypeMethod.getAnnotation(GenerateRunnable.class) != null);
+        boolean blockingClosure = prototypeMethod.getAnnotation(Daemonize.class).blockingClosure() || prototypeMethod.getAnnotation(AwaitedClosure.class) != null;
 
-        ClassName className = voidQuest ? ClassName.get(QUEST_PACKAGE, VOID_QUEST_TYPE_NAME) : ClassName.get(QUEST_PACKAGE, questTypeName);
+        ClassName className = voidQuest ? (voidWithRunnable ? ClassName.get(QUEST_PACKAGE, RETURN_VOID_QUEST_TYPE_NAME) : ClassName.get(QUEST_PACKAGE, VOID_QUEST_TYPE_NAME)) : ClassName.get(QUEST_PACKAGE, questTypeName);
 
         TypeName mainQuestOfRet = voidQuest ? className : ParameterizedTypeName.get(className, prototypeMethodData.getMethodRetTypeName());
 
@@ -285,14 +285,37 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                     prototypeMethodData.getClosureOfRet(),
                     "closure"
             );
-            mainQuestConstructorBuilder.addStatement("super(closure)");
+
+            //if (blockingClosure) {
+                mainQuestConstructorBuilder.addParameter(
+                        ClassName.get(
+                                BaseDaemonGenerator.CLOSURE_PACKAGE,
+                                BaseDaemonGenerator.CLOSURE_WAITER_STRING
+                        ),
+                        "closureAwaiter");
+                mainQuestConstructorBuilder.addStatement("super(closure, closureAwaiter)");
+//            } else {
+//                mainQuestConstructorBuilder.addStatement("super(closure)");
+//            }
+
         } else {
             if (voidWithRunnable) {
+
                 mainQuestConstructorBuilder.addParameter(TypeName.get(Runnable.class), "retRun");
-                mainQuestConstructorBuilder.addStatement("super(retRun)");
+
+                //if (blockingClosure) {
+                mainQuestConstructorBuilder.addParameter(
+                        ClassName.get(
+                                BaseDaemonGenerator.CLOSURE_PACKAGE,
+                                BaseDaemonGenerator.CLOSURE_WAITER_STRING
+                        ),
+                        "closureAwaiter");
+                mainQuestConstructorBuilder.addStatement("super(retRun, closureAwaiter)");
+//                } else {
+//                    mainQuestConstructorBuilder.addStatement("super(retRun)");
+//                }
             } else {
                 mainQuestConstructorBuilder.addStatement("super()");
-                mainQuestConstructorBuilder.addStatement("setVoid()");
             }
         }
 
@@ -337,7 +360,7 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         boolean voidWithRunnable = prototypeMethodData.isVoid() && (prototypeMethod.getAnnotation(Daemonize.class).generateRunnable() || prototypeMethod.getAnnotation(GenerateRunnable.class) != null);
         boolean consumerArg = prototypeMethod.getAnnotation(Daemonize.class).consumerArg() || prototypeMethod.getAnnotation(ConsumerArg.class) != null;
-        boolean blockingClosure = prototypeMethod.getAnnotation(Daemonize.class).blockingClosure() || prototypeMethod.getAnnotation(BlockingClosure.class) != null;
+        boolean blockingClosure = prototypeMethod.getAnnotation(Daemonize.class).blockingClosure() || prototypeMethod.getAnnotation(AwaitedClosure.class) != null;
 
         apiMethodBuilder = addTypeParameters(prototypeMethod, apiMethodBuilder);
 
@@ -357,21 +380,29 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                     daemonEngineString + ".pursueQuest(new "
                             + currentMainQuestName + questTypeName + "("
                             + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ")
-                            + "closure)"
-                            + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer())" + (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")")
+                            + "closure"
+                            + ", " + (blockingClosure ?  daemonEngineString + ".getClosureAwaiter()" : "null")
+                            + ")"
+                            //+ (consumerArg ? (".setConsumer(consumer))") : (".setConsumer(" + daemonEngineString + ".getConsumer())" + (blockingClosure ? (".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())") : "" ) + ")"))
+                            + (consumerArg ? ".setConsumer(consumer)" : ".setConsumer(" + daemonEngineString + ".getConsumer())")
+                            //+ (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "")
+                            + ")"
 
             );
         } else {
 
             if (voidWithRunnable) {
-
                 apiMethodBuilder.addParameter(TypeName.get(Runnable.class), "retRun");
-
                 apiMethodBuilder.addStatement(
                         daemonEngineString + ".pursueQuest(new "
                                 + currentMainQuestName + questTypeName + "("
-                                + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ") + "retRun)"
-                                + (consumerArg ? ".setConsumer(consumer))" : ".setConsumer(" + daemonEngineString + ".getConsumer())" + (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "" ) + ")")
+                                + (prototypeMethodData.getArguments().isEmpty() ? "" :  prototypeMethodData.getArguments() + ", ")
+                                + "retRun"
+                                + ", " + (blockingClosure ?  daemonEngineString + ".getClosureAwaiter()" : "null")
+                                + ")"
+                                + (consumerArg ? ".setConsumer(consumer)" : ".setConsumer(" + daemonEngineString + ".getConsumer())")
+                                //+ (blockingClosure ? ".setClosureWaiter(" + daemonEngineString + ".getClosureAwaiter())" : "")
+                                + ")"
                 );
             } else
                 apiMethodBuilder.addStatement(

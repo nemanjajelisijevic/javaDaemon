@@ -130,7 +130,7 @@
 //    protected void playSound(MediaPlayer player, File soundFile) {
 //
 //        InMemoryMediadataSource soundClip = soundmap.get(soundFile);
-//        player.reset();
+//        player.markAwait();
 //        player.setDataSource(soundClip);
 //        try {
 //            player.prepare();

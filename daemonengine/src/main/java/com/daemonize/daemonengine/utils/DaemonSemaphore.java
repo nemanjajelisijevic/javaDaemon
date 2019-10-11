@@ -20,8 +20,10 @@ public class DaemonSemaphore {
 
     public void go() {
         lock.lock();
-        flag = false;
-        condition.signalAll();
+        if (flag) {
+            flag = false;
+            condition.signalAll();
+        }
         lock.unlock();
     }
 

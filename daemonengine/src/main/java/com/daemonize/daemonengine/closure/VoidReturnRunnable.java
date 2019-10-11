@@ -2,10 +2,14 @@ package com.daemonize.daemonengine.closure;
 
 public class VoidReturnRunnable extends ReturnRunnable<Void> {
 
-    private Runnable retRun;
+    protected Runnable retRun;
 
     public VoidReturnRunnable(Runnable retRun) {
         this.retRun = retRun;
+    }
+
+    public Runnable getRunnableClosure() {
+        return retRun;
     }
 
     @Override
