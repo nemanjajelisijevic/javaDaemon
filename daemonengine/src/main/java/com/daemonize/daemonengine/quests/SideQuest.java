@@ -12,6 +12,15 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
 
   protected ClosureWaiter closureWaiter;
 
+  private T result;
+  private Runnable resultRunnable = new Runnable() {
+     @Override
+     public void run() {
+         setResultAndUpdate(result);
+     }
+  };
+
+
   public SideQuest() {
     this(null);
   }
@@ -34,11 +43,11 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
   @Override
   public boolean run(){
     try {
-      T result = pursue();
+      result = pursue();
       if (result != null) {
-        closureWaiter.markAwait();
+        //closureWaiter.markAwait();
         setResultAndUpdate(result);
-        closureWaiter.awaitClosure();
+        closureWaiter.awaitClosure(resultRunnable);
       }
       return true;
     } catch (InterruptedException ex) {

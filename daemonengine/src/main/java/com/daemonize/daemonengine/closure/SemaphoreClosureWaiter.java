@@ -15,13 +15,13 @@ public class SemaphoreClosureWaiter implements ClosureWaiter {
 
     public SemaphoreClosureWaiter() {}
 
-    @Override
-    public void markAwait() {
-        lock.lock();
-        flag = true;
-        lock.unlock();
-        System.err.println(DaemonUtils.tag() + name + " marked!");
-    }
+//    @Override
+//    public void markAwait() {
+//        lock.lock();
+//        flag = true;
+//        lock.unlock();
+//        System.err.println(DaemonUtils.tag() + name + " marked!");
+//    }
 
     @Override
     public void clear() {
@@ -31,21 +31,23 @@ public class SemaphoreClosureWaiter implements ClosureWaiter {
             condition.signal();
         }
         lock.unlock();
-        System.err.println(DaemonUtils.tag() + name + " cleared!");
+        //System.err.println(DaemonUtils.tag() + name + " cleared!");
     }
 
     @Override
-    public void awaitClosure() throws InterruptedException {
+    public void awaitClosure(Runnable action) throws InterruptedException {
         lock.lock();
+        flag = true;
+        action.run();
         try {
             while(flag) {
-                System.err.println(DaemonUtils.tag() + name + " about to await!");
+                //System.err.println(DaemonUtils.tag() + name + " about to await!");
                 condition.await();
             }
         } finally {
             flag = false;
             lock.unlock();
-            System.err.println(DaemonUtils.tag() + name + " done awaiting!");
+            //System.err.println(DaemonUtils.tag() + name + " done awaiting!");
         }
     }
 

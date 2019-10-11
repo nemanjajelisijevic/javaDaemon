@@ -9,6 +9,15 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
 
+  private T result;
+  private Runnable setResultAction = new Runnable() {
+      @Override
+      public void run() {
+        setResultAndUpdate(result);
+      }
+  };
+
+
   MainQuest() {
     this.state = DaemonState.MAIN_QUEST;
     this.returnRunnable = new ReturnRunnable<T>();
@@ -27,11 +36,11 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
   @Override
   public boolean run() {
     try {
-        T result = pursue();
+        result = pursue();
         if (!Thread.currentThread().isInterrupted() && result != null) {
-            closureWaiter.markAwait();
-            setResultAndUpdate(result);
-            closureWaiter.awaitClosure();
+            //closureWaiter.markAwait();
+            //setResultAndUpdate(result);
+            closureWaiter.awaitClosure(setResultAction);
         }
         return true;
     } catch (InterruptedException ex) {

@@ -234,7 +234,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   /**
    * Prototype method {@link com.daemonize.game.Bullet#pushSprite} */
   public LaserBulletDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 

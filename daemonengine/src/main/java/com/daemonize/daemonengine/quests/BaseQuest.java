@@ -16,14 +16,16 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
 
   protected ClosureWaiter closureWaiter = new ClosureWaiter() {
 
-    @Override
-    public void markAwait() {}
+//    @Override
+//    public void markAwait() {}
 
     @Override
     public void clear() {}
 
     @Override
-    public void awaitClosure() throws InterruptedException {}
+    public void awaitClosure(Runnable action) throws InterruptedException {
+      action.run();
+    }
   };
 
   public String getDescription() {

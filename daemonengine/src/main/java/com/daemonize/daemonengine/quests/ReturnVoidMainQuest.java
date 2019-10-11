@@ -9,6 +9,13 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class ReturnVoidMainQuest extends MainQuest<Void> {
 
+    private Runnable updateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            consumer.consume(returnRunnable);
+        }
+    };
+
     public ReturnVoidMainQuest(Runnable retRun, ClosureWaiter closureWaiter) {
         super();
         this.state = DaemonState.MAIN_QUEST;
@@ -25,9 +32,9 @@ public abstract class ReturnVoidMainQuest extends MainQuest<Void> {
         try {
             pursue();
             if (!Thread.currentThread().isInterrupted()) {
-                closureWaiter.markAwait();
-                consumer.consume(returnRunnable);
-                closureWaiter.awaitClosure();
+//                closureWaiter.markAwait();
+//                consumer.consume(returnRunnable);
+                closureWaiter.awaitClosure(updateRunnable);
             }
             return true;
         } catch (InterruptedException ex) {
