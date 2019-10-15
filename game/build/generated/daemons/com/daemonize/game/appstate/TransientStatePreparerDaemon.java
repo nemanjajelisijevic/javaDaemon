@@ -3,7 +3,7 @@ package com.daemonize.game.appstate;
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
@@ -107,7 +107,7 @@ public class TransientStatePreparerDaemon implements Daemon<TransientStatePrepar
 
   private final class PrepareTransientStateMainQuest extends MainQuest<TransientState1> {
     private PrepareTransientStateMainQuest(Closure<TransientState1> closure,
-        ClosureWaiter closureAwaiter) {
+        ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.description = "prepareTransientState";
     }

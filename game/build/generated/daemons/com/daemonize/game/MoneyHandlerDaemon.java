@@ -3,7 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
@@ -276,7 +276,7 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   }
 
   private final class AnimateMoneySideQuest extends SleepSideQuest<Pair<ImageMover.PositionedImage, ImageMover.PositionedImage>> {
-    private AnimateMoneySideQuest(ClosureWaiter closureAwaiter) {
+    private AnimateMoneySideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "animateMoney";
     }
@@ -296,7 +296,7 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     private float velocityint;
 
     private GoToMainQuest(float x, float y, float velocityint, Closure<Boolean> closure,
-        ClosureWaiter closureAwaiter) {
+        ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.x = x;
       this.y = y;

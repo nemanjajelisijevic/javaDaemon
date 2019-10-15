@@ -8,10 +8,6 @@ public class VoidReturnRunnable extends ReturnRunnable<Void> {
         this.retRun = retRun;
     }
 
-    public Runnable getRunnableClosure() {
-        return retRun;
-    }
-
     @Override
     public ReturnRunnable<Void> setClosure(Closure<Void> closure) {
         throw new IllegalStateException("Method not supported.");

@@ -12,7 +12,7 @@ public class DaemonUtils {
     }
 
     public static String tag() {
-        return Thread.currentThread().getName() + ", Thread ID: " + Thread.currentThread().getId() + " - ";
+        return "[" + Thread.currentThread().getName() + ", Thread ID: " + Thread.currentThread().getId() + "] - ";
     }
 
     public static String timedTag() {

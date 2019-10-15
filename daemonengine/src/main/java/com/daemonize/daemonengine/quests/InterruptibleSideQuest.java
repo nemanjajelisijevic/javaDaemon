@@ -1,7 +1,7 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonLatch;
 import com.daemonize.daemonengine.utils.DaemonUtils;
@@ -26,8 +26,8 @@ public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements 
         this(null);
     }
 
-    public InterruptibleSideQuest(ClosureWaiter closureWaiter) {
-        super(closureWaiter);
+    public InterruptibleSideQuest(ClosureExecutionWaiter closureExecutionWaiter) {
+        super(closureExecutionWaiter);
     }
 
     @Override

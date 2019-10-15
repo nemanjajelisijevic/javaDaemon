@@ -1,19 +1,17 @@
 package com.daemonize.daemonengine.closure;
 
-import com.daemonize.daemonengine.utils.DaemonUtils;
-
 public class AwaitedVoidReturnRunnable extends VoidReturnRunnable {
 
-    private ClosureWaiter closureWaiter;
+    private ClosureExecutionWaiter closureExecutionWaiter;
 
-    public AwaitedVoidReturnRunnable(ClosureWaiter closureWaiter, Runnable retRun) {
+    public AwaitedVoidReturnRunnable(ClosureExecutionWaiter closureExecutionWaiter, Runnable retRun) {
         super(retRun);
-        this.closureWaiter = closureWaiter;
+        this.closureExecutionWaiter = closureExecutionWaiter;
     }
 
     @Override
     public void run() {
         super.run();
-        closureWaiter.clear();
+        closureExecutionWaiter.endClosureWait();
     }
 }

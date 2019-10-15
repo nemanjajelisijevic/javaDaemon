@@ -1,7 +1,6 @@
 package com.daemonize.daemonengine.quests;
 
-import com.daemonize.daemonengine.closure.AwaitedReturnRunnable;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -14,17 +13,14 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
   protected ReturnRunnable<T> returnRunnable;
   protected Consumer consumer;
 
-  protected ClosureWaiter closureWaiter = new ClosureWaiter() {
-
-//    @Override
-//    public void markAwait() {}
+  protected ClosureExecutionWaiter closureExecutionWaiter = new ClosureExecutionWaiter() {
 
     @Override
-    public void clear() {}
+    public void endClosureWait() {}
 
     @Override
-    public void awaitClosure(Runnable action) throws InterruptedException {
-      action.run();
+    public void awaitClosureExecution(Runnable updateConsumerAction) throws InterruptedException {
+      updateConsumerAction.run();
     }
   };
 

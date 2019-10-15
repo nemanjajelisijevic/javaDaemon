@@ -111,7 +111,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         }
     }
 
-    //@AwaitedClosure
+    @AwaitedClosure
     @GenerateRunnable
     @Daemonize
     @Override

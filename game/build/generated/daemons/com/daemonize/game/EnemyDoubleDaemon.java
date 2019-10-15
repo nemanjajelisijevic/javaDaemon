@@ -3,7 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
@@ -427,7 +427,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   private final class AnimateEnemySideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private AnimateEnemySideQuest(ClosureWaiter closureAwaiter) {
+    private AnimateEnemySideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "animateEnemy";
     }
@@ -445,7 +445,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     private float velocity;
 
     private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun,
-        ClosureWaiter closureAwaiter) {
+        ClosureExecutionWaiter closureAwaiter) {
       super(retRun, closureAwaiter);
       this.sprite = sprite;
       this.velocity = velocity;
@@ -460,7 +460,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   private final class ReloadMainQuest extends MainQuest<Target> {
-    private ReloadMainQuest(Closure<Target> closure, ClosureWaiter closureAwaiter) {
+    private ReloadMainQuest(Closure<Target> closure, ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.description = "reload";
     }
@@ -495,7 +495,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     private float velocityint;
 
     private GoToMainQuest(float x, float y, float velocityint, Closure<Boolean> closure,
-        ClosureWaiter closureAwaiter) {
+        ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.x = x;
       this.y = y;

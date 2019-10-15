@@ -3,7 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
@@ -208,7 +208,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   /**
    * Prototype method {@link com.daemonize.game.Bullet#pushSprite} */
   public BulletDoubleDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -333,7 +333,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private AnimateBulletSideQuest(ClosureWaiter closureAwaiter) {
+    private AnimateBulletSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "animateBullet";
     }
@@ -351,7 +351,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     private float velocity;
 
     private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun,
-        ClosureWaiter closureAwaiter) {
+        ClosureExecutionWaiter closureAwaiter) {
       super(retRun, closureAwaiter);
       this.sprite = sprite;
       this.velocity = velocity;
@@ -368,7 +368,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   private final class RotateMainQuest extends ReturnVoidMainQuest {
     private int angle;
 
-    private RotateMainQuest(int angle, Runnable retRun, ClosureWaiter closureAwaiter) {
+    private RotateMainQuest(int angle, Runnable retRun, ClosureExecutionWaiter closureAwaiter) {
       super(retRun, closureAwaiter);
       this.angle = angle;
       this.description = "rotate";
@@ -389,7 +389,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     private float velocityint;
 
     private GoToMainQuest(float x, float y, float velocityint, Closure<Boolean> closure,
-        ClosureWaiter closureAwaiter) {
+        ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.x = x;
       this.y = y;
@@ -413,7 +413,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     private float velocityint;
 
     private RotateAndGoToMainQuest(int angle, float x, float y, float velocityint,
-        Closure<Boolean> closure, ClosureWaiter closureAwaiter) {
+        Closure<Boolean> closure, ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.angle = angle;
       this.x = x;

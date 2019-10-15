@@ -3,14 +3,14 @@ package com.daemonize.daemonengine.quests;
 import com.daemonize.daemonengine.closure.AwaitedReturnRunnable;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 
 public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
 
-  protected ClosureWaiter closureWaiter;
+  protected ClosureExecutionWaiter closureExecutionWaiter;
 
   private T result;
   private Runnable resultRunnable = new Runnable() {
@@ -25,10 +25,10 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
     this(null);
   }
 
-  public SideQuest(ClosureWaiter closureWaiter) {
-    if (closureWaiter != null) {
-      this.closureWaiter = closureWaiter;
-      this.returnRunnable = new AwaitedReturnRunnable<T>(closureWaiter);
+  public SideQuest(ClosureExecutionWaiter closureExecutionWaiter) {
+    if (closureExecutionWaiter != null) {
+      this.closureExecutionWaiter = closureExecutionWaiter;
+      this.returnRunnable = new AwaitedReturnRunnable<T>(closureExecutionWaiter);
     } else {
       this.returnRunnable = new ReturnRunnable<T>();
     }
@@ -45,9 +45,8 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
     try {
       result = pursue();
       if (result != null) {
-        //closureWaiter.markAwait();
         setResultAndUpdate(result);
-        closureWaiter.awaitClosure(resultRunnable);
+        closureExecutionWaiter.awaitClosureExecution(resultRunnable);
       }
       return true;
     } catch (InterruptedException ex) {

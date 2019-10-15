@@ -3,7 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.HybridDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
@@ -123,7 +123,7 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
   }
 
   private final class LogAndReturnSideQuest extends SideQuest<Integer> {
-    private LogAndReturnSideQuest(ClosureWaiter closureAwaiter) {
+    private LogAndReturnSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "logAndReturn";
     }
@@ -135,7 +135,7 @@ public class DoubleExampleDaemon implements Daemon<DoubleExampleDaemon> {
   }
 
   private final class IncrementMainQuest extends MainQuest<Boolean> {
-    private IncrementMainQuest(Closure<Boolean> closure, ClosureWaiter closureAwaiter) {
+    private IncrementMainQuest(Closure<Boolean> closure, ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.description = "increment";
     }

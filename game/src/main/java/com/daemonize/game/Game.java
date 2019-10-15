@@ -68,7 +68,9 @@ public class Game {
                 for (ImageView view : projectile.getViews())
                     view.hide();
             });
-            activeProjectiles.remove(projectile);
+
+            if (!activeProjectiles.remove(projectile))
+                throw new IllegalStateException("Projectile(" + projectile.getName() + ") leak onRemove(" + getName() + ")!!!!!!!!!!!!!!!!!!");
         }
 
         @Override
@@ -79,8 +81,10 @@ public class Game {
                     view.setAbsoluteX(projectile.getLastCoordinates().getFirst())
                             .setAbsoluteY(projectile.getLastCoordinates().getSecond())
                             .show();
-                activeProjectiles.add(projectile);
             });
+
+            if (!activeProjectiles.add(projectile))
+                throw new IllegalStateException("Projectile(" + projectile.getName() + ") leak onGet(" + getName() + ")!!!!!!!!!!!!!!!!!!");
         }
     }
 
@@ -1199,45 +1203,18 @@ public class Game {
                                     System.err.println("******************************************************************************");
                                     System.err.println("ACTIVE BULLETS: " + bulletRepo.activeProjectiles.size());
                                     System.err.println("INACTIVE BULLETS: " + bulletRepo.size());
-                                    for (BulletDoubleDaemon bullet : bulletRepo.activeProjectiles) {
+                                    for (BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
                                         System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-                                        System.err.println(bullet.getName() + ", ACTIVE STATES CALL HISTORY: " + bullet.mainDaemonEngine.getCallHistory().toString());
-                                        bullet.mainDaemonEngine.disableCallHistoryRecording();
-                                        bullet.pushSprite(bulletSprite, 0, new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                bullet.pushSprite(bulletSprite, 0, this::run);
-                                            }
-                                        });
-                                    }
 
                                     System.err.println("ACTIVE ROCKETS: " + rocketRepo.activeProjectiles.size());
                                     System.err.println("INACTIVE ROCKETS: " + rocketRepo.size());
-                                    for (BulletDoubleDaemon bullet : rocketRepo.activeProjectiles) {
+                                    for (BulletDoubleDaemon bullet : rocketRepo.activeProjectiles)
                                         System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-                                        System.err.println(bullet.getName() + ", ACTIVE STATES CALL HISTORY: " + bullet.mainDaemonEngine.getCallHistory().toString());
-                                        bullet.mainDaemonEngine.disableCallHistoryRecording();
-                                        bullet.pushSprite(bulletSpriteRocket, 0, new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                bullet.pushSprite(bulletSpriteRocket, 0, this::run);
-                                            }
-                                        });
-                                    }
 
                                     System.err.println("ACTIVE MISSILES: " + enemyMissileRepo.activeProjectiles.size());
                                     System.err.println("INACTIVE MISSILES: " + enemyMissileRepo.size());
-                                    for (BulletDoubleDaemon bullet : enemyMissileRepo.activeProjectiles) {
+                                    for (BulletDoubleDaemon bullet : enemyMissileRepo.activeProjectiles)
                                         System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-                                        System.err.println(bullet.getName() + ", ACTIVE STATES CALL HISTORY: " + bullet.mainDaemonEngine.getCallHistory().toString());
-                                        bullet.mainDaemonEngine.disableCallHistoryRecording();
-                                        bullet.pushSprite(enemyMissileSprite, 0, new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                bullet.pushSprite(enemyMissileSprite, 0, this::run);
-                                            }
-                                        });
-                                    }
                                     System.err.println("******************************************************************************");
                                 });
                             }
@@ -1247,8 +1224,8 @@ public class Game {
 
                 @Override
                 public void onGet(EnemyDoubleDaemon enemy) {
-                    System.err.println(DaemonUtils.tag() + "Enemy repo size: " + this.size());
 
+                    System.err.println(DaemonUtils.tag() + "Enemy repo size: " + this.size());
                     System.err.println(DaemonUtils.tag() + enemy.getName() + " STATES: " + enemy.getEnginesState().toString());
 
                     enemy.setAnimateEnemySideQuest(renderer).setClosure(new MultiViewAnimateClosure());
@@ -2065,7 +2042,7 @@ public class Game {
             float velocity,
             int bulletDamage,
             int noOfBulletsFired,
-            Runnable destructionClosure
+            Runnable targetDestructionClosure
     ) {
         System.out.println(DaemonUtils.tag() + repo.getName() + " size: " + repo.size());
 
@@ -2142,7 +2119,7 @@ public class Game {
                                 if (newHp > 0)
                                     target.setHp(newHp);
                                 else
-                                    destructionClosure.run();
+                                    targetDestructionClosure.run();
                             }
 
                             currentSoundManager.playSound(rocketExplosionSound);
@@ -2233,7 +2210,5 @@ public class Game {
             moneyView.getFirst().hide();
             moneyView.getSecond().hide();
         });
-
-        //renderer.consume(()->infoScore.setNumbers(++score));
     };
 }

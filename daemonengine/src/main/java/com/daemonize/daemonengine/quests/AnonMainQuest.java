@@ -1,14 +1,14 @@
 package com.daemonize.daemonengine.quests;
 
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 
 public class AnonMainQuest<T> extends MainQuest<T> {
 
     private Quest<T> userQuest;
 
-    public AnonMainQuest(Quest<T> userQuest, Closure<T> closure, ClosureWaiter closureWaiter) {
-        super(closure, closureWaiter);
+    public AnonMainQuest(Quest<T> userQuest, Closure<T> closure, ClosureExecutionWaiter closureExecutionWaiter) {
+        super(closure, closureExecutionWaiter);
         this.userQuest = userQuest;
     }
 

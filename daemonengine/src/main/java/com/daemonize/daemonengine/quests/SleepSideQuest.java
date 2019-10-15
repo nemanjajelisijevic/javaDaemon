@@ -1,9 +1,6 @@
 package com.daemonize.daemonengine.quests;
 
-import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
-import com.daemonize.daemonengine.closure.Return;
-import com.daemonize.daemonengine.consumer.Consumer;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class SleepSideQuest<T> extends SideQuest<T> {
@@ -14,8 +11,8 @@ public abstract class SleepSideQuest<T> extends SideQuest<T> {
         this(null);
     }
 
-    public SleepSideQuest(ClosureWaiter closureWaiter) {
-        super(closureWaiter);
+    public SleepSideQuest(ClosureExecutionWaiter closureExecutionWaiter) {
+        super(closureExecutionWaiter);
         this.sleepInterval = 10;
     }
 

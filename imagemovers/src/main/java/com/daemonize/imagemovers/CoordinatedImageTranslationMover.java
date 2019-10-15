@@ -1,5 +1,6 @@
 package com.daemonize.imagemovers;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.graphics2d.images.Image;
@@ -56,6 +57,11 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         try {
             while (!coordinatesReached)
                 coordinateReachedCondition.await();
+        } catch (InterruptedException ex) {
+            System.err.println(DaemonUtils.tag() + "goto interrupted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            if (Thread.currentThread().getName().contains("Bullet"))
+                throw new IllegalStateException(DaemonUtils.tag() + "goto interrupted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            //return false;
         } finally {
             coordinatesReached = false;
             animateSemaphore.unsubscribe();

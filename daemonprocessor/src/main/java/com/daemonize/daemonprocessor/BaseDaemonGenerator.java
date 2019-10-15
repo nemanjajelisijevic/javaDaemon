@@ -50,7 +50,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     //closures
     protected static final String CLOSURE_PACKAGE = "com.daemonize.daemonengine.closure";
     protected static final String CLOSURE_STRING = "Closure";
-    protected static final String CLOSURE_WAITER_STRING = "ClosureWaiter";
+    protected static final String CLOSURE_WAITER_STRING = "ClosureExecutionWaiter";
 
     //engine
     protected static final String DAEMON_ENGINE_PACKAGE_ROOT = "com.daemonize.daemonengine";
@@ -100,29 +100,14 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         return daemonEngineString;
     }
 
-
-
-
-
-
-
-
     protected TypeElement classElement;
-
-
 
     protected String packageName;
     protected String daemonSimpleName;
 
     protected String returnRunnableType;
 
-
-
-
-
     protected ClassName consumerInterface = ClassName.get(CONSUMER_PACKAGE_ROOT, "Consumer");
-
-
 
     public String getDaemonEngineSimpleName() {
         return daemonEngineSimpleName;
@@ -218,10 +203,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
         if (annClass.getKind().equals(ElementKind.CLASS)) {
 
-            //while (!(annClass.getSuperclass() instanceof NoType || annClass.getSuperclass().getKind().equals(NONE))) {
-
             while (!(((TypeElement) ((DeclaredType) annClass.getSuperclass()).asElement())).getQualifiedName().toString().equals(baseClassBound)) {
-
                 annClass = (TypeElement) ((DeclaredType) annClass.getSuperclass()).asElement();
                 for (Element innerElement : annClass.getEnclosedElements()) {
                     if ((innerElement instanceof ExecutableElement) &&
@@ -413,15 +395,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
                 .addStatement("return this")
                 .build();
     }
-//
-//    public MethodSpec generateGetStateDaemonApiMethod() {
-//        return MethodSpec.methodBuilder("getState")
-//                .addAnnotation(Override.class)
-//                .addModifiers(Modifier.PUBLIC)
-//                .returns(daemonStateClassName)
-//                .addStatement("return " + daemonEngineString + ".getState()")
-//                .build();
-//    }
 
     public MethodSpec generateSetNameDaemonApiMethod() {
         return MethodSpec.methodBuilder("setName")
@@ -599,7 +572,6 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
 
     }
-
 
     public abstract MethodSpec generateGetEnginesStateDaemonApiMethod();
 

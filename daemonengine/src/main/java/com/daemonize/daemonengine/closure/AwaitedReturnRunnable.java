@@ -1,19 +1,17 @@
 package com.daemonize.daemonengine.closure;
 
-import com.daemonize.daemonengine.utils.DaemonUtils;
-
 public class AwaitedReturnRunnable<T> extends ReturnRunnable<T> {
 
-    private ClosureWaiter closureWaiter;
+    private ClosureExecutionWaiter closureExecutionWaiter;
 
-    public AwaitedReturnRunnable(ClosureWaiter closureWaiter) {
+    public AwaitedReturnRunnable(ClosureExecutionWaiter closureExecutionWaiter) {
         super();
-        this.closureWaiter = closureWaiter;
+        this.closureExecutionWaiter = closureExecutionWaiter;
     }
 
     @Override
     public void run() {
         super.run();
-        closureWaiter.clear();
+        closureExecutionWaiter.endClosureWait();
     }
 }

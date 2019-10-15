@@ -3,7 +3,7 @@ package com.daemonize.daemonengine.quests;
 import com.daemonize.daemonengine.closure.AwaitedReturnRunnable;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.DaemonState;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
@@ -17,17 +17,16 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
       }
   };
 
-
   MainQuest() {
     this.state = DaemonState.MAIN_QUEST;
     this.returnRunnable = new ReturnRunnable<T>();
   }
 
-  public MainQuest(Closure<T> closure, ClosureWaiter closureWaiter){
+  public MainQuest(Closure<T> closure, ClosureExecutionWaiter closureExecutionWaiter){
     this.state = DaemonState.MAIN_QUEST;
-    if (closureWaiter != null) {
-        this.closureWaiter = closureWaiter;
-        this.returnRunnable = new AwaitedReturnRunnable<T>(closureWaiter).setClosure(closure);
+    if (closureExecutionWaiter != null) {
+        this.closureExecutionWaiter = closureExecutionWaiter;
+        this.returnRunnable = new AwaitedReturnRunnable<T>(closureExecutionWaiter).setClosure(closure);
     } else {
         this.returnRunnable = new ReturnRunnable<T>().setClosure(closure);
     }
@@ -37,11 +36,8 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
   public boolean run() {
     try {
         result = pursue();
-        if (!Thread.currentThread().isInterrupted() && result != null) {
-            //closureWaiter.markAwait();
-            //setResultAndUpdate(result);
-            closureWaiter.awaitClosure(setResultAction);
-        }
+        if (!Thread.currentThread().isInterrupted() && result != null)
+            closureExecutionWaiter.awaitClosureExecution(setResultAction);
         return true;
     } catch (InterruptedException ex) {
         System.out.println(DaemonUtils.tag() + description + " interrupted.");

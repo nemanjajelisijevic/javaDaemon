@@ -3,7 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.closure.Closure;
-import com.daemonize.daemonengine.closure.ClosureWaiter;
+import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
@@ -442,7 +442,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   }
 
   private final class AnimateTowerSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private AnimateTowerSideQuest(ClosureWaiter closureAwaiter) {
+    private AnimateTowerSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "animateTower";
     }
@@ -455,7 +455,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   }
 
   private final class InitTowerSideQuest extends InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private InitTowerSideQuest(ClosureWaiter closureAwaiter) {
+    private InitTowerSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "initTower";
     }
@@ -473,7 +473,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     private float velocity;
 
     private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun,
-        ClosureWaiter closureAwaiter) {
+        ClosureExecutionWaiter closureAwaiter) {
       super(retRun, closureAwaiter);
       this.sprite = sprite;
       this.velocity = velocity;
@@ -489,7 +489,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   private final class UpdateSpriteMainQuest extends MainQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private UpdateSpriteMainQuest(Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure,
-        ClosureWaiter closureAwaiter) {
+        ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.description = "updateSprite";
     }
@@ -504,7 +504,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   private final class ReloadMainQuest extends ReturnVoidMainQuest {
     private long millis;
 
-    private ReloadMainQuest(long millis, Runnable retRun, ClosureWaiter closureAwaiter) {
+    private ReloadMainQuest(long millis, Runnable retRun, ClosureExecutionWaiter closureAwaiter) {
       super(retRun, closureAwaiter);
       this.millis = millis;
       this.description = "reload";
@@ -519,7 +519,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   private final class ScanMainQuest extends MainQuest<Pair<Tower.TowerType, Target>> {
     private ScanMainQuest(Closure<Pair<Tower.TowerType, Target>> closure,
-        ClosureWaiter closureAwaiter) {
+        ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.description = "scan";
     }

@@ -21,8 +21,11 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonBaseEngine<EagerM
     boolean ret;
     mainQuestLock.lock();
     ret = mainQuestQueue.add(quest);
-    mainQuestAvailable.signal();
+    if (ret && mainQuestQueue.size() == 1)
+      mainQuestAvailable.signal();
     mainQuestLock.unlock();
+    if (!ret)
+      throw new IllegalStateException("Could not add to daemons(" + getName() + ") mainQuetQueue!!!");
     return ret;
   }
 
@@ -56,7 +59,7 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonBaseEngine<EagerM
     if (!state.equals(DaemonState.STOPPED) && !state.equals(DaemonState.IDLE)) {
       if (daemonThread != null
               && !Thread.currentThread().equals(daemonThread)
-              && daemonThread.isAlive()) {
+              && !daemonThread.isInterrupted()) {
         daemonThread.interrupt();
       }
     }
@@ -67,8 +70,8 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonBaseEngine<EagerM
   public EagerMainQuestDaemonEngine clearAndInterrupt() {
       mainQuestLock.lock();
       mainQuestQueue.clear();
-      mainQuestLock.unlock();
       interrupt();
+      mainQuestLock.unlock();
       return this;
   }
 

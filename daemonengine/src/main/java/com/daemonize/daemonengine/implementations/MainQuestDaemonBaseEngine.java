@@ -16,29 +16,11 @@ import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.quests.VoidQuest;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> extends BaseDaemonEngine<D> implements DaemonEngine<D> {
-
-    private volatile boolean historyEnabled = true;
-    private List<String> callHistory = new LinkedList<>();
-
-    public D disableCallHistoryRecording() {
-        historyEnabled = false;
-        return (D) this;
-    }
-
-    public D enableCallHistoryRecording() {
-        historyEnabled = true;
-        return (D) this;
-    }
-
-    public List<String> getCallHistory() {
-        return callHistory;
-    }
 
     protected final Queue<MainQuest> mainQuestQueue;
     protected final Lock mainQuestLock = new ReentrantLock();
@@ -74,7 +56,6 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
             }
         }.setConsumer(consumer));
         return (D) this;
-      //return daemonize(quest);
     }
 
     @Override
@@ -118,13 +99,10 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
     @Override
     protected boolean runQuest(BaseQuest quest) {
         setState(quest.getState());
-        if (historyEnabled) callHistory.add(quest.getDescription());
         if(!quest.run()) {
             setState(DaemonState.GONE_DAEMON);
-            if (historyEnabled) callHistory.add(quest.getDescription() + ", success: false\n");
             return false;
         }
-        if (historyEnabled) callHistory.add(quest.getDescription() + ", success: true\n");
         return true;
     }
 
