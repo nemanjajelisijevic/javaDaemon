@@ -20,7 +20,6 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
      }
   };
 
-
   public SideQuest() {
     this(null);
   }
