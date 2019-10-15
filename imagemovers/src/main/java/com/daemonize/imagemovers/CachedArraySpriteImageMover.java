@@ -1,6 +1,5 @@
 package com.daemonize.imagemovers;
 
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 
@@ -17,10 +16,6 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
         animateSemaphore.subscribe();
         try {
             cache.await();
-        } catch (InterruptedException ex) {
-            System.err.println(DaemonUtils.tag() + "pushSprite interrupted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            if (Thread.currentThread().getName().contains("Bullet"))
-                throw new IllegalStateException(DaemonUtils.tag() + "pushSprite interrupted!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         } finally {
             cache.clearCache();
             animateSemaphore.unsubscribe();
