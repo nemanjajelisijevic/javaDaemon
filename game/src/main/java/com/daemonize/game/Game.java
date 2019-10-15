@@ -1199,24 +1199,24 @@ public class Game {
                                                 diagonalMatrix[j][i].hide();
                                 });
 
-                                gameConsumer.consume(()-> {
-                                    System.err.println("******************************************************************************");
-                                    System.err.println("ACTIVE BULLETS: " + bulletRepo.activeProjectiles.size());
-                                    System.err.println("INACTIVE BULLETS: " + bulletRepo.size());
-                                    for (BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
-                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-
-                                    System.err.println("ACTIVE ROCKETS: " + rocketRepo.activeProjectiles.size());
-                                    System.err.println("INACTIVE ROCKETS: " + rocketRepo.size());
-                                    for (BulletDoubleDaemon bullet : rocketRepo.activeProjectiles)
-                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-
-                                    System.err.println("ACTIVE MISSILES: " + enemyMissileRepo.activeProjectiles.size());
-                                    System.err.println("INACTIVE MISSILES: " + enemyMissileRepo.size());
-                                    for (BulletDoubleDaemon bullet : enemyMissileRepo.activeProjectiles)
-                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-                                    System.err.println("******************************************************************************");
-                                });
+//                                gameConsumer.consume(()-> {
+//                                    System.err.println("******************************************************************************");
+//                                    System.err.println("ACTIVE BULLETS: " + bulletRepo.activeProjectiles.size());
+//                                    System.err.println("INACTIVE BULLETS: " + bulletRepo.size());
+//                                    for (BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
+//                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
+//
+//                                    System.err.println("ACTIVE ROCKETS: " + rocketRepo.activeProjectiles.size());
+//                                    System.err.println("INACTIVE ROCKETS: " + rocketRepo.size());
+//                                    for (BulletDoubleDaemon bullet : rocketRepo.activeProjectiles)
+//                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
+//
+//                                    System.err.println("ACTIVE MISSILES: " + enemyMissileRepo.activeProjectiles.size());
+//                                    System.err.println("INACTIVE MISSILES: " + enemyMissileRepo.size());
+//                                    for (BulletDoubleDaemon bullet : enemyMissileRepo.activeProjectiles)
+//                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
+//                                    System.err.println("******************************************************************************");
+//                                });
                             }
                         });
                     }
