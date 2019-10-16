@@ -68,9 +68,6 @@ public class Game {
                 for (ImageView view : projectile.getViews())
                     view.hide();
             });
-
-            if (!activeProjectiles.remove(projectile))
-                throw new IllegalStateException("Projectile(" + projectile.getName() + ") leak onRemove(" + getName() + ")!!!!!!!!!!!!!!!!!!");
         }
 
         @Override
@@ -82,9 +79,6 @@ public class Game {
                             .setAbsoluteY(projectile.getLastCoordinates().getSecond())
                             .show();
             });
-
-            if (!activeProjectiles.add(projectile))
-                throw new IllegalStateException("Projectile(" + projectile.getName() + ") leak onGet(" + getName() + ")!!!!!!!!!!!!!!!!!!");
         }
     }
 
