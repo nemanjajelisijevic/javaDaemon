@@ -307,7 +307,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   /**
    * Prototype method {@link com.daemonize.game.Tower#pushSprite} */
   public TowerDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 

@@ -3,13 +3,14 @@ package com.daemonize.imagemovers;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import com.daemonize.graphics2d.images.Image;
 
 
-public class ImageTranslationMover implements ImageMover, SpriteIterator {
+public class ImageTranslationMover implements ImageMover, SpriteIterator, Pausable {
 
     private volatile float lastX;
     private volatile float lastY;
@@ -118,7 +119,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         velocity.direction.coeficientX = 0;
         velocity.direction.coeficientY = 0;
 
-        if (x - lastX == 0 || y - lastY == 0)
+        if (x - lastX == 0 && y - lastY == 0)
             return false;
 
         dX = x - lastX;
@@ -154,10 +155,12 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return this;
     }
 
+    @Override
     public void pause(){
         pauseSemaphore.stop();
     }
 
+    @Override
     public void cont(){
         pauseSemaphore.go();
     }
@@ -170,17 +173,38 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         this.outOfBordersClosure = closure;
     }
 
+    public static final double FPS = 16000000;
+    private long lastFrameTimeStamp = 0;
+    private long spriteIterationTimer = 0;
+    protected double timeCoeficient = 0;
+
     @Override
     public PositionedImage animate() throws InterruptedException {
 
         pauseSemaphore.await();
         animateSemaphore.await();
 
-        ret.image = iterateSprite();
+        if (lastFrameTimeStamp == 0) {
+            lastFrameTimeStamp = System.nanoTime();
+            ret.image = iterateSprite();
+        }
+
+        long currentFrameTimeStamp = System.nanoTime();
+        long frameInterval = currentFrameTimeStamp - lastFrameTimeStamp;
+
+        lastFrameTimeStamp = currentFrameTimeStamp;
+        spriteIterationTimer += frameInterval;
+
+        if (spriteIterationTimer > FPS) {
+            ret.image = iterateSprite();
+            spriteIterationTimer = 0;
+        }
+
+        timeCoeficient = ((double) frameInterval) / FPS;
 
         synchronized (this) {
-            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY);
-            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * dXY);
+            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY) * timeCoeficient;
+            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * dXY) * timeCoeficient;
         }
 
         return ret;

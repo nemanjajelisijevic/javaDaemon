@@ -53,9 +53,9 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
 
   /**
    * Prototype method {@link Bullet#animateBullet} */
-  public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
-    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(null);
-    sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
+  public SideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
+    SideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(sideDaemonEngine.getClosureAwaiter());
+    sideDaemonEngine.setSideQuest(sideQuest.setConsumer(consumer));
     return sideQuest;
   }
 
@@ -370,7 +370,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     }
   }
 
-  private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+  private final class AnimateBulletSideQuest extends SideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateBulletSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "animateBullet";

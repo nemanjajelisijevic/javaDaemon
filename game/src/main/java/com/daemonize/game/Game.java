@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.closure.BareClosure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
@@ -8,6 +9,7 @@ import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
+import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
@@ -87,6 +89,71 @@ public class Game {
                 throw new IllegalStateException("Projectile(" + projectile.getName() + ") leak onGet(" + getName() + ")!!!!!!!!!!!!!!!!!!");
         }
     }
+
+    //EnemyDoubleDaemon tracerEnemy;
+    //float tracerVelocity;
+
+//    public void startStopTracer () {
+//        if(tracerEnemy.getVelocity().intensity != 0) {
+//            tracerVelocity = tracerEnemy.getVelocity().intensity;
+//            tracerEnemy.setVelocity(0);
+//        } else {
+//            tracerEnemy.setVelocity(tracerVelocity);
+//        }
+//    }
+//
+//
+//    public void up(){
+//
+//        int angle = (int) RotatingSpriteImageMover.getAngle(
+//                tracerEnemy.getLastCoordinates().getFirst(),
+//                tracerEnemy.getLastCoordinates().getSecond(),
+//                tracerEnemy.getLastCoordinates().getFirst(),
+//                0
+//        );
+//
+//
+//
+//        tracerEnemy.rotate(angle).redirect(tracerEnemy.getLastCoordinates().getFirst(), 0);
+//    };
+//
+//    public void down(){
+//
+//
+//        int angle = (int) RotatingSpriteImageMover.getAngle(
+//                tracerEnemy.getLastCoordinates().getFirst(),
+//                tracerEnemy.getLastCoordinates().getSecond(),
+//                tracerEnemy.getLastCoordinates().getFirst(),
+//                borderY
+//        );
+//
+//        tracerEnemy.rotate(angle).redirect(tracerEnemy.getLastCoordinates().getFirst(), borderY);
+//    }
+//
+//    public void left(){
+//
+//        int angle = (int) RotatingSpriteImageMover.getAngle(
+//                tracerEnemy.getLastCoordinates().getFirst(),
+//                tracerEnemy.getLastCoordinates().getSecond(),
+//                0,
+//                tracerEnemy.getLastCoordinates().getSecond()
+//        );
+//
+//        tracerEnemy.rotate(angle).redirect(0, tracerEnemy.getLastCoordinates().getSecond());
+//    }
+//
+//    public void right() {
+//
+//        int angle = (int) RotatingSpriteImageMover.getAngle(
+//                tracerEnemy.getLastCoordinates().getFirst(),
+//                tracerEnemy.getLastCoordinates().getSecond(),
+//                borderX,
+//                tracerEnemy.getLastCoordinates().getSecond()
+//        );
+//
+//        tracerEnemy.rotate(angle).redirect(borderX, tracerEnemy.getLastCoordinates().getSecond());
+//    }
+
 
     //running flag
     private volatile boolean running;
@@ -190,7 +257,7 @@ public class Game {
 
     //enemies
     private long enemyCounter = 0;
-    private float enemyVelocity = 1;
+    private float enemyVelocity = 0.3F;
     private int enemyHp = 500;
 
     private Image[] enemySprite;
@@ -1032,6 +1099,25 @@ public class Game {
                         });
                     }
                 }, false);
+
+//
+//                if (tracerEnemy == null)
+//                    tracerEnemy = enemyRepo.get();
+//
+//                tracerEnemy.setCoordinates(borderX / 2, borderY / 2)
+//                        .clearAndInterrupt()
+//                        .rotate(180)
+//                        .goTo(- borderX / 4, borderY / 2, 2, new Closure<Boolean>() {
+//                            @Override
+//                            public void onReturn(Return<Boolean> ret) {
+//                                tracerEnemy.rotate(- 180)
+//                                        .goTo(borderX / 2, borderY / 2, 6, ret1 ->
+//                                                tracerEnemy.rotate(180).goTo(- borderX / 4, borderY / 2, 4, this::onReturn)
+//                                        );
+//                            }
+//                        });
+
+
             });
 
             towerUpgradeDialogue = new TowerUpgradeDialog(
@@ -1199,24 +1285,24 @@ public class Game {
                                                 diagonalMatrix[j][i].hide();
                                 });
 
-//                                gameConsumer.consume(()-> {
-//                                    System.err.println("******************************************************************************");
-//                                    System.err.println("ACTIVE BULLETS: " + bulletRepo.activeProjectiles.size());
-//                                    System.err.println("INACTIVE BULLETS: " + bulletRepo.size());
-//                                    for (BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
-//                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-//
-//                                    System.err.println("ACTIVE ROCKETS: " + rocketRepo.activeProjectiles.size());
-//                                    System.err.println("INACTIVE ROCKETS: " + rocketRepo.size());
-//                                    for (BulletDoubleDaemon bullet : rocketRepo.activeProjectiles)
-//                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-//
-//                                    System.err.println("ACTIVE MISSILES: " + enemyMissileRepo.activeProjectiles.size());
-//                                    System.err.println("INACTIVE MISSILES: " + enemyMissileRepo.size());
-//                                    for (BulletDoubleDaemon bullet : enemyMissileRepo.activeProjectiles)
-//                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-//                                    System.err.println("******************************************************************************");
-//                                });
+                                gameConsumer.consume(()-> {
+                                    System.err.println("******************************************************************************");
+                                    System.err.println("ACTIVE BULLETS: " + bulletRepo.activeProjectiles.size());
+                                    System.err.println("INACTIVE BULLETS: " + bulletRepo.size());
+                                    for (BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
+                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
+
+                                    System.err.println("ACTIVE ROCKETS: " + rocketRepo.activeProjectiles.size());
+                                    System.err.println("INACTIVE ROCKETS: " + rocketRepo.size());
+                                    for (BulletDoubleDaemon bullet : rocketRepo.activeProjectiles)
+                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
+
+                                    System.err.println("ACTIVE MISSILES: " + enemyMissileRepo.activeProjectiles.size());
+                                    System.err.println("INACTIVE MISSILES: " + enemyMissileRepo.size());
+                                    for (BulletDoubleDaemon bullet : enemyMissileRepo.activeProjectiles)
+                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
+                                    System.err.println("******************************************************************************");
+                                });
                             }
                         });
                     }
@@ -1524,8 +1610,8 @@ public class Game {
 
                 //every... enemies increase the pain!!!!
                 if (enemyCounter % 3 == 0) {
-                    if(enemyVelocity < 6)
-                        enemyVelocity += 1;
+                    if(enemyVelocity < 3)
+                        enemyVelocity += 0.3;
                     enemyHp++;
                 }
 
@@ -1570,7 +1656,7 @@ public class Game {
                                     enemyDoubleDaemon.getLastCoordinates(),
                                     target,
                                     enemyMissileRepo,
-                                    15,
+                                    5,
                                     target.getTowerLevel().bulletDamage,
                                     2,
                                     ()->{
@@ -1926,7 +2012,7 @@ public class Game {
                                     fireBullet(
                                             towerDaemon.getLastCoordinates(),
                                             enemy,
-                                            25,
+                                            6,
                                             towerDaemon.getTowerLevel().bulletDamage,
                                             towerDaemon.getTowerLevel().currentLevel,
                                             false,
@@ -1941,7 +2027,7 @@ public class Game {
                                             towerDaemon.getLastCoordinates(),
                                             enemy,
                                             rocketRepo,
-                                            18,
+                                            5,
                                             towerDaemon.getTowerLevel().bulletDamage,
                                             towerDaemon.getTowerLevel().currentLevel,
                                             () -> bulletClosure.onReturn(5)

@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.AwaitedClosure;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
@@ -195,6 +196,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         super.setRotationSprite(rotationSprite);
     }
 
+    @AwaitedClosure
     @Daemonize
     @GenerateRunnable
     @Override

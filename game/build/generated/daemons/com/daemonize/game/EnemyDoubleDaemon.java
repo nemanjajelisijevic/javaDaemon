@@ -10,7 +10,6 @@ import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.ReturnVoidMainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
-import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
@@ -51,9 +50,9 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   /**
    * Prototype method {@link Enemy#animateEnemy} */
-  public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateEnemySideQuest(Consumer consumer) {
-    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateEnemySideQuest(null);
-    sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
+  public SideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateEnemySideQuest(Consumer consumer) {
+    SideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateEnemySideQuest(sideDaemonEngine.getClosureAwaiter());
+    sideDaemonEngine.setSideQuest(sideQuest.setConsumer(consumer));
     return sideQuest;
   }
 
@@ -426,7 +425,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
-  private final class AnimateEnemySideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+  private final class AnimateEnemySideQuest extends SideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateEnemySideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "animateEnemy";

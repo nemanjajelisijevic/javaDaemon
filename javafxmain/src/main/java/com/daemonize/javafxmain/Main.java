@@ -17,6 +17,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -69,6 +70,32 @@ public class Main extends Application {
 
         scene.setCursor(Cursor.HAND);
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> game.onTouch((float) event.getSceneX(), (float) event.getSceneY()));
+
+//        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+//
+//            switch (event.getCode()) {
+//
+//                case A:
+//                    game.left();
+//                    break;
+//                case S:
+//                    game.down();
+//                    break;
+//                case D:
+//                    game.right();
+//                    break;
+//                case W:
+//                    game.up();
+//                    break;
+//                case SPACE:
+//                    game.startStopTracer();
+//                    break;
+//                default:
+//                    break;
+//
+//            }
+//
+//        });
 
 //            scene.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
 //                if (game.isPaused())

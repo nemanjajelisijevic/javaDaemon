@@ -10,7 +10,6 @@ import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.ReturnVoidMainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
-import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
@@ -45,9 +44,9 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
 
   /**
    * Prototype method {@link Bullet#animateBullet} */
-  public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
-    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(null);
-    sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
+  public SideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
+    SideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(sideDaemonEngine.getClosureAwaiter());
+    sideDaemonEngine.setSideQuest(sideQuest.setConsumer(consumer));
     return sideQuest;
   }
 
@@ -332,7 +331,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return this;
   }
 
-  private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+  private final class AnimateBulletSideQuest extends SideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
     private AnimateBulletSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "animateBullet";
