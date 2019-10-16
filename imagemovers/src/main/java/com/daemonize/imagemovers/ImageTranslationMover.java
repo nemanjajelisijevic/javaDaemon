@@ -189,6 +189,8 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator, Pausab
             ret.image = iterateSprite();
         }
 
+        Thread.sleep(10);
+
         long currentFrameTimeStamp = System.nanoTime();
         long frameInterval = currentFrameTimeStamp - lastFrameTimeStamp;
 

@@ -53,6 +53,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
                     closureAvailable.await();
                 }
                 closureRunnable = closureQueue.poll();//TODO null safety
+                System.err.println(DaemonUtils.tag() + closureQueue.size());
             } catch (InterruptedException ex) {
                 System.out.println(DaemonUtils.tag() + name + " interrupted!");
                 break;
