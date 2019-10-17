@@ -42,9 +42,8 @@ public class AndroidSoundManager implements SoundManager<AndroidSoundClip> {
         boolean fileExists = false;
 
         for(String file : context.fileList()) {
-            if (file.equals(newName)) {
+            if (file.equals(newName))
                 fileExists = true;
-            }
         }
 
         if (!fileExists) {
