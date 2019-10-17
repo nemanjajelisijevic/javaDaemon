@@ -43,7 +43,6 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
 
     private void loop() {
 
-
         while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             try {
@@ -53,7 +52,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
                     closureAvailable.await();
                 }
                 closureRunnable = closureQueue.poll();//TODO null safety
-                System.err.println(DaemonUtils.tag() + closureQueue.size());
+                //System.err.println(DaemonUtils.tag() + closureQueue.size());
             } catch (InterruptedException ex) {
                 System.out.println(DaemonUtils.tag() + name + " interrupted!");
                 break;

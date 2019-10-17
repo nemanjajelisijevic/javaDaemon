@@ -84,11 +84,8 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     @Override
     public PositionedImage animate() throws InterruptedException {
         PositionedImage ret = super.animate();
-
-        Pair<Float, Float> lastCoord = getLastCoordinates();
-
-        if (Math.abs(lastCoord.getFirst() - targetX)  <= velocity.intensity * getdXY()
-                && Math.abs(lastCoord.getSecond() - targetY)  <= velocity.intensity * getdXY()) {
+        if (Math.abs(ret.positionX - targetX)  <= 2 * velocity.intensity * getdXY()
+                && Math.abs(ret.positionY - targetY)  <= 2 * velocity.intensity * getdXY()) {
             coordinateLock.lock();
             coordinatesReached = true;
             setTargetCoordinates(Float.NaN, Float.NaN);

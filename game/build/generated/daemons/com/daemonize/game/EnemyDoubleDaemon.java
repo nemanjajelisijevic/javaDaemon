@@ -201,6 +201,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return prototype.getTargetCoordinates();
   }
 
+  public EnemyDoubleDaemon setFps(int fps) {
+    prototype.setFps(fps);
+    return this;
+  }
+
   @Override
   public EnemyDoubleDaemon setShootable(boolean shootable) {
     prototype.setShootable(shootable);

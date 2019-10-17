@@ -63,6 +63,11 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.getTargetCoordinates();
   }
 
+  public BulletDoubleDaemon setFps(int fps) {
+    prototype.setFps(fps);
+    return this;
+  }
+
   public BulletDoubleDaemon setVelocity(ImageMover.Velocity velocity) {
     prototype.setVelocity(velocity);
     return this;

@@ -1364,6 +1364,11 @@ public class Game {
                 .setName(enemyName)
                 .setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
+                if (i % 2 == 0)
+                    enemy.setFps(30);
+                else
+                    enemy.setFps(50);
+
                 enemy.getPrototype().setBorders(
                         0,
                         (grid.getStartingX() + grid.getGridWidth()),
@@ -1433,7 +1438,7 @@ public class Game {
                                 .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                 ).setName(rocketName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-                rocketDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY);
+                rocketDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY).setFps(40);
 
                 rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
                         .setOutOfBordersClosure(()-> rocketRepo.add(rocketDoubleDaemon.clearAndInterrupt()))
@@ -1462,7 +1467,7 @@ public class Game {
                                 .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(enemyMissileSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
                 ).setName(rocketName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-                missileDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY);
+                missileDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY).setFps(60);
 
                 missileDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
                         .setOutOfBordersClosure(()-> enemyMissileRepo.add(missileDoubleDaemon.clearAndInterrupt()))

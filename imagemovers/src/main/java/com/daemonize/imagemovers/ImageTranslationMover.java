@@ -173,10 +173,23 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator, Pausab
         this.outOfBordersClosure = closure;
     }
 
-    public static final double FPS = 16000000;
+    private long FR_NANOS = 16000000;
+    private long FR_MILLIS = 16;
+    protected double FR_COEF = 1;
+
+    public void setFps(int fps) {
+        if (fps < 1 || fps > 60)
+            throw new IllegalArgumentException("FPS must be > 0 and <= 60");
+
+        FR_MILLIS = 1000 / fps;
+        FR_NANOS =  1000000000 / fps;
+        FR_COEF = FR_MILLIS / 16;
+    }
+
     private long lastFrameTimeStamp = 0;
     private long spriteIterationTimer = 0;
-    protected double timeCoeficient = 0;
+    private double timeCoeficient = 0;
+
 
     @Override
     public PositionedImage animate() throws InterruptedException {
@@ -187,27 +200,37 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator, Pausab
         if (lastFrameTimeStamp == 0) {
             lastFrameTimeStamp = System.nanoTime();
             ret.image = iterateSprite();
+            System.err.println(DaemonUtils.tag() + "FR_MILLIS: " + FR_MILLIS + ", FR_COEF: " + FR_COEF);
         }
-
-        Thread.sleep(10);
 
         long currentFrameTimeStamp = System.nanoTime();
         long frameInterval = currentFrameTimeStamp - lastFrameTimeStamp;
 
+        System.out.println(DaemonUtils.tag() + "Frame interval: " + frameInterval);
+
         lastFrameTimeStamp = currentFrameTimeStamp;
         spriteIterationTimer += frameInterval;
 
-        if (spriteIterationTimer > FPS) {
+        if (spriteIterationTimer > FR_NANOS) {
             ret.image = iterateSprite();
             spriteIterationTimer = 0;
         }
 
-        timeCoeficient = ((double) frameInterval) / FPS;
+        timeCoeficient = (((double) frameInterval) / FR_NANOS) * FR_COEF;
 
         synchronized (this) {
             ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY) * timeCoeficient;
             ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * dXY) * timeCoeficient;
         }
+
+        long tts =((2 * FR_NANOS) - frameInterval) / 1000000;
+
+        System.out.println(DaemonUtils.tag() + "TTS: " + tts);
+
+        if (tts > 0 && tts < FR_MILLIS)
+            Thread.sleep(tts);
+        else
+            Thread.sleep(FR_MILLIS);
 
         return ret;
     }

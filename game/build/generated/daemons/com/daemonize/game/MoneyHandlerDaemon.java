@@ -60,6 +60,11 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return this;
   }
 
+  public MoneyHandlerDaemon setFps(int fps) {
+    prototype.setFps(fps);
+    return this;
+  }
+
   public MoneyHandlerDaemon setVelocity(ImageMover.Velocity velocity) {
     prototype.setVelocity(velocity);
     return this;

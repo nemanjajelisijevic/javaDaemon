@@ -39,15 +39,27 @@ public class AndroidSoundManager implements SoundManager<AndroidSoundClip> {
     public AndroidSoundClip loadSoundClip(String name) throws SoundException {
 
         String newName = "new" + name;
-        try (
-                InputStream is = getClass().getResourceAsStream("/" + name);
-                FileOutputStream fos = context.openFileOutput(newName, Context.MODE_PRIVATE)
-        ){
-            int res = Integer.MIN_VALUE;
-            while ((res = is.read()) != -1)
-                fos.write(res);
-        } catch (IOException e) {
-            throw new SoundException("Unable to load sound file: " + name, e);
+        boolean fileExists = false;
+
+        for(String file : context.fileList()) {
+            if (file.equals(newName)) {
+                fileExists = true;
+            }
+        }
+
+        if (!fileExists) {
+
+            try (
+                    InputStream is = getClass().getResourceAsStream("/" + name);
+                    FileOutputStream fos = context.openFileOutput(newName, Context.MODE_PRIVATE)
+            ) {
+                int res = Integer.MIN_VALUE;
+                while ((res = is.read()) != -1)
+                    fos.write(res);
+            } catch (IOException e) {
+                throw new SoundException("Unable to load sound file: " + name, e);
+            }
+
         }
 
         return new AndroidSoundClip(new File(newName));

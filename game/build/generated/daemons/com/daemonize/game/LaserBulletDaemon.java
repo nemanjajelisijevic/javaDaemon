@@ -72,6 +72,11 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return prototype.getTargetCoordinates();
   }
 
+  public LaserBulletDaemon setFps(int fps) {
+    prototype.setFps(fps);
+    return this;
+  }
+
   public LaserBulletDaemon setVelocity(ImageMover.Velocity velocity) {
     prototype.setVelocity(velocity);
     return this;
