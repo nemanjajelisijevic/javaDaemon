@@ -68,7 +68,7 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     public void setCoordinates(float lastX, float lastY) {
         super.setCoordinates(lastX, lastY);
 
-        setTargetCoordinates(Float.MIN_VALUE, Float.MIN_VALUE);
+        setTargetCoordinates(Float.NaN, Float.NaN);
     }
 
     @Override
