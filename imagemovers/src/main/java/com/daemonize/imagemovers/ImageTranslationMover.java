@@ -118,7 +118,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         velocity.direction.coeficientX = 0;
         velocity.direction.coeficientY = 0;
 
-        if (x - lastX == 0 || y - lastY == 0)
+        if (x - lastX == 0 && y - lastY == 0)
             return false;
 
         dX = x - lastX;
