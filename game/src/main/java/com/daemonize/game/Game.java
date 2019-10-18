@@ -2,7 +2,6 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.DaemonEngine;
 import com.daemonize.daemonengine.closure.BareClosure;
-import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
@@ -816,7 +815,6 @@ public class Game {
                 soundOffImage = imageManager.loadImageFromAssets("soundOff.png", numWidth /** 4 / 5*/, numHeight /** 4 / 5*/);
 
                 Image[] dialogUpgradeTower1 = new Image[3];
-
                 dialogUpgradeTower1[0] = imageManager.loadImageFromAssets("mgleve2.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
                 dialogUpgradeTower1[1] = imageManager.loadImageFromAssets("mgleve3.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
                 dialogUpgradeTower1[2] = imageManager.loadImageFromAssets("mgleveTOP.png", upgradeDialogBackrgoundImageWidth, upgradeDialogBackgroundImageHeight);
@@ -1018,7 +1016,7 @@ public class Game {
                     renderer.consume(()->saleButton.enable().setImage(saleButtonImage));
 
                     //remove tower from grid and recalculate path
-                    if (grid.destroyTower(field.getRow(), field.getColumn())) {
+                    if (grid.destroyObject(field.getRow(), field.getColumn())) {
                         renderer.consume(()->{
                             gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide();
                             towerUpgradeDialogue.getRootView().hide();
@@ -1592,7 +1590,7 @@ public class Game {
                                             towers.remove(target);
                                             field.setObject(null);
 
-                                            grid.destroyTower(field.getRow(), field.getColumn());
+                                            grid.destroyObject(field.getRow(), field.getColumn());
                                             renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
                                         }).queueStop();
                                     }
@@ -1770,7 +1768,7 @@ public class Game {
         ImageView fieldView = gridViewMatrix[field.getRow()][field.getColumn()];
 
         //check if selected field is on the last remaining path
-        if (!grid.setTower(field.getRow(), field.getColumn())){
+        if (!grid.setObject(field.getRow(), field.getColumn())){
 
             if (!deny) {
 
@@ -1884,7 +1882,10 @@ public class Game {
             towers.add(towerDaemon);
             field.setObject(towerDaemon);
 
-            towerDaemon.start().setInitTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn).onInterrupt(gameConsumer, () -> {
+            towerDaemon.start()
+                    .setInitTowerSideQuest(renderer)
+                    .setClosure(new MultiViewAnimateClosure()::onReturn)
+                    .onInterrupt(gameConsumer, () -> {
 
                 towerDaemon.setAnimateTowerSideQuest(renderer).setClosure(new MultiViewAnimateClosure()::onReturn);
 
@@ -2109,7 +2110,6 @@ public class Game {
                                     && Math.abs(bulletY - target.getLastCoordinates().getSecond()) < rocketExplosionRange) {
 
                                 int newHp = target.getHp() - rocketDoubleDaemon.getDamage();
-
                                 if (newHp > 0)
                                     target.setHp(newHp);
                                 else

@@ -113,13 +113,13 @@ public class Grid<T> {
 //        return new Pair<>(row,column);
 //    }
 
-    public boolean setTower(float x, float y) {
+    public boolean setObject(float x, float y) {
         int row = (int) ((y) / fieldWith);
         int column = (int) ((x) / fieldWith);
-        return setTower(row, column);
+        return setObject(row, column);
     }
 
-    public synchronized boolean setTower(int row, int column) {
+    public synchronized boolean setObject(int row, int column) {
 
         if (!grid[row][column].isWalkable() ) return false;
         if (row == grid.length - 1 && column == grid[row].length - 1) return false;
@@ -148,14 +148,14 @@ public class Grid<T> {
         }
     }
 
-    public boolean destroyTower(float x, float y) {
+    public boolean destroyObject(float x, float y) {
         int row = (int) ((y) / fieldWith);
         int column = (int) ((x) / fieldWith);
 
-        return destroyTower(row, column);
+        return destroyObject(row, column);
     }
 
-    public boolean destroyTower(int row, int column) {
+    public boolean destroyObject(int row, int column) {
 
         if (row == grid.length - 1 && column == grid[row].length - 1) {
             System.err.println(DaemonUtils.timedTag() + "Accessing bad field[" + row + "][" + column + "]");
