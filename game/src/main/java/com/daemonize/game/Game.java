@@ -1526,7 +1526,6 @@ public class Game {
 
                 EnemyDoubleDaemon enemyDoubleDaemon = enemyRepo.getAndConfigure(enemy->enemy.setMaxHp(enemyHp).setHp(enemyHp));
 
-                System.err.println(DaemonUtils.timedTag() + enemyDoubleDaemon.getName() + ", STATES: " + enemyDoubleDaemon.getEnginesState().toString());
                 System.out.println(DaemonUtils.tag() + "Enemy counter: " + enemyCounter);
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());
                 System.out.println(DaemonUtils.tag() + "Enemy state: " + enemyDoubleDaemon.getEnginesState().get(enemyDoubleDaemon.getEnginesState().size() - 1));
@@ -1687,24 +1686,14 @@ public class Game {
                 int cnt = 0;
 
                 while (cnt < 6) {
-                    if (firstFieldView.isShowing())
-                        renderer.consume(firstFieldView::hide);
-                    else
-                        renderer.consume(firstFieldView::show);
-
+                    renderer.consume(firstFieldView.isShowing() ? firstFieldView::hide : firstFieldView::show);
                     cnt++;
-
                     Thread.sleep(300);
                 }
 
                 while (cnt < 12) {
-                    if (lastFieldView.isShowing())
-                        renderer.consume(lastFieldView::hide);
-                    else
-                        renderer.consume(lastFieldView.setImage(fieldImageTowerDen)::show);
-
+                    renderer.consume(lastFieldView.isShowing() ? lastFieldView::hide : lastFieldView::show);
                     cnt++;
-
                     Thread.sleep(300);
                 }
 
@@ -1712,8 +1701,13 @@ public class Game {
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
 
-            towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).setName("Tower Sprite Upgrader").setUncaughtExceptionHandler(uncaughtExceptionHandler).start();
-            fieldEraserEngine = new EagerMainQuestDaemonEngine(renderer).setName("Field Eraser").setUncaughtExceptionHandler(uncaughtExceptionHandler).start();
+            towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).setName("Tower Sprite Upgrader")
+                    .setUncaughtExceptionHandler(uncaughtExceptionHandler)
+                    .start();
+
+            fieldEraserEngine = new EagerMainQuestDaemonEngine(renderer).setName("Field Eraser")
+                    .setUncaughtExceptionHandler(uncaughtExceptionHandler)
+                    .start();
 
             renderer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             gameConsumer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
@@ -1745,7 +1739,9 @@ public class Game {
             //show upgrade dialog
             renderer.consume(()->{
 
-                towerUpgradeDialogue.getRootView().setAbsoluteX(borderX / 2).setAbsoluteY(borderY / 2);
+                towerUpgradeDialogue.getRootView()
+                        .setAbsoluteX(borderX / 2)
+                        .setAbsoluteY(borderY / 2);
 
                 towerUpgradeDialogue.getRootView()
                         .getViewByName("TowerView")
@@ -1951,7 +1947,6 @@ public class Game {
                                     );
 
                                     int lvl = towerDaemon.getTowerLevel().currentLevel;
-
                                     float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
                                     long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
