@@ -12,6 +12,7 @@ import com.daemonize.sound.SoundManager;
 import javafx.application.Application;
 
 import javafx.geometry.Rectangle2D;
+import javafx.scene.CacheHint;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -60,6 +61,8 @@ public class Main extends Application {
         game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
         Group root = new Group(canvas);
+        root.setCache(true);
+        root.setCacheHint(CacheHint.SPEED);
         primaryStage.setTitle("Tower Defense");
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
