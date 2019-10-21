@@ -7,7 +7,6 @@ public class Field<T> implements  IHeapItem , Comparable {
     int row; //i - n
     int column;//j - m
 
-
     public int gCost;
     public int hCost;
 

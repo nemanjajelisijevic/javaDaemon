@@ -849,7 +849,6 @@ public class Game {
                 }
 
                 //sounds init
-                //soundManager.setConsumer(gameConsumer);
                 bulletSound = activeSoundManager.loadSoundClip("bullet.wav");
 
                 if (loaderBar.hasNext()) {
@@ -2147,7 +2146,9 @@ public class Game {
 
                 Pair<Integer, Integer> prevFieldCoord = enemyTarget.getPreviousField();
 
-                Field<TowerDaemon> prevField = (prevFieldCoord == null) ?  grid.getField(0, 0) : grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
+                Field<TowerDaemon> prevField = (prevFieldCoord == null)
+                        ?  grid.getField(0, 0)
+                        : grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
 
                 //markAwait to next fields center
                 Field next = grid.getMinWeightOfNeighbors(prevField);
