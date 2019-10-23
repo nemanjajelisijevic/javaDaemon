@@ -271,7 +271,7 @@ public class Game {
 
         @Override
         public void onReturn(Return<ImageMover.PositionedImage> aReturn) {
-            ImageMover.PositionedImage posBmp = aReturn.runtimeCheckAndGet();
+            ImageMover.PositionedImage posBmp = aReturn.get();
             view.setAbsoluteX(posBmp.positionX)
                     .setAbsoluteY(posBmp.positionY)
                     .setImage(posBmp.image);
@@ -281,7 +281,7 @@ public class Game {
     private static class MultiViewAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
-            GenericNode.forEach(aReturn.runtimeCheckAndGet(), arg -> {
+            GenericNode.forEach(aReturn.get(), arg -> {
                 ImageMover.PositionedImage image = arg.getFirst();
                 arg.getSecond().setAbsoluteX(image.positionX)
                         .setAbsoluteY(image.positionY)
