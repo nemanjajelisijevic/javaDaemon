@@ -1472,7 +1472,7 @@ public class Game {
                             selectTowerDialogue.getSelectTowerDialogue().checkCoordinates(x, y);
 
                         if (towerSelect == null)
-                            System.out.println("Select" + "please select tower");
+                            System.out.println("Please select tower");
                         else
                             manageTower(x, y);
                     }
