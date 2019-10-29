@@ -935,7 +935,7 @@ public class Game {
             scene.addImageView(soundButton);
 
             Button upgradeButton = new Button("Upgrade", upgradeButtonImage);
-            upgradeButton.onClick(()->{
+            upgradeButton.onClick(() -> {
 
                 TowerDaemon tow = towerUpgradeDialogue.getTower();
                 tow.levelUp();
@@ -965,7 +965,7 @@ public class Game {
 
                 renderer.consume(()->upgradeButton.disable().setImage(upgradeButtonImagePressed));
 
-                towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
+                towerSpriteUpgrader.daemonize(gameConsumer, () -> Thread.sleep(100), () -> {
 
                     CompositeImageViewImpl towerView = towerUpgradeDialogue.getRootView().getViewByName("TowerView");
 
@@ -984,7 +984,7 @@ public class Game {
             });
 
             Button closeButton = new Button("Close", closeButtonImage);
-            closeButton.onClick(()->{
+            closeButton.onClick(() -> {
                 currentSoundManager.playSound(soundTogglerSound);
                 renderer.consume(()->closeButton.disable().setImage(closeButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
@@ -994,7 +994,7 @@ public class Game {
             });
 
             Button saleButton = new Button("Sale", saleButtonImage);
-            saleButton.onClick(()->{
+            saleButton.onClick(() -> {
                 currentSoundManager.playSound(towerSelectionSound);
                 renderer.consume(()->saleButton.disable().setImage(saleButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, ()->Thread.sleep(100), ()->{
@@ -1060,7 +1060,7 @@ public class Game {
 
             });
 
-            Button tow3 = new Button("TowerType3", greenTower.get(0)[0]).onClick(()->{
+            Button tow3 = new Button("TowerType3", greenTower.get(0)[0]).onClick(() -> {
                 towerSelect = Tower.TowerType.TYPE3;
                 currentTowerSprite = greenTower.get(0);
                 currentSoundManager.playSound(towerSelectionSound);
@@ -1563,7 +1563,7 @@ public class Game {
                                     15,
                                     target.getTowerLevel().bulletDamage,
                                     2,
-                                    ()->{
+                                    () -> {
 
                                         if(!target.isShootable()) {
                                             renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
@@ -1736,7 +1736,7 @@ public class Game {
             }
 
             //show upgrade dialog
-            renderer.consume(()->{
+            renderer.consume(() -> {
 
                 towerUpgradeDialogue.getRootView()
                         .setAbsoluteX(borderX / 2)
@@ -1780,10 +1780,8 @@ public class Game {
                     @Override
                     public Boolean pursue() throws Exception {
                         if (cnt++ <= 6) {
-                            if (cnt % 2 == 0)
-                                return false;
-                            else
-                                return true;
+                            if (cnt % 2 == 0) return false;
+                            else return true;
                         } else
                             throw new InterruptedException();
                     }
