@@ -415,6 +415,16 @@ public class Game {
             moneyDaemon.stop();
             enemyGenerator.stop();
             for(EnemyDoubleDaemon enemy : new ArrayList<>(activeEnemies)) enemy.stop();
+
+            for(BulletDoubleDaemon bullet : bulletRepo.activeProjectiles) bullet.stop();
+            bulletRepo.forEach(bullet -> bullet.stop());
+
+            for(BulletDoubleDaemon rocket : rocketRepo.activeProjectiles) rocket.stop();
+            rocketRepo.forEach(rocket -> rocket.stop());
+
+            for(BulletDoubleDaemon missile : enemyMissileRepo.activeProjectiles) missile.stop();
+            enemyMissileRepo.forEach(missile -> missile.stop());
+
             for (TowerDaemon tower : towers) tower.stop();
             laser.stop();
             scene.unlockViews();
