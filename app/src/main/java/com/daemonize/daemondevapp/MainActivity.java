@@ -130,21 +130,20 @@ public class MainActivity extends AppCompatActivity {
         if(event.getAction() == MotionEvent.ACTION_DOWN)
             game.onTouch(event.getX(), event.getY());
         return true;
-        //return super.onTouchEvent(event);
     }
 
     @Override
     public void onResume(){
-        super.onResume();
         if (game.isRunning() && game.isPaused())
             game.cont();
+        super.onResume();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         if (game.isRunning() && !game.isPaused())
             game.pause();
+        super.onPause();
     }
 
     @Override
@@ -154,8 +153,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         game.stop();
+        super.onDestroy();
     }
 
     @Override

@@ -217,6 +217,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     @Daemonize
     public Pair<TowerType, Target> scan() throws InterruptedException {
 
+        pauseSemaphore.await();
+
         scanRet = Pair.create(null, null);
 
         targetLock.lock();
@@ -305,6 +307,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateTower() throws InterruptedException {
         try {
+            pauseSemaphore.await();
             animateSemaphore.await();
             return updateSprite();
         } catch (InterruptedException ex) {

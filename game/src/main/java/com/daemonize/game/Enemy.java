@@ -70,6 +70,7 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     @Daemonize
     public Target reload() throws InterruptedException {
         Thread.sleep(400);
+        pauseSemaphore.await();
         targetSemaphore.await();
         return getTarget();
     }
