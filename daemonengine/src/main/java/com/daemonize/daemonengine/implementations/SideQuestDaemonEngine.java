@@ -31,6 +31,8 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   public <T, Q extends SideQuest<T>> Q setSideQuest(Consumer consumer, final Q sideQuest) {
     setSideQuest(sideQuest.setConsumer(consumer));
+    if(sideQuest instanceof InterruptibleQuest)
+      ((InterruptibleQuest) sideQuest).setDaemon(this);
     return sideQuest;
   }
 

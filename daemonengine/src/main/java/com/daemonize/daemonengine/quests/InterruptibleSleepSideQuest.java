@@ -1,15 +1,24 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.Daemon;
+import com.daemonize.daemonengine.closure.BareClosure;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonLatch;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> implements InterruptibleQuest<InterruptibleSleepSideQuest<T>>{
+public abstract class InterruptibleSleepSideQuest<T, D extends Daemon<D>> extends SleepSideQuest<T> implements InterruptibleQuest<InterruptibleSleepSideQuest<T, D>, D> {
 
     private Runnable onInterruptRunnable;
     private DaemonLatch initLatch = new DaemonLatch(2).setName(this.getClass().getSimpleName() + " init latch");
+    private D daemon;
+
+    @Override
+    public InterruptibleSleepSideQuest<T, D> setDaemon(D daemon) {
+        this.daemon = daemon;
+        return this;
+    }
 
     public InterruptibleSleepSideQuest() {
         this(null);
@@ -19,11 +28,17 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
         super(closureExecutionWaiter);
     }
 
-    public InterruptibleSleepSideQuest<T> onInterrupt(final Consumer consumer, final Runnable interruptClosure) {
+    @Override
+    public InterruptibleSleepSideQuest<T, D> onInterrupt(final Consumer consumer, final BareClosure<D> interruptClosure) {
         this.onInterruptRunnable = new Runnable() {
             @Override
             public void run() {
-                consumer.consume(interruptClosure);
+                consumer.consume(new Runnable() {
+                    @Override
+                    public void run() {
+                        interruptClosure.onReturn(daemon);
+                    }
+                });
             }
         };
         initLatch.decrement();
@@ -31,14 +46,14 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
     }
 
     @Override
-    public InterruptibleSleepSideQuest<T> setClosure(Closure<T> closure) {
+    public InterruptibleSleepSideQuest<T, D> setClosure(Closure<T> closure) {
         super.setClosure(closure);
         initLatch.decrement();
         return this;
     }
 
     @Override
-    public InterruptibleSleepSideQuest<T> setSleepInterval(long milliseconds) {
+    public InterruptibleSleepSideQuest<T, D> setSleepInterval(long milliseconds) {
         super.setSleepInterval(milliseconds);
         return this;
     }

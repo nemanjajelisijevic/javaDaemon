@@ -55,8 +55,9 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   /**
    * Prototype method {@link Tower#initTower} */
-  public InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setInitTowerSideQuest(Consumer consumer) {
-    InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new InitTowerSideQuest(null);
+  public InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>, TowerDaemon> setInitTowerSideQuest(Consumer consumer) {
+    InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>, TowerDaemon> sideQuest = new InitTowerSideQuest(null);
+    sideQuest.setDaemon(this);
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -454,7 +455,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     }
   }
 
-  private final class InitTowerSideQuest extends InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+  private final class InitTowerSideQuest extends InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>, TowerDaemon> {
     private InitTowerSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "initTower";

@@ -5,6 +5,7 @@ import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.graphics2d.images.Image;
+import com.daemonize.imagemovers.ImageTranslationMover;
 
 
 @Daemon(doubleDaemonize = true, daemonizeBaseMethods = true)
@@ -16,6 +17,12 @@ public class MoneyHandler extends CoordinatedImageTranslationMover  {
     public MoneyHandler(Image[] sprite, Image moneySign, float dXY) {
         super(sprite, 0, Pair.create(0F, 0F), dXY);
         this.currency.image = moneySign;
+    }
+
+    @Override
+    public MoneyHandler setBorders(float x1, float x2, float y1, float y2) {
+        super.setBorders(x1, x2, y1, y2);
+        return this;
     }
 
     public void setAmount(int amount) {

@@ -1,21 +1,35 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.Daemon;
+import com.daemonize.daemonengine.closure.BareClosure;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonLatch;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements InterruptibleQuest<InterruptibleSideQuest<T>> {
+public abstract class InterruptibleSideQuest<T, D extends Daemon<D>> extends SideQuest<T> implements InterruptibleQuest<InterruptibleSideQuest<T, D>, D> {
 
     private Runnable onInterruptRunnable;
     private DaemonLatch initLatch = new DaemonLatch(2).setName(this.getClass().getSimpleName() + " init latch");
+    private D daemon;
 
-    public InterruptibleSideQuest<T> onInterrupt(final Consumer consumer, final Runnable interruptClosure) {
+    @Override
+    public InterruptibleSideQuest<T, D> setDaemon(D daemon) {
+        this.daemon = daemon;
+        return this;
+    }
+
+    public InterruptibleSideQuest<T, D> onInterrupt(final Consumer consumer, final BareClosure<D> interruptClosure) {
         this.onInterruptRunnable = new Runnable() {
             @Override
             public void run() {
-                consumer.consume(interruptClosure);
+                consumer.consume(new Runnable() {
+                    @Override
+                    public void run() {
+                        interruptClosure.onReturn(daemon);
+                    }
+                });
             }
         };
         initLatch.decrement();
@@ -31,7 +45,7 @@ public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements 
     }
 
     @Override
-    public InterruptibleSideQuest<T> setClosure(Closure<T> closure) {
+    public InterruptibleSideQuest<T, D> setClosure(Closure<T> closure) {
         super.setClosure(closure);
         initLatch.decrement();
         return this;

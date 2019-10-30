@@ -136,11 +136,32 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         }
 
         //build sideQuestQuest
-        ClassName sideQuestClassName = sleep > 0 ?( interruptible ? ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP_INTERRUPTIBLE) : ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP)) : (interruptible ? ClassName.get(QUEST_PACKAGE, INTERRUPTIBLE_SIDE_QUEST) : ClassName.get(QUEST_PACKAGE, questTypeName));
-        TypeName sideQuestOfRet = ParameterizedTypeName.get(
-                sideQuestClassName,
-                prototypeMethodData.getMethodRetTypeName()
-        );
+        ClassName sideQuestClassName = sleep > 0
+                ?
+                (
+                        interruptible
+                            ? ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP_INTERRUPTIBLE)
+                            : ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP)
+                )
+                :
+                (
+                        interruptible
+                                ? ClassName.get(QUEST_PACKAGE, INTERRUPTIBLE_SIDE_QUEST)
+                                : ClassName.get(QUEST_PACKAGE, questTypeName)
+                );
+
+        TypeName sideQuestOfRet;
+        if (interruptible)
+            sideQuestOfRet = ParameterizedTypeName.get(
+                    sideQuestClassName,
+                    prototypeMethodData.getMethodRetTypeName(),
+                    ClassName.get(packageName, daemonSimpleName)
+            );
+        else
+            sideQuestOfRet = ParameterizedTypeName.get(
+                    sideQuestClassName,
+                    prototypeMethodData.getMethodRetTypeName()
+            );
 
         String sideQuestName = Character.valueOf(
                 prototypeMethodData.getMethodName().charAt(0)
@@ -204,7 +225,8 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 interruptible ?
                         ParameterizedTypeName.get(
                                 ClassName.get(QUEST_PACKAGE, INTERRUPTIBLE_SIDE_QUEST),
-                                prototypeMethodData.getMethodRetTypeName()
+                                prototypeMethodData.getMethodRetTypeName(),
+                                ClassName.get(packageName, daemonSimpleName)
                         )
                         :
                         ParameterizedTypeName.get(
@@ -216,7 +238,8 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 interruptible ?
                         ParameterizedTypeName.get(
                                 ClassName.get(QUEST_PACKAGE, SIDE_QUEST_SLEEP_INTERRUPTIBLE),
-                                prototypeMethodData.getMethodRetTypeName()
+                                prototypeMethodData.getMethodRetTypeName(),
+                                ClassName.get(packageName, daemonSimpleName)
                         )
                         :
                         ParameterizedTypeName.get(
@@ -227,9 +250,24 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         MethodSpec.Builder sideQuestSetter = MethodSpec.methodBuilder("set" + Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1) + "SideQuest")
                 .addModifiers(Modifier.PUBLIC)
                 .addJavadoc("Prototype method {@link $N#$N}", sideQuestMethod.getFirst().getEnclosingElement().getSimpleName(), sideQuestMethod.getFirst().getSimpleName())
-                .addParameter(consumer, "consumer")
-                .returns(sideQuestOfRet)
+                .addParameter(consumer, "consumer");
+
+//        if(interruptible)
+//            sideQuestSetter.addParameter(
+//                    ParameterizedTypeName.get(
+//                            ClassName.get(
+//                                    BaseDaemonGenerator.CLOSURE_PACKAGE,
+//                                    BaseDaemonGenerator.BARE_CLOSURE_STRING
+//                            ),
+//                            ClassName.get(packageName, daemonSimpleName)
+//                    ), "daemon"
+//            );
+
+        sideQuestSetter.returns(sideQuestOfRet)
                 .addStatement("$T sideQuest = new $N(" + (blockingClosure ? daemonEngineString + ".getClosureAwaiter()" : "null" ) +  ")", sideQuestOfRet, sideQuest);
+
+        if (interruptible)
+            sideQuestSetter.addStatement("sideQuest.setDaemon(this)");
 
         if (sleep > 0)
             sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L).setConsumer(consumer))", sleep);

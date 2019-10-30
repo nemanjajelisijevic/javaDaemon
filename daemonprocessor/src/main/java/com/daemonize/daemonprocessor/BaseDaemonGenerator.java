@@ -50,6 +50,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
     //closures
     protected static final String CLOSURE_PACKAGE = "com.daemonize.daemonengine.closure";
     protected static final String CLOSURE_STRING = "Closure";
+    protected static final String BARE_CLOSURE_STRING = "BareClosure";
     protected static final String CLOSURE_WAITER_STRING = "ClosureExecutionWaiter";
 
     //engine
