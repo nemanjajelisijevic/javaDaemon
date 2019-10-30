@@ -45,8 +45,8 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
 
   /**
    * Prototype method {@link LaserBullet#animateLaser} */
-  public SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> setAnimateLaserSideQuest(Consumer consumer) {
-    SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> sideQuest = new AnimateLaserSideQuest(null);
+  public SleepSideQuest<List<ImageMover.PositionedImage>> setAnimateLaserSideQuest(Consumer consumer) {
+    SleepSideQuest<List<ImageMover.PositionedImage>> sideQuest = new AnimateLaserSideQuest(null);
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -86,8 +86,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return prototype.getSize();
   }
 
-  public List<Pair<ImageView, ImageMover.PositionedImage>> animateLaser() throws
-      InterruptedException {
+  public List<ImageMover.PositionedImage> animateLaser() throws InterruptedException {
     return prototype.animateLaser();
   }
 
@@ -358,14 +357,14 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return this;
   }
 
-  private final class AnimateLaserSideQuest extends SleepSideQuest<List<Pair<ImageView, ImageMover.PositionedImage>>> {
+  private final class AnimateLaserSideQuest extends SleepSideQuest<List<ImageMover.PositionedImage>> {
     private AnimateLaserSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
       this.description = "animateLaser";
     }
 
     @Override
-    public final List<Pair<ImageView, ImageMover.PositionedImage>> pursue() throws Exception {
+    public final List<ImageMover.PositionedImage> pursue() throws Exception {
       return prototype.animateLaser();
     }
   }

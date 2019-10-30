@@ -290,6 +290,27 @@ public class Game {
         }
     }
 
+    private static class LaserAnimateClosure implements Closure<List<ImageMover.PositionedImage>> {
+
+        private List<ImageView> photonViews;
+
+        public LaserAnimateClosure(List<ImageView> photonViews) {
+            this.photonViews = photonViews;
+        }
+
+        @Override
+        public void onReturn(Return<List<ImageMover.PositionedImage>> ret) {
+
+            List<ImageMover.PositionedImage> photons = ret.get();
+
+            for (int i = 0; i < photons.size(); ++i)
+                photonViews.get(i)
+                        .setAbsoluteX(photons.get(i).positionX)
+                        .setAbsoluteY(photons.get(i).positionY)
+                        .setImage(photons.get(i).image);
+        }
+    }
+
     //sound manager
     private SoundManager currentSoundManager;
     private SoundManager activeSoundManager;
@@ -1338,7 +1359,7 @@ public class Game {
                         new Bullet(
                                 bulletSpriteRocket,
                                 0,
-                                Pair.create((float) 0, (float) 0),
+                                Pair.create(0F, 0F),
                                 bulletDamage,
                                 bulletSpriteRocket[0].getWidth(),
                                 dXY
@@ -1396,13 +1417,7 @@ public class Game {
                     new LaserBullet(laserSprite, 40, Pair.create(0F, 0F), bulletDamage, dXY)
             ).setViews(laserViews).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-            laser.setAnimateLaserSideQuest(renderer).setClosure(ret -> {
-                for (Pair<ImageView, ImageMover.PositionedImage> viewAndImage : ret.runtimeCheckAndGet())
-                    viewAndImage.getFirst()
-                            .setAbsoluteX(viewAndImage.getSecond().positionX)
-                            .setAbsoluteY(viewAndImage.getSecond().positionY)
-                            .setImage(viewAndImage.getSecond().image);
-            });
+            laser.setAnimateLaserSideQuest(renderer).setClosure(new LaserAnimateClosure(laserViews));
 
             //init moneyDaemon
             moneyDaemon = new MoneyHandlerDaemon(
@@ -1580,7 +1595,6 @@ public class Game {
                                         }
 
                                         renderer.consume(target.getHpView()::hide);
-
                                         enemyDoubleDaemon.setTarget(null);
 
                                         Field<TowerDaemon> field = grid.getField(
