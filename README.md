@@ -13,11 +13,12 @@ https://github.com/nemanjajelisijevic/javaDaemon/blob/master/game/src/main/java/
 
 //For javafx usage use oracles jdk (openjdk) or whichever contains the javafx gui libraries.
 
-JavaDaemon is a java library/code generator for creating service objects. Based on the thread per object idea.
+JavaDaemon is a java library/code generator for creating service objects. Based on the thread per object idea 
+(Active Object concurrency pattern).
 
 Generates a wrapper (Daemon) class which is an async representation of an annotated prototype class. Or an interface.
 It encapsulates the prototype instance and a thread that executes all the prototype method bodies in its own context, 
-queuing the return value to a consuming (calling thread), allowing the calling thread to loop and be responsive.
+queuing the return value to a consuming (calling) thread, allowing that user thread to loop and be responsive.
 
 It maps public methods of the prototype class (annotated @Daemonize) to Daemons methods with similar signature,
 differing in one thing. The return value is mapped to an output argument of a type:
@@ -47,15 +48,17 @@ api) with dependencies to the daemonengine lib, by parsing users prototype class
 
 Some clarification with an example:
 
-    @Daemonize
+    @Daemon
     public class Example {
 
+        @Daemonize
         public Integer add (Integer i, Integer k) throws InterruptedException {
             //Do the slowest addition the world has ever seen
             Thread.sleep(10000);
             return i + k;
         }
 
+        @Daemonize
         public void dummy(String dummyString, List<Float> floats) {
 
         }
@@ -64,26 +67,37 @@ Some clarification with an example:
             return i - k;
         }
 
+        @Daemonize
         private void shouldNotBeHere(){}
 
+        @Daemonize
         protected Integer shouldNorBeHere() {
             return  1;
         }
-
+        
+        @Daemonize
         public List<String> complicated(String text) throws InterruptedException {
             return new ArrayList<>();
         }
 
+        @Daemonize
         public Pair<Integer, String> pairThem() {
             return Pair.create(5, "12");
         }
 
-        public void voidIt(){}
+        @GenerateRunnable
+        @Daemonize
+        public void voidIt() throws InterruptedException {
+            Thread.sleep(2000);
+        }
 
+        @Daemonize
         public void voidIt(int a) {}
-
+        
+        @Daemonize
         public void voidIt(boolean a) {}
-
+        
+        @Daemonize
         public boolean voidIt(boolean a, boolean b) {
             return a & b;
         }
@@ -105,40 +119,49 @@ Daemonprocessor will generate the Daemon class in the same package:
 
       //**************************************** PROTOTYPE METHODS MAPPED ***************************************/
 
-      public void add(Integer i, Integer k, Closure<Integer> closure) {
+      public ExampleDaemon add(Integer i, Integer k, Closure<Integer> closure) {
         daemonEngine.pursueQuest(new AddMainQuest(i, k, closure));
+        return this;
       }
 
-      public void dummy(String dummystring, List<Float> floats) {
+      public ExampleDaemon dummy(String dummystring, List<Float> floats) {
         daemonEngine.pursueQuest(new DummyMainQuest(dummystring, floats));
+        return this;
       }
 
-      public void subtract(int i, int k, Closure<Integer> closure) {
+      public ExampleDaemon subtract(int i, int k, Closure<Integer> closure) {
         daemonEngine.pursueQuest(new SubtractMainQuest(i, k, closure));
+        return this;
       }
 
-      public void complicated(String text, Closure<List<String>> closure) {
+      public ExampleDaemon complicated(String text, Closure<List<String>> closure) {
         daemonEngine.pursueQuest(new ComplicatedMainQuest(text, closure));
+        return this;
       }
 
-      public void pairThem(Closure<Pair<Integer, String>> closure) {
+      public ExampleDaemon pairThem(Closure<Pair<Integer, String>> closure) {
         daemonEngine.pursueQuest(new PairThemMainQuest(closure));
+        return this;
       }
 
-      public void voidIt() {
-        daemonEngine.pursueQuest(new VoidItMainQuest());
+      public ExampleDaemon voidIt(Runnable retRun) {
+        daemonEngine.pursueQuest(new VoidItMainQuest(retRun));
+        return this;
       }
 
-      public void voidIt(int a) {
+      public ExampleDaemon voidIt(int a) {
         daemonEngine.pursueQuest(new VoidItIMainQuest(a));
+        return this;
       }
 
-      public void voidIt(boolean a) {
+      public ExampleDaemon voidIt(boolean a) {
         daemonEngine.pursueQuest(new VoidItIIMainQuest(a));
+        return this;
       }
 
-      public void voidIt(boolean a, boolean b, Closure<Boolean> closure) {
+      public ExampleDaemon voidIt(boolean a, boolean b, Closure<Boolean> closure) {
         daemonEngine.pursueQuest(new VoidItIIIMainQuest(a, b, closure));
+        return this;
       }
 
       //*********************************** DAEMON INTERFACE METHODS ********************************************/
@@ -153,7 +176,7 @@ Daemonprocessor will generate the Daemon class in the same package:
       }
 
       @Override
-      public void start() {
+      public ExampleDaemon start() {
         daemonEngine.start();
       }
 
@@ -209,8 +232,11 @@ So it can be used:
          ex.printStackTrace();
       }
     });
-    
-    //the 'add' call is enqueued to Daemons call queue and returns immediatelty. Closure holding the result is
-    //handed over to the main loopers queue once the prototype 'add' method returns (10 sec in this case)
+ 
+//the 'add' call is enqueued to Daemons call queue and returns immediatelty. Closure holding the result is
+//handed over to the main loopers queue once the prototype 'add' method returns (10 sec in this case)
+ 
+    exampleDaemon.voidIt(() -> exampleDaemon.add(24, 66, ret -> view.setText(ret.get())));   
+
 
 To be continued...
