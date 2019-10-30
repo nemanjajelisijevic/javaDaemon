@@ -109,7 +109,7 @@ public class LaserBullet extends Bullet {
             Thread.currentThread().sleep(duration);
         } finally {
             fire = false;
-            drawConsumer.consume(()->{
+            drawConsumer.consume(() -> {
                 for (ImageView view : views)
                     view.hide();
             });

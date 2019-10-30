@@ -249,37 +249,10 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
             );
     }
 
-//    @CallingThread
-//    @Override
-//    public void pause() {
-//        super.pause();
-//        pauseScan();
-//    }
-//
-//    @CallingThread
-//    @Override
-//    public void cont() {
-//        super.cont();
-//        contScan();
-//        targetLock.lock();
-//        targetCondition.signalAll();
-//        targetLock.unlock();
-//    }
-
     @Override
     public void setCurrentAngle(int currentAngle) {
         super.setCurrentAngle(currentAngle);
     }
-
-//    @CallingThread
-//    public void pauseScan() {
-//        scanSemaphore.stop();
-//    }
-
-//    @CallingThread
-//    public void contScan() {
-//        scanSemaphore.markAwait();
-//    }
 
     protected volatile PositionedImage ret = new PositionedImage();
     protected PositionedImage hBar = new PositionedImage();
