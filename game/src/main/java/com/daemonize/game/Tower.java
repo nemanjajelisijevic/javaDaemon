@@ -38,7 +38,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         }
     }
 
-    private TowerLevel towerLevel = new TowerLevel(0,0,Integer.MAX_VALUE);
+    private TowerLevel towerLevel = new TowerLevel(0,0, Integer.MAX_VALUE);
 
     protected ImageView view;
     private ImageView hpView;

@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DummyStatePreparerDaemon implements Daemon<DummyStatePreparerDaemon> {
-  private InitState.DummyStatePreparer prototype;
+  private InitStage.DummyStatePreparer prototype;
 
   public MainQuestDaemonEngine daemonEngine;
 
-  public DummyStatePreparerDaemon(Consumer consumer, InitState.DummyStatePreparer prototype) {
+  public DummyStatePreparerDaemon(Consumer consumer, InitStage.DummyStatePreparer prototype) {
     this.daemonEngine = new MainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.prototype = prototype;
   }
@@ -27,11 +27,11 @@ public class DummyStatePreparerDaemon implements Daemon<DummyStatePreparerDaemon
     return this;
   }
 
-  public InitState.DummyStatePreparer getPrototype() {
+  public InitStage.DummyStatePreparer getPrototype() {
     return prototype;
   }
 
-  public DummyStatePreparerDaemon setPrototype(InitState.DummyStatePreparer prototype) {
+  public DummyStatePreparerDaemon setPrototype(InitStage.DummyStatePreparer prototype) {
     this.prototype = prototype;
     return this;
   }
