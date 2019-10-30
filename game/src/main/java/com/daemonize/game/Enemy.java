@@ -199,6 +199,14 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         return rotationMover.iterateSprite();
     }
 
+    private GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(null, null));
+    private GenericNode<Pair<PositionedImage, ImageView>> hBarGN = new GenericNode<>(Pair.create(null, null));
+    private GenericNode<Pair<PositionedImage, ImageView>> paralyzedGN = new GenericNode<>(Pair.create(null, null));
+
+    {
+        root.addChild(hBarGN);
+    }
+
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() throws InterruptedException {
 
@@ -209,17 +217,23 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         if (enemyPosBmp == null)
             return null;
 
-        GenericNode<Pair<PositionedImage, ImageView>> root = new GenericNode<>(Pair.create(enemyPosBmp, view));
+        root.getValue().setFirst(enemyPosBmp).setSecond(view);
+
         hBar.image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
         hBar.positionX = lastCoord.getFirst();
         hBar.positionY = lastCoord.getSecond() - 2 * hBar.image.getHeight();
-        root.addChild(new GenericNode<>(Pair.create(hBar, hpView)));
+        hBarGN.getValue().setFirst(hBar).setSecond(hpView);
 
         if (paralyzed) {
             paralyzedPosImage.positionX = enemyPosBmp.positionX;
             paralyzedPosImage.positionY = enemyPosBmp.positionY;
-            root.addChild(new GenericNode<>(Pair.create(paralyzedPosImage, paralyzedView)));
+            paralyzedGN.getValue().setFirst(paralyzedPosImage).setSecond(paralyzedView);
+            root.addChild(paralyzedGN);
+        } else {
+            if(root.getChildren().size() >  1)
+                root.getChildren().remove(1);
         }
+
         return root;
     }
 }
