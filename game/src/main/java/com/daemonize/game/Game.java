@@ -2187,6 +2187,9 @@ public class Game {
 
         laser.desintegrateTarget(source, target, duration, renderer, ret -> {
 
+            if (!ret.runtimeCheckAndGet())
+                return;
+
             int newHp = enemyTarget.getHp() - laser.getDamage();
             if (newHp > 0) {
 

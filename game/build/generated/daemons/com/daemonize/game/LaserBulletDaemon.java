@@ -225,7 +225,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   /**
    * Prototype method {@link com.daemonize.game.LaserBullet#desintegrateTarget} */
   public LaserBulletDaemon desintegrateTarget(Pair<Float, Float> sourcecoord, Target target,
-      long duration, Consumer drawconsumer, Closure<List<ImageView>> closure) {
+      long duration, Consumer drawconsumer, Closure<Boolean> closure) {
     mainDaemonEngine.pursueQuest(new DesintegrateTargetMainQuest(sourcecoord, target, duration, drawconsumer, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
@@ -382,7 +382,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     }
   }
 
-  private final class DesintegrateTargetMainQuest extends MainQuest<List<ImageView>> {
+  private final class DesintegrateTargetMainQuest extends MainQuest<Boolean> {
     private Pair<Float, Float> sourcecoord;
 
     private Target target;
@@ -392,7 +392,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     private Consumer drawconsumer;
 
     private DesintegrateTargetMainQuest(Pair<Float, Float> sourcecoord, Target target,
-        long duration, Consumer drawconsumer, Closure<List<ImageView>> closure,
+        long duration, Consumer drawconsumer, Closure<Boolean> closure,
         ClosureExecutionWaiter closureAwaiter) {
       super(closure, closureAwaiter);
       this.sourcecoord = sourcecoord;
@@ -403,7 +403,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     }
 
     @Override
-    public final List<ImageView> pursue() throws Exception {
+    public final Boolean pursue() throws Exception {
       return prototype.desintegrateTarget(sourcecoord, target, duration, drawconsumer);
     }
   }

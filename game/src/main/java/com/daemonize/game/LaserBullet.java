@@ -4,6 +4,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -61,7 +62,7 @@ public class LaserBullet extends Bullet {
     }
 
     @Daemonize
-    public List<ImageView> desintegrateTarget(
+    public boolean desintegrateTarget(
             Pair<Float, Float> sourceCoord,
             Target target,
             long duration,
@@ -69,7 +70,7 @@ public class LaserBullet extends Bullet {
     ) throws InterruptedException {
 
         if (!target.isShootable())
-            return null;
+            return false;
 
         for (ImageView view : views)
             drawConsumer.consume(view::hide);
@@ -115,7 +116,7 @@ public class LaserBullet extends Bullet {
             phaseLock.unsubscribe();
         }
 
-        return views;
+        return true;
     }
 
     @SideQuest(SLEEP = 25)
