@@ -1175,8 +1175,6 @@ public class Game {
                         enemy.getParalyzedView().hide().setAbsoluteX(0).setAbsoluteY(0);
                     });
 
-                    System.err.println(DaemonUtils.tag() + enemy.getEnginesState().toString());
-
                     enemy.pushSprite(explodeSprite, 0, () -> {
                         renderer.consume(() -> enemy.getView().hide().setAbsoluteX(0).setAbsoluteY(0));
                         enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY());
