@@ -3,29 +3,25 @@ package com.daemonize.game.appstate;
 import com.daemonize.daemonengine.consumer.Consumer;
 
 
-public abstract class DaemonState<T extends DaemonState> {
+public abstract class DaemonStage<S extends DaemonStage> {
 
     protected Consumer consumer;
 
-    @SuppressWarnings("unchecked")
-    public final T setConsumer(Consumer consumer){
+    protected DaemonStage(Consumer consumer) {
         this.consumer = consumer;
-        return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
-    public final T enter() {
+    public final S enter() {
         onEnter();
-        return (T) this;
+        return (S) this;
     }
 
     protected abstract void onEnter();
 
     protected abstract void onExit();
 
-    protected final void transition(DaemonState next) {
+    protected final void transition(DaemonStage next) {
         onExit();
-        next.setConsumer(consumer);
         consumer.consume(new Runnable() {
             @Override
             public void run() {
