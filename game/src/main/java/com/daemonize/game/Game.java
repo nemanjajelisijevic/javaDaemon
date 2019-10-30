@@ -397,7 +397,7 @@ public class Game {
 
     public void cont() { //continueAll
         gameConsumer.consume(() -> {
-            enemyGenerator.start();
+            enemyGenerator.cont();
             for (EnemyDoubleDaemon enemy : activeEnemies)
                 enemy.cont();
             for (TowerDaemon tower : towers)
@@ -1465,7 +1465,7 @@ public class Game {
                 gameConsumer.consume(() -> {
                     towerSpriteUpgrader.stop();
                     fieldEraserEngine.stop();
-                    enemyGenerator.stop();
+                    enemyGenerator.pause();
                     for (EnemyDoubleDaemon enemy : activeEnemies)
                         enemy.pause();
                     for (TowerDaemon tower : towers)

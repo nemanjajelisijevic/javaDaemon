@@ -21,6 +21,7 @@ public class DynamicIntervalDummyQuest extends DummyQuest {
             long sleep = intervalRegulator.getSleepInterval();
             if (sleep > 0)
                 Thread.sleep(sleep);
+            pauseSemaphore.await();
             consumer.consume(returnRunnable);
             return true;
         } catch (InterruptedException ex) {
