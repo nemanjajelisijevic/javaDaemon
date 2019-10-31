@@ -94,7 +94,7 @@ public class Game {
     //image loader
     private ImageManager imageManager;
 
-    //state holder
+    //daemonState holder
     private DaemonChainScript stateChain = new DaemonChainScript();
 
     //Scene
@@ -471,7 +471,7 @@ public class Game {
     }
 
     {
-        //init state (loading sprites)
+        //init daemonState (loading sprites)
         stateChain.addState(() -> { //image loading State
 
             try {
@@ -1288,11 +1288,33 @@ public class Game {
                                 enemyHp,
                                 Pair.create(grid.getStartingX(), grid.getStartingY()),
                                 dXY
-                        ).setView(scene.addImageView(new ImageViewImpl(enemyName + " View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(10)))
-                                .setHpView(scene.addImageView(new ImageViewImpl(enemyName + " HP View").setImage(enemySprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(10)))
-                                .setTargetView(scene.addImageView(new ImageViewImpl(enemyName + " Target View").setImage(target).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(10)))
-                                .setHealthBarImage(healthBarSprite)
-                                .setParalyzedImage(paralyzed)
+                        ).setView(
+                                scene.addImageView(
+                                        new ImageViewImpl(enemyName + " View")
+                                                .setImage(enemySprite[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(10)
+                                )
+                        ).setHpView(
+                                scene.addImageView(new ImageViewImpl(enemyName + " HP View")
+                                        .setImage(enemySprite[0])
+                                        .hide()
+                                        .setAbsoluteX(0)
+                                        .setAbsoluteY(0)
+                                        .setZindex(10)
+                                )
+                        ).setTargetView(
+                                scene.addImageView(
+                                        new ImageViewImpl(enemyName + " Target View")
+                                                .setImage(target)
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(10)
+                                )
+                        ).setHealthBarImage(healthBarSprite).setParalyzedImage(paralyzed)
                 ).setParalyzedView(scene.addImageView(new ImageViewImpl(enemyName + " Paralyzed View").setImage(paralyzed).setAbsoluteX(0).setAbsoluteY(0).setZindex(11).hide()))
                 .setName(enemyName)
                 .setUncaughtExceptionHandler(uncaughtExceptionHandler);
@@ -1326,9 +1348,34 @@ public class Game {
                                 bulletDamage,
                                 bulletSprite[0].getWidth(),
                                 dXY
-                        ).setView(scene.addImageView(new ImageViewImpl(bulletName + " View 1").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)))
-                                .setView2(scene.addImageView(new ImageViewImpl(bulletName + " View 2").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)))
-                                .setView3(scene.addImageView(new ImageViewImpl(bulletName + " View 3").setImage(bulletSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(1)))
+                        ).setView(
+                                scene.addImageView(
+                                        new ImageViewImpl(bulletName + " View 1")
+                                                .setImage(bulletSprite[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(1)
+                                )
+                        ).setView2(
+                                scene.addImageView(
+                                        new ImageViewImpl(bulletName + " View 2")
+                                                .setImage(bulletSprite[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(1)
+                                )
+                        ).setView3(
+                                scene.addImageView(
+                                        new ImageViewImpl(bulletName + " View 3")
+                                                .setImage(bulletSprite[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(1)
+                                )
+                        )
                 ).setName(bulletName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 bulletDoubleDaemon.getPrototype().setBorders(
@@ -1361,9 +1408,34 @@ public class Game {
                                 bulletDamage,
                                 bulletSpriteRocket[0].getWidth(),
                                 dXY
-                        ).setView(scene.addImageView(new ImageViewImpl(rocketName + " View 1").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
-                                .setView2(scene.addImageView(new ImageViewImpl(rocketName + " View 2").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
-                                .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(bulletSpriteRocket[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                        ).setView(
+                                scene.addImageView(
+                                        new ImageViewImpl(rocketName + " View 1")
+                                                .setImage(bulletSpriteRocket[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(5)
+                                )
+                        ).setView2(
+                                scene.addImageView(
+                                        new ImageViewImpl(rocketName + " View 2")
+                                                .setImage(bulletSpriteRocket[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(5)
+                                )
+                        ).setView3(
+                                scene.addImageView(
+                                        new ImageViewImpl(rocketName + " View 3")
+                                                .setImage(bulletSpriteRocket[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(5)
+                                )
+                        )
                 ).setName(rocketName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 rocketDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY);
@@ -1390,9 +1462,34 @@ public class Game {
                                 bulletDamage,
                                 enemyMissileSprite[0].getWidth(),
                                 dXY
-                        ).setView(scene.addImageView(new ImageViewImpl(rocketName + " View 1").setImage(enemyMissileSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
-                                .setView2(scene.addImageView(new ImageViewImpl(rocketName + " View 2").setImage(enemyMissileSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
-                                .setView3(scene.addImageView(new ImageViewImpl(rocketName + " View 3").setImage(enemyMissileSprite[0]).hide().setAbsoluteX(0).setAbsoluteY(0).setZindex(5)))
+                        ).setView(
+                                scene.addImageView(
+                                        new ImageViewImpl(rocketName + " View 1")
+                                                .setImage(enemyMissileSprite[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(5)
+                                )
+                        ).setView2(
+                                scene.addImageView(
+                                        new ImageViewImpl(rocketName + " View 2")
+                                                .setImage(enemyMissileSprite[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(5)
+                                )
+                        ).setView3(
+                                scene.addImageView(
+                                        new ImageViewImpl(rocketName + " View 3")
+                                                .setImage(enemyMissileSprite[0])
+                                                .hide()
+                                                .setAbsoluteX(0)
+                                                .setAbsoluteY(0)
+                                                .setZindex(5)
+                                )
+                        )
                 ).setName(rocketName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 missileDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY);
@@ -1420,7 +1517,7 @@ public class Game {
             //init moneyDaemon
             moneyDaemon = new MoneyHandlerDaemon(
                     gameConsumer,
-                    (MoneyHandler) new MoneyHandler(moneyNumbersImages, dollarSign, dXY).setBorders(0, borderX, 0, borderY)
+                    new MoneyHandler(moneyNumbersImages, dollarSign, dXY).setBorders(0, borderX, 0, borderY)
             ).setName("Money handler Daemon")
                     .setUncaughtExceptionHandler(uncaughtExceptionHandler)
                     .setCoordinates(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY())
@@ -1436,8 +1533,14 @@ public class Game {
 
             moneyDaemon.setAnimateMoneySideQuest(renderer).setClosure(ret -> {
                 Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> result = ret.get();
-                moneyView.getFirst().setImage(result.getFirst().image).setAbsoluteX(result.getFirst().positionX).setAbsoluteY(result.getFirst().positionY);
-                moneyView.getSecond().setImage(result.getSecond().image).setAbsoluteX(result.getSecond().positionX).setAbsoluteY(result.getSecond().positionY);
+                moneyView.getFirst()
+                        .setImage(result.getFirst().image)
+                        .setAbsoluteX(result.getFirst().positionX)
+                        .setAbsoluteY(result.getFirst().positionY);
+                moneyView.getSecond()
+                        .setImage(result.getSecond().image)
+                        .setAbsoluteX(result.getSecond().positionX)
+                        .setAbsoluteY(result.getSecond().positionY);
             });
 
             //prepare the scene and start the renderer
@@ -1549,7 +1652,7 @@ public class Game {
 
                 System.out.println(DaemonUtils.tag() + "Enemy counter: " + enemyCounter);
                 System.out.println(DaemonUtils.tag() + "Enemy repo size: " + enemyRepo.size());
-                System.out.println(DaemonUtils.tag() + "Enemy state: " + enemyDoubleDaemon.getEnginesState().get(enemyDoubleDaemon.getEnginesState().size() - 1));
+                System.out.println(DaemonUtils.tag() + "Enemy daemonState: " + enemyDoubleDaemon.getEnginesState().get(enemyDoubleDaemon.getEnginesState().size() - 1));
 
                 int firstAngle = (int) RotatingSpriteImageMover.getAngle(
                         enemyDoubleDaemon.getLastCoordinates().getFirst(),
@@ -1872,8 +1975,12 @@ public class Game {
                             towerSelect,
                             dXY,
                             towerHp
-                    ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show())
-                            .setHealthBarImage(healthBarSprite)
+                    ).setHpView(
+                            towerHpViwes[field.getRow()][field.getColumn()]
+                                    .setAbsoluteX(field.getCenterX())
+                                    .setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight())
+                                    .show()
+                    )
 
                     :
 
@@ -1885,7 +1992,12 @@ public class Game {
                             towerSelect,
                             dXY,
                             towerHp
-                    ).setHpView(towerHpViwes[field.getRow()][field.getColumn()].setAbsoluteX(field.getCenterX()).setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight()).show());
+                    ).setHpView(
+                            towerHpViwes[field.getRow()][field.getColumn()]
+                                    .setAbsoluteX(field.getCenterX())
+                                    .setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight())
+                                    .show()
+                    );
 
             TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
                     .setName(towerName)

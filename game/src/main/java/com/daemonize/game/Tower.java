@@ -119,11 +119,6 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         return this;
     }
 
-    public Tower setHealthBarImage(Image[] healthBarImage) {
-        this.spriteHealthBarImage = healthBarImage;
-        return this;
-    }
-
     @Override
     public boolean isShootable() {
         return shootable;
