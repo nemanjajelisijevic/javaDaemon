@@ -103,7 +103,7 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   @Override
   public SideQuestDaemonEngine interrupt() {
-    if (!state.equals(DaemonState.STOPPED) && !state.equals(DaemonState.IDLE)) {
+    if (!daemonState.equals(DaemonState.STOPPED) && !daemonState.equals(DaemonState.IDLE)) {
       if (daemonThread != null
               && !Thread.currentThread().equals(daemonThread)
               && daemonThread.isAlive()) {

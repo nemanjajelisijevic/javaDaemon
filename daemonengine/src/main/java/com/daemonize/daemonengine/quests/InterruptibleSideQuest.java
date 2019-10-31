@@ -29,7 +29,7 @@ public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements 
 
     public InterruptibleSideQuest(ClosureExecutionWaiter closureExecutionWaiter) {
         super(closureExecutionWaiter);
-        //this.state = DaemonState.INITIALIZING;
+        //this.daemonState = DaemonState.INITIALIZING;
     }
 
     @Override

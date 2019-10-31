@@ -12,9 +12,12 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.daemonize.daemonengine.DaemonState.GONE_DAEMON;
+import static com.daemonize.daemonengine.DaemonState.STOPPED;
+
 public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Daemon<D> {
 
-    protected volatile DaemonState state = DaemonState.STOPPED;
+    protected volatile DaemonState daemonState = STOPPED;
     protected Consumer consumer;
     private String name = this.getClass().getSimpleName();
 
@@ -24,7 +27,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     private BaseQuest.DaemonStateSetter stateSetter = new BaseQuest.DaemonStateSetter() {
         @Override
         public void setState(DaemonState state) {
-            setDaemonState(state);
+            if (!daemonState.equals(STOPPED) && !daemonState.equals(GONE_DAEMON))
+                setDaemonState(state);
         }
     };
 
@@ -63,11 +67,11 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     }
 
     protected void setDaemonState(DaemonState state) {
-      this.state = state;
+      this.daemonState = state;
     }
 
     public DaemonState getState() {
-      return state;
+      return daemonState;
     }
 
     protected abstract BaseQuest getQuest();
@@ -78,11 +82,11 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
         BaseQuest currentQuest;
 
-        while (!state.equals(DaemonState.GONE_DAEMON)) {
+        while (!daemonState.equals(DaemonState.GONE_DAEMON)) {
 
             currentQuest = getQuest();
             if (currentQuest == null) {
-                if (state.equals(DaemonState.IDLE))//TODO check dis
+                if (daemonState.equals(DaemonState.IDLE))//TODO check dis
                     continue;
               break;
             }
@@ -92,7 +96,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
         cleanUp();
         System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
-        setDaemonState(DaemonState.STOPPED);
+        setDaemonState(STOPPED);
     }
 
     protected boolean runQuest(BaseQuest quest) {
@@ -102,7 +106,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     @Override
     public synchronized D start() {
         DaemonState initState = getState();
-        if (initState.equals(DaemonState.STOPPED) || initState.equals(DaemonState.GONE_DAEMON))
+        if (initState.equals(STOPPED) || initState.equals(DaemonState.GONE_DAEMON))
             initThread();
         return (D) this;
     }
@@ -125,8 +129,8 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
     @Override
     public synchronized void stop() {
-      if (state != DaemonState.STOPPED) {
-        state = DaemonState.GONE_DAEMON;
+      if (daemonState != STOPPED) {
+        daemonState = DaemonState.GONE_DAEMON;
         if (daemonThread != null
                 && !Thread.currentThread().equals(daemonThread)//TODO check if possible to stopDaemon from daemon thread
                 && daemonThread.isAlive()) {
