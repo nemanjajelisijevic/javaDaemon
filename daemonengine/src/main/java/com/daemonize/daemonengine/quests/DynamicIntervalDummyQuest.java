@@ -24,7 +24,7 @@ public class DynamicIntervalDummyQuest extends DummyQuest {
             if (sleep > 0)
                 Thread.sleep(sleep);
             pauseSemaphore.await();
-            daemonStateSetter.setState(DaemonState.CONSUMING);
+            daemonStateSetter.setState(DaemonState.AWAITING_CLOSURE);
             consumer.consume(returnRunnable);
             return true;
         } catch (InterruptedException ex) {
