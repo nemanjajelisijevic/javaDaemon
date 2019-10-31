@@ -21,6 +21,13 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
     protected Thread daemonThread;
     protected Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
+    private BaseQuest.DaemonStateSetter stateSetter = new BaseQuest.DaemonStateSetter() {
+        @Override
+        public void setState(DaemonState state) {
+            setDaemonState(state);
+        }
+    };
+
     private SemaphoreClosureExecutionWaiter closureAwaiter = new SemaphoreClosureExecutionWaiter().setName(name + " closureAwaiter");
 
     public ClosureExecutionWaiter getClosureAwaiter() {
@@ -55,7 +62,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
       this.consumer = consumer;
     }
 
-    protected void setState(DaemonState state) {
+    protected void setDaemonState(DaemonState state) {
       this.state = state;
     }
 
@@ -74,23 +81,21 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             currentQuest = getQuest();
-
             if (currentQuest == null) {
                 if (state.equals(DaemonState.IDLE))//TODO check dis
                     continue;
               break;
             }
-
+            currentQuest.setDaemonStateSetter(stateSetter);
             runQuest(currentQuest);
         }
 
         cleanUp();
         System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
-        setState(DaemonState.STOPPED);
+        setDaemonState(DaemonState.STOPPED);
     }
 
     protected boolean runQuest(BaseQuest quest) {
-        setState(quest.getState());
         return quest.run();
     };
 
@@ -110,7 +115,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
             }
         });
         daemonThread.setName(name);
-        setState(DaemonState.INITIALIZING);
+        setDaemonState(DaemonState.INITIALIZING);
         if (uncaughtExceptionHandler != null)
             daemonThread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
         daemonThread.start();

@@ -42,7 +42,7 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonBaseEngine<EagerM
     try {
       mainQuestLock.lock();
       while (mainQuestQueue.isEmpty()) {
-        setState(DaemonState.IDLE);
+        setDaemonState(DaemonState.IDLE);
         mainQuestAvailable.await();
       }
       ret = mainQuestQueue.poll();

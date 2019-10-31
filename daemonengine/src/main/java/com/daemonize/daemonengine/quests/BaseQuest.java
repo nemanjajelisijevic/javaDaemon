@@ -7,7 +7,12 @@ import com.daemonize.daemonengine.consumer.Consumer;
 
 public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T> {
 
-  protected DaemonState state;
+  @FunctionalInterface
+  public interface DaemonStateSetter {
+    void setState(DaemonState state);
+  }
+
+  protected DaemonStateSetter daemonStateSetter;
   protected String description = "";
 
   protected ReturnRunnable<T> returnRunnable;
@@ -23,6 +28,11 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
       updateConsumerAction.run();
     }
   };
+
+  public Q setDaemonStateSetter(DaemonStateSetter daemonStateSetter) {
+    this.daemonStateSetter = daemonStateSetter;
+    return (Q) this;
+  }
 
   public String getDescription() {
     return description;
@@ -40,10 +50,6 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
 
   public Consumer getConsumer() {
     return consumer;
-  }
-
-  public DaemonState getState() {
-    return state;
   }
 
   public abstract T pursue() throws Exception;

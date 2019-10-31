@@ -10,10 +10,8 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
 
-  protected ClosureExecutionWaiter closureExecutionWaiter;
-
-  private T result;
-  private Runnable resultRunnable = new Runnable() {
+  protected T result;
+  protected Runnable resultRunnable = new Runnable() {
      @Override
      public void run() {
          setResultAndUpdate(result);
@@ -31,7 +29,7 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
     } else {
       this.returnRunnable = new ReturnRunnable<T>();
     }
-    this.state = DaemonState.SIDE_QUEST;
+    //this.state = DaemonState.SIDE_QUEST;
   }
 
   public SideQuest<T> setClosure(Closure<T> closure) {
@@ -42,10 +40,12 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
   @Override
   public boolean run(){
     try {
+      daemonStateSetter.setState(DaemonState.SIDE_QUEST);
       result = pursue();
       if (result != null) {
-        setResultAndUpdate(result);
+        daemonStateSetter.setState(DaemonState.AWAITING_CLOSURE);
         closureExecutionWaiter.awaitClosureExecution(resultRunnable);
+        daemonStateSetter.setState(DaemonState.SIDE_QUEST);
       }
       return true;
     } catch (InterruptedException ex) {

@@ -1,5 +1,6 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class DynamicIntervalDummyQuest extends DummyQuest {
@@ -18,10 +19,12 @@ public class DynamicIntervalDummyQuest extends DummyQuest {
     @Override
     public boolean run() {
         try {
+            daemonStateSetter.setState(DaemonState.IDLE);
             long sleep = intervalRegulator.getSleepInterval();
             if (sleep > 0)
                 Thread.sleep(sleep);
             pauseSemaphore.await();
+            daemonStateSetter.setState(DaemonState.CONSUMING);
             consumer.consume(returnRunnable);
             return true;
         } catch (InterruptedException ex) {

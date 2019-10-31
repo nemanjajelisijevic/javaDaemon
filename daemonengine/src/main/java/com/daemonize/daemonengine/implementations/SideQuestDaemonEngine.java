@@ -5,15 +5,9 @@ import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.EagerDaemon;
 import com.daemonize.daemonengine.SideQuestDaemon;
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.quests.InterruptibleQuest;
-import com.daemonize.daemonengine.quests.InterruptibleSideQuest;
-import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
-import com.daemonize.daemonengine.quests.Quest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.BaseQuest;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -53,7 +47,7 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
     sideQuestLock.lock();
     try {
       while (currentSideQuest == null) {
-        setState(DaemonState.IDLE);
+        setDaemonState(DaemonState.IDLE);
         sideQuestCondition.await();
       }
     } catch (InterruptedException ex) {}
@@ -71,14 +65,14 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   @Override
   protected boolean runQuest(BaseQuest quest) {
-    setState(quest.getState());
+    //setDaemonState(quest.getState());
     if(!quest.run()) {
       sideQuestLock.lock();
       try {
 
         currentSideQuest = null; //TODO check if nulling is neccessary
         while (currentSideQuest == null) {
-          setState(DaemonState.IDLE);
+          setDaemonState(DaemonState.IDLE);
           sideQuestCondition.await();
         }
 

@@ -19,9 +19,7 @@ public class DummyQuest extends BaseQuest<Void, DummyQuest> {
         return sleepInterval;
     }
 
-    public DummyQuest() {
-        this.state = DaemonState.SIDE_QUEST;
-    }
+    public DummyQuest() {}
 
     public DummyQuest setClosure(Runnable closure) {
         this.returnRunnable = new VoidReturnRunnable(closure);
@@ -46,9 +44,11 @@ public class DummyQuest extends BaseQuest<Void, DummyQuest> {
     @Override
     public boolean run() {
         try {
+            daemonStateSetter.setState(DaemonState.IDLE);
             if (sleepInterval > 0)
                 Thread.sleep(sleepInterval);
             pauseSemaphore.await();
+            daemonStateSetter.setState(DaemonState.CONSUMING);
             consumer.consume(returnRunnable);
             return true;
         } catch (InterruptedException ex) {

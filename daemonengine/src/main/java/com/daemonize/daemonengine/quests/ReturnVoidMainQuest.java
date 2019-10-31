@@ -1,5 +1,6 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.AwaitedVoidReturnRunnable;
 import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.closure.VoidReturnRunnable;
@@ -28,9 +29,13 @@ public abstract class ReturnVoidMainQuest extends VoidMainQuest {
     @Override
     public boolean run() {
         try {
+            daemonStateSetter.setState(DaemonState.MAIN_QUEST);
             pursue();
-            if (!Thread.currentThread().isInterrupted())
+            if (!Thread.currentThread().isInterrupted()) {
+                daemonStateSetter.setState(DaemonState.AWAITING_CLOSURE);
                 closureExecutionWaiter.awaitClosureExecution(updateRunnable);
+                daemonStateSetter.setState(DaemonState.MAIN_QUEST);
+            }
             return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");

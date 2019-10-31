@@ -98,9 +98,8 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
 
     @Override
     protected boolean runQuest(BaseQuest quest) {
-        setState(quest.getState());
         if(!quest.run()) {
-            setState(DaemonState.GONE_DAEMON);
+            setDaemonState(DaemonState.GONE_DAEMON);
             return false;
         }
         return true;

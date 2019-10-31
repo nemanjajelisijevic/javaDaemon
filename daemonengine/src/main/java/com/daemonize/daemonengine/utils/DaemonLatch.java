@@ -18,6 +18,10 @@ public class DaemonLatch {
         this.counter = startCount;
     }
 
+    public final int getCounter() {
+        return counter;
+    }
+
     public void decrement() {
         lock.lock();
         if (--counter < 1) {

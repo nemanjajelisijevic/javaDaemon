@@ -6,13 +6,12 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public abstract class VoidMainQuest extends MainQuest<Void> {
 
-    public VoidMainQuest() {
-        this.state = DaemonState.MAIN_QUEST;
-    }
+    public VoidMainQuest() {}
 
     @Override
     public boolean run() {
         try {
+            daemonStateSetter.setState(DaemonState.MAIN_QUEST);
             pursue();
             return true;
         } catch (InterruptedException ex) {
