@@ -932,7 +932,14 @@ public class Game {
         }).addState(() -> { //views and dialogs population
 
             //add background to scene
-            backgroundView = scene.addImageView(new ImageViewImpl("Background").setImageWithoutOffset(backgroundImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(0).show());
+            backgroundView = scene.addImageView(
+                    new ImageViewImpl("Background")
+                            .setImageWithoutOffset(backgroundImage)
+                            .setAbsoluteX(0)
+                            .setAbsoluteY(0)
+                            .setZindex(0)
+                            .show()
+            );
 
             //dialogues and ui views
             scoreBackGrView = new ImageViewImpl("Score Background").setImage(scoreBackGrImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(3);
@@ -1315,9 +1322,16 @@ public class Game {
                                                 .setZindex(10)
                                 )
                         ).setHealthBarImage(healthBarSprite).setParalyzedImage(paralyzed)
-                ).setParalyzedView(scene.addImageView(new ImageViewImpl(enemyName + " Paralyzed View").setImage(paralyzed).setAbsoluteX(0).setAbsoluteY(0).setZindex(11).hide()))
-                .setName(enemyName)
-                .setUncaughtExceptionHandler(uncaughtExceptionHandler);
+                ).setParalyzedView(
+                        scene.addImageView(
+                                new ImageViewImpl(enemyName + " Paralyzed View")
+                                        .setImage(paralyzed)
+                                        .setAbsoluteX(0)
+                                        .setAbsoluteY(0)
+                                        .setZindex(11)
+                                        .hide()
+                        )
+                ).setName(enemyName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
                 enemy.getPrototype().setBorders(
                         0,
