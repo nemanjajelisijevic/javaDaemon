@@ -29,7 +29,6 @@ public abstract class SideQuest<T> extends BaseQuest<T, SideQuest<T>> {
     } else {
       this.returnRunnable = new ReturnRunnable<T>();
     }
-    //this.daemonState = DaemonState.SIDE_QUEST;
   }
 
   public SideQuest<T> setClosure(Closure<T> closure) {
