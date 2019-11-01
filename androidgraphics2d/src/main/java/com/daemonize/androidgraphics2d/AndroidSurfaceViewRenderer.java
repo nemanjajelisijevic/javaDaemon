@@ -176,6 +176,6 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
 
     @Override
     public void cont() {
-        drawConsumer.pause();
+        drawConsumer.cont();
     }
 }
