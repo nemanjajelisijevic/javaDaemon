@@ -24,7 +24,11 @@ public class AngleToBitmapArray {
         return step;
     }
 
-    public AngleToBitmapArray(Image [] sprite, int step) {
+    public AngleToBitmapArray(Image[] sprite) {
+        this(sprite, 360 / sprite.length);
+    }
+
+    public AngleToBitmapArray(Image[] sprite, int step) {
         this.step = step;
         for (int i = 0; i < array.length; ++i) {
             int it = i / step;

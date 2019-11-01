@@ -5,6 +5,7 @@ import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.graphics2d.images.Image;
+import com.daemonize.imagemovers.ImageTranslationMover;
 
 
 @Daemon(doubleDaemonize = true, daemonizeBaseMethods = true)
@@ -22,6 +23,12 @@ public class MoneyHandler extends CoordinatedImageTranslationMover  {
         if (amount < 0  || amount > 9) //TODO fix boundries
             throw new IllegalArgumentException("Amount must be > 0 && < 10!");
         this.amount = amount;
+    }
+
+    @Override
+    public MoneyHandler setBorders(float x1, float x2, float y1, float y2) {
+        super.setBorders(x1, x2, y1, y2);
+        return this;
     }
 
     @Override

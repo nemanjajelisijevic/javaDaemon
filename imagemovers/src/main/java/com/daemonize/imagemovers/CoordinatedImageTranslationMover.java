@@ -44,17 +44,6 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     @Daemonize
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
 
-        //check borders
-        if (x < borderX1)
-            x = borderX1;
-        else if (x > borderX2)
-            x = borderX2;
-
-        if (y < borderY1)
-            y = borderY1;
-        else if (y > borderY2)
-            y = borderY2;
-
         if (!super.setDirectionAndMove(x, y, velocityInt))
             return false;
 
@@ -83,9 +72,11 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
 
     @Override
     public PositionedImage animate() throws InterruptedException {
+
         PositionedImage ret = super.animate();
-        if (Math.abs(ret.positionX - targetX)  <= 2 * velocity.intensity * getdXY()
-                && Math.abs(ret.positionY - targetY)  <= 2 * velocity.intensity * getdXY()) {
+
+        if (Math.abs(ret.positionX - targetX)  <= velocity.intensity * getdXY()
+                && Math.abs(ret.positionY - targetY)  <= velocity.intensity * getdXY()) {
             coordinateLock.lock();
             coordinatesReached = true;
             setTargetCoordinates(Float.NaN, Float.NaN);

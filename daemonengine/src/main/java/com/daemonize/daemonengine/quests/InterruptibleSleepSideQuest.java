@@ -1,5 +1,6 @@
 package com.daemonize.daemonengine.quests;
 
+import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ClosureExecutionWaiter;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -46,11 +47,22 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
     @Override
     public boolean run() {
         try {
+
+            if(initLatch.getCounter() > 0)
+                daemonStateSetter.setState(DaemonState.INITIALIZING);
             initLatch.await();
-            T result = pursue();
-            if (!Thread.currentThread().isInterrupted() && result != null)
-                setResultAndUpdate(result);
+            daemonStateSetter.setState(DaemonState.SIDE_QUEST);
+
+            result = pursue();
+            if (!Thread.currentThread().isInterrupted() && result != null) {
+                daemonStateSetter.setState(DaemonState.AWAITING_CLOSURE);
+                closureExecutionWaiter.awaitClosureExecution(resultRunnable);
+                daemonStateSetter.setState(DaemonState.SIDE_QUEST);
+            }
+
+            daemonStateSetter.setState(DaemonState.IDLE);
             Thread.sleep(sleepInterval);
+            daemonStateSetter.setState(DaemonState.SIDE_QUEST);
             return true;
         } catch (InterruptedException ex) {
             System.out.println(DaemonUtils.tag() + description + " interrupted.");

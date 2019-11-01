@@ -28,6 +28,7 @@ public class SemaphoreClosureExecutionWaiter implements ClosureExecutionWaiter {
 
     @Override
     public void awaitClosureExecution(Runnable updateConsumerAction) throws InterruptedException {
+
         lock.lock();
         flag = true;
         updateConsumerAction.run();

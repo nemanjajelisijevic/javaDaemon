@@ -67,7 +67,7 @@ public interface ImageMover extends Movable {
 
     void setVelocity(float velocity);
 
-    <K extends ImageMover> K setBorders(float x1, float x2, float y1, float y2);
+    <I extends ImageMover> I setBorders(float x1, float x2, float y1, float y2);
 
     @SideQuest(SLEEP = 25)
     PositionedImage animate() throws InterruptedException;

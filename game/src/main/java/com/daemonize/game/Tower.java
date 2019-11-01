@@ -39,7 +39,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         }
     }
 
-    private TowerLevel towerLevel = new TowerLevel(0,0,Integer.MAX_VALUE);
+    private TowerLevel towerLevel = new TowerLevel(0,0, Integer.MAX_VALUE);
 
     protected ImageView view;
     private ImageView hpView;
@@ -117,11 +117,6 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
     public Tower setHpView(ImageView hpView) {
         this.hpView = hpView;
-        return this;
-    }
-
-    public Tower setHealthBarImage(Image[] healthBarImage) {
-        this.spriteHealthBarImage = healthBarImage;
         return this;
     }
 
@@ -219,6 +214,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     @Daemonize
     public Pair<TowerType, Target> scan() throws InterruptedException {
 
+        pauseSemaphore.await();
+
         scanRet = Pair.create(null, null);
 
         targetLock.lock();
@@ -251,37 +248,10 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
             );
     }
 
-//    @CallingThread
-//    @Override
-//    public void pause() {
-//        super.pause();
-//        pauseScan();
-//    }
-//
-//    @CallingThread
-//    @Override
-//    public void cont() {
-//        super.cont();
-//        contScan();
-//        targetLock.lock();
-//        targetCondition.signalAll();
-//        targetLock.unlock();
-//    }
-
     @Override
     public void setCurrentAngle(int currentAngle) {
         super.setCurrentAngle(currentAngle);
     }
-
-//    @CallingThread
-//    public void pauseScan() {
-//        scanSemaphore.stop();
-//    }
-
-//    @CallingThread
-//    public void contScan() {
-//        scanSemaphore.markAwait();
-//    }
 
     protected volatile PositionedImage ret = new PositionedImage();
     protected PositionedImage hBar = new PositionedImage();
@@ -334,6 +304,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     @SideQuest(SLEEP = 25)
     public GenericNode<Pair<PositionedImage, ImageView>> animateTower() throws InterruptedException {
         try {
+            pauseSemaphore.await();
             animateSemaphore.await();
             return updateSprite();
         } catch (InterruptedException ex) {

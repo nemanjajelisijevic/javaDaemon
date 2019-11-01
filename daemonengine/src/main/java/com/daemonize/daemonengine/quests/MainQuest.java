@@ -18,12 +18,10 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
   };
 
   MainQuest() {
-    this.state = DaemonState.MAIN_QUEST;
     this.returnRunnable = new ReturnRunnable<T>();
   }
 
   public MainQuest(Closure<T> closure, ClosureExecutionWaiter closureExecutionWaiter){
-    this.state = DaemonState.MAIN_QUEST;
     if (closureExecutionWaiter != null) {
         this.closureExecutionWaiter = closureExecutionWaiter;
         this.returnRunnable = new AwaitedReturnRunnable<T>(closureExecutionWaiter).setClosure(closure);
@@ -35,9 +33,13 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
   @Override
   public boolean run() {
     try {
+        daemonStateSetter.setState(DaemonState.MAIN_QUEST);
         result = pursue();
-        if (!Thread.currentThread().isInterrupted() && result != null)
+        if (!Thread.currentThread().isInterrupted() && result != null) {
+            daemonStateSetter.setState(DaemonState.AWAITING_CLOSURE);
             closureExecutionWaiter.awaitClosureExecution(setResultAction);
+            daemonStateSetter.setState(DaemonState.MAIN_QUEST);
+        }
         return true;
     } catch (InterruptedException ex) {
         System.out.println(DaemonUtils.tag() + description + " interrupted.");

@@ -1,8 +1,8 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.appstate.DaemonState;
-import com.daemonize.game.appstate.TransientState1;
+import com.daemonize.game.appstate.DaemonStage;
 import com.daemonize.game.controller.TouchController;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.renderer.Renderer2D;
@@ -12,7 +12,7 @@ import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 
-public class InitState extends DaemonState<InitState> {
+public class InitStage extends DaemonStage<InitStage> {
 
     @Daemon
     public static class DummyStatePreparer {
@@ -34,13 +34,15 @@ public class InitState extends DaemonState<InitState> {
     private Image backgroundImage;
     private Image startButtonImage;
 
-    public InitState(
+    public InitStage(
+            Consumer consumer,
             Renderer2D renderer,
             TouchController controller,
             Image backgroundImage,
             Image startButtonImage,
             Pair<Integer, Integer> borders
     ) {
+        super(consumer);
         this.renderer = renderer;
         this.controller = controller;
         this.initScene = new Scene2D();
@@ -60,7 +62,7 @@ public class InitState extends DaemonState<InitState> {
 
 
         startButton = (Button) initScene.addImageView(new Button("Start", borderX / 2, borderY / 2, 1, startButtonImage).hide());
-        startButton.onClick(()->transition(new TransientState1(1)));
+        //startButton.onClick(()->transition(new TransientStage1(1)));
 
         initScene.lockViews();
         renderer.setScene(initScene).start();

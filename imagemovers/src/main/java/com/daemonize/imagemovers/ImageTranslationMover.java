@@ -35,7 +35,7 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator, Pausab
     private PositionedImage ret = new PositionedImage();
 
     protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore().setName("Animate Semaphore");
-    private DaemonSemaphore pauseSemaphore = new DaemonSemaphore().setName("Global pause semaphore");
+    protected DaemonSemaphore pauseSemaphore = new DaemonSemaphore().setName("Global pause semaphore");
 
     public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
         this.spriteIterator = new BasicSpriteIterator(sprite);

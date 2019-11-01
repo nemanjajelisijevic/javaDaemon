@@ -4,6 +4,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -35,14 +36,8 @@ public class LaserBullet extends Bullet {
         this.photonList = new ArrayList<>(views.size());
         this.coefficients = new float[views.size()];
         float dc = 1F / coefficients.length;
-        for (int i = 0; i < coefficients.length; ++i)  {
+        for (int i = 0; i < coefficients.length; ++i)
             coefficients[i] = (i + 1) * dc;
-//            PositionedImage dummy = new PositionedImage();
-//            dummy.positionX = 0;
-//            dummy.positionY = 0;
-//            dummy.image = spriteIterator.getSprite()[0];
-//            photonList.add(dummy);
-        }
     }
 
     @Override
@@ -67,7 +62,7 @@ public class LaserBullet extends Bullet {
     }
 
     @Daemonize
-    public List<ImageView> desintegrateTarget(
+    public boolean desintegrateTarget(
             Pair<Float, Float> sourceCoord,
             Target target,
             long duration,
@@ -75,7 +70,7 @@ public class LaserBullet extends Bullet {
     ) throws InterruptedException {
 
         if (!target.isShootable())
-            return null;
+            return false;
 
         for (ImageView view : views)
             drawConsumer.consume(view::hide);
@@ -114,18 +109,18 @@ public class LaserBullet extends Bullet {
             Thread.currentThread().sleep(duration);
         } finally {
             fire = false;
-            drawConsumer.consume(()->{
+            drawConsumer.consume(() -> {
                 for (ImageView view : views)
                     view.hide();
             });
             phaseLock.unsubscribe();
         }
 
-        return views;
+        return true;
     }
 
     @SideQuest(SLEEP = 25)
-    public List<Pair<ImageView, PositionedImage>> animateLaser() throws InterruptedException {
+    public List<PositionedImage> animateLaser() throws InterruptedException {
 
         phaseLock.await();
 
@@ -133,15 +128,13 @@ public class LaserBullet extends Bullet {
             return null;
 
         Velocity velocity = target.getVelocity();
-        List<Pair<ImageView, PositionedImage>> ret = new LinkedList<>();
 
         for (int j = 0; j < photonList.size(); ++j) {
             photonList.get(j).positionX = photonList.get(j).positionX + velocity.intensity * coefficients[j] * velocity.direction.coeficientX;
             photonList.get(j).positionY = photonList.get(j).positionY + velocity.intensity * coefficients[j] * velocity.direction.coeficientY;
-            ret.add(Pair.create(views.get(j), photonList.get(j)));
         }
 
-        return ret;
+        return photonList;
     }
 
 }

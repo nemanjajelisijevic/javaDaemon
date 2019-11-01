@@ -54,11 +54,20 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
     @Override
     protected boolean runQuest(BaseQuest quest) {
         if(!quest.run()) {
-            setState(DaemonState.GONE_DAEMON);
+            setDaemonState(DaemonState.GONE_DAEMON);
             return false;
         }
-
         return true;
+    }
+
+    public DummyDaemon pause() {
+        dummyQuest.pause();
+        return this;
+    }
+
+    public DummyDaemon cont() {
+        dummyQuest.cont();
+        return this;
     }
 
     @Override

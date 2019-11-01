@@ -31,15 +31,6 @@ public class Grid<T> {
 
     private List<Field> path;
 
-//    public Grid(float row, float column, Pair<Integer, Integer> startPoint, Pair<Integer, Integer> endPoint) {
-//        this.startPoint = startPoint;
-//        this.endPoint = endPoint;
-//        pathFinding = new Dijkstra();
-//        grid = createFieldGround(row, column);
-//        pathFinding.recalculate(this);//new Pair<>(0,0),new Pair<>(row - 1,column - 1)
-//
-//    }
-
     public boolean isInsideOfGrid (float x, float y){
         boolean in = false;
         float x2 = xCoordinateInReal + grid[0].length * fieldWith;
@@ -106,20 +97,13 @@ public class Grid<T> {
         this.path = path;
     }
 
-//    public Pair<Integer,Integer>  getFieldCoord(float x, float y) {
-//        int row = (int) ((y) / fieldWith);
-//        int column = (int) ((x) / fieldWith);
-//
-//        return new Pair<>(row,column);
-//    }
-
-    public boolean setTower(float x, float y) {
+    public boolean setObject(float x, float y) {
         int row = (int) ((y) / fieldWith);
         int column = (int) ((x) / fieldWith);
-        return setTower(row, column);
+        return setObject(row, column);
     }
 
-    public synchronized boolean setTower(int row, int column) {
+    public synchronized boolean setObject(int row, int column) {
 
         if (!grid[row][column].isWalkable() ) return false;
         if (row == grid.length - 1 && column == grid[row].length - 1) return false;
@@ -148,14 +132,14 @@ public class Grid<T> {
         }
     }
 
-    public boolean destroyTower(float x, float y) {
+    public boolean destroyObject(float x, float y) {
         int row = (int) ((y) / fieldWith);
         int column = (int) ((x) / fieldWith);
 
-        return destroyTower(row, column);
+        return destroyObject(row, column);
     }
 
-    public boolean destroyTower(int row, int column) {
+    public boolean destroyObject(int row, int column) {
 
         if (row == grid.length - 1 && column == grid[row].length - 1) {
             System.err.println(DaemonUtils.timedTag() + "Accessing bad field[" + row + "][" + column + "]");
@@ -232,25 +216,6 @@ public class Grid<T> {
         Collections.sort(neighbors);
 
         return neighbors.get(0);
-
-//        Field currentMinField = neighbors.get(0);
-//        for (Field field : neighbors) {
-//            if (field.isWalkable()) {
-//                if (currentMinField.fCost() >= field.fCost()) {
-//                    if (currentMinField.fCost() == field.fCost()) {
-//                        //they are same, we choose random one
-//                        int randomNum = (int) (Math.random() * 101);
-//                        currentMinField = (randomNum < 50 ? currentMinField : field);
-//                    } else {
-//                        currentMinField = field;
-//                    }
-//                }
-//            }
-//        }
-
-//        return currentMinField;
-
-
     }
 
     public StringBuilder gridToString() {
