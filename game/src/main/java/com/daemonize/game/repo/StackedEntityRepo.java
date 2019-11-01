@@ -42,6 +42,14 @@ public abstract class StackedEntityRepo<T> implements EntityRepo<Stack<T>, T> {
     }
 
     @Override
+    public void addAndConfigure(T entity, EntityConfigurator<T> configurator) {
+        this.onAdd(entity);
+        if (configurator != null)
+            configurator.configure(entity);
+        stack.push(entity);
+    }
+
+    @Override
     public T configureAndGet(EntityConfigurator<T> configurator) {
         T ret  = stack.pop();
         if (ret != null) {

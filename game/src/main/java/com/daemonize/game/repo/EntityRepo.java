@@ -13,6 +13,7 @@ public interface EntityRepo<C extends Collection<T>, T> {
     C getStructure();
 
     boolean add(T entity);
+    void addAndConfigure(T entity, EntityConfigurator<T> configurator);
 
     T configureAndGet(EntityConfigurator<T> configurator);
     T getAndConfigure(EntityConfigurator<T> configurator);
