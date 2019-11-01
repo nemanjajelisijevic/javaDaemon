@@ -75,8 +75,8 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
 
         PositionedImage ret = super.animate();
 
-        if (Math.abs(ret.positionX - targetX)  <= velocity.intensity * getdXY()
-                && Math.abs(ret.positionY - targetY)  <= velocity.intensity * getdXY()) {
+        if (Math.abs(ret.positionX - targetX)  <= velocity.intensity * getdXY() * 2
+                && Math.abs(ret.positionY - targetY)  <= velocity.intensity * getdXY() * 2) {
             coordinateLock.lock();
             coordinatesReached = true;
             setTargetCoordinates(Float.NaN, Float.NaN);

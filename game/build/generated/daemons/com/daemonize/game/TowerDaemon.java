@@ -179,11 +179,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return prototype.getVelocity();
   }
 
-  public TowerDaemon setHealthBarImage(Image[] healthbarimage) {
-    prototype.setHealthBarImage(healthbarimage);
-    return this;
-  }
-
   public TowerDaemon setView(ImageView view) {
     prototype.setView(view);
     return this;

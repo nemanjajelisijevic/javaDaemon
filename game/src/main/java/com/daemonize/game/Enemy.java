@@ -208,7 +208,7 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         root.addChild(hBarGN);
     }
 
-    @SideQuest(SLEEP = 25)
+    @SideQuest(blockingClosure = true)
     public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() throws InterruptedException {
 
         Pair<Float, Float> lastCoord = getLastCoordinates();
