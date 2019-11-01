@@ -145,10 +145,24 @@ public class AndroidTextureViewRenderer implements Renderer2D<AndroidTextureView
     }
 
     @Override
+    public int closureQueueSize() {
+        return drawConsumer.closureQueueSize();
+    }
+
+    @Override
     public AndroidTextureViewRenderer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
         drawThread.setUncaughtExceptionHandler(handler);
         drawConsumer.setUncaughtExceptionHandler(handler);
         return this;
     }
 
+    @Override
+    public void pause() {
+        drawConsumer.pause();
+    }
+
+    @Override
+    public void cont() {
+        drawConsumer.cont();
+    }
 }

@@ -46,7 +46,7 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   /**
    * Prototype method {@link Bullet#animateBullet} */
   public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
-    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(null);
+    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(sideDaemonEngine.getClosureAwaiter());
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -123,11 +123,6 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.getViews();
   }
 
-  public BulletDoubleDaemon pause() {
-    prototype.pause();
-    return this;
-  }
-
   public String toString() {
     return prototype.toString();
   }
@@ -170,11 +165,6 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
 
   public Image[] getSprite() {
     return prototype.getSprite();
-  }
-
-  public BulletDoubleDaemon cont() {
-    prototype.cont();
-    return this;
   }
 
   public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> animateBullet() throws

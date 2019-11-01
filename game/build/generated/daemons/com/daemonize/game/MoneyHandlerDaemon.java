@@ -106,11 +106,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return this;
   }
 
-  public MoneyHandlerDaemon pause() {
-    prototype.pause();
-    return this;
-  }
-
   public Image iterateSprite() {
     return prototype.iterateSprite();
   }
@@ -134,11 +129,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
 
   public MoneyHandlerDaemon setSprite(Image[] sprite) {
     prototype.setSprite(sprite);
-    return this;
-  }
-
-  public MoneyHandlerDaemon cont() {
-    prototype.cont();
     return this;
   }
 

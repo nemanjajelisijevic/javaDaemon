@@ -398,21 +398,12 @@ public class Game {
     public void cont() { //continueAll
         gameConsumer.consume(() -> {
             enemyGenerator.cont();
-            for (EnemyDoubleDaemon enemy : activeEnemies)
-                enemy.cont();
-            for (TowerDaemon tower : towers)
-                tower.cont();
-            for(BulletDoubleDaemon rocket : rocketRepo.activeProjectiles)
-                rocket.cont();
-            for(BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
-                bullet.cont();
-            for(BulletDoubleDaemon missile : enemyMissileRepo.activeProjectiles)
-                missile.cont();
-            renderer.start();
-            towerSpriteUpgrader.start();
-            fieldEraserEngine.start();
+            renderer.cont();
             paused = false;
         });
+        System.err.println(DaemonUtils.tag() + " Game Consumer queue size: " + gameConsumer.closureQueueSize());
+        System.err.println(DaemonUtils.tag() + " Renderer queue size: " + renderer.closureQueueSize());
+        gameConsumer.cont();
     }
 
     public boolean isRunning() {
@@ -1580,20 +1571,9 @@ public class Game {
             //onPause
             this.onPauseRunnable = () -> {
                 gameConsumer.consume(() -> {
-                    towerSpriteUpgrader.stop();
-                    fieldEraserEngine.stop();
                     enemyGenerator.pause();
-                    for (EnemyDoubleDaemon enemy : activeEnemies)
-                        enemy.pause();
-                    for (TowerDaemon tower : towers)
-                        tower.pause();
-                    for(BulletDoubleDaemon rocket : rocketRepo.activeProjectiles)
-                        rocket.pause();
-                    for(BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
-                        bullet.pause();
-                    for(BulletDoubleDaemon missile : enemyMissileRepo.activeProjectiles)
-                        missile.pause();
-                    renderer.stop();
+                    gameConsumer.pause();
+                    renderer.pause();
                     paused = true;
                 });
             };

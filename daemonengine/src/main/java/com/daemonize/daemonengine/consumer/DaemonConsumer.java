@@ -3,7 +3,9 @@ package com.daemonize.daemonengine.consumer;
 
 import com.daemonize.daemonengine.Daemon;
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.Pausable;
 import com.daemonize.daemonengine.closure.Closure;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
 import java.util.ArrayList;
@@ -14,7 +16,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonConsumer> {
+public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonConsumer>, Pausable {
 
     private volatile DaemonState state = DaemonState.STOPPED;
     private Queue<Runnable> closureQueue = new LinkedList<>();
@@ -24,6 +26,8 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
     private Thread looperThread;
     private Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
     private Runnable closureRunnable;
+
+    private DaemonSemaphore pauseSemaphore = new DaemonSemaphore();
 
     public DaemonConsumer(String name) {
         this.name = name;
@@ -47,6 +51,9 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
         while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             try {
+
+                pauseSemaphore.await();
+
                 closureLock.lock();
                 while (closureQueue.isEmpty()) {
                     state = DaemonState.IDLE;
@@ -87,6 +94,21 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
             looperThread.start();
         }
         return this;
+    }
+
+    @Override
+    public int closureQueueSize() {
+        return closureQueue.size();
+    }
+
+    @Override
+    public void pause() {
+        pauseSemaphore.stop();
+    }
+
+    @Override
+    public void cont() {
+        pauseSemaphore.go();
     }
 
     @Override

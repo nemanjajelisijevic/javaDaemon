@@ -34,7 +34,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     private PositionedImage ret = new PositionedImage();
 
     protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore().setName("Animate Semaphore");
-    protected DaemonSemaphore pauseSemaphore = new DaemonSemaphore().setName("Global pause semaphore");
 
     public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
         this.spriteIterator = new BasicSpriteIterator(sprite);
@@ -154,13 +153,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return this;
     }
 
-    public void pause(){
-        pauseSemaphore.stop();
-    }
-
-    public void cont(){
-        pauseSemaphore.go();
-    }
 
     public void setOutOfBordersConsumer(Consumer consumer) {
         this.outOfBordersConsumer = consumer;
@@ -173,7 +165,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     @Override
     public PositionedImage animate() throws InterruptedException {
 
-        pauseSemaphore.await();
         animateSemaphore.await();
 
         ret.image = iterateSprite();

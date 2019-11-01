@@ -100,6 +100,11 @@ public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWA
     }
 
     @Override
+    public int closureQueueSize() {
+        return drawConsumer.closureQueueSize();
+    }
+
+    @Override
     public void stop() {
         drawConsumer.stop();
     }
@@ -107,6 +112,16 @@ public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWA
     @Override
     public AndroidCustomHWAViewRenderer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
         drawConsumer.setUncaughtExceptionHandler(handler);
-        return null;
+        return this;
+    }
+
+    @Override
+    public void pause() {
+        drawConsumer.pause();
+    }
+
+    @Override
+    public void cont() {
+        drawConsumer.cont();
     }
 }

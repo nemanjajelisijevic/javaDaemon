@@ -70,7 +70,6 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     @Daemonize
     public Target reload() throws InterruptedException {
         Thread.sleep(400);
-        pauseSemaphore.await();
         targetSemaphore.await();
         return getTarget();
     }
@@ -208,7 +207,7 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         root.addChild(hBarGN);
     }
 
-    @SideQuest(SLEEP = 25)
+    @SideQuest(SLEEP = 25, blockingClosure = true)
     public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() throws InterruptedException {
 
         Pair<Float, Float> lastCoord = getLastCoordinates();

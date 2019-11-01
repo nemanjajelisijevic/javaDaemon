@@ -48,7 +48,7 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   /**
    * Prototype method {@link Tower#animateTower} */
   public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateTowerSideQuest(Consumer consumer) {
-    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateTowerSideQuest(null);
+    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateTowerSideQuest(sideDaemonEngine.getClosureAwaiter());
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -149,11 +149,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     prototype.setVelocity(velocity);
   }
 
-  public TowerDaemon pause() {
-    prototype.pause();
-    return this;
-  }
-
   @Override
   public boolean isParalyzed() {
     return prototype.isParalyzed();
@@ -177,11 +172,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   @Override
   public ImageMover.Velocity getVelocity() {
     return prototype.getVelocity();
-  }
-
-  public TowerDaemon setHealthBarImage(Image[] healthbarimage) {
-    prototype.setHealthBarImage(healthbarimage);
-    return this;
   }
 
   public TowerDaemon setView(ImageView view) {
@@ -273,11 +263,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   public TowerDaemon setHpView(ImageView hpview) {
     prototype.setHpView(hpview);
-    return this;
-  }
-
-  public TowerDaemon cont() {
-    prototype.cont();
     return this;
   }
 

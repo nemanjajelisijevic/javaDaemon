@@ -1,6 +1,7 @@
 package com.daemonize.daemonengine.dummy;
 
 import com.daemonize.daemonengine.DaemonState;
+import com.daemonize.daemonengine.Pausable;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.BaseDaemonEngine;
 import com.daemonize.daemonengine.quests.DummyQuest;
@@ -8,7 +9,7 @@ import com.daemonize.daemonengine.quests.BaseQuest;
 import com.daemonize.daemonengine.quests.DynamicIntervalDummyQuest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 
-public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
+public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> implements Pausable {
 
     private DummyQuest dummyQuest;
 
@@ -60,14 +61,14 @@ public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> {
         return true;
     }
 
-    public DummyDaemon pause() {
+    @Override
+    public void pause() {
         dummyQuest.pause();
-        return this;
     }
 
-    public DummyDaemon cont() {
+    @Override
+    public void cont() {
         dummyQuest.cont();
-        return this;
     }
 
     @Override

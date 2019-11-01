@@ -41,6 +41,11 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
     }
 
     @Override
+    public int closureQueueSize() {
+        return drawConsumer.closureQueueSize();
+    }
+
+    @Override
     public Scene2D getScene() {
         return scene;
     }
@@ -102,5 +107,16 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
     public JavaFXRenderer setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
         drawConsumer.setUncaughtExceptionHandler(handler);
         return this;
+    }
+
+
+    @Override
+    public void pause() {
+        drawConsumer.pause();
+    }
+
+    @Override
+    public void cont() {
+        drawConsumer.cont();
     }
 }

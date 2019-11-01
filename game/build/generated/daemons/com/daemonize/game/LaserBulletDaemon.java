@@ -46,7 +46,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   /**
    * Prototype method {@link LaserBullet#animateLaser} */
   public SleepSideQuest<List<ImageMover.PositionedImage>> setAnimateLaserSideQuest(Consumer consumer) {
-    SleepSideQuest<List<ImageMover.PositionedImage>> sideQuest = new AnimateLaserSideQuest(null);
+    SleepSideQuest<List<ImageMover.PositionedImage>> sideQuest = new AnimateLaserSideQuest(sideDaemonEngine.getClosureAwaiter());
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -54,7 +54,7 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   /**
    * Prototype method {@link Bullet#animateBullet} */
   public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
-    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(null);
+    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(sideDaemonEngine.getClosureAwaiter());
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -135,11 +135,6 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return prototype.getViews();
   }
 
-  public LaserBulletDaemon pause() {
-    prototype.pause();
-    return this;
-  }
-
   public String toString() {
     return prototype.toString();
   }
@@ -182,11 +177,6 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
 
   public Image[] getSprite() {
     return prototype.getSprite();
-  }
-
-  public LaserBulletDaemon cont() {
-    prototype.cont();
-    return this;
   }
 
   public LaserBulletDaemon setViews(List<ImageView> views) {

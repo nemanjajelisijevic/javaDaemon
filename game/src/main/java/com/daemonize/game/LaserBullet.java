@@ -119,7 +119,7 @@ public class LaserBullet extends Bullet {
         return true;
     }
 
-    @SideQuest(SLEEP = 25)
+    @SideQuest(SLEEP = 25, blockingClosure = true)
     public List<PositionedImage> animateLaser() throws InterruptedException {
 
         phaseLock.await();

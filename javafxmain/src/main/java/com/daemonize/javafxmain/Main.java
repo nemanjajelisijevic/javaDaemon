@@ -73,15 +73,15 @@ public class Main extends Application {
         scene.setCursor(Cursor.HAND);
         scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> game.onTouch((float) event.getSceneX(), (float) event.getSceneY()));
 
-//            scene.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
-//                if (game.isPaused())
-//                    game.cont();
-//            });
-//
-//            scene.addEventFilter(MouseEvent.MOUSE_EXITED, event -> {
-//                if (!game.isPaused())
-//                    game.pause();
-//            });
+        scene.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+            if (game.isPaused())
+                game.cont();
+        });
+
+        scene.addEventFilter(MouseEvent.MOUSE_EXITED, event -> {
+            if (!game.isPaused())
+                game.pause();
+        });
 
         if(!game.isRunning())
             game.run();

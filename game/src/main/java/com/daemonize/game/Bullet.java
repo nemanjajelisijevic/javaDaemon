@@ -158,7 +158,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
         bullet.addChild(bullet1);
     }
 
-    @SideQuest(SLEEP = 25)
+    @SideQuest(SLEEP = 25, blockingClosure = true)
     public GenericNode<Pair<PositionedImage, ImageView>> animateBullet() throws InterruptedException {
 
         PositionedImage posImage = super.animate();
