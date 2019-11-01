@@ -48,39 +48,6 @@ import java.util.Set;
 
 public class Game {
 
-    //common repo for bullets, rockets and enemy missiles
-    private static class ProjectileRepo extends StackedEntityRepo<BulletDoubleDaemon> {
-
-        private Consumer renderer;
-        private Image[] projectileSprite;
-        public Set<BulletDoubleDaemon> activeProjectiles = new HashSet<>();
-
-        public ProjectileRepo(Consumer renderer, Image[] projectileSprite) {
-            this.renderer = renderer;
-            this.projectileSprite = projectileSprite;
-        }
-
-        @Override
-        public void onAdd(BulletDoubleDaemon projectile) {
-            projectile.clearAndInterrupt().clearVelocity().popSprite();
-            renderer.consume(() -> {
-                for (ImageView view : projectile.getViews())
-                    view.hide();
-            });
-        }
-
-        @Override
-        public void onGet(BulletDoubleDaemon projectile) {
-            projectile.setSprite(projectileSprite);
-            renderer.consume(() -> {
-                for (ImageView view : projectile.getViews())
-                    view.setAbsoluteX(projectile.getLastCoordinates().getFirst())
-                            .setAbsoluteY(projectile.getLastCoordinates().getSecond())
-                            .show();
-            });
-        }
-    }
-
     //running flag
     private volatile boolean running;
 
@@ -308,6 +275,39 @@ public class Game {
                         .setAbsoluteX(photons.get(i).positionX)
                         .setAbsoluteY(photons.get(i).positionY)
                         .setImage(photons.get(i).image);
+        }
+    }
+
+    //common repo for bullets, rockets and enemy missiles
+    private static class ProjectileRepo extends StackedEntityRepo<BulletDoubleDaemon> {
+
+        private Consumer renderer;
+        private Image[] projectileSprite;
+        public Set<BulletDoubleDaemon> activeProjectiles = new HashSet<>();
+
+        public ProjectileRepo(Consumer renderer, Image[] projectileSprite) {
+            this.renderer = renderer;
+            this.projectileSprite = projectileSprite;
+        }
+
+        @Override
+        public void onAdd(BulletDoubleDaemon projectile) {
+            projectile.clearAndInterrupt().clearVelocity().popSprite();
+            renderer.consume(() -> {
+                for (ImageView view : projectile.getViews())
+                    view.hide();
+            });
+        }
+
+        @Override
+        public void onGet(BulletDoubleDaemon projectile) {
+            projectile.setSprite(projectileSprite);
+            renderer.consume(() -> {
+                for (ImageView view : projectile.getViews())
+                    view.setAbsoluteX(projectile.getLastCoordinates().getFirst())
+                            .setAbsoluteY(projectile.getLastCoordinates().getSecond())
+                            .show();
+            });
         }
     }
 
@@ -630,7 +630,6 @@ public class Game {
                         renderer.drawScene();
                     }
 
-                    //rocketExplodeSprite[i] = imageManager.rescaleImage(explodeSprite[i], miniWidth, miniHeight);
                     rocketExplodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", miniWidth, miniHeight);
                 }
 
@@ -1754,7 +1753,6 @@ public class Game {
 
                                     if ((currentRow != previousRow) && (currentColumn != previousColumn))
                                         renderer.consume(diagonalMatrix[Math.min(currentRow, previousRow)][Math.min(currentColumn, previousColumn)]::show);
-
                                 }
 
                                 renderer.consume(currentFieldView::show);
@@ -2275,7 +2273,7 @@ public class Game {
                         ?  grid.getField(0, 0)
                         : grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
 
-                //markAwait to next fields center
+                //go to next fields center
                 Field next = grid.getMinWeightOfNeighbors(prevField);
 
                 int angle = (int) RotatingSpriteImageMover.getAngle(
