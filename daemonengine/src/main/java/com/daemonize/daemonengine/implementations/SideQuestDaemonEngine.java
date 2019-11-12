@@ -31,8 +31,10 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
   @Override
   public void setSideQuest(SideQuest quest) {
     sideQuestLock.lock();
+    boolean wasNull = currentSideQuest == null;
     currentSideQuest = quest;
-    sideQuestCondition.signal();
+    if (wasNull)
+      sideQuestCondition.signal();
     sideQuestLock.unlock();
   }
 
@@ -65,23 +67,10 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   @Override
   protected boolean runQuest(BaseQuest quest) {
-    //setDaemonState(quest.getState());
     if(!quest.run()) {
       sideQuestLock.lock();
-      try {
-
-        currentSideQuest = null; //TODO check if nulling is neccessary
-        while (currentSideQuest == null) {
-          setDaemonState(DaemonState.IDLE);
-          sideQuestCondition.await();
-        }
-
-      } catch (InterruptedException e) {
-
-      } finally {
-        sideQuestLock.unlock();
-        return false;
-      }
+      currentSideQuest = null;
+      sideQuestLock.unlock();
     }
     return true;
   }
