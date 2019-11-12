@@ -52,8 +52,9 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
         setDaemonState(DaemonState.IDLE);
         sideQuestCondition.await();
       }
-    } catch (InterruptedException ex) {}
-    finally {
+    } catch (InterruptedException ex) {
+
+    } finally {
       sideQuestLock.unlock();
     }
 
