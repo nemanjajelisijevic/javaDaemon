@@ -15,7 +15,6 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon<SideQuestDaemonEngine>, EagerDaemon<SideQuestDaemonEngine> {
 
   private SideQuest currentSideQuest;
-
   private Lock sideQuestLock = new ReentrantLock();
   private Condition sideQuestCondition = sideQuestLock.newCondition();
 
