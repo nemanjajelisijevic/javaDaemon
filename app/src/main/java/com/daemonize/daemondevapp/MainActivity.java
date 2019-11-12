@@ -7,16 +7,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-//import android.view.TextureView;
+
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 
-//import com.daemonize.androidgraphics2d.AndroidHWAccSurfaceViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidCustomHWAViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidImageManager;
-//import com.daemonize.androidgraphics2d.AndroidSurfaceViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidCustomHWAView;
 import com.daemonize.androidsound.AndroidSoundManager;
 import com.daemonize.game.Game;
@@ -26,7 +24,6 @@ import com.daemonize.sound.SoundManager;
 
 public class MainActivity extends AppCompatActivity {
 
-    //private ConstraintLayout layout;
     private Game game;
 
     private int getPercentageValue(int percent, int hundredPercentValue) {
@@ -45,28 +42,9 @@ public class MainActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
 
         int borderX = getResources().getDisplayMetrics().widthPixels;
         int borderY = getResources().getDisplayMetrics().heightPixels;
-
-//        if (Build.VERSION.SDK_INT >= 26) {
-//        SurfaceView surfaceView = new SurfaceView(this);
-//        surfaceView.setMinimumWidth(borderX);
-//        surfaceView.setMinimumHeight(borderY);
-//        surfaceView.setVisibility(View.VISIBLE);
-//        surfaceView.setZOrderOnTop(true);
-//        setContentView(surfaceView);
-//        Renderer2D renderer = new AndroidHWAccSurfaceViewRenderer(surfaceView);
-//        } else {
-//            TextureView textureView = new TextureView(this);
-//            textureView.setMinimumWidth(borderX);
-//            textureView.setMinimumHeight(borderY);
-//            textureView.setVisibility(View.VISIBLE);
-//            setContentView(textureView);
-//            Renderer2D renderer =  new AndroidTextureViewRenderer(textureView);
-//        }
-
 
         AndroidCustomHWAView customHWAView = new AndroidCustomHWAView(this);
         customHWAView.setMinimumWidth(borderX);
@@ -75,15 +53,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(customHWAView);
         Renderer2D renderer = new AndroidCustomHWAViewRenderer(customHWAView);
 
-
         ImageManager imageManager = new AndroidImageManager(this);
 
         int rows = 6;
         int columns = 9;
 
-
         SoundManager soundManager = new AndroidSoundManager(this, 16);
-//
+
 //        new MainQuestDaemonEngine(null).daemonize(()->{
 //            try {
 //                soundManager.loadBackgroundMusic("Tremors.mp3");
@@ -93,7 +69,17 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }).setName("Background Music Loader").start();
 
-        game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
+        game = new Game(
+                renderer,
+                imageManager,
+                soundManager,
+                borderX,
+                borderY,
+                rows,
+                columns,
+                50,
+                50
+        );
 
         game.uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
             @Override
@@ -111,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (android.content.ActivityNotFoundException ex) {
                     Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
                 }
-
             }
         };
 
