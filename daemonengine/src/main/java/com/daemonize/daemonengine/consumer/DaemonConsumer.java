@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonConsumer>, Pausable {
 
     private volatile DaemonState state = DaemonState.STOPPED;
-    private Queue<Runnable> closureQueue = new LinkedList<>();
+    private Queue<Runnable> closureQueue;
     private final Lock closureLock = new ReentrantLock();
     private final Condition closureAvailable = closureLock.newCondition();
     private String name;
@@ -29,8 +29,14 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
 
     private DaemonSemaphore pauseSemaphore = new DaemonSemaphore();
 
-    public DaemonConsumer(String name) {
+    public DaemonConsumer(String name)
+    {
+        this(name, new LinkedList<Runnable>());
+    }
+
+    public DaemonConsumer(String name, Queue<Runnable> queueImpl) {
         this.name = name;
+        this.closureQueue = queueImpl;
     }
 
     @Override
