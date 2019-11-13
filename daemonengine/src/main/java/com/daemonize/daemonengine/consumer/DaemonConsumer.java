@@ -20,7 +20,8 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
 
     private volatile String name;
     private volatile DaemonState state = DaemonState.STOPPED;
-    private volatile Queue<Runnable> closureQueue;
+
+    private final Queue<Runnable> closureQueue;
     private final Lock closureLock = new ReentrantLock();
     private final Condition closureAvailable = closureLock.newCondition();
 
@@ -58,19 +59,17 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
         while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             try {
-
                 pauseSemaphore.await();
-
                 closureLock.lock();
                 while (closureQueue.isEmpty()) {
                     state = DaemonState.IDLE;
                     closureAvailable.await();
                 }
-                closureRunnable = closureQueue.poll();//TODO null safety
+                closureRunnable = closureQueue.poll();
             } catch (InterruptedException ex) {
                 System.out.println(DaemonUtils.tag() + name + " interrupted!");
-                break;
-            } finally { //TODO Handle Exceptions
+                break;//TODO check this break
+            } finally {
                 closureLock.unlock();
             }
 

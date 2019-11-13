@@ -14,9 +14,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngine> implements SideQuestDaemon<SideQuestDaemonEngine>, EagerDaemon<SideQuestDaemonEngine> {
 
-  private SideQuest currentSideQuest;
-  private Lock sideQuestLock = new ReentrantLock();
-  private Condition sideQuestCondition = sideQuestLock.newCondition();
+  private volatile SideQuest currentSideQuest;
+  private final Lock sideQuestLock = new ReentrantLock();
+  private final Condition sideQuestCondition = sideQuestLock.newCondition();
 
   public SideQuestDaemonEngine(){
     super();
@@ -29,11 +29,17 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
 
   @Override
   public void setSideQuest(SideQuest quest) {
+
     sideQuestLock.lock();
-    boolean wasNull = currentSideQuest == null;
+
+    if (getState().equals(DaemonState.SIDE_QUEST))
+      clearAndInterrupt();
+    else {
+      if (currentSideQuest == null)
+        sideQuestCondition.signal();
+    }
+
     currentSideQuest = quest;
-    if (wasNull)
-      sideQuestCondition.signal();
     sideQuestLock.unlock();
   }
 
@@ -85,7 +91,8 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
   @Override
   public void stop() {
     sideQuestLock.lock();
-    sideQuestCondition.signal();
+    if (currentSideQuest == null)
+        sideQuestCondition.signal();
     sideQuestLock.unlock();
     super.stop();
   }
