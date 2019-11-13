@@ -18,11 +18,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonConsumer>, Pausable {
 
+    private volatile String name;
     private volatile DaemonState state = DaemonState.STOPPED;
-    private Queue<Runnable> closureQueue;
+    private volatile Queue<Runnable> closureQueue;
     private final Lock closureLock = new ReentrantLock();
     private final Condition closureAvailable = closureLock.newCondition();
-    private String name;
+
     private Thread looperThread;
     private Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
     private Runnable closureRunnable;
