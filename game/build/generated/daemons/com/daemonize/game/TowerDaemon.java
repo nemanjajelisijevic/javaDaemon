@@ -54,9 +54,17 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   }
 
   /**
-   * Prototype method {@link Tower#initTower} */
-  public InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setInitTowerSideQuest(Consumer consumer) {
-    InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new InitTowerSideQuest(null);
+   * Prototype method {@link Tower#deactivateTower} */
+  public InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setDeactivateTowerSideQuest(Consumer consumer) {
+    InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new DeactivateTowerSideQuest(sideDaemonEngine.getClosureAwaiter());
+    sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
+    return sideQuest;
+  }
+
+  /**
+   * Prototype method {@link Tower#activateTower} */
+  public InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setActivateTowerSideQuest(Consumer consumer) {
+    InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new ActivateTowerSideQuest(sideDaemonEngine.getClosureAwaiter());
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -164,6 +172,11 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return this;
   }
 
+  public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> deactivateTower() throws
+      InterruptedException {
+    return prototype.deactivateTower();
+  }
+
   @Override
   public float getRange() {
     return prototype.getRange();
@@ -247,9 +260,9 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return prototype.toString();
   }
 
-  public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> initTower() throws
-      InterruptedException {
-    return prototype.initTower();
+  public TowerDaemon prepareForDeactivation() {
+    prototype.prepareForDeactivation();
+    return this;
   }
 
   public Image iterateSprite() {
@@ -279,6 +292,11 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   public TowerDaemon setOutOfBordersConsumer(Consumer consumer) {
     prototype.setOutOfBordersConsumer(consumer);
     return this;
+  }
+
+  public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> activateTower() throws
+      InterruptedException {
+    return prototype.activateTower();
   }
 
   public boolean setDirectionAndMove(float x, float y, float velocityint) {
@@ -439,16 +457,29 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     }
   }
 
-  private final class InitTowerSideQuest extends InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private InitTowerSideQuest(ClosureExecutionWaiter closureAwaiter) {
+  private final class DeactivateTowerSideQuest extends InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private DeactivateTowerSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
-      this.description = "initTower";
+      this.description = "deactivateTower";
     }
 
     @Override
     public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
         Exception {
-      return prototype.initTower();
+      return prototype.deactivateTower();
+    }
+  }
+
+  private final class ActivateTowerSideQuest extends InterruptibleSleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
+    private ActivateTowerSideQuest(ClosureExecutionWaiter closureAwaiter) {
+      super(closureAwaiter);
+      this.description = "activateTower";
+    }
+
+    @Override
+    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
+        Exception {
+      return prototype.activateTower();
     }
   }
 

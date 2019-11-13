@@ -248,7 +248,7 @@ public class Game {
     private static class MultiViewAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
         @Override
         public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
-            GenericNode.forEach(aReturn.get(), arg -> {
+            GenericNode.forEach(aReturn.runtimeCheckAndGet(), arg -> {
                 ImageMover.PositionedImage image = arg.getFirst();
                 arg.getSecond().setAbsoluteX(image.positionX)
                         .setAbsoluteY(image.positionY)
@@ -1027,16 +1027,28 @@ public class Game {
                 renderer.consume(() -> saleButton.disable().setImage(saleButtonImagePressed));
                 towerSpriteUpgrader.daemonize(gameConsumer, () -> Thread.sleep(100), () -> {
                     TowerDaemon tower = towerUpgradeDialogue.getTower();
-                    tower.setShootable(false);
-                    renderer.consume(tower.getHpView()::hide);
+//                    tower.setShootable(false);
+//                    renderer.consume(tower.getHpView()::hide);
 
                     Field<TowerDaemon> field = grid.getField(
                             tower.getLastCoordinates().getFirst(),
                             tower.getLastCoordinates().getSecond()
                     );
 
+
+                    tower.clearAndInterrupt()
+                            .prepareForDeactivation()
+                            .setDeactivateTowerSideQuest(renderer)
+                            .setClosure(new MultiViewAnimateClosure())
+                            .onInterrupt(gameConsumer, () -> {
+                                tower.setShootable(false);
+                                tower.stop();
+                                renderer.consume(tower.getHpView()::hide);
+                                renderer.consume(() ->gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
+                            });
+
                     //stop and remove tower
-                    tower.stop();
+                    //tower.queueStop();
                     towers.remove(tower);
                     field.setObject(null);
 
@@ -1045,7 +1057,7 @@ public class Game {
                     //remove tower from grid and recalculate path
                     if (grid.destroyObject(field.getRow(), field.getColumn())) {
                         renderer.consume(() -> {
-                            gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide();
+                            //gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide();
                             towerUpgradeDialogue.getRootView().hide();
                             infoScore.setNumbers(++score);
                         });
@@ -1186,14 +1198,17 @@ public class Game {
                             Field currentErasingField = grid.getField(0, 0);
 
                             do {
-                                if (gridViewMatrix[currentErasingField.getRow()][currentErasingField.getColumn()].isShowing() && gridViewMatrix[currentErasingField.getRow()][currentErasingField.getColumn()].getImage().equals(fieldImage)) {
+                                if (gridViewMatrix[currentErasingField.getRow()][currentErasingField.getColumn()].isShowing()
+                                        && gridViewMatrix[currentErasingField.getRow()][currentErasingField.getColumn()].getImage().equals(fieldImage)) {
 
                                     renderer.consume(gridViewMatrix[currentErasingField.getRow()][currentErasingField.getColumn()]::hide);
 
-                                    if ((currentErasingField.getRow() > 0) && (currentErasingField.getColumn() > 0) && diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn() - 1].isShowing())
+                                    if ((currentErasingField.getRow() > 0) && (currentErasingField.getColumn() > 0)
+                                            && diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn() - 1].isShowing())
                                         renderer.consume(diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn() - 1]::hide);
 
-                                    if ((currentErasingField.getRow() > 0) && (currentErasingField.getColumn() < columns - 1) && diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn()].isShowing())
+                                    if ((currentErasingField.getRow() > 0) && (currentErasingField.getColumn() < columns - 1)
+                                            && diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn()].isShowing())
                                         renderer.consume(diagonalMatrix[currentErasingField.getRow() - 1][currentErasingField.getColumn()]::hide);
 
                                     Thread.sleep(150);
@@ -2001,7 +2016,7 @@ public class Game {
             field.setObject(towerDaemon);
 
             towerDaemon.start()
-                    .setInitTowerSideQuest(renderer)
+                    .setActivateTowerSideQuest(renderer)
                     .setClosure(new MultiViewAnimateClosure()::onReturn)
                     .onInterrupt(gameConsumer, () -> {
 

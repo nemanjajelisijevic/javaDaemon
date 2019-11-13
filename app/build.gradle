@@ -36,5 +36,6 @@ dependencies {
     implementation project(':androidsound')
     implementation project(':androidgraphics2d')
     implementation project (':game')
+    testCompile 'junit:junit:4.12'
 }
 

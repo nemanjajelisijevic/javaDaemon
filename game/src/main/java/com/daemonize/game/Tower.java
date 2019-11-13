@@ -277,8 +277,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
     private int initHpCount = 0;
 
-    @SideQuest(SLEEP = 25, interruptible = true)
-    public GenericNode<Pair<PositionedImage, ImageView>> initTower() throws InterruptedException {
+    @SideQuest(SLEEP = 25, interruptible = true, blockingClosure = true)
+    public GenericNode<Pair<PositionedImage, ImageView>> activateTower() throws InterruptedException {
         if (spriteBuffer.getCurrentAngle() != 0) {
 
             ret.image = spriteBuffer.getDecrementedByStep();
@@ -287,6 +287,33 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
             if (initHpCount < spriteHealthBarImage.length) {
                 hBar.image = spriteHealthBarImage[initHpCount++];
+            }
+
+            genericRetHBar.getValue().setFirst(hBar).setSecond(hpView);
+            return genericRet;
+        }
+
+        towerLevel = new TowerLevel(1,2,1500);
+        throw new InterruptedException();
+    }
+
+
+    public void prepareForDeactivation() {
+        initHpCount = spriteHealthBarImage.length - 1;
+        spriteBuffer.setCurrentAngle(0);
+    }
+
+
+    @SideQuest(SLEEP = 25, interruptible = true, blockingClosure = true)
+    public GenericNode<Pair<PositionedImage, ImageView>> deactivateTower() throws InterruptedException {
+        if (spriteBuffer.getCurrentAngle() < 180) {
+
+            ret.image = spriteBuffer.getIncrementedByStep();
+
+            genericRet.getValue().setFirst(ret).setSecond(view);
+
+            if (initHpCount >= 0) {
+                hBar.image = spriteHealthBarImage[initHpCount--];
             }
 
             genericRetHBar.getValue().setFirst(hBar).setSecond(hpView);
