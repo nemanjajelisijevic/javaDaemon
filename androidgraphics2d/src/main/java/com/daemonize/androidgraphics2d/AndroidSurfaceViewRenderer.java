@@ -66,13 +66,13 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
     public void surfaceDestroyed(SurfaceHolder holder) {}
 
 
-    public AndroidSurfaceViewRenderer(SurfaceView surfaceView) {
+    public AndroidSurfaceViewRenderer(SurfaceView surfaceView, int closureQueueSize) {
         this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         surfaceView.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
         this.surfaceHolder = surfaceView.getHolder();
         this.surfaceHolder.addCallback(this);
         this.surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
-        this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer");
+        this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer", closureQueueSize);
     }
 
     @Override

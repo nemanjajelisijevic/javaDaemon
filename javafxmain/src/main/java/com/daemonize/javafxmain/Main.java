@@ -53,7 +53,7 @@ public class Main extends Application {
         Canvas canvas = new Canvas(borderX, borderY);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Renderer2D renderer = new JavaFXRenderer(gc, borderX, borderY);
+        Renderer2D renderer = new JavaFXRenderer(gc, borderX, borderY, 200);
         ImageManager imageManager = new JavaFxImageManager("");
 
         SoundManager soundManager = new JavaFxSoundManager(4);

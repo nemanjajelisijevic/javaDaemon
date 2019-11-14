@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         customHWAView.setMinimumHeight(borderY);
         customHWAView.setVisibility(View.VISIBLE);
         setContentView(customHWAView);
-        Renderer2D renderer = new AndroidCustomHWAViewRenderer(customHWAView);
+        Renderer2D renderer = new AndroidCustomHWAViewRenderer(customHWAView, 200);
 
         ImageManager imageManager = new AndroidImageManager(this);
 

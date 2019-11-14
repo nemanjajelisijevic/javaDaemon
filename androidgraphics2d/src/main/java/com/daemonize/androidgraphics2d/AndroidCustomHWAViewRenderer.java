@@ -29,11 +29,11 @@ public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWA
         }
     };
 
-    public AndroidCustomHWAViewRenderer(AndroidCustomHWAView view) {
+    public AndroidCustomHWAViewRenderer(AndroidCustomHWAView view, int closureQueueSize) {
         this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         this.view = view.setRenderer(this);
         this.view.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
-        this.drawConsumer = new DrawConsumer(this, "AndroidCustomHWAViewRenderer draw consumer");
+        this.drawConsumer = new DrawConsumer(this, "AndroidCustomHWAViewRenderer draw consumer", closureQueueSize);
     }
 
     @Override

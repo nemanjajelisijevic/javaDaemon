@@ -55,7 +55,7 @@ public class AndroidTextureViewRenderer implements Renderer2D<AndroidTextureView
     }
 
 
-    public AndroidTextureViewRenderer(TextureView textureView) {
+    public AndroidTextureViewRenderer(TextureView textureView, int closureQueueSize) {
         this.textureView = textureView;
         this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         this.textureView.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
@@ -63,7 +63,7 @@ public class AndroidTextureViewRenderer implements Renderer2D<AndroidTextureView
 //        this.surfaceHolder = surfaceView.getHolder();
 //        this.surfaceHolder.addCallback(this);
 //        this.textureView.setFormat(PixelFormat.TRANSPARENT);
-        this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer");
+        this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer", closureQueueSize);
     }
 
     @Override

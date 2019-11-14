@@ -7,8 +7,8 @@ public class DrawConsumer extends DaemonConsumer {
 
     private Renderer2D renderer;
 
-    public DrawConsumer(Renderer2D renderer, String name) {
-        super(name, new BoundedBufferQueue<Runnable>(200));
+    public DrawConsumer(Renderer2D renderer, String name, int closureQueueSize) {
+        super(name, new BoundedBufferQueue<Runnable>(closureQueueSize));
         this.renderer = renderer;
     }
 

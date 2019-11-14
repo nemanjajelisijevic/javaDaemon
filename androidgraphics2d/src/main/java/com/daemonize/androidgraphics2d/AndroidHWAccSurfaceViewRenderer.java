@@ -11,7 +11,7 @@ public class AndroidHWAccSurfaceViewRenderer extends AndroidSurfaceViewRenderer 
         return surfaceHolder.lockHardwareCanvas();
     }
 
-    public AndroidHWAccSurfaceViewRenderer(SurfaceView surfaceView) {
-        super(surfaceView);
+    public AndroidHWAccSurfaceViewRenderer(SurfaceView surfaceView, int closureQueueSize) {
+        super(surfaceView, closureQueueSize);
     }
 }

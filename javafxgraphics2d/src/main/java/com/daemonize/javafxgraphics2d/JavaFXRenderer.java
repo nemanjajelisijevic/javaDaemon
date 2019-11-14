@@ -32,12 +32,12 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         }
     };
 
-    public JavaFXRenderer(GraphicsContext gc, int width, int height) {
+    public JavaFXRenderer(GraphicsContext gc, int width, int height, int closureQueueSize) {
         this.gc = gc;
         this.gc.setFill(Color.BLACK);
         this.width = width;
         this.height = height;
-        this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer");
+        this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer", closureQueueSize);
     }
 
     @Override
