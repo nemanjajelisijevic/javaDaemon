@@ -85,7 +85,6 @@ public class Main extends Application {
 
         if(!game.isRunning())
             game.run();
-
     }
 
     @Override
