@@ -3,16 +3,78 @@ package com.daemonize.daemondevapp;
 import com.daemonize.daemonengine.utils.BoundedBufferQueue;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 public class BoundedBufferQueueTest {
 
+
+    private List<Integer> expecteds = new ArrayList<>(50);
+    private BoundedBufferQueue<Integer> queue;
+
+    @Before
+    public void setUp() {
+
+        for (int i = 0; i < 50; ++i) {
+            expecteds.add(i);
+        }
+
+         queue = new BoundedBufferQueue<>(20);
+    }
+
+    @Test
+    public void testEndure() {
+
+        int expectedPolled = 0;
+
+        for (int i = 0; i < expecteds.size(); ++i) {
+
+            System.out.println("=========================================================");
+
+            System.out.println("Adding expected: " + expecteds.get(i));
+
+            try {
+                queue.add(expecteds.get(i));
+            } catch (IllegalStateException ex) {
+                System.out.println("************************************************");
+                System.out.println("Exception: " + ex.getMessage());
+                Integer polled = queue.poll();
+                System.out.println("Polled: " + polled);
+                queue.add(i);
+                Assert.assertEquals(Integer.valueOf(expectedPolled++), polled);
+                Assert.assertEquals(20, queue.size());
+                System.out.println("************************************************");
+            }
+
+            System.out.println("Queue size:" + queue.size());
+            System.out.println("Queue state:" + queue.toString());
+
+            System.out.println("=========================================================");
+        }
+
+        System.out.println("DEPLETING QUEUE");
+
+        Integer pollingExpected = 30;
+
+        while (!queue.isEmpty()) {
+            Integer polled = queue.poll();
+            Assert.assertEquals(pollingExpected++, polled);
+            System.out.println("Queue state: " + queue.toString());
+        }
+
+        Assert.assertNull(queue.poll());
+
+
+        System.out.println("=========================================================");
+    }
+
+
     @Test
     public void test() {
-
-        BoundedBufferQueue<Integer> queue = new BoundedBufferQueue<>(20);
 
         System.out.println("Head: " + queue.getHead());
         System.out.println("Tail: " + queue.getTail());
@@ -384,6 +446,72 @@ public class BoundedBufferQueueTest {
         System.out.println(queue.toString());
 
         Assert.assertEquals(19, queue.size());
+
+        System.out.println("*******************************************************");
+
+        queue.add(23);
+        System.out.println("Size: " + queue.size());
+        System.out.println("Head: " + queue.getHead());
+        System.out.println("Tail: " + queue.getTail());
+        array = queue.toArray();
+        for(int i = 0; i < array.length; ++i)
+            System.out.println("Queue Element[" + i + "]: " + array[i]);
+
+        System.out.println(queue.toString());
+
+        Assert.assertEquals(20, queue.size());
+
+
+        System.out.println("*******************************************************");
+
+        System.out.println("Trying to insert new element (24)");
+
+        try {
+            queue.add(24);
+        } catch (IllegalStateException ex) {
+            ex.printStackTrace();
+        }
+
+        System.out.println("Size: " + queue.size());
+        System.out.println("Head: " + queue.getHead());
+        System.out.println("Tail: " + queue.getTail());
+        array = queue.toArray();
+        for(int i = 0; i < array.length; ++i)
+            System.out.println("Queue Element[" + i + "]: " + array[i]);
+
+        System.out.println(queue.toString());
+
+        Assert.assertEquals(20, queue.size());
+
+
+        System.out.println("*******************************************************");
+        System.out.println("Polling all elements");
+        System.out.println("Size: " + queue.size());
+
+        int expectedSize = 20;
+
+        Assert.assertEquals(expectedSize, queue.size());
+
+        while (!queue.isEmpty()) {
+            System.out.println("**************");
+            removed = queue.poll();
+            System.out.println("Removed: " + removed);
+            System.out.println("Size: " + queue.size());
+            Assert.assertEquals(--expectedSize, queue.size());
+            System.out.println(queue.toString());
+            System.out.println("**************");
+        }
+
+        System.out.println("*******************************************************");
+
+        System.out.println("Trying to remove one more past empty");
+
+        removed = queue.poll();
+
+        System.out.println("Removed: " + removed);
+
+        Assert.assertNull(removed);
+        Assert.assertEquals(0, queue.size());
 
     }
 

@@ -35,7 +35,6 @@ public class BoundedBufferQueue<T> implements Queue<T> {
     @Override
     public boolean offer(T element) {
         int toBeTail = (tail + 1) % (capacity);
-
         if (toBeTail != head) {
             array[tail] = element;
             tail = toBeTail;
@@ -83,19 +82,17 @@ public class BoundedBufferQueue<T> implements Queue<T> {
 
     @Override
     public int size() {
-
-        if (tail > head)
-            return (tail - head);
-        else if (tail < head) {
-            return (capacity - head) + tail;
-        } else
+        if (head == tail)
             return 0;
-
+        else if (tail > head)
+            return (tail - head);
+        else
+            return (capacity - head) + tail;
     }
 
     @Override
     public boolean isEmpty() {
-        return size() == 0;
+        return head == tail;
     }
 
     @Override
