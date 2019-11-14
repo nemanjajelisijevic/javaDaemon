@@ -1791,7 +1791,7 @@ public class Game {
                                     return;
                                 }
 
-                                //markAwait to next fields center
+                                //go to next fields center
                                 Field next = grid.getMinWeightOfNeighbors(current);
                                 int angle = (int) RotatingSpriteImageMover.getAngle(
                                         current.getCenterX(),

@@ -11,7 +11,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 
 public class DummyDaemon extends BaseDaemonEngine<DummyDaemon> implements Pausable {
 
-    private DummyQuest dummyQuest;
+    private final DummyQuest dummyQuest;
 
     public static DummyDaemon create(Consumer consumer, long sleep) {
         return new DummyDaemon(consumer, sleep);
