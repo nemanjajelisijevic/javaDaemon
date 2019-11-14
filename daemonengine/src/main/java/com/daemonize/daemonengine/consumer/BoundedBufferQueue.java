@@ -96,13 +96,9 @@ public class BoundedBufferQueue<T> implements Queue<T> {
     }
 
     @Override
-    public boolean contains(Object o) {
-        return false;
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        return null;
+    public void clear() {
+        head = 0;
+        tail = 0;
     }
 
     @Override
@@ -124,6 +120,16 @@ public class BoundedBufferQueue<T> implements Queue<T> {
 
             return ret;
         }
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return false;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return null;
     }
 
     @Override
@@ -154,12 +160,6 @@ public class BoundedBufferQueue<T> implements Queue<T> {
     @Override
     public boolean retainAll(Collection<?> c) {
         return false;
-    }
-
-    @Override
-    public void clear() {
-        head = 0;
-        tail = 0;
     }
 
     //DEBUG
