@@ -45,12 +45,11 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
     public boolean consume(Runnable runnable) {
         boolean ret;
         closureLock.lock();
-        ret = closureQueue.add(runnable);
+        closureQueue.add(runnable);
         if (closureQueue.size() == 1)
             closureAvailable.signal();
         closureLock.unlock();
-        if (!ret) throw new IllegalStateException(DaemonUtils.tag() + "Could not add to consumers(" + name + ") queue!!!!");
-        return ret;
+        return true;
     }
 
     private void loop() {
