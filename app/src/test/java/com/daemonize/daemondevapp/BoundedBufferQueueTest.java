@@ -19,12 +19,9 @@ public class BoundedBufferQueueTest {
 
     @Before
     public void setUp() {
-
-        for (int i = 0; i < expectedsSize; ++i) {
+        for (int i = 0; i < expectedsSize; ++i)
             expecteds.add(i * 7);
-        }
-
-         queue = new BoundedBufferQueue<>(queueCapacity);
+        queue = new BoundedBufferQueue<>(queueCapacity);
     }
 
     @Test
@@ -54,7 +51,7 @@ public class BoundedBufferQueueTest {
             }
 
             System.out.println("Queue size:" + queue.size());
-            System.out.println("Queue state:" + queue.toString());
+            //System.out.println("Queue state:" + queue.toString());
 
             System.out.println("=========================================================");
         }
