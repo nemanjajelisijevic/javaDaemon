@@ -49,7 +49,13 @@ public class DoubleDaemonEngine implements EagerDaemon<DoubleDaemonEngine>, Daem
 
     @Override
     public <T> DoubleDaemonEngine daemonize(Consumer consumer, Quest<T> quest, Closure<T> closure, boolean awaitedClosure) {
-        mainQuestDaemonEngine.addMainQuest((AnonMainQuest<T>) new AnonMainQuest(quest, closure, awaitedClosure ? mainQuestDaemonEngine.getClosureAwaiter() : null).setConsumer(consumer)); //TODO check ret
+        mainQuestDaemonEngine.addMainQuest(
+                (AnonMainQuest<T>) new AnonMainQuest(
+                        quest,
+                        closure,
+                        awaitedClosure ? mainQuestDaemonEngine.getClosureAwaiter() : null
+                ).setConsumer(consumer)
+        );
         return this;
     }
 

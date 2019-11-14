@@ -28,9 +28,6 @@ public class HybridDaemonEngine extends MainQuestDaemonBaseEngine<HybridDaemonEn
   @Override
   public boolean pursueQuest(MainQuest quest) {
     boolean ret = addMainQuest(quest);
-/*    if (getState().equals(DaemonState.STOPPED)) {//TODO check dis
-      start();
-    } else */
     if (getState().equals(DaemonState.SIDE_QUEST) && !daemonThread.isInterrupted()) {
       daemonThread.interrupt();
     }
