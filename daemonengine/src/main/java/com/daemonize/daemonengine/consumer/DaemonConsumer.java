@@ -55,7 +55,6 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
 
     private void loop() {
 
-
         while (!state.equals(DaemonState.GONE_DAEMON)) {
 
             try {

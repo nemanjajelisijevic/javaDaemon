@@ -7,6 +7,7 @@ import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
+import com.daemonize.daemonengine.utils.BoundedBufferQueue;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
@@ -481,7 +482,14 @@ public class Game {
 
                 for (int i = 0; i < laserViewNo; ++i) {
                     int currX = startX + (i * step);
-                    laserViews.add(new ImageViewImpl("laser View " + i).setImage(loadingSprite[0]).hide().setAbsoluteX(currX).setAbsoluteY(borderY * 3 / 4).setZindex(1));
+                    laserViews.add(
+                            new ImageViewImpl("laser View " + i)
+                                    .setImage(loadingSprite[0])
+                                    .hide()
+                                    .setAbsoluteX(currX)
+                                    .setAbsoluteY(borderY * 3 / 4)
+                                    .setZindex(1)
+                    );
                 }
 
                 Iterator<ImageView> loaderBar = laserViews.iterator();
