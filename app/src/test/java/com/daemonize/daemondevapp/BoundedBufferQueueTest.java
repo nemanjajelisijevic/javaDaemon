@@ -12,14 +12,14 @@ import java.util.Queue;
 
 public class BoundedBufferQueueTest {
 
-
-    private List<Integer> expecteds = new ArrayList<>(50);
+    private int expectedsSize = 500;
+    private List<Integer> expecteds = new ArrayList<>(expectedsSize);
     private BoundedBufferQueue<Integer> queue;
 
     @Before
     public void setUp() {
 
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < expectedsSize; ++i) {
             expecteds.add(i);
         }
 
@@ -30,6 +30,7 @@ public class BoundedBufferQueueTest {
     public void testEndure() {
 
         int expectedPolled = 0;
+        List<Integer> polls = new ArrayList<>(expectedsSize);
 
         for (int i = 0; i < expecteds.size(); ++i) {
 
@@ -44,6 +45,7 @@ public class BoundedBufferQueueTest {
                 System.out.println("Exception: " + ex.getMessage());
                 Integer polled = queue.poll();
                 System.out.println("Polled: " + polled);
+                polls.add(polled);
                 queue.add(i);
                 Assert.assertEquals(Integer.valueOf(expectedPolled++), polled);
                 Assert.assertEquals(20, queue.size());
@@ -58,16 +60,21 @@ public class BoundedBufferQueueTest {
 
         System.out.println("DEPLETING QUEUE");
 
-        Integer pollingExpected = 30;
+        Integer pollingExpected = expecteds.size() - 20;
 
         while (!queue.isEmpty()) {
             Integer polled = queue.poll();
+            polls.add(polled);
             Assert.assertEquals(pollingExpected++, polled);
             System.out.println("Queue state: " + queue.toString());
         }
 
         Assert.assertNull(queue.poll());
 
+        Assert.assertEquals(polls.size(), expectedsSize);
+
+        System.out.println("Polls:\n");
+        System.out.println(polls.toString());
 
         System.out.println("=========================================================");
     }
