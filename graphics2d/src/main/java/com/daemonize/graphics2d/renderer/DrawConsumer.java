@@ -1,7 +1,7 @@
 package com.daemonize.graphics2d.renderer;
 
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
-import com.daemonize.daemonengine.utils.BoundedBufferQueue;
+import com.daemonize.daemonengine.consumer.BoundedBufferQueue;
 
 public class DrawConsumer extends DaemonConsumer {
 

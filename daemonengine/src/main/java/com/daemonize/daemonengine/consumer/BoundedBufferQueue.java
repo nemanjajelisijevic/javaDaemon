@@ -1,4 +1,4 @@
-package com.daemonize.daemonengine.utils;
+package com.daemonize.daemonengine.consumer;
 
 import java.util.Arrays;
 import java.util.Collection;
