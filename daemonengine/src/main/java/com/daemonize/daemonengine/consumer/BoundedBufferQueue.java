@@ -16,7 +16,7 @@ public class BoundedBufferQueue<T> implements Queue<T> {
 
     public BoundedBufferQueue(int capacity) {
         if (capacity < 1)
-            throw new IllegalArgumentException("Invalid size arg: " + capacity + " (must be > 0)");
+            throw new IllegalArgumentException("Invalid capacity arg: " + capacity + " (must be > 0)");
         this.capacity = capacity + 1;
         this.array = new Object[this.capacity];
     }
