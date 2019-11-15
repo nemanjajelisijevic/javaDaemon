@@ -260,6 +260,10 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return prototype.toString();
   }
 
+  public double absDistance(float x1, float y1, float x2, float y2) {
+    return prototype.absDistance(x1, y1, x2, y2);
+  }
+
   public TowerDaemon prepareForDeactivation() {
     prototype.prepareForDeactivation();
     return this;

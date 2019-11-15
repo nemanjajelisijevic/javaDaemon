@@ -57,10 +57,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return sideQuest;
   }
 
-  public boolean redirect(float x, float y) {
-    return prototype.redirect(x, y);
-  }
-
   @Override
   public EnemyDoubleDaemon setParalyzed(boolean paralyzed) {
     prototype.setParalyzed(paralyzed);
@@ -71,10 +67,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon setHp(int hp) {
     prototype.setHp(hp);
     return this;
-  }
-
-  public Pair<Float, Float> getTargetCoordinates() {
-    return prototype.getTargetCoordinates();
   }
 
   public EnemyDoubleDaemon popSprite() {
@@ -101,18 +93,8 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   @Override
-  public EnemyDoubleDaemon setShootable(boolean shootable) {
-    prototype.setShootable(shootable);
-    return this;
-  }
-
-  @Override
   public int getMaxHp() {
     return prototype.getMaxHp();
-  }
-
-  public ImageView getView() {
-    return prototype.getView();
   }
 
   @Override
@@ -125,10 +107,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
-  public Pair<Integer, Integer> getPreviousField() {
-    return prototype.getPreviousField();
-  }
-
   @Override
   public boolean isShootable() {
     return prototype.isShootable();
@@ -138,18 +116,9 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return prototype.getParalyzedView();
   }
 
-  public boolean setDirectionToPoint(float x, float y) {
-    return prototype.setDirectionToPoint(x, y);
-  }
-
   @Override
   public EnemyDoubleDaemon setMaxHp(int maxhp) {
     prototype.setMaxHp(maxhp);
-    return this;
-  }
-
-  public EnemyDoubleDaemon setBorders(float x1, float x2, float y1, float y2) {
-    prototype.setBorders(x1, x2, y1, y2);
     return this;
   }
 
@@ -167,31 +136,14 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     prototype.setVelocity(velocity);
   }
 
-  public float getdXY() {
-    return prototype.getdXY();
-  }
-
   public EnemyDoubleDaemon setTarget(Target target) {
     prototype.setTarget(target);
     return this;
   }
 
-  public EnemyDoubleDaemon setParalyzedImage(Image paralyzedimage) {
-    prototype.setParalyzedImage(paralyzedimage);
-    return this;
-  }
-
-  public ImageView getTargetView() {
-    return prototype.getTargetView();
-  }
-
   @Override
   public boolean isParalyzed() {
     return prototype.isParalyzed();
-  }
-
-  public Image iterateSprite() {
-    return prototype.iterateSprite();
   }
 
   public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> animateEnemy() throws
@@ -219,16 +171,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
-  @Override
-  public Pair<Float, Float> getLastCoordinates() {
-    return prototype.getLastCoordinates();
-  }
-
-  public EnemyDoubleDaemon setHpView(ImageView hpview) {
-    prototype.setHpView(hpview);
-    return this;
-  }
-
   public Image[] getSprite() {
     return prototype.getSprite();
   }
@@ -240,6 +182,72 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   public EnemyDoubleDaemon clearVelocity() {
     prototype.clearVelocity();
+    return this;
+  }
+
+  public ImageView getHpView() {
+    return prototype.getHpView();
+  }
+
+  public boolean redirect(float x, float y) {
+    return prototype.redirect(x, y);
+  }
+
+  public Pair<Float, Float> getTargetCoordinates() {
+    return prototype.getTargetCoordinates();
+  }
+
+  @Override
+  public EnemyDoubleDaemon setShootable(boolean shootable) {
+    prototype.setShootable(shootable);
+    return this;
+  }
+
+  public ImageView getView() {
+    return prototype.getView();
+  }
+
+  public Pair<Integer, Integer> getPreviousField() {
+    return prototype.getPreviousField();
+  }
+
+  public boolean setDirectionToPoint(float x, float y) {
+    return prototype.setDirectionToPoint(x, y);
+  }
+
+  public EnemyDoubleDaemon setBorders(float x1, float x2, float y1, float y2) {
+    prototype.setBorders(x1, x2, y1, y2);
+    return this;
+  }
+
+  public float getdXY() {
+    return prototype.getdXY();
+  }
+
+  public EnemyDoubleDaemon setParalyzedImage(Image paralyzedimage) {
+    prototype.setParalyzedImage(paralyzedimage);
+    return this;
+  }
+
+  public ImageView getTargetView() {
+    return prototype.getTargetView();
+  }
+
+  public double absDistance(float x1, float y1, float x2, float y2) {
+    return prototype.absDistance(x1, y1, x2, y2);
+  }
+
+  public Image iterateSprite() {
+    return prototype.iterateSprite();
+  }
+
+  @Override
+  public Pair<Float, Float> getLastCoordinates() {
+    return prototype.getLastCoordinates();
+  }
+
+  public EnemyDoubleDaemon setHpView(ImageView hpview) {
+    prototype.setHpView(hpview);
     return this;
   }
 
@@ -260,10 +268,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   public boolean setDirectionAndMove(float x, float y, float velocityint) {
     return prototype.setDirectionAndMove(x, y, velocityint);
-  }
-
-  public ImageView getHpView() {
-    return prototype.getHpView();
   }
 
   public SideQuest getCurrentSideQuest() {
