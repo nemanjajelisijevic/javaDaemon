@@ -9,6 +9,7 @@ import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.imagemovers.ImageMover;
+import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
 
 import com.daemonize.graphics2d.images.Image;
@@ -1685,8 +1686,12 @@ public class Game {
                         TowerDaemon target = (TowerDaemon) ret.runtimeCheckAndGet();
 
                         if (target.isShootable()
-                            && Math.abs(target.getLastCoordinates().getFirst() - enemyDoubleDaemon.getLastCoordinates().getFirst()) < range
-                            && Math.abs(target.getLastCoordinates().getSecond() - enemyDoubleDaemon.getLastCoordinates().getSecond()) < range) {
+                                && ImageTranslationMover.absDistance(
+                                        target.getLastCoordinates().getFirst(),
+                                        target.getLastCoordinates().getSecond(),
+                                        enemyDoubleDaemon.getLastCoordinates().getFirst(),
+                                        enemyDoubleDaemon.getLastCoordinates().getSecond()
+                                ) < range) {
 
                             if (enemyDoubleDaemon.isShootable())
                                 renderer.consume(() ->

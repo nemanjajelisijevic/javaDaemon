@@ -5,6 +5,7 @@ import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
+import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
@@ -70,8 +71,13 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     protected TargetTester targetTester = target -> (target.isShootable()
-            && (Math.abs(target.getLastCoordinates().getFirst() - getLastCoordinates().getFirst()) < range
-            && Math.abs(target.getLastCoordinates().getSecond() - getLastCoordinates().getSecond()) < range));
+            && ImageTranslationMover.absDistance(
+                    target.getLastCoordinates().getFirst(),
+                    target.getLastCoordinates().getSecond(),
+                    getLastCoordinates().getFirst(),
+                    getLastCoordinates().getSecond()
+               ) < range
+    );
 
     public Tower(Image[] rotationSprite, Image[] healthBarImage, Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
         super(rotationSprite, rotationSprite[18], 0, startingPos, dXY);
