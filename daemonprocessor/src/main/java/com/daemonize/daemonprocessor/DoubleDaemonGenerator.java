@@ -288,15 +288,15 @@ public class DoubleDaemonGenerator extends BaseDaemonGenerator {
     public MethodSpec generateSetNameDaemonApiMethod() {
 
         MethodSpec.Builder builder =  MethodSpec.methodBuilder("setName")
-                .addParameter(String.class, "name")
+                .addParameter(String.class, "engineName")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
-                .addStatement(mainGenerator.getDaemonEngineString() + ".setName(name)")
-                .addStatement(sideGenerator.getDaemonEngineString() + ".setName(name + \" - SIDE\")");
+                .addStatement(mainGenerator.getDaemonEngineString() + ".setName(engineName)")
+                .addStatement(sideGenerator.getDaemonEngineString() + ".setName(engineName + \" - SIDE\")");
 
         for (String dedicatedEngine : mainGenerator.getDedicatedEnginesNameSet())
-            builder.addStatement(dedicatedEngine + ".setName(name + \" - " + dedicatedEngine + "\")");
+            builder.addStatement(dedicatedEngine + ".setName(engineName + \" - " + dedicatedEngine + "\")");
 
         return builder.addStatement("return this").build();
     }

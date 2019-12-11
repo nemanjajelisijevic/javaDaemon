@@ -1,4 +1,4 @@
-package com.daemonize.game.tabel;
+package com.daemonize.game.grid;
 
 public class Field<T> implements  IHeapItem , Comparable {
     float centerX;

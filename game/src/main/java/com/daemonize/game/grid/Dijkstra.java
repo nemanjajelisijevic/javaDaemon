@@ -1,8 +1,6 @@
-package com.daemonize.game.tabel;
+package com.daemonize.game.grid;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 public class Dijkstra extends PathFinding {
 

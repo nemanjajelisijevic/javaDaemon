@@ -5,5 +5,5 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 public @interface DedicatedThread {
-    String name() default "";
+    String engineName() default "";
 }

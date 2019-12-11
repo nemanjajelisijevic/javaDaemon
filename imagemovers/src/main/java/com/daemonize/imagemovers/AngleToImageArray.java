@@ -2,7 +2,7 @@ package com.daemonize.imagemovers;
 
 import com.daemonize.graphics2d.images.Image;
 
-public class AngleToBitmapArray {
+public class AngleToImageArray {
 
     private Image[] array = new Image[360];
     private int step;
@@ -11,8 +11,8 @@ public class AngleToBitmapArray {
 
     public void setCurrentAngle(int degrees) {
 
-        if (degrees == 360)
-            degrees = 0;
+        if (degrees >= 360)
+            degrees = degrees - 360;
 
         if (degrees < 0 || degrees > 359) {
             throw new IllegalArgumentException("Arg degrees must be > 0 && < 360, set: " + degrees);
@@ -24,11 +24,11 @@ public class AngleToBitmapArray {
         return step;
     }
 
-    public AngleToBitmapArray(Image[] sprite) {
+    public AngleToImageArray(Image[] sprite) {
         this(sprite, 360 / sprite.length);
     }
 
-    public AngleToBitmapArray(Image[] sprite, int step) {
+    public AngleToImageArray(Image[] sprite, int step) {
         this.step = step;
         for (int i = 0; i < array.length; ++i) {
             int it = i / step;

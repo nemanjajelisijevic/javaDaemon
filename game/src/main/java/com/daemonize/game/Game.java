@@ -7,6 +7,7 @@ import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
+import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
@@ -20,8 +21,8 @@ import com.daemonize.game.repo.QueuedEntityRepo;
 import com.daemonize.game.repo.StackedEntityRepo;
 import com.daemonize.graphics2d.scene.Scene2D;
 
-import com.daemonize.game.tabel.Field;
-import com.daemonize.game.tabel.Grid;
+import com.daemonize.game.grid.Field;
+import com.daemonize.game.grid.Grid;
 
 import com.daemonize.graphics2d.scene.views.Button;
 import com.daemonize.graphics2d.scene.views.CompositeImageViewImpl;
@@ -1237,25 +1238,6 @@ public class Game {
                                             if (diagonalMatrix[j][i].getImage().equals(fieldGreenDiagonal) && diagonalMatrix[j][i].isShowing())
                                                 diagonalMatrix[j][i].hide();
                                 });
-
-//                                gameConsumer.consume(()-> {
-//                                    System.err.println("******************************************************************************");
-//                                    System.err.println("ACTIVE BULLETS: " + bulletRepo.activeProjectiles.size());
-//                                    System.err.println("INACTIVE BULLETS: " + bulletRepo.size());
-//                                    for (BulletDoubleDaemon bullet : bulletRepo.activeProjectiles)
-//                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-//
-//                                    System.err.println("ACTIVE ROCKETS: " + rocketRepo.activeProjectiles.size());
-//                                    System.err.println("INACTIVE ROCKETS: " + rocketRepo.size());
-//                                    for (BulletDoubleDaemon bullet : rocketRepo.activeProjectiles)
-//                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-//
-//                                    System.err.println("ACTIVE MISSILES: " + enemyMissileRepo.activeProjectiles.size());
-//                                    System.err.println("INACTIVE MISSILES: " + enemyMissileRepo.size());
-//                                    for (BulletDoubleDaemon bullet : enemyMissileRepo.activeProjectiles)
-//                                        System.err.println(bullet.getName() + ", ACTIVE STATES: " + bullet.getEnginesState().toString() + ", " + bullet.toString());
-//                                    System.err.println("******************************************************************************");
-//                                });
                             }
                         });
                     }
@@ -1677,72 +1659,73 @@ public class Game {
                         firstField.getCenterY()
                 );
 
-                enemyDoubleDaemon.setTarget(null).rotate(firstAngle).reload(new Closure<Target>() {
-                    @Override
-                    public void onReturn(Return<Target> ret) {
+                enemyDoubleDaemon.setTarget(null)
+                        .rotate(firstAngle)
+                        .reload(new Closure<Target>() {
+                            @Override
+                            public void onReturn(Return<Target> ret) {
 
-                        renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
+                                renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
 
-                        TowerDaemon target = (TowerDaemon) ret.runtimeCheckAndGet();
+                                TowerDaemon target = (TowerDaemon) ret.runtimeCheckAndGet();
 
-                        if (target.isShootable()
-                                && ImageTranslationMover.absDistance(
-                                        target.getLastCoordinates().getFirst(),
-                                        target.getLastCoordinates().getSecond(),
-                                        enemyDoubleDaemon.getLastCoordinates().getFirst(),
-                                        enemyDoubleDaemon.getLastCoordinates().getSecond()
-                                ) < range) {
-
-                            if (enemyDoubleDaemon.isShootable())
-                                renderer.consume(() ->
-                                        enemyDoubleDaemon.getTargetView()
-                                                .setAbsoluteX(target.getLastCoordinates().getFirst())
-                                                .setAbsoluteY(target.getLastCoordinates().getSecond())
-                                                .show()
-                                );
-
-                            fireRocketBullet(
-                                    enemyDoubleDaemon.getLastCoordinates(),
-                                    target,
-                                    enemyMissileRepo,
-                                    15,
-                                    target.getTowerLevel().bulletDamage,
-                                    2,
-                                    () -> {
-
-                                        if(!target.isShootable()) {
-                                            renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
-                                            return;
-                                        }
-
-                                        renderer.consume(target.getHpView()::hide);
-                                        enemyDoubleDaemon.setTarget(null);
-
-                                        Field<TowerDaemon> field = grid.getField(
+                                if (target.isShootable()
+                                        && ImageTranslationMover.absDistance(
                                                 target.getLastCoordinates().getFirst(),
-                                                target.getLastCoordinates().getSecond()
+                                                target.getLastCoordinates().getSecond(),
+                                                enemyDoubleDaemon.getLastCoordinates().getFirst(),
+                                                enemyDoubleDaemon.getLastCoordinates().getSecond()
+                                        ) < range) {
+
+                                    if (enemyDoubleDaemon.isShootable())
+                                        renderer.consume(() ->
+                                                enemyDoubleDaemon.getTargetView()
+                                                        .setAbsoluteX(target.getLastCoordinates().getFirst())
+                                                        .setAbsoluteY(target.getLastCoordinates().getSecond())
+                                                        .show()
                                         );
 
-                                        currentSoundManager.playSound(bigExplosion);
+                                    fireRocketBullet(
+                                            enemyDoubleDaemon.getLastCoordinates(),
+                                            target,
+                                            enemyMissileRepo,
+                                            15,
+                                            target.getTowerLevel().bulletDamage,
+                                            2,
+                                            () -> {
 
-                                        target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
-                                            target.setShootable(false);
-                                            renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
-                                            renderer.consume(target.getView()::hide);
-                                            towers.remove(target);
-                                            field.setObject(null);
+                                                if(!target.isShootable()) {
+                                                    renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
+                                                    return;
+                                                }
 
-                                            grid.destroyObject(field.getRow(), field.getColumn());
-                                            renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
-                                        }).queueStop();
-                                    }
-                            );
-                        }
+                                                renderer.consume(target.getHpView()::hide);
+                                                enemyDoubleDaemon.setTarget(null);
 
-                        enemyDoubleDaemon.reload(this::onReturn);
-                    }
-                }).goTo(
-                        firstField.getCenterX(),
+                                                Field<TowerDaemon> field = grid.getField(
+                                                        target.getLastCoordinates().getFirst(),
+                                                        target.getLastCoordinates().getSecond()
+                                                );
+
+                                                currentSoundManager.playSound(bigExplosion);
+
+                                                target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
+                                                    target.setShootable(false);
+                                                    renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
+                                                    renderer.consume(target.getView()::hide);
+                                                    towers.remove(target);
+                                                    field.setObject(null);
+
+                                                    grid.destroyObject(field.getRow(), field.getColumn());
+                                                    renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
+                                                }).queueStop();
+                                            }
+                                    );
+                                }
+
+                                enemyDoubleDaemon.reload(this::onReturn);
+                            }
+                }).goTo(firstField.getCenterX(),
                         firstField.getCenterY(),
                         enemyVelocity,
                         new Closure<Boolean>() {
@@ -1814,10 +1797,7 @@ public class Game {
                             }
                         }
                 );
-            });
-
-            //start enemy generator
-            enemyGenerator.setName("Enemy Generator").start();
+            }).setName("Enemy Generator").start();
 
             //marking start and end field
             ImageView firstFieldView = gridViewMatrix[0][0];
@@ -1853,6 +1833,9 @@ public class Game {
 
             renderer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             gameConsumer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+
+
+            //denyMarker = new DenyMarker(renderer, gameConsumer, fieldImageTowerDen, fieldImage);
         });
     }
 
@@ -1899,6 +1882,8 @@ public class Game {
         }
     }
 
+//    private DenyMarker denyMarker;
+
     private boolean deny;
 
     private void setNewTower(Field<TowerDaemon> field) {
@@ -1908,10 +1893,12 @@ public class Game {
         //check if selected field is on the last remaining path
         if (!grid.setObject(field.getRow(), field.getColumn())){
 
+            //if (!denyMarker.denied()) {
             if (!deny) {
 
-                deny = true;
+                //denyMarker.setView(fieldView, isGeenFieldShown).start();
 
+                deny = true;
                 boolean isGeenFieldShown = fieldView.isShowing() && fieldView.getImage().equals(fieldImage);
                 renderer.consume(fieldView.setImage(fieldImageTowerDen)::show);
 
@@ -1936,7 +1923,6 @@ public class Game {
                         fieldView.hide();
                 }).onInterrupt(renderer, () -> {
                     denyMarker.stop();
-
                     deny = false;
                     fieldView.setImage(fieldImage);
 
@@ -2028,6 +2014,7 @@ public class Game {
             field.setObject(towerDaemon);
 
             towerDaemon.start()
+                    .prepareForActivation()
                     .setActivateTowerSideQuest(renderer)
                     .setClosure(new MultiViewAnimateClosure()::onReturn)
                     .onInterrupt(gameConsumer, () -> {
@@ -2049,7 +2036,8 @@ public class Game {
                             BareClosure<Integer> bulletClosure = amount -> {
                                 currentSoundManager.playSound(bigExplosion);
                                 enemyRepo.add(enemy);
-                                moneyDaemon.clearAndInterrupt().setAmount(amount)
+                                moneyDaemon.clearAndInterrupt()
+                                        .setAmount(amount)
                                         .setCoordinates(enemy.getLastCoordinates().getFirst(), enemy.getLastCoordinates().getSecond())
                                         .goTo(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY(), 13, moneyGoToClosure::onReturn);
 
@@ -2116,7 +2104,6 @@ public class Game {
     }
 
     private void manageTower(float x, float y) {
-
         //check if correct field
         Field<TowerDaemon> field = grid.getField(x, y);
         if (field == null) return;
@@ -2143,12 +2130,12 @@ public class Game {
     ) {
         System.out.println(DaemonUtils.tag() +  bulletRepo.getName() + " size: " + bulletRepo.size());
 
-        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet -> {
+        BulletDoubleDaemon bulletDoubleDaemon = bulletRepo.configureAndGet(bullet ->
             bullet.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage)
-                    .start();
-        });
+                    .start()
+        );
 
         float targetX = target.getLastCoordinates().getFirst();
         float targetY = target.getLastCoordinates().getSecond();
@@ -2185,12 +2172,12 @@ public class Game {
     ) {
         System.out.println(DaemonUtils.tag() + repo.getName() + " size: " + repo.size());
 
-        BulletDoubleDaemon rocketDoubleDaemon = repo.configureAndGet(rocket -> {
+        BulletDoubleDaemon rocketDoubleDaemon = repo.configureAndGet(rocket ->
             rocket.setCoordinates(sourceCoord.getFirst(), sourceCoord.getSecond())
                     .setLevel(noOfBulletsFired)
                     .setDamage(bulletDamage)
-                    .start();
-        });
+                    .start()
+        );
 
         int launchX = getRandomInt(
                 (int)(sourceCoord.getFirst() - fieldImage.getWidth() / 2),
@@ -2247,11 +2234,9 @@ public class Game {
                                 return;
                             }
 
-                            float bulletX = rocketDoubleDaemon.getLastCoordinates().getFirst();
-                            float bulletY = rocketDoubleDaemon.getLastCoordinates().getSecond();
-
-                            if (Math.abs(bulletX - target.getLastCoordinates().getFirst()) < rocketExplosionRange
-                                    && Math.abs(bulletY - target.getLastCoordinates().getSecond()) < rocketExplosionRange) {
+                            if (ImageTranslationMover.absDistance(
+                                    rocketDoubleDaemon.getLastCoordinates(),
+                                    target.getLastCoordinates()) < rocketExplosionRange) {
 
                                 int newHp = target.getHp() - rocketDoubleDaemon.getDamage();
                                 if (newHp > 0)

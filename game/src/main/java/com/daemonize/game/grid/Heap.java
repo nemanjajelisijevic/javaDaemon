@@ -1,4 +1,4 @@
-package com.daemonize.game.tabel;
+package com.daemonize.game.grid;
 
 public class Heap<T extends IHeapItem> {
     T[] items;

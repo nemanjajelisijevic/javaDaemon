@@ -2,7 +2,6 @@ package com.daemonize.imagemovers;
 
 
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
-import com.daemonize.imagemovers.AngleToBitmapArray;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 
@@ -10,14 +9,14 @@ import java.util.Arrays;
 
 public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
-    protected volatile AngleToBitmapArray spriteBuffer;
+    protected volatile AngleToImageArray spriteBuffer;
     protected volatile Image[] currentRotationSprite;
     private volatile int size;
 
     public synchronized void setRotationSprite(Image[] rotationSprite) {
         int currentAngle = spriteBuffer != null ? spriteBuffer.getCurrentAngle() : 0;
         int step = 360 / rotationSprite.length;
-        this.spriteBuffer = new AngleToBitmapArray(rotationSprite, step);
+        this.spriteBuffer = new AngleToImageArray(rotationSprite, step);
         this.currentRotationSprite = new Image[(180 / step) + 1];
         this.size = 0;
         popSprite();

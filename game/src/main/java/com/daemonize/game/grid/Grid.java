@@ -1,4 +1,4 @@
-package com.daemonize.game.tabel;
+package com.daemonize.game.grid;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;

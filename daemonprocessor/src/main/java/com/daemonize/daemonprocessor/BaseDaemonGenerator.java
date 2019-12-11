@@ -269,7 +269,7 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
         List<Pair<ExecutableElement, String>> ret = new ArrayList<>();
         for (ExecutableElement method : publicMethods) {
             if (method.getAnnotation(DedicatedThread.class) != null)
-                ret.add(Pair.create(method, method.getAnnotation(DedicatedThread.class).name()));
+                ret.add(Pair.create(method, method.getAnnotation(DedicatedThread.class).engineName()));
             else {
                 Daemonize annotation = method.getAnnotation(Daemonize.class);
                 if (annotation != null && annotation.dedicatedThread())
@@ -398,11 +398,11 @@ public abstract class BaseDaemonGenerator implements DaemonGenerator {
 
     public MethodSpec generateSetNameDaemonApiMethod() {
         return MethodSpec.methodBuilder("setName")
-                .addParameter(String.class, "name")
+                .addParameter(String.class, "engineName")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
-                .addStatement(daemonEngineString + ".setName(name)")
+                .addStatement(daemonEngineString + ".setName(engineName)")
                 .addStatement("return this")
                 .build();
     }

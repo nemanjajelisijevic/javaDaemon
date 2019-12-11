@@ -1,6 +1,4 @@
-package com.daemonize.game.tabel;
-
-//import android.util.Log;
+package com.daemonize.game.grid;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -106,8 +106,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     public Tower setHp(int hp) {
-        if (hp <= hpMax)
-            this.hp = hp;
+//        if (hp <= hpMax)
+//            this.hp = hp;
         return this;
     }
 
@@ -214,7 +214,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
     private Pair<TowerType, Target> scanRet = Pair.create(null, null);
 
-    @DedicatedThread(name = "scan")
+    @DedicatedThread(engineName = "scan")
     @Daemonize
     public Pair<TowerType, Target> scan() throws InterruptedException {
 
@@ -283,6 +283,11 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
     private int initHpCount = 0;
 
+    public void prepareForActivation() {
+        initHpCount = 0;
+        spriteBuffer.setCurrentAngle(180);
+    }
+
     @SideQuest(SLEEP = 25, interruptible = true, blockingClosure = true)
     public GenericNode<Pair<PositionedImage, ImageView>> activateTower() throws InterruptedException {
         if (spriteBuffer.getCurrentAngle() != 0) {
@@ -291,9 +296,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
             genericRet.getValue().setFirst(ret).setSecond(view);
 
-            if (initHpCount < spriteHealthBarImage.length) {
+            if (initHpCount < spriteHealthBarImage.length)
                 hBar.image = spriteHealthBarImage[initHpCount++];
-            }
 
             genericRetHBar.getValue().setFirst(hBar).setSecond(hpView);
             return genericRet;
@@ -318,9 +322,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
 
             genericRet.getValue().setFirst(ret).setSecond(view);
 
-            if (initHpCount >= 0) {
+            if (initHpCount >= 0)
                 hBar.image = spriteHealthBarImage[initHpCount--];
-            }
 
             genericRetHBar.getValue().setFirst(hBar).setSecond(hpView);
             return genericRet;

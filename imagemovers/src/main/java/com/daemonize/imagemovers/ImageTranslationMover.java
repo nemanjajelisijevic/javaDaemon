@@ -182,5 +182,9 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         float dY = y1 - y2;
         return Math.sqrt(dX*dX + dY*dY);
     }
+
+    public static double absDistance(Pair<Float, Float> source, Pair<Float, Float> dest) {
+        return absDistance(source.getFirst(), source.getSecond(), dest.getFirst(), dest.getSecond());
+    }
 }
 

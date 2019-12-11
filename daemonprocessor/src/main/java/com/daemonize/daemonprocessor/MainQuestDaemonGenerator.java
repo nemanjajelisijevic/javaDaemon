@@ -358,7 +358,10 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                         prototypeMethod.getSimpleName()
                 );
 
-        boolean voidWithRunnable = prototypeMethodData.isVoid() && (prototypeMethod.getAnnotation(Daemonize.class).generateRunnable() || prototypeMethod.getAnnotation(GenerateRunnable.class) != null);
+        boolean voidWithRunnable =
+                prototypeMethodData.isVoid()
+                        && (prototypeMethod.getAnnotation(Daemonize.class).generateRunnable()
+                        || prototypeMethod.getAnnotation(GenerateRunnable.class) != null);
         boolean consumerArg = prototypeMethod.getAnnotation(Daemonize.class).consumerArg() || prototypeMethod.getAnnotation(ConsumerArg.class) != null;
         boolean blockingClosure = prototypeMethod.getAnnotation(Daemonize.class).blockingClosure() || prototypeMethod.getAnnotation(AwaitedClosure.class) != null;
 
@@ -459,14 +462,14 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
     public MethodSpec generateDedicatedEnginesSetNameDaemonApiMethod() {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("setName")
-                .addParameter(String.class, "name")
+                .addParameter(String.class, "engineName")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ClassName.get(packageName, daemonSimpleName))
-                .addStatement(daemonEngineString + ".setName(name)");
+                .addStatement(daemonEngineString + ".setName(engineName)");
 
         for (String dedicatedEngine : getDedicatedEnginesNameSet())
-            builder.addStatement(dedicatedEngine + ".setName(name +\" - " + dedicatedEngine + "\")");
+            builder.addStatement(dedicatedEngine + ".setName(engineName +\" - " + dedicatedEngine + "\")");
 
 
         return  builder.addStatement("return this")
@@ -544,7 +547,11 @@ public class MainQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
         MethodSpec.Builder builder = MethodSpec.methodBuilder("getEnginesQueueSizes")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)))
-                .addStatement("$T ret = new $T()", ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(Integer.class)))
+                .addStatement(
+                        "$T ret = new $T()",
+                        ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)),
+                        ParameterizedTypeName.get(ClassName.get(ArrayList.class), ClassName.get(Integer.class))
+                )
                 .addStatement("ret.add(" + getDaemonEngineString() + ".queueSize())");
 
         for (String dedicatedEngine : getDedicatedEnginesNameSet())
