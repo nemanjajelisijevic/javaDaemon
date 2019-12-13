@@ -1332,7 +1332,7 @@ public class Game {
                                         .hide()
                                         .setAbsoluteX(0)
                                         .setAbsoluteY(0)
-                                        .setZindex(10)
+                                        .setZindex(11)
                                 )
                         ).setTargetView(
                                 scene.addImageView(
@@ -1350,7 +1350,7 @@ public class Game {
                                         .setImage(paralyzed)
                                         .setAbsoluteX(0)
                                         .setAbsoluteY(0)
-                                        .setZindex(11)
+                                        .setZindex(10)
                                         .hide()
                         )
                 ).setName(enemyName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
