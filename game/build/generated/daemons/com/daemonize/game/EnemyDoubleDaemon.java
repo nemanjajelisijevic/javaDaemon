@@ -251,6 +251,10 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
+  public double absDistance(Pair<Float, Float> source, Pair<Float, Float> dest) {
+    return prototype.absDistance(source, dest);
+  }
+
   public EnemyDoubleDaemon setCoordinates(float lastx, float lasty) {
     prototype.setCoordinates(lastx, lasty);
     return this;
@@ -360,11 +364,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   @Override
-  public EnemyDoubleDaemon setName(String name) {
-    mainDaemonEngine.setName(name);
-    sideDaemonEngine.setName(name + " - SIDE");
-    goToDaemonEngine.setName(name + " - goToDaemonEngine");
-    reloadDaemonEngine.setName(name + " - reloadDaemonEngine");
+  public EnemyDoubleDaemon setName(String engineName) {
+    mainDaemonEngine.setName(engineName);
+    sideDaemonEngine.setName(engineName + " - SIDE");
+    goToDaemonEngine.setName(engineName + " - goToDaemonEngine");
+    reloadDaemonEngine.setName(engineName + " - reloadDaemonEngine");
     return this;
   }
 

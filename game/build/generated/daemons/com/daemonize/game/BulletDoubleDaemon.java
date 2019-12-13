@@ -171,6 +171,10 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.getSprite();
   }
 
+  public double absDistance(Pair<Float, Float> source, Pair<Float, Float> dest) {
+    return prototype.absDistance(source, dest);
+  }
+
   public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> animateBullet() throws
       InterruptedException {
     return prototype.animateBullet();
@@ -276,9 +280,9 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   @Override
-  public BulletDoubleDaemon setName(String name) {
-    mainDaemonEngine.setName(name);
-    sideDaemonEngine.setName(name + " - SIDE");
+  public BulletDoubleDaemon setName(String engineName) {
+    mainDaemonEngine.setName(engineName);
+    sideDaemonEngine.setName(engineName + " - SIDE");
     return this;
   }
 

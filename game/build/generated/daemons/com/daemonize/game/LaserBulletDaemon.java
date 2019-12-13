@@ -183,6 +183,10 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
     return prototype.getSprite();
   }
 
+  public double absDistance(Pair<Float, Float> source, Pair<Float, Float> dest) {
+    return prototype.absDistance(source, dest);
+  }
+
   public LaserBulletDaemon setViews(List<ImageView> views) {
     prototype.setViews(views);
     return this;
@@ -301,9 +305,9 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   }
 
   @Override
-  public LaserBulletDaemon setName(String name) {
-    mainDaemonEngine.setName(name);
-    sideDaemonEngine.setName(name + " - SIDE");
+  public LaserBulletDaemon setName(String engineName) {
+    mainDaemonEngine.setName(engineName);
+    sideDaemonEngine.setName(engineName + " - SIDE");
     return this;
   }
 

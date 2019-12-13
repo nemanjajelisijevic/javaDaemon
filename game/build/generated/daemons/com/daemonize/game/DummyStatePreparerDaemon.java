@@ -72,8 +72,8 @@ public class DummyStatePreparerDaemon implements Daemon<DummyStatePreparerDaemon
   }
 
   @Override
-  public DummyStatePreparerDaemon setName(String name) {
-    daemonEngine.setName(name);
+  public DummyStatePreparerDaemon setName(String engineName) {
+    daemonEngine.setName(engineName);
     return this;
   }
 

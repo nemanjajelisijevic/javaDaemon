@@ -219,6 +219,11 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return prototype.getHpView();
   }
 
+  public TowerDaemon prepareForActivation() {
+    prototype.prepareForActivation();
+    return this;
+  }
+
   public double getAngle(float x1, float y1, float x2, float y2) {
     return prototype.getAngle(x1, y1, x2, y2);
   }
@@ -281,6 +286,10 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   public TowerDaemon setHpView(ImageView hpview) {
     prototype.setHpView(hpview);
     return this;
+  }
+
+  public double absDistance(Pair<Float, Float> source, Pair<Float, Float> dest) {
+    return prototype.absDistance(source, dest);
   }
 
   public TowerDaemon rotateTowards(float x, float y) throws InterruptedException {
@@ -393,10 +402,10 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   }
 
   @Override
-  public TowerDaemon setName(String name) {
-    mainDaemonEngine.setName(name);
-    sideDaemonEngine.setName(name + " - SIDE");
-    scanDaemonEngine.setName(name + " - scanDaemonEngine");
+  public TowerDaemon setName(String engineName) {
+    mainDaemonEngine.setName(engineName);
+    sideDaemonEngine.setName(engineName + " - SIDE");
+    scanDaemonEngine.setName(engineName + " - scanDaemonEngine");
     return this;
   }
 

@@ -136,6 +136,10 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return this;
   }
 
+  public double absDistance(Pair<Float, Float> source, Pair<Float, Float> dest) {
+    return prototype.absDistance(source, dest);
+  }
+
   public MoneyHandlerDaemon clearVelocity() {
     prototype.clearVelocity();
     return this;
@@ -219,9 +223,9 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   }
 
   @Override
-  public MoneyHandlerDaemon setName(String name) {
-    mainDaemonEngine.setName(name);
-    sideDaemonEngine.setName(name + " - SIDE");
+  public MoneyHandlerDaemon setName(String engineName) {
+    mainDaemonEngine.setName(engineName);
+    sideDaemonEngine.setName(engineName + " - SIDE");
     return this;
   }
 

@@ -9,6 +9,10 @@ import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.ConsumerArg;
+import com.daemonize.daemonprocessor.annotations.Daemon;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
@@ -137,7 +141,43 @@ public class Game {
 
     private Image[] currentTowerSprite;
 
-    private EagerMainQuestDaemonEngine towerSpriteUpgrader;
+    //tower sprite upgrader helper
+    @Daemon(eager = true)
+    public static class TowerSpriteUpgrader {
+        @Daemonize
+        public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> updateTowerSprite(TowerDaemon tower, Image[] sprite) {
+            tower.setRotationSprite(sprite);
+            return tower.getPrototype().updateSprite();
+        }
+    }
+
+    private TowerSpriteUpgraderDaemon towerSpriteUpgrader;
+
+    @Daemon(eager = true)
+    public static class ButtonDisabler {
+
+        private long waitTime;
+        private Consumer drawConsumer;
+
+        public ButtonDisabler(long waitTime, Consumer drawConsumer) {
+            this.waitTime = waitTime;
+            this.drawConsumer = drawConsumer;
+        }
+
+        @ConsumerArg
+        @GenerateRunnable
+        @Daemonize
+        public void disableButton(Button button, Image disabled, Image enabled) throws InterruptedException {
+            drawConsumer.consume(()->button.disable().setImage(disabled));
+            try {
+                Thread.sleep(waitTime);
+            } finally {
+                drawConsumer.consume(()->button.enable().setImage(enabled));
+            }
+        }
+    }
+
+    private ButtonDisablerDaemon buttonDisabler;
 
     //tower rockets
     private int maxRockets = 150;
@@ -993,19 +1033,12 @@ public class Game {
 
                 Image[] rotSprite = currentSprite;
 
-                towerSpriteUpgrader.daemonize(() -> {
-                        tow.setRotationSprite(rotSprite);
-                        return tow.getPrototype().updateSprite();
-                    }, new MultiViewAnimateClosure()::onReturn, false);
+                towerSpriteUpgrader.updateTowerSprite(tow, rotSprite, new MultiViewAnimateClosure()::onReturn);
 
                 currentSoundManager.playSound(towerSelectionSound);
 
-                renderer.consume(() -> upgradeButton.disable().setImage(upgradeButtonImagePressed));
-
-                towerSpriteUpgrader.daemonize(gameConsumer, () -> Thread.sleep(100), () -> {
-
+                buttonDisabler.disableButton(upgradeButton, upgradeButtonImagePressed, upgradeButtonImage, gameConsumer, () -> {
                     CompositeImageViewImpl towerView = towerUpgradeDialogue.getRootView().getViewByName("TowerView");
-
                     renderer.consume(() -> towerView.setImage(dialogueImageTowerUpgrade[tow.getTowerLevel().currentLevel - 1]));
 
                     if (score > 2 && tow.getTowerLevel().currentLevel < 3)
@@ -1016,34 +1049,32 @@ public class Game {
                     score -= 2;
 
                     renderer.consume(() -> infoScore.setNumbers(score));
-                    renderer.consume(() -> upgradeButton.enable().setImage(upgradeButtonImage));
-                }, false);
+                });
             });
 
             Button closeButton = new Button("Close", closeButtonImage);
             closeButton.onClick(() -> {
                 currentSoundManager.playSound(soundTogglerSound);
-                renderer.consume(() -> closeButton.disable().setImage(closeButtonImagePressed));
-                towerSpriteUpgrader.daemonize(gameConsumer, () -> Thread.sleep(100), () -> {
-                    renderer.consume(() -> closeButton.enable().setImage(closeButtonImage));
-                    renderer.consume(towerUpgradeDialogue.getRootView()::hide);
-                }, false);
+                buttonDisabler.disableButton(
+                        closeButton,
+                        closeButtonImagePressed,
+                        closeButtonImage,
+                        renderer,
+                        towerUpgradeDialogue.getRootView()::hide
+                );
             });
 
             Button saleButton = new Button("Sale", saleButtonImage);
             saleButton.onClick(() -> {
                 currentSoundManager.playSound(towerSelectionSound);
-                renderer.consume(() -> saleButton.disable().setImage(saleButtonImagePressed));
-                towerSpriteUpgrader.daemonize(gameConsumer, () -> Thread.sleep(100), () -> {
+                buttonDisabler.disableButton(saleButton, saleButtonImagePressed, saleButtonImage, gameConsumer, () -> {
+
                     TowerDaemon tower = towerUpgradeDialogue.getTower();
-//                    tower.setShootable(false);
-//                    renderer.consume(tower.getHpView()::hide);
 
                     Field<TowerDaemon> field = grid.getField(
                             tower.getLastCoordinates().getFirst(),
                             tower.getLastCoordinates().getSecond()
                     );
-
 
                     tower.clearAndInterrupt()
                             .prepareForDeactivation()
@@ -1056,12 +1087,8 @@ public class Game {
                                 renderer.consume(() ->gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
                             });
 
-                    //stop and remove tower
-                    //tower.queueStop();
                     towers.remove(tower);
                     field.setObject(null);
-
-                    renderer.consume(() -> saleButton.enable().setImage(saleButtonImage));
 
                     //remove tower from grid and recalculate path
                     if (grid.destroyObject(field.getRow(), field.getColumn())) {
@@ -1071,7 +1098,7 @@ public class Game {
                             infoScore.setNumbers(++score);
                         });
                     }
-                }, false);
+                });
             });
 
             towerUpgradeDialogue = new TowerUpgradeDialog(
@@ -1823,8 +1850,16 @@ public class Game {
 
             System.out.println(DaemonUtils.tag() + "DXY: " + dXY);
 
-            towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).setName("Tower Sprite Upgrader")
-                    .setUncaughtExceptionHandler(uncaughtExceptionHandler)
+//            towerSpriteUpgrader = new EagerMainQuestDaemonEngine(renderer).setName("Tower Sprite Upgrader")
+//                    .setUncaughtExceptionHandler(uncaughtExceptionHandler)
+//                    .start();
+
+            towerSpriteUpgrader = new TowerSpriteUpgraderDaemon(gameConsumer, new TowerSpriteUpgrader())
+                    .setName("Tower Sprite Upgrader")
+                    .start();
+
+            buttonDisabler = new ButtonDisablerDaemon(gameConsumer, new ButtonDisabler(100, renderer))
+                    .setName("Button Disabler")
                     .start();
 
             fieldEraserEngine = new EagerMainQuestDaemonEngine(renderer).setName("Field Eraser")
