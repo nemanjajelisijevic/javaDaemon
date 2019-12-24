@@ -129,7 +129,7 @@ So, how is this implemented?
 
 Pros and cons (constraints)
 
-	//Multiplatform programming and Gradle build tools
+	//Multiplatform programming and Gradle build tools and MOE research
 	//Design patterns and SOLID
 	//Division of class methods by the executing thread
 	//Synchronization...
