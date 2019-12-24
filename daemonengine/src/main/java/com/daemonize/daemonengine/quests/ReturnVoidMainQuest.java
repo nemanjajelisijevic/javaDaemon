@@ -16,7 +16,7 @@ public abstract class ReturnVoidMainQuest extends VoidMainQuest {
         }
     };
 
-    public ReturnVoidMainQuest(Runnable retRun, ClosureExecutionWaiter closureExecutionWaiter) {
+    protected ReturnVoidMainQuest(Runnable retRun, ClosureExecutionWaiter closureExecutionWaiter) {
         super();
         if (closureExecutionWaiter != null) {
             this.closureExecutionWaiter = closureExecutionWaiter;

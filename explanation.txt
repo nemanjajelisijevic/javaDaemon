@@ -1,0 +1,142 @@
+What is it?
+
+	JavaDaemon is a framework for creating multithreaded and reactive apps in Java. I found it to be useful for making games.
+	2D games for now, but I recently started working on incorporating it with OpenGl and hope to build a full blown 3D game engine.
+
+	And that is my first goal, to produce a multiplatform game development framework, purely based on Java as the language of choice.
+	That being said, it is not bound to game development only, it can be used in various kind of apps (Android, java desktop apps, even server side stuff...).
+
+	With little modifications it can be made for Kotlin.
+
+	Its pure Java, so no platform dependencies.
+
+About multithreading and concurrency:
+
+	Multithreading is important in todays software development, as it allows the program to leverage the power of multiple CPU cores,
+	executng tasks fully in parrallel, making the program faster and more modular in a sense of distributing tasks. 
+	But programming a multithreaded app with only the language constructs like threads and synchronization primitives can be hard and tedious task.
+
+	Many frameworks include their own solution for easing the concurrency usage by the app developer, and there is a variety of libraries and frameworks to choose from.
+	Currently, one of most popular Java libraries is REcative Extensions for Java or RXJava, which I use at work on daily basis.
+
+	JavaDaemon has the same goal as ReactiveX (RXJava) library, but different approach. Like RXJava its a combination of OOP and functional programming.
+	While RX framework is based on Observer software design pattern which can decouple subscribers and observers to run in different threads,
+	this framework is based on Active Object concurrency pattern and producer-consumer app building pattern.
+
+	Concurrency on steroids, is maybe a better way to describe it.
+
+Wait, what are those mentioned patterns?
+
+	The Active Object design pattern decouples method execution from method invocation for objects that each reside in their own thread of control.
+	The Producer/Consumer pattern is used to decouple processes that produce and consume data at different rates.
+
+So, to start off with the basics.
+
+Conteptual overview of javaDaemon
+
+	Daemon framework is based on two main components: Daemons and Consumers.
+	For the sake of clarity, concept of Consumers will be explained first. 
+	Its a pretty known concept so if it bores you just skip it.
+
+	Consumer:
+
+		The most used architecture in non-server (client) application frameworks is the event-loop based one.
+
+		Event loop (also called a consumer thread) is, as the word says: a loop. A loop that is executed by a dedicated thread, and holds a certain condition (synchronization primitive)
+		to regulate its idle time (awaiting on a condition) so it wouldn't eat up CPU cycles needlessly when there is nothing to be computed. Thus, its only active when an event is dispatched to it,
+		it reacts to the event by running some developer specifiied procedure.
+
+		Usually, event loop is waiting while some data structure (queue) associated with it, is empty, which represents the condition to idle, and when an event is dispatched
+		it means that the event is enqueued to the queue, so it can be retrieved by event loop and used in the event handling procedure developer specifies. Events are created as a result of some specific task that has
+		been executed in some other threads context (producer thread). All together, they represent the producer-consumer scenario. 
+
+		As every program starts with the main programs thread executing the main function. Somewhere in that function (ussually after setting up and allocating all of the needed frameworks runtime data
+		and other threads for running the bussines logic code), that main thread is stuck in an event-loop. Its commonly called GUI thread as it works with the Graphical User Interface 
+		(updating the GUI components like texts and images, as well as reacting to user controls like buttons etc.). Conventionally, its not recomended to run bussines logic code in the gui thread,
+		especially if that code takes a some time to execute, since it will block the main thread and cause the user interface halt (app not responding).
+
+		So delegating the business logic tasks to other threads in application is desired (like reacting to the button click that symbolyzes a task to be done),
+		and when those tasks are done an event is sent form the tasks thread to the GUI threads' event loop to update the views.
+
+		As in some toher frameworks, an event in JavaDaemon is the Runnable object and its specializations in form of Closures, which are objects that just encapsulate the algorithm
+		to be executed or plainly - function objects. Closure (in Java 8 java.utils.function its called Consumer, but I feel like thats not a very suitable name) is like a Runnable, but it has one argument to be passed.
+
+		Those objects are the base of functional programming (in Java at least, different languages have different implementations) and can be written as lambda expressions (more on that later).
+		They are sucessors of functors in C++ or function pointers in C. Their main purpouse is allowing the functions to be passed around as if they were objects (data types).
+
+		So, the Consumer type in javaDaemon is a class that encapsulates an event loop thread that executes all Runables and Closures dispatched to it by other threads.
+		Consumer can be the GUI thread or it can be a standalone thread, however the developer chooses to implement it.
+
+	The Daemon:
+
+		Daemon is the other part of the framework, the main part, the thing that that the framework is named after. Daemon is named after daemon process in unix like OSes, not the java daemon thread, 
+		because threads in javaDaemon are user threads, and will be waited for by JVM to run out of scope. Of course, it can be made daemon, as in java daemon thread, but I never had the need for it.
+
+		In that sense, a daemon is a long-running background process that answers requests for services. The term originated with Unix, but most operating systems use daemons in some form or another...
+		Nevermind, I just thought its a cool name.
+
+		The Daemon represents users (developers) class instance or object in form of active object. Active object because it encapsulates a dedicated thread (or more than one).
+		Any kind of user defined class can be used as a prototype for a Daemon. Furthermore, all the logic of users methods and state of the member fields are undisturbed by presence of Daemons.
+		(I've pondered on writing an epic fantasy novel about a small and miserable POJO object, which obtains a Daemon armor and sets off in series of adventures along the continent of Java :))
+
+		So, basically, Daemon is a class wrapper for developers written prototype class. It accepts users prototype class as a constructor parameter, encapsulating the reference to it,
+		and maps marked (annotated) PUBLIC prototype method to their asynchronous counterpart, where instead of prototype methods return value of <ReturnType>,
+		a new parameter of type Closure<ReturnType> (or Runnable if method returns void) is added so user can use it to extend the calling logic.
+
+		Just public methods. Privates and protecteds make no sense, thus enforcing the user class API. Still dont know what to do with static methods...
+
+		It could be said that, underneath, Daemons also function by following the producer consumer scenario. Actually, they can also be considered consumers, if you think of the scope 
+		that made the method call as a producer. But, from another point of view, Daemons are producers. They produce the return value of the users class method and dispatch it to 
+		the Consumer via Closures.
+
+		For each prototype marked method there is a little class generated that carries all of the arguments with it - I call it the Quest :).
+		Every marked method gets its own subtype of a Quest class with different params, mirroring the signature of the marked user method.
+		As there is a base Quest class for all of the methods, they can be enqueued to the call queue, upon which the Daemon thread consumes, thus, effectivly calling the prototype
+		method in Daemon threads context resolved by the type of quest. When the user method returns, Daemon dispatches its return value to the predefined Consumer in form of a Closure or
+		Runnable (if the method is void, but the caller needs to be notified that the method is done).
+
+		Not all of the Daemons methods are asyncronous, just the marked ones. Because, obviously, simple methods like acessors dont need to be executed asynchronously.
+
+		So when the Daemons async method is called, the call is enqueued to one of the Daemons thread engine call queues, and calling thread returns immediately (definition of asynchronous execution). 
+		The fact that it returns immediately allows the call to be made from a Consumer, so the consumer can continue looping and serving other Daemons and their Closures.
+
+		In that way, Daemons and Consumers complement each other.
+
+Allright, but how do I use it?
+
+	Annotations.
+
+	Another great tool of the Java compiler. There are lots of usages for annotations, and here, its the bolierplate code generation. In javaDaemon, boilerplate is the multithreading code.
+	With annotations developer can mark a class to be processed in compile time, and a Daemon wrapper class is generated.
+
+
+	//service objects and start and stop methods
+
+//calling generated code morals?
+
+So, how is this implemented?
+
+There are two components to JavaDaemon. They are directly translated to two libraries. 
+
+Daemonengine is a runtime library that provides thread plumbing via engines that make Daemons run in different threads.
+
+Daemonprocessor is a compile time component, a library with an entrypoint in a specialized Java Annotation processor.
+
+When configured in a project the Daemonprocessor scans the project for annotated classes. When it finds them it generates Daemons.
+As said, 
+
+
+//Synchronization...
+//Division of class methods by the executing thread
+
+Multiplatform programming and Gradle build tools
+
+Pros and cons
+
+//Design patterns and SOLID
+
+Why games? And why Java?
+
+//Hardware 
+
+Contemplating the future

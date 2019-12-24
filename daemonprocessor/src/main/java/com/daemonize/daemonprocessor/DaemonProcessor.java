@@ -31,7 +31,6 @@ import javax.tools.Diagnostic;
         {
                 "com.daemonize.daemonprocessor.annotations.Daemon",
                 "com.daemonize.daemonprocessor.annotations.SideQuest",
-                "com.daemonize.daemonprocessor.annotations.CallingThread",
                 "com.daemonize.daemonprocessor.annotations.DedicatedThread"
         }
 )
@@ -125,7 +124,9 @@ public class DaemonProcessor extends AbstractProcessor {
                         } else {
 
                             for(ExecutableElement method : publicPrototypeMethods) {
-                                if(method.getAnnotation(DedicatedThread.class) != null || (method.getAnnotation(Daemonize.class) != null && method.getAnnotation(Daemonize.class).dedicatedThread()))
+                                if(method.getAnnotation(DedicatedThread.class) != null
+                                        || (method.getAnnotation(Daemonize.class) != null
+                                        && method.getAnnotation(Daemonize.class).dedicatedThread()))
                                     throw new IllegalStateException(
                                             "Error daemonizing class: "
                                             + classElement.getSimpleName().toString()

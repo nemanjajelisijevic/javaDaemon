@@ -48,9 +48,11 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
     public boolean run() {
         try {
 
-            if(initLatch.getCounter() > 0)
+            if(initLatch.getCounter() > 0) {
                 daemonStateSetter.setState(DaemonState.INITIALIZING);
-            initLatch.await();
+                initLatch.await();
+            }
+
             daemonStateSetter.setState(DaemonState.SIDE_QUEST);
 
             result = pursue();
