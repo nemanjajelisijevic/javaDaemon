@@ -289,7 +289,7 @@ Pros and cons (constraints)
 
 Why games? And why Java?
 
-	I know that Java developers code with little core about programs performances, since Java is used for non preformance
+	I know that Java developers code with little care about programs performances, since Java is used for non preformance
 	critical applications or backend apps which run on superbuff mighty servers. Furthermore, this kind of usage and the fact
 	that it began with the rise of internet and web programming, had dubbed Java as a "slow" language in terms of execution 
 	performance. Sure, its slower than C/C++, because there is some interpretation by JVM, but today, with this kind of hardware 
