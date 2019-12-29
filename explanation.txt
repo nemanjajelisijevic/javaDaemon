@@ -178,8 +178,9 @@ Allright, but how do I use it?
 	Animate method returns PositionedImage object which contains new x and y coords, as well as the current image (from sprite)
 	to be drawn.
 	
-	Go to method calculates, lets say, the direction and velocity of the Movable object. Because it will have its own thread of
-	execution, it can rest on a codition or a semaphore until animating thread engine is done.
+	Go to method calculates, lets say, the direction and velocity of the Movable object, wait for animation engine to actually
+	draw this frame by frame, and return the outcome. Because it will have its own thread of execution, it can rest on a codition or 
+	a semaphore until animating thread engine is done.
 	
 	Daemon looks like this:
 
@@ -234,7 +235,8 @@ Allright, but how do I use it?
 			if (ret.get()) { //if the movable has arrived do some more logic
 				//fire bullet or land a mine or whatever
 				//and if damaged get some healing...
-			}
+			} else
+				movable.stop();
 		});
 
 		//or just go to another coords
@@ -260,8 +262,6 @@ Allright, but how do I use it?
 				movable.goTo(nextX, nextY, nextVel, this::onReturn);
 			}
 		});
-		
-		movable.stop();
 		
 	Now, some of the reactions I got from developers I consulted with is about calling generated code.
 	
