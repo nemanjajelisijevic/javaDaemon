@@ -3,7 +3,7 @@ What is it?
 	JavaDaemon is a framework for creating multithreaded and reactive apps in Java. I found it to be useful for making games.
 	2D games for now, but I recently started working on incorporating it with OpenGl and hope to build a full blown 3D game engine.
 
-	And this is my first step, to produce a multiplatform game development framework, purely based on Java as the language 
+	And this is my first step towards producing a multiplatform game development framework, purely based on Java as the language 
 	of choice. Of course, not something that could compare to big AAA game engines, but something that could be useful and fun 
 	to use.
 	
@@ -23,8 +23,6 @@ About multithreading and concurrency:
 	But programming a multithreaded app with only the language constructs like threads and synchronization primitives can
 	be hard and tedious task. Many frameworks include their own solution for easing the concurrency usage by the app developer,
 	and there is a variety of libraries and frameworks to choose from.
-	
-	//Java executors and services
 	
 	Currently, one of most popular Java libraries is Recative Extensions for Java or RXJava, which I use at work on daily basis.
 
@@ -83,7 +81,7 @@ Conteptual overview of javaDaemon
 		one argument to be passed.
 
 		Those objects are the base of functional programming (in Java at least, different languages have different 
-		implementations) and can be written as lambda expressions (more on that later). They are sucessors of functors in C++
+		implementations) and can be written as lambda expressions. They are sucessors of functors in C++
 		or function pointers in C. Their main purpouse is allowing the functions to be passed around as if they were objects 
 		(data types).
 
@@ -110,11 +108,10 @@ Conteptual overview of javaDaemon
 		and sets off in series of adventures along the continent of Java :))
 
 		So, basically, Daemon is a class wrapper for developers written prototype class. It accepts users prototype class as a 
-		constructor parameter, encapsulating the reference to it,
-		and maps marked (annotated) PUBLIC, user written, prototype method to their asynchronous counterpart, where instead of 
-		prototype methods return value of <ReturnType>,
-		a new parameter of type Closure<ReturnType> (or Runnable if method returns void) is added, so user can use it to extend 
-		the calling logic.
+		constructor parameter, encapsulating the reference to it, and maps marked (annotated) PUBLIC, user written, 
+		prototype method to their asynchronous counterpart, where instead of prototype methods return value of <ReturnType>,
+		a new parameter of type Closure<ReturnType> (or Runnable if method returns void) is added, 
+		so user can use it to extend the calling logic.
 
 		Just public methods. Privates and protecteds access modifiers make no sense in this context, thus enforcing the user 
 		class API. Still dont know what to do with static methods...
@@ -161,8 +158,111 @@ Allright, but how do I use it?
 	There are constraints in usage, for sure. Like @SideQuest method cant take in any parameters, and more for other kinds of modes,
 	but that will be explained in depth some other time.
 	
-	//Example code
+	An example:
+
+		@Daemon(doubleDaemon = true)
+		public interface MovableAnimator extends .... {
+
+			@Daemonize
+			public boolean goTo(int x, int y, float velocity);
+
+			@SideQuesta(SLEEP = 25)
+			public PositionedImage animate();
+		}	
 	
+	Here is an abstraction that describes a movable object in 2D plane. @SideQuest will make sure that a dedicated thread engine
+	will be generated to call animate method every 25ms. 
+	Any concrete implementation of that interface can contain specfic animation techniques and allows the developer to
+	annotate an interface and use it with any implementation they like.
+	
+	Animate method returns PositionedImage object which contains new x and y coords, as well as the current image (from sprite)
+	to be drawn.
+	
+	Go to method calculates, lets say, the direction and velocity of the Movable object. Because it will have its own thread of
+	execution, it can rest on a codition or a semaphore until animating thread engine is done.
+	
+	Daemon looks like this:
+
+		public class MovableAnimatorDaemon {
+
+			private MovableAnimator prototype;
+
+			private EagerMainQuestDaemonEngine mainEngine;
+			private SideQuestEngine sideEngine;
+
+			MovableDaemon(Consumer consumer, MovableAnimator prototype) {
+				this.prototype = prototype;
+				//init engines...
+			}
+
+			public MovableAnimatorDaemon goTo(int x, int y, float velocity, Closure<Boolean> closure) {
+				//enqueue goTo on EagerMainQuestDaemonEngine mainEngines call queue...
+				return this;
+			}
+
+			public SideQuest setAnimateSideQuest(Consumer consumer) {
+				//init quest for animation and configure it to run on sideEngine...
+				return sideQuest;
+			}
+
+			//quests definitions and stuff...
+		}
+	
+	And, the usage:
+	
+		...
+
+		Consumer gameConsumer; //consumer dedicated to executing game logic
+		Consumer renderer; //consumer dedicated to rendering aka. The Renderer
+
+		...
+
+		//instantination - Bridge pattern
+		MovableAnimatorDaemon movable = new MovableAnimatorDaemon(gameConsumer, new SpecificImplemetationOfMovable(...))
+						.setName("SpecificImplemetationOfMovable Daemon");
+
+		//sideQuest config
+		movable.setAnimateSideQuest(renderer).setClosure(ret -> {
+			PositionedImage posImg = ret.get();
+			correspondingView.setX(posImg.getX())
+					 .setY(posImg.getY())
+					 .setImage(posImg.getImage());
+		});
+
+		//start the daemon and go to specific coords
+		movable.start().goTo(someX, someY, someVelocity, ret -> {
+			if (ret.get()) { //if the movable has arrived do some more logic
+				//fire bullet or land a mine or whatever
+				//and if damaged get some healing...
+			}
+		});
+
+		//or just go to another coords
+		movable.goTo(firstX, firstY, firstVel, ret -> if (ret.get()) movable.goTo(secondX, secondY, secondVel, ret2 -> ...));
+
+		//or use anon class as closure and get the Closures this ptr
+		//and lock the movable in a multithreaded recursion
+		//also a signature of Closure can be seen
+		movable.goTo(x, y, vel, new Closure<Boolean> {
+			@Override
+			public void onReturn(Return<Boolean> ret) {
+			
+				//guard against invalid return
+				//Return class has addtitonal logic for exception handling 
+				if(!ret.get()) { 
+					movable.stop();
+					return;
+				}
+			
+				//do the logic
+				//calculate next x, y , velocity
+				//and then go to next coords with the same closure allocated here
+				movable.goTo(nextX, nextY, nextVel, this::onReturn);
+			}
+		});
+		
+		movable.stop();
+		
 	Now, some of the reactions I got from developers I consulted with is about calling generated code.
 	
 So, how is this implemented?
@@ -172,15 +272,17 @@ So, how is this implemented?
 	Daemonengine is a runtime library that provides thread plumbing via engines that make Daemons run in different threads.
 	Daemonprocessor is a compile time component, a library with an entrypoint in a specialized Java Annotation processor.
 
-	When configured in a project the Daemonprocessor scans the project for annotated classes. When it finds them it generates Daemons.
+	When configured in a project the Daemonprocessor scans the project for annotated classes. When it finds them it generates 
+	Daemons.
 	As said, 
 
-
+	//JavaPoet praise
 	//platform code abstraction
 
 Pros and cons (constraints)
 
 	//Multiplatform programming and Gradle build tools and MOE research
+	//OOP iheritance and polymorphism
 	//Design patterns and SOLID
 	//Division of class methods by the executing thread
 	//Synchronization...
