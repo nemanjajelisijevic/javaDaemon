@@ -166,7 +166,7 @@ Allright, but how do I use it?
 			@Daemonize
 			public boolean goTo(int x, int y, float velocity);
 
-			@SideQuesta(SLEEP = 25)
+			@SideQuest(SLEEP = 25)
 			public PositionedImage animate();
 		}	
 	
