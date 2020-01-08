@@ -45,11 +45,11 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
     public boolean consume(Runnable runnable) {
         boolean ret;
         closureLock.lock();
-        closureQueue.add(runnable);
+        ret = closureQueue.add(runnable);
         if (closureQueue.size() == 1)
             closureAvailable.signal();
         closureLock.unlock();
-        return true;
+        return ret;
     }
 
     private void loop() {
