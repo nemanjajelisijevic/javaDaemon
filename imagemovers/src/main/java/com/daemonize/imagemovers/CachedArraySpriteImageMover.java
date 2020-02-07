@@ -6,9 +6,9 @@ import com.daemonize.graphics2d.images.Image;
 
 public class CachedArraySpriteImageMover extends ImageTranslationMover {
 
-    protected AwaitedArraySprite cache = new AwaitedArraySprite();
+    protected AwaitedSprite cache = new AwaitedSprite();
 
-    public synchronized void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
+    public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
         this.velocity.intensity = velocity;
         cache.clearCache();
         cache.setSprite(sprite);

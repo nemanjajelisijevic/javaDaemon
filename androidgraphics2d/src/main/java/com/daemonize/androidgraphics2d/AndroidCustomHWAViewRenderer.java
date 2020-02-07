@@ -21,6 +21,7 @@ public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWA
     private DrawConsumer drawConsumer;
 
     private Paint paint;
+    private int backgroundColor = Color.TRANSPARENT;
 
     private Runnable invalidateRunnable = new Runnable() {
         @Override
@@ -47,6 +48,11 @@ public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWA
         return this;
     }
 
+    public AndroidCustomHWAViewRenderer setBackgroundColor(int backgroundColor) {
+        this.backgroundColor = backgroundColor;
+        return this;
+    }
+
     @Override
     public AndroidCustomHWAViewRenderer setDirty() {
         this.dirtyFlag = true;
@@ -65,7 +71,7 @@ public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWA
     }
 
     AndroidCustomHWAViewRenderer drawSceneFromView(Canvas canvas) {
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        canvas.drawColor(backgroundColor);
         for (ImageView view : scene.getViews()) {
             if (view.isShowing()) {
                 canvas.drawBitmap(

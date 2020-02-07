@@ -1,6 +1,7 @@
 package com.daemonize.daemondevapp;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         customHWAView.setMinimumHeight(borderY);
         customHWAView.setVisibility(View.VISIBLE);
         setContentView(customHWAView);
-        Renderer2D renderer = new AndroidCustomHWAViewRenderer(customHWAView, 200);
+        Renderer2D renderer = new AndroidCustomHWAViewRenderer(customHWAView, 200).setBackgroundColor(Color.BLACK);
 
         ImageManager imageManager = new AndroidImageManager(this);
 

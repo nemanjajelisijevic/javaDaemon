@@ -9,14 +9,14 @@ import java.util.Arrays;
 
 public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
-    protected volatile AngleToImageArray spriteBuffer;
+    protected volatile AngleToSpriteMapper spriteBuffer;
     protected volatile Image[] currentRotationSprite;
     private volatile int size;
 
     public synchronized void setRotationSprite(Image[] rotationSprite) {
         int currentAngle = spriteBuffer != null ? spriteBuffer.getCurrentAngle() : 0;
         int step = 360 / rotationSprite.length;
-        this.spriteBuffer = new AngleToImageArray(rotationSprite, step);
+        this.spriteBuffer = new AngleToSpriteMapper(rotationSprite, step);
         this.currentRotationSprite = new Image[(180 / step) + 1];
         this.size = 0;
         popSprite();

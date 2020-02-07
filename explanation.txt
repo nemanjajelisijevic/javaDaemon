@@ -3,6 +3,10 @@ What is it?
 	JavaDaemon is a framework for creating multithreaded and reactive apps in Java. I found it to be useful for making games.
 	2D games for now, but I recently started working on incorporating it with OpenGl and hope to build a full blown 3D game engine.
 
+	As I haven't had any game development experience before, I should say that I am currently learning the guts of graphics pipeline, linear algebra,
+	OpenGl and other game engine design related concepts, and its is a vast topic. But, as I am making progress, I am becoming more confident
+	that this kind of a concurrency tool is the right one for the job.
+
 	And this is my first step towards producing a multiplatform game development framework, purely based on Java as the language 
 	of choice. Of course, not something that could compare to big AAA game engines, but something that could be useful and fun 
 	to use.
@@ -263,7 +267,14 @@ Allright, but how do I use it?
 			}
 		});
 		
-	Now, some of the reactions I got from developers I consulted with is about calling generated code.
+	Now, some of the reactions I got from developers I consulted with, is about calling or using the generated code.
+	Since the daemons should exist in classpath, higher layers can use them properly.
+
+	It's a bit confusing at first, when the project is compiled but something is not configured right,
+	or the annotation processor hasn't been run, and the source code is all red. But after a few times
+	its easy to get a hang of it.
+
+	Error handling in compile time is evolving so it should be pretty easy to grasp and use.
 	
 So, how is this implemented?
 
@@ -274,10 +285,17 @@ So, how is this implemented?
 
 	When configured in a project the Daemonprocessor scans the project for annotated classes. When it finds them it generates 
 	Daemons.
-	As said, 
 
-	//JavaPoet praise
-	//platform code abstraction
+	Instead of generating java source code from scratch, the great JavaPoet library is used (https://github.com/square/javapoet).
+	Awesome library. Stable, easy to use and works great with Java apt library types.
+
+	2D game engine (animation) is still in its early stages, lots of stuff is yet to be perfected and optimized, but the proof of
+	concept is there. It can be nicely abstracted from platform specific implementations in few key abstractions that are easy to use.
+
+    Renderer, sound  manager and image loader are some of the abstractions that are initialized in a very thin platform specific
+    main function (activity) and injected into the Game scope, so game can be a regular java library independent of any platform specific code.
+
+    This approach is going to be extended to the 3D engine design.
 
 Pros and cons (constraints)
 
@@ -292,7 +310,7 @@ Why games? And why Java?
 	I know that Java developers code with little care about programs performances, since Java is used for non preformance
 	critical applications or backend apps which run on superbuff mighty servers. Furthermore, this kind of usage and the fact
 	that it began with the rise of internet and web programming, had dubbed Java as a "slow" language in terms of execution 
-	performance. Sure, its slower than C/C++, because there is some interpretation by JVM, but today, with this kind of hardware 
+	performance. Sure, its slower than C/C++, because of the runtime interpretation by JVM, but today, with this kind of hardware
 	that is used even in mobile devices, and some performance optimization skills, I have no doubt that a game of modest size, at 
 	least, can be made with a lot less effort than before.
 	

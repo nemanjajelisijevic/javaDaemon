@@ -7,12 +7,12 @@ import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.InterruptibleSleepSideQuest;
-import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
+import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
@@ -75,7 +75,29 @@ public class Game {
 
     //BackgroundImage
     private Image backgroundImage;
-    private ImageView backgroundView;
+    //private ImageView backgroundView;
+
+    private ImageView globeView;
+    private Image[] globeSprite;
+
+    @Daemon
+    public static class GlobeRotater {
+
+        private Image[] globeSprite;
+        private int cnt = 0;
+
+        public GlobeRotater(Image[] globeSprite) {
+            this.globeSprite = globeSprite;
+        }
+
+        @SideQuest(SLEEP = 35)
+        public Image rotateGlobe() {
+            return globeSprite[cnt++ % globeSprite.length];
+        }
+
+    }
+
+    private GlobeRotaterDaemon globeRotater;
 
     //screen borders
     private int borderX;
@@ -333,12 +355,13 @@ public class Game {
         }
 
         @Override
-        public void onAdd(BulletDoubleDaemon projectile) {
+        public boolean onAdd(BulletDoubleDaemon projectile) {
             projectile.clearAndInterrupt().clearVelocity().popSprite();
             renderer.consume(() -> {
                 for (ImageView view : projectile.getViews())
                     view.hide();
             });
+            return true;
         }
 
         @Override
@@ -441,6 +464,7 @@ public class Game {
         gameConsumer.consume(() -> {
             enemyGenerator.cont();
             renderer.cont();
+            globeRotater.start();
             paused = false;
         });
         System.err.println(DaemonUtils.tag() + " Game Consumer queue size: " + gameConsumer.closureQueueSize());
@@ -463,6 +487,7 @@ public class Game {
 
     public Game stop(){
         gameConsumer.consume(() -> {
+            globeRotater.stop();
             towerSpriteUpgrader.stop();
             fieldEraserEngine.stop();
             activeSoundManager.stop();
@@ -942,6 +967,15 @@ public class Game {
 
                 laserSound = activeSoundManager.loadSoundClip("laser.wav");
 
+
+                globeSprite = imageManager.cutSpriteSheet(
+                        "globe-sprite.png",
+                        8,
+                        9,
+                        (backgroundImage.getWidth() / 2) * 9,
+                        (backgroundImage.getHeight() * 2 / 3) * 8
+                );
+
                 while (loaderBar.hasNext()){
                     loaderBar.next().show();
                     renderer.drawScene();
@@ -971,14 +1005,28 @@ public class Game {
         }).addState(() -> { //views and dialogs population
 
             //add background to scene
-            backgroundView = scene.addImageView(
-                    new ImageViewImpl("Background")
-                            .setImageWithoutOffset(backgroundImage)
-                            .setAbsoluteX(0)
-                            .setAbsoluteY(0)
+//            backgroundView = scene.addImageView(
+//                    new ImageViewImpl("Background")
+//                            .setImageWithoutOffset(backgroundImage)
+//                            .setAbsoluteX(0)
+//                            .setAbsoluteY(0)
+//                            .setZindex(0)
+//                            .show()
+//            );
+
+            //add background to scene
+            globeView = scene.addImageView(
+                    new ImageViewImpl("Globe")
+                            .setImage(globeSprite[0])
+                            .setAbsoluteX(borderX * 2 / 5)
+                            .setAbsoluteY(borderY / 2)
                             .setZindex(0)
                             .show()
             );
+
+
+            globeRotater = new GlobeRotaterDaemon(new GlobeRotater(globeSprite)).setName("Globe Rotater");
+            globeRotater.setRotateGlobeSideQuest(renderer).setClosure(image -> globeView.setImage(image.get()));
 
             //dialogues and ui views
             scoreBackGrView = new ImageViewImpl("Score Background").setImage(scoreBackGrImage).setAbsoluteX(0).setAbsoluteY(0).setZindex(3);
@@ -1210,22 +1258,9 @@ public class Game {
 
             //enemy repo init
             enemyRepo = new QueuedEntityRepo<EnemyDoubleDaemon>() {
-                @Override
-                public void onAdd(EnemyDoubleDaemon enemy) {
-                    enemy.setShootable(false).clearVelocity().clearAndInterrupt();
 
-                    renderer.consume(() -> {
-                        enemy.getHpView().hide().setAbsoluteX(0).setAbsoluteY(0);
-                        enemy.getTargetView().hide().setAbsoluteX(0).setAbsoluteY(0);
-                        enemy.getParalyzedView().hide().setAbsoluteX(0).setAbsoluteY(0);
-                    });
 
-                    enemy.pushSprite(explodeSprite, 0, () -> {
-                        renderer.consume(() -> enemy.getView().hide().setAbsoluteX(0).setAbsoluteY(0));
-                        enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY());
-                    }).queueStop();
-
-                    activeEnemies.remove(enemy);
+                private void eraseGrid() {
 
                     if (activeEnemies.isEmpty()) {
 
@@ -1271,10 +1306,40 @@ public class Game {
                 }
 
                 @Override
+                public boolean onAdd(EnemyDoubleDaemon enemy) {
+
+                    if (activeEnemies.remove(enemy)) {
+
+                        renderer.consume(() -> {
+                            enemy.getHpView().hide().setAbsoluteX(0).setAbsoluteY(0);
+                            enemy.getTargetView().hide().setAbsoluteX(0).setAbsoluteY(0);
+                            enemy.getParalyzedView().hide().setAbsoluteX(0).setAbsoluteY(0);
+                        });
+
+                        enemy.setShootable(false)
+                                .clearVelocity()
+                                .clearAndInterrupt()
+                                .pushSprite(explodeSprite, 0, () -> {
+                                    renderer.consume(() -> enemy.getView().hide().setAbsoluteX(0).setAbsoluteY(0));
+                                    enemy.popSprite()
+                                            .setPreviousField(null)
+                                            .setCoordinates(grid.getStartingX(), grid.getStartingY());
+                                }).queueStop();
+
+                        eraseGrid();
+                        return  true;
+                    } else
+                        return false;
+                }
+
+                @Override
                 public void onGet(EnemyDoubleDaemon enemy) {
 
                     System.err.println(DaemonUtils.tag() + "Enemy repo size: " + this.size());
-                    System.err.println(DaemonUtils.tag() + enemy.getName() + " STATES: " + enemy.getEnginesState().toString());
+                    //System.err.println(DaemonUtils.tag() + enemy.getName() + " STATES: " + enemy.getEnginesState().toString());
+
+                    if (activeEnemies.isEmpty())
+                        System.err.println("Enemies in repo:\n" + toString());
 
                     enemy.setAnimateEnemySideQuest(renderer).setClosure(new MultiViewAnimateClosure());
                     enemy.setShootable(true)
@@ -1289,6 +1354,18 @@ public class Game {
                         enemy.getView().show();
                         enemy.getHpView().show();
                     });
+                }
+
+                @Override
+                public String toString() {
+
+                    StringBuilder sb = new StringBuilder();
+
+                    forEach(enemy -> {
+                        sb.append(enemy.getName() + "\n");
+                    });
+
+                    return sb.toString();
                 }
             };
 
@@ -1602,6 +1679,7 @@ public class Game {
             //onPause
             this.onPauseRunnable = () -> {
                 gameConsumer.consume(() -> {
+                    globeRotater.stop();
                     enemyGenerator.pause();
                     gameConsumer.pause();
                     renderer.pause();
@@ -1802,6 +1880,7 @@ public class Game {
                                         renderer.consume(() -> infoScore.setNumbers(--score));
                                     currentSoundManager.playSound(bigExplosion);
                                     renderer.consume(currentFieldView.setImage(fieldImageTowerDen)::show);
+                                    if (enemyDoubleDaemon.isShootable())
                                     enemyRepo.add(enemyDoubleDaemon);
                                     return;
                                 }
@@ -1854,7 +1933,7 @@ public class Game {
 //                    .setUncaughtExceptionHandler(uncaughtExceptionHandler)
 //                    .start();
 
-            towerSpriteUpgrader = new TowerSpriteUpgraderDaemon(gameConsumer, new TowerSpriteUpgrader())
+            towerSpriteUpgrader = new TowerSpriteUpgraderDaemon(renderer, new TowerSpriteUpgrader())
                     .setName("Tower Sprite Upgrader")
                     .start();
 
@@ -1868,6 +1947,9 @@ public class Game {
 
             renderer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             gameConsumer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+
+
+            globeRotater.start();
 
 
             //denyMarker = new DenyMarker(renderer, gameConsumer, fieldImageTowerDen, fieldImage);
@@ -2015,7 +2097,8 @@ public class Game {
                             towerSelect,
                             dXY,
                             towerHp
-                    ).setHpView(
+                    ).setParalyzerEngine(gameConsumer, () -> Thread.sleep(enemyParalyzingInterval))
+                    .setHpView(
                             towerHpViwes[field.getRow()][field.getColumn()]
                                     .setAbsoluteX(field.getCenterX())
                                     .setAbsoluteY(field.getCenterY() - 2 * healthBarSprite[9].getHeight())
@@ -2122,7 +2205,7 @@ public class Game {
                                     float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
                                     long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
-                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, () -> bulletClosure.onReturn(1));
+                                    fireLaser(towerDaemon/*.getLastCoordinates()*/, enemy, velocity, duration, () -> bulletClosure.onReturn(1));
 
                                     reloadInterval = 4000;
                                     break;
@@ -2289,7 +2372,7 @@ public class Game {
     }
 
     public void fireLaser(
-            Pair<Float, Float> source,
+            TowerDaemon laserTower,
             Target target,
             float velocity,
             long duration,
@@ -2304,35 +2387,7 @@ public class Game {
 
         currentSoundManager.playSound(laserSound);
 
-        Runnable paralyzerClosure = () -> {
-
-            enemyTarget.setParalyzed(false);
-
-            renderer.consume(() -> enemyTarget.getParalyzedView().hide());
-
-            if (target.isShootable()) {
-
-                target.setVelocity(enemyVelocity);
-
-                Pair<Integer, Integer> prevFieldCoord = enemyTarget.getPreviousField();
-
-                Field<TowerDaemon> prevField = (prevFieldCoord == null)
-                        ?  grid.getField(0, 0)
-                        : grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
-
-                //go to next fields center
-                Field next = grid.getMinWeightOfNeighbors(prevField);
-
-                int angle = (int) RotatingSpriteImageMover.getAngle(
-                        target.getLastCoordinates().getFirst(),
-                        target.getLastCoordinates().getSecond(),
-                        next.getCenterX(),
-                        next.getCenterY()
-                );
-
-                enemyTarget.rotate(angle).redirect(next.getCenterX(), next.getCenterY());
-            }
-        };
+        Pair<Float, Float> source = laserTower.getLastCoordinates();
 
         laser.desintegrateTarget(source, target, duration, renderer, ret -> {
 
@@ -2340,26 +2395,41 @@ public class Game {
                 return;
 
             int newHp = enemyTarget.getHp() - laser.getDamage();
-            if (newHp > 0) {
+            if (enemyTarget.isShootable() && newHp > 0) {
 
                 enemyTarget.setHp(newHp);
                 enemyTarget.setVelocity(velocity);
 
-                if (enemyParalyizer.queueSize() == 0) {
-                    if (enemyTarget.isShootable()) {
-                        renderer.consume(() -> enemyTarget.getParalyzedView().show());
-                        enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), paralyzerClosure, false);
-                    }
-                } else {
-                    if (enemyTarget.isShootable()) {
-                        renderer.consume(() -> enemyTarget.getParalyzedView().show());
-                        new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(() -> {
-                            System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");
-                            Thread.sleep(enemyParalyzingInterval);
-                        }, paralyzerClosure, false);
-                    }
-                }
+                renderer.consume(() -> enemyTarget.getParalyzedView().show());
+                ((LaserTower) laserTower.getPrototype()).paralyze(() -> {
 
+                    enemyTarget.setParalyzed(false);
+
+                    renderer.consume(() -> enemyTarget.getParalyzedView().hide());
+
+                    if (target.isShootable()) {
+
+                        target.setVelocity(enemyVelocity);
+
+                        Pair<Integer, Integer> prevFieldCoord = enemyTarget.getPreviousField();
+
+                        Field<TowerDaemon> prevField = (prevFieldCoord == null)
+                                ?  grid.getField(0, 0)
+                                : grid.getField(prevFieldCoord.getFirst(), prevFieldCoord.getSecond());
+
+                        //go to next fields center
+                        Field next = grid.getMinWeightOfNeighbors(prevField);
+
+                        int angle = (int) RotatingSpriteImageMover.getAngle(
+                                target.getLastCoordinates().getFirst(),
+                                target.getLastCoordinates().getSecond(),
+                                next.getCenterX(),
+                                next.getCenterY()
+                        );
+
+                        enemyTarget.rotate(angle).redirect(next.getCenterX(), next.getCenterY());
+                    }
+                });
             } else
                 destructionClosure.run();
         });

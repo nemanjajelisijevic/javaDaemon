@@ -128,7 +128,6 @@ abstract class MainQuestDaemonBaseEngine<D extends MainQuestDaemonBaseEngine> ex
         return mainQuestQueue.size();
     }
 
-
     @Override
     public D clear() {
         mainQuestLock.lock();

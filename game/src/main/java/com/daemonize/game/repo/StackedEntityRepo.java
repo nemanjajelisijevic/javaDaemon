@@ -36,9 +36,11 @@ public abstract class StackedEntityRepo<T> implements EntityRepo<Stack<T>, T> {
 
     @Override
     public boolean add(T entity) {
-        this.onAdd(entity);
-        stack.push(entity);
-        return true;
+        if (this.onAdd(entity)) {
+            stack.push(entity);
+            return true;
+        } else
+            return false;
     }
 
     @Override
@@ -77,7 +79,7 @@ public abstract class StackedEntityRepo<T> implements EntityRepo<Stack<T>, T> {
     }
 
     @Override
-    public abstract void onAdd(T entity);
+    public abstract boolean onAdd(T entity);
 
     @Override
     public abstract void onGet(T entity);

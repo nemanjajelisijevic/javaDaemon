@@ -32,14 +32,12 @@ public class SemaphoreClosureExecutionWaiter implements ClosureExecutionWaiter {
         lock.lock();
         flag = true;
         updateConsumerAction.run();
-        try {
-            while(flag)
-                condition.awaitUninterruptibly();//TODO check if awaitUninterruptedly !!!!!!!!!!!!!!!!!!!!
-        } finally {
-            Thread.interrupted();//clear interrupt flag!!!!!
-            flag = false;
-            lock.unlock();
-        }
+        while(flag)
+            condition.awaitUninterruptibly();//TODO check if awaitUninterruptedly !!!!!!!!!!!!!!!!!!!!
+
+        Thread.interrupted();//clear interrupt flag!!!!!
+        flag = false;
+        lock.unlock();
     }
 
     public String getName() {

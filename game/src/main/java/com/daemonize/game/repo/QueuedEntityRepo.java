@@ -32,8 +32,10 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<Queue<T>, T> {
 
     @Override
     public boolean add(T entity) {
-        this.onAdd(entity);
-        return queue.add(entity);
+        if (this.onAdd(entity))
+            return queue.add(entity);
+        else
+            return false;
     }
 
     @Override
@@ -72,7 +74,7 @@ public abstract class QueuedEntityRepo<T> implements EntityRepo<Queue<T>, T> {
     }
 
     @Override
-    public abstract void onAdd(T entity);
+    public abstract boolean onAdd(T entity);
 
     @Override
     public abstract void onGet(T entity);

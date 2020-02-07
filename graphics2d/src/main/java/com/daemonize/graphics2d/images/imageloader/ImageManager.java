@@ -7,4 +7,5 @@ import java.io.IOException;
 public interface ImageManager {
     Image loadImageFromAssets(String name, int width, int height) throws IOException;
     Image rescaleImage(Image image, int width, int height);
+    Image[] cutSpriteSheet(String name, int rows, int columns, int imageWidth, int imageHeight) throws IOException;
 }

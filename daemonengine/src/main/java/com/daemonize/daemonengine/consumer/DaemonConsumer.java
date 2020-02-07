@@ -49,6 +49,10 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
         if (closureQueue.size() == 1)
             closureAvailable.signal();
         closureLock.unlock();
+
+        if (!ret) //TODO DEBUG
+            throw new IllegalStateException("Could not add to closureQueue!!!");
+
         return ret;
     }
 

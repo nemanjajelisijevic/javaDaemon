@@ -19,7 +19,7 @@ public interface EntityRepo<C extends Collection<T>, T> {
     T getAndConfigure(EntityConfigurator<T> configurator);
     T get();
 
-    void onAdd(T entity);
+    boolean onAdd(T entity);
     void onGet(T entity);
 
     //List<T> asList();

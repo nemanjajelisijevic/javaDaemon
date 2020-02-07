@@ -4,6 +4,9 @@ import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.ReturnRunnable;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.Daemon;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.imagemovers.ImageTranslationMover;
@@ -11,10 +14,20 @@ import com.daemonize.imagemovers.ImageTranslationMover;
 
 public class LaserTower extends Tower {
 
+    @FunctionalInterface
+    @Daemon(eager = true)
+    public interface ParalyzerEngine {
+        @GenerateRunnable
+        @Daemonize
+        void paralyze() throws InterruptedException;
+    }
+
     private Consumer renderer;
     private ReturnRunnable<GenericNode<Pair<PositionedImage, ImageView>>> updateRunnable = new ReturnRunnable<>();
 
     private volatile boolean animateFollowTarget = true;
+
+    private ParalyzerEngineDaemon paralyzerEngineDaemon;
 
     public LaserTower(
             Consumer renderer,
@@ -38,6 +51,20 @@ public class LaserTower extends Tower {
                      getLastCoordinates().getSecond()
                    ) < this.range
                 && target.getVelocity().intensity > 0.3F;
+        this.paralyzerEngineDaemon = new ParalyzerEngineDaemon(null, null)
+                .setName("Laser Tower Paralyzer Engine");
+    }
+
+    public LaserTower setParalyzerEngine(Consumer consumer, ParalyzerEngine paralyzer) {
+        paralyzerEngineDaemon.stop();
+        paralyzerEngineDaemon.setConsumer(consumer)
+                .setPrototype(paralyzer)
+                .start();
+        return this;
+    }
+
+    public void paralyze(Runnable closure) {
+        paralyzerEngineDaemon.paralyze(closure);
     }
 
     @Override

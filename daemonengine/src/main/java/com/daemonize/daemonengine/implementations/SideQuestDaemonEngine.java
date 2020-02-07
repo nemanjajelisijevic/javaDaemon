@@ -81,12 +81,12 @@ public class SideQuestDaemonEngine extends BaseDaemonEngine<SideQuestDaemonEngin
     return true;
   }
 
-  @Override
-  protected void cleanUp() {
-    sideQuestLock.lock();
-    currentSideQuest = null;
-    sideQuestLock.unlock();
-  }
+  //  @Override
+//  protected void cleanUp() {
+//    sideQuestLock.lock();
+//    currentSideQuest = null;
+//    sideQuestLock.unlock();
+//  }
 
   @Override
   public void stop() {
