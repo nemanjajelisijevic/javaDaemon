@@ -1,6 +1,7 @@
 package com.daemonize.game;
 
 import com.daemonize.daemonengine.DaemonEngine;
+import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.BareClosure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
@@ -2224,7 +2225,16 @@ public class Game {
     private void manageTower(float x, float y) {
         //check if correct field
         Field<TowerDaemon> field = grid.getField(x, y);
-        if (field == null) return;
+        if (field == null) {
+            List<DaemonState> states = globeRotater.getEnginesState();
+
+            if (states.get(0).equals(DaemonState.STOPPED))
+                globeRotater.start();
+            else
+                globeRotater.stop();
+
+            return;
+        }
 
         TowerDaemon tow = field.getObject();
 
