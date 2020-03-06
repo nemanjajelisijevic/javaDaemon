@@ -65,7 +65,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
                 }
                 closureRunnable = closureQueue.poll();
             } catch (InterruptedException ex) {
-                System.out.println(DaemonUtils.tag() + name + " interrupted!");
+                //System.out.println(DaemonUtils.tag() + name + " interrupted!");
                 break;//TODO check this break
             } finally {
                 closureLock.unlock();
@@ -77,7 +77,7 @@ public class DaemonConsumer implements Consumer<DaemonConsumer>, Daemon<DaemonCo
         }
 
         state = DaemonState.STOPPED;
-        System.out.println(DaemonUtils.tag() + name + " stopped!");
+        //System.out.println(DaemonUtils.tag() + name + " stopped!");
     }
 
     @Override

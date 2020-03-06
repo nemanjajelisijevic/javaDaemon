@@ -27,6 +27,11 @@ public class Button extends CompositeImageViewImpl {
         return this;
     }
 
+    public Button click() {
+        onClickCallback.run();
+        return this;
+    }
+
     @Override
     public boolean checkCoordinates(float x, float y) {
 

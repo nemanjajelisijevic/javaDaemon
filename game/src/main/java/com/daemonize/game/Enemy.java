@@ -187,11 +187,35 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         rotationMover.rotate(angle);
     }
 
-    @DedicatedThread
+    @Daemonize
+    public void rotateTowards(float x, float y) throws InterruptedException {
+        rotationMover.rotate((int)RotatingSpriteImageMover.getAngle(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y));
+    }
+
+    @DedicatedThread(engineName = "goTo")
     @Daemonize
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
+    }
+
+    @DedicatedThread(engineName = "goTo")
+    @Daemonize
+    public void go(float x, float y, float velocityInt) throws InterruptedException {
+        super.goTo(x, y, velocityInt);
+    }
+
+    @DedicatedThread(engineName = "goTo")
+    @Daemonize
+    public void rotAndGo(float x, float y, float velocityInt) throws InterruptedException {
+        rotateTowards(x, y);
+        go(x, y, velocityInt);
+    }
+
+    @Daemonize
+    public void redir(float x, float y) throws InterruptedException {
+        rotateTowards(x, y);
+        super.redirect(x, y);
     }
 
     @Override

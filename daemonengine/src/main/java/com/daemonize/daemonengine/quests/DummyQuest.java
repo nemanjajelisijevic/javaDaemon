@@ -52,7 +52,7 @@ public class DummyQuest extends BaseQuest<Void, DummyQuest> {
             consumer.consume(returnRunnable);
             return true;
         } catch (InterruptedException ex) {
-            System.out.println(DaemonUtils.tag() + description + " interrupted.");
+            //System.out.println(DaemonUtils.tag() + description + " interrupted.");
             return true;
         }
     }

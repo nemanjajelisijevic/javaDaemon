@@ -47,7 +47,7 @@ public class EagerMainQuestDaemonEngine extends MainQuestDaemonBaseEngine<EagerM
       }
       ret = mainQuestQueue.poll();
     } catch (InterruptedException ex) {
-      //System.out.println(DaemonUtils.tag() + " Waiting on a quest interrupted");
+      ////System.out.println(DaemonUtils.tag() + " Waiting on a quest interrupted");
     } finally {
       mainQuestLock.unlock();
     }

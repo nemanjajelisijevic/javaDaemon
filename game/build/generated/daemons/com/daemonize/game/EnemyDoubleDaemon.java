@@ -37,15 +37,15 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine goToDaemonEngine;
-
   protected EagerMainQuestDaemonEngine reloadDaemonEngine;
+
+  protected EagerMainQuestDaemonEngine goToDaemonEngine;
 
   public EnemyDoubleDaemon(Consumer consumer, Enemy prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
-    this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
     this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
+    this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -279,6 +279,27 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Enemy#redir} */
+  public EnemyDoubleDaemon redir(float x, float y) {
+    mainDaemonEngine.pursueQuest(new RedirMainQuest(x, y).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Enemy#rotAndGo} */
+  public EnemyDoubleDaemon rotAndGo(float x, float y, float velocityint) {
+    goToDaemonEngine.pursueQuest(new RotAndGoMainQuest(x, y, velocityint).setConsumer(goToDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Enemy#go} */
+  public EnemyDoubleDaemon go(float x, float y, float velocityint) {
+    goToDaemonEngine.pursueQuest(new GoMainQuest(x, y, velocityint).setConsumer(goToDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Enemy#pushSprite} */
   public EnemyDoubleDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
     mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
@@ -303,6 +324,13 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
    * Prototype method {@link com.daemonize.game.Enemy#goTo} */
   public EnemyDoubleDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
     goToDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure, null).setConsumer(goToDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Enemy#rotateTowards} */
+  public EnemyDoubleDaemon rotateTowards(float x, float y) {
+    mainDaemonEngine.pursueQuest(new RotateTowardsMainQuest(x, y).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -437,6 +465,69 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     }
   }
 
+  private final class RedirMainQuest extends VoidMainQuest {
+    private float x;
+
+    private float y;
+
+    private RedirMainQuest(float x, float y) {
+      super();
+      this.x = x;
+      this.y = y;
+      this.description = "redir";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.redir(x, y);
+      return null;
+    }
+  }
+
+  private final class RotAndGoMainQuest extends VoidMainQuest {
+    private float x;
+
+    private float y;
+
+    private float velocityint;
+
+    private RotAndGoMainQuest(float x, float y, float velocityint) {
+      super();
+      this.x = x;
+      this.y = y;
+      this.velocityint = velocityint;
+      this.description = "rotAndGo";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.rotAndGo(x, y, velocityint);
+      return null;
+    }
+  }
+
+  private final class GoMainQuest extends VoidMainQuest {
+    private float x;
+
+    private float y;
+
+    private float velocityint;
+
+    private GoMainQuest(float x, float y, float velocityint) {
+      super();
+      this.x = x;
+      this.y = y;
+      this.velocityint = velocityint;
+      this.description = "go";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.go(x, y, velocityint);
+      return null;
+    }
+  }
+
   private final class PushSpriteMainQuest extends ReturnVoidMainQuest {
     private Image[] sprite;
 
@@ -504,6 +595,25 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     @Override
     public final Boolean pursue() throws Exception {
       return prototype.goTo(x, y, velocityint);
+    }
+  }
+
+  private final class RotateTowardsMainQuest extends VoidMainQuest {
+    private float x;
+
+    private float y;
+
+    private RotateTowardsMainQuest(float x, float y) {
+      super();
+      this.x = x;
+      this.y = y;
+      this.description = "rotateTowards";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.rotateTowards(x, y);
+      return null;
     }
   }
 }

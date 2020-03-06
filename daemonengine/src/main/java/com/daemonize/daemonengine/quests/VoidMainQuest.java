@@ -15,7 +15,7 @@ public abstract class VoidMainQuest extends MainQuest<Void> {
             pursue();
             return true;
         } catch (InterruptedException ex) {
-            System.out.println(DaemonUtils.tag() + description + " interrupted.");
+            //System.out.println(DaemonUtils.tag() + description + " interrupted.");
             return true;
         } catch (final Exception ex) {
             final String tag = DaemonUtils.tag();

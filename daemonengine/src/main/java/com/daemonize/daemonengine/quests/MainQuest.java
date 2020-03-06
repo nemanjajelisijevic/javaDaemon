@@ -42,7 +42,7 @@ public abstract class MainQuest<T> extends BaseQuest<T, MainQuest<T>> {
         }
         return true;
     } catch (InterruptedException ex) {
-        System.out.println(DaemonUtils.tag() + description + " interrupted.");
+        //System.out.println(DaemonUtils.tag() + description + " interrupted.");
         return true;
     } catch (Exception ex) {
         setErrorAndUpdate(ex);

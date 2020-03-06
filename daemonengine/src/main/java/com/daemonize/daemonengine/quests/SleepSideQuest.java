@@ -39,7 +39,7 @@ public abstract class SleepSideQuest<T> extends SideQuest<T> {
             daemonStateSetter.setState(DaemonState.SIDE_QUEST);
             return true;
         } catch (InterruptedException ex) {
-            System.out.println(DaemonUtils.tag() + description + " interrupted.");
+            //System.out.println(DaemonUtils.tag() + description + " interrupted.");
             return true;
         } catch (Exception ex) {
             setErrorAndUpdate(ex);
