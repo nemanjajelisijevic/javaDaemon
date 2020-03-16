@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -51,6 +52,20 @@ public class CommandParser {
             return first;
         }
 
+        public List<T> elements() {
+            List ret = new ArrayList();
+
+            ret.add(first);
+
+            Enumeration<T> elems = stack.elements();
+
+            while(elems.hasMoreElements()) {
+                ret.add(elems.nextElement());
+            }
+
+            return ret;
+        }
+
     }
 
     private Scanner cmdScanner;
@@ -72,13 +87,13 @@ public class CommandParser {
                 Field[] fieldarray = stack.peek().getFirst().getClass().getDeclaredFields();
 
                 for (Field field : fieldarray) {
-                    System.err.println(DaemonUtils.tag() + field.getDeclaringClass().getSimpleName() +  " - Type: " + field.getType() + " - fieldname: " + field.getName());
+                    System.out.println(DaemonUtils.tag() + field.getDeclaringClass().getSimpleName() +  " - Type: " + field.getType() + " - fieldname: " + field.getName());
                 }
 
             } else if (cmd.startsWith("field ")) {
 
                 String fieldName =  cmd.replace("field ", "");
-                System.err.println(DaemonUtils.tag() + getField(fieldName).toString());
+                System.out.println(DaemonUtils.tag() + getField(fieldName).toString());
 
             } else if (cmd.equals("ret")) {
                 stack.pop();
@@ -97,7 +112,7 @@ public class CommandParser {
                 Method[] methods = stack.peek().getFirst().getClass().getMethods();
 
                 for (Method method : methods) {
-                    System.err.println(DaemonUtils.tag() + stack.peek().getFirst().getClass().getSimpleName() + "->" + method.getName());
+                    System.out.println(DaemonUtils.tag() + stack.peek().getFirst().getClass().getSimpleName() + "->" + method.getName());
                 }
 
             } else if (cmd.startsWith("method ")) {
@@ -111,7 +126,7 @@ public class CommandParser {
 
                         Class<?>[] params =  method.getParameterTypes();
 
-                        System.err.println(DaemonUtils.tag() + stack.peek().getFirst().getClass().getSimpleName() + "/"
+                        System.out.println(DaemonUtils.tag() + stack.peek().getFirst().getClass().getSimpleName() + "/"
                                 + stack.peek().getFirst().getClass().getSimpleName() + "-> "
                                 + method.getReturnType().getSimpleName() + " " + method.getName());
 
@@ -123,7 +138,7 @@ public class CommandParser {
 
 
             } else if(cmd.startsWith("toString")) {
-                System.err.println(stack.peek().getFirst().toString());
+                System.out.println(stack.peek().getFirst().toString());
             } else if (isMethod(cmd)) {
                 Object ret = execStatement(cmd);
             }
@@ -132,7 +147,20 @@ public class CommandParser {
             e.printStackTrace();
         }
 
-        System.err.print(DaemonUtils.tag() + stack.peek().getFirst().getClass().getSimpleName() + "(" + stack.peek().getSecond() + ")>");
+        StringBuilder path = new StringBuilder();
+
+        List<Pair<Object, String>> elements = stack.elements();
+
+        for(int i = 0; i < elements.size(); ++i) {
+
+            if(i == elements.size() - 1) {
+                path.append(elements.get(i).getSecond());
+            } else {
+                path.append(elements.get(i).getSecond() + ".");
+            }
+        }
+
+        System.out.print(DaemonUtils.tag() + stack.peek().getFirst().getClass().getSimpleName() + "(" + path.toString() + ")>");
     }
 
     private Object getField(String fieldName) throws NoSuchFieldException, IllegalAccessException, InstantiationException {
@@ -174,7 +202,6 @@ public class CommandParser {
                 retField.setAccessible(true);
 
                 if (retField.getType().isPrimitive()) {
-
                     if (retField.getType().equals(int.class)){
                         return retField.get(Integer.valueOf(0));
                     } else if (retField.getType().equals(float.class)) {
@@ -238,74 +265,95 @@ public class CommandParser {
             methodName = methodPath;
         }
 
+        //args
+        String argsString = statement.substring(openParenthesis + 1, statement.length() - 1);
 
-        //find method
-        Method[] methods = field.getClass().getMethods();
+        if (argsString.isEmpty()) { //method has no args
 
-        Method invoked = null;
 
-        for (Method method : methods) {
-            if (method.getName().equals(methodName)) {
-                invoked = method;
+            //find method
+            Method[] methods = field.getClass().getMethods();
+
+            Method invoked = null;
+
+            for (Method method : methods) {
+                if (method.getName().equals(methodName) && method.getParameterTypes().length == 0) {
+                    invoked = method;
+                    break;
+                }
             }
-        }
 
-        if (invoked != null) {
-
-                //args
-                String argsString = statement.substring(openParenthesis + 1, statement.length() - 1);
-
-            if (argsString.isEmpty()) { //method has no args
-                if (invoked.getReturnType().equals(void.class)) {
-                    invoked.invoke(field);
-                } else {
-                    ret = invoked.invoke(field);
-                }
+            if (invoked.getReturnType().equals(void.class)) {
+                invoked.invoke(field);
             } else {
+                ret = invoked.invoke(field);
+            }
 
-                String[] argArray = null;
-                List<Object> evaluatedArgs = new LinkedList<>();
+        } else {
 
-                if (argsString.contains(",")) {
-                    argArray = argsString.split(",");
-                } else if (!argsString.isEmpty()) { //one arg
-                    argArray = new String[]{argsString};
-                } else if (argsString.isEmpty()) {
-                    argArray = new String[]{};
-                }
+            String[] argArray = null;
+            List<Object> evaluatedArgs = new LinkedList<>();
 
-                for (String arg : argArray) {
+            if (argsString.contains(",")) {
+                argArray = argsString.split(",");
+            } else if (!argsString.isEmpty()) { //one arg
+                argArray = new String[]{argsString};
+            } else if (argsString.isEmpty()) {
+                argArray = new String[]{};
+            }
 
-                    arg = arg.trim();
+            for (String arg : argArray) {
 
-                    if (isMethod(arg)) {
-                        evaluatedArgs.add(execStatement(arg));
-                    } else if (arg.equals("this")) {
-                        evaluatedArgs.add(stack.peek().getFirst());
-                    } else if (arg.startsWith("lit ")) {//TODO regexp literal args
+                arg = arg.trim();
 
+                if (isMethod(arg)) {
+                    evaluatedArgs.add(execStatement(arg));
+                } else if (arg.equals("this")) {
+                    evaluatedArgs.add(stack.peek().getFirst());
+                } else if (arg.startsWith("l ")) {//TODO regexp literal args
 
-                        arg = arg.substring(4);
+                    arg = arg.substring(2);
+
+                    if (arg.matches("[0-9.]*")) { // check if arg is a number
+
                         Number num;
 
                         try {
                             num = Integer.parseInt(arg);
                         } catch (NumberFormatException e) {
-                            num = Float.parseFloat(arg);
+                            try {
+                                num = Float.parseFloat(arg);
+                            } catch (NumberFormatException ex) {
+                                num = Double.parseDouble(arg); //could be double if user goes wild with decimals
+                            }
                         }
 
                         evaluatedArgs.add(num);
-
-                    } else {
-                        evaluatedArgs.add(getField(arg));
+                    } else {// store arg as a string
+                        evaluatedArgs.add(arg);
                     }
-
+                } else if (arg.equals("null")) {
+                    evaluatedArgs.add(null);
+                } else {
+                    evaluatedArgs.add(getField(arg));
                 }
-
-                ret = invoked.invoke(field, evaluatedArgs.toArray());
             }
 
+            //find method
+            Method[] methods = field.getClass().getMethods();
+
+            Method invoked = null;
+
+            for (Method method : methods) {
+                if (method.getName().equals(methodName) && (method.getParameterTypes().length == evaluatedArgs.size())) {
+                    invoked = method;
+                    break;
+                }
+            }
+
+            ret = invoked.invoke(field, evaluatedArgs.toArray());
         }
+
 
         return ret;
     }

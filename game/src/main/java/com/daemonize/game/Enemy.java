@@ -209,7 +209,14 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     @Daemonize
     public void rotAndGo(float x, float y, float velocityInt) throws InterruptedException {
         rotateTowards(x, y);
-        go(x, y, velocityInt);
+        goTo(x, y, velocityInt);
+    }
+
+    @DedicatedThread(engineName = "goTo")
+    @Daemonize
+    public void rotAndGo(Pair<Float, Float> coords, float velocityInt) throws InterruptedException {
+        rotateTowards(coords.getFirst(), coords.getSecond());
+        goTo(coords.getFirst(), coords.getSecond(), velocityInt);
     }
 
     @Daemonize

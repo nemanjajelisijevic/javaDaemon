@@ -45,9 +45,11 @@ import com.daemonize.sound.SoundManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -134,7 +136,7 @@ public class Game {
 
     private ImageView[][] towerHpViwes;
 
-    private Set<TowerDaemon> towers = new HashSet<>();
+    private Map<String, TowerDaemon> towers = new HashMap<>();
     private int range;
     private Tower.TowerType towerSelect;
 
@@ -489,7 +491,7 @@ public class Game {
             for(BulletDoubleDaemon missile : enemyMissileRepo.activeProjectiles) missile.stop();
             enemyMissileRepo.forEach(missile -> missile.stop());
 
-            for (TowerDaemon tower : towers) tower.stop();
+            for (TowerDaemon tower : towers.values()) tower.stop();
             laser.stop();
             scene.unlockViews();
             renderer.stop();
@@ -1094,10 +1096,10 @@ public class Game {
                                 tower.setShootable(false);
                                 tower.stop();
                                 renderer.consume(tower.getHpView()::hide);
-                                renderer.consume(() ->gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
+                                renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
                             });
 
-                    towers.remove(tower);
+                    towers.remove(tower.getName());
                     field.setObject(null);
 
                     //remove tower from grid and recalculate path
@@ -1597,7 +1599,7 @@ public class Game {
                             enemySprite,
                             enemyVelocity,
                             enemyHp,
-                            Pair.create((float)(borderX / 2),(float)(borderY / 2)),
+                            Pair.create(0F, 0F),
                             dXY
                     ).setView(
                             scene.addImageView(
@@ -1649,22 +1651,19 @@ public class Game {
                     .setAnimateEnemySideQuest(renderer)
                     .setClosure(new MultiViewAnimateClosure()::onReturn);
 
-
-
-
             //prepare the scene and start the renderer
             scene.lockViews();
 
             //System.out.println(DaemonUtils.tag() + "Scene size: " + scene.getViews().size());
 
-            scene.forEach(view -> {
-                //System.out.println(DaemonUtils.tag() + view.getName());
-                //System.out.println(DaemonUtils.tag() + "X: " + view.getAbsoluteX());
-                //System.out.println(DaemonUtils.tag() + "Y: " + view.getAbsoluteY());
-                //System.out.println(DaemonUtils.tag() + "Image: "  + view.getImage().toString());
-                //System.out.println(DaemonUtils.tag() + "Image imp: " + view.getImage().getImageImp().toString());
-                //System.out.println(DaemonUtils.tag() + "Z Index: " + view.getZindex());
-            });
+//            scene.forEach(view -> {
+//                System.out.println(DaemonUtils.tag() + view.getName());
+//                System.out.println(DaemonUtils.tag() + "X: " + view.getAbsoluteX());
+//                System.out.println(DaemonUtils.tag() + "Y: " + view.getAbsoluteY());
+//                System.out.println(DaemonUtils.tag() + "Image: "  + view.getImage().toString());
+//                System.out.println(DaemonUtils.tag() + "Image imp: " + view.getImage().getImageImp().toString());
+//                System.out.println(DaemonUtils.tag() + "Z Index: " + view.getZindex());
+//            });
 
             activeSoundManager.start();
             renderer.setScene(scene).start();
@@ -1813,7 +1812,7 @@ public class Game {
                                                     target.setShootable(false);
                                                     renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
                                                     renderer.consume(target.getView()::hide);
-                                                    towers.remove(target);
+                                                    towers.remove(target.getName());
                                                     field.setObject(null);
 
                                                     grid.destroyObject(field.getRow(), field.getColumn());
@@ -1942,11 +1941,12 @@ public class Game {
             renderer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
             gameConsumer.setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-            ie.start();
+            ie.start().rotAndGo(borderX / 2, borderY / 2, 3.4F);
             renderer.consume(()->{
                 ie.getView().show();
                 ie.getHpView().show();
             });
+
 
 
             //denyMarker = new DenyMarker(renderer, gameConsumer, fieldImageTowerDen, fieldImage);
@@ -2124,7 +2124,7 @@ public class Game {
                     .setShootable(true)
                     .setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-            towers.add(towerDaemon);
+            towers.put(towerDaemon.getName(), towerDaemon);
             field.setObject(towerDaemon);
 
             towerDaemon.start()
@@ -2355,7 +2355,7 @@ public class Game {
                                 int newHp = target.getHp() - rocketDoubleDaemon.getDamage();
                                 if (newHp > 0)
                                     target.setHp(newHp);
-                                else
+                                else if(targetDestructionClosure != null)
                                     targetDestructionClosure.run();
                             }
 
@@ -2365,6 +2365,17 @@ public class Game {
                 );
             }
         });
+    }
+
+    private void fireRocketBullet(
+            Pair<Float, Float> sourceCoord,
+            Target target,
+            StackedEntityRepo<BulletDoubleDaemon> repo,
+            float velocity,
+            int bulletDamage,
+            int noOfBulletsFired
+    ) {
+        fireRocketBullet(sourceCoord, target, repo, velocity, bulletDamage, noOfBulletsFired, null);
     }
 
     public void fireLaser(

@@ -106,8 +106,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     public Tower setHp(int hp) {
-        if (hp <= hpMax)
-            this.hp = hp;
+//        if (hp <= hpMax)
+//            this.hp = hp;
         return this;
     }
 
@@ -353,6 +353,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         String ret =  towerLevel.toString()
                     + "\nTowerType: " + towertype
                     + "\nCurrent hp: " + hp + ", Max hp: " + hpMax
+                    + "\nCoords - X: " + getLastCoordinates().getFirst() + ", Y: " + getLastCoordinates().getSecond()
                     + "\nShootable: " + shootable
                     + "\nRange: " + range
                     + "\nTarget available: " + Boolean.toString(this.target != null)
