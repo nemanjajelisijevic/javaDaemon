@@ -2367,7 +2367,7 @@ public class Game {
         });
     }
 
-    private void fireRocketBullet(
+    public void fireRocketBullet(
             Pair<Float, Float> sourceCoord,
             Target target,
             StackedEntityRepo<BulletDoubleDaemon> repo,

@@ -192,6 +192,11 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         rotationMover.rotate((int)RotatingSpriteImageMover.getAngle(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y));
     }
 
+    @Daemonize
+    public void rotateTowards(Pair<Float, Float> coords) throws InterruptedException {
+        rotateTowards(coords.getFirst(), coords.getSecond());
+    }
+
     @DedicatedThread(engineName = "goTo")
     @Daemonize
     @Override

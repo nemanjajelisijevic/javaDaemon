@@ -10,8 +10,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Stack;
 
@@ -71,9 +73,12 @@ public class CommandParser {
     private Scanner cmdScanner;
     private NonEmptyStack<Pair<Object, String>> stack;
 
+    private Map<String, Object> typedefs;
+
     public CommandParser(Object reflectiveObject) {
         this.cmdScanner = new Scanner(System.in);
         this.stack = new NonEmptyStack<>(Pair.create(reflectiveObject, "root"));
+        this.typedefs = new HashMap<>();
     }
 
     @SideQuest
@@ -83,7 +88,23 @@ public class CommandParser {
 
             String cmd = cmdScanner.nextLine();
 
-            if (cmd.equals("fields")) {
+            if (cmd.startsWith("typedef ")) {
+
+                String keyVal = cmd.replace("typedef ", "");
+                keyVal = keyVal.trim();
+
+                String[] split = keyVal.split(" ");
+
+                if (split.length != 2) {
+                    throw new IllegalArgumentException("Should be 2 args. Actual: " + keyVal);
+                }
+
+                String key = split[0].trim();
+                Object val = getField(split[1].trim());
+
+                typedefs.put(key, val);
+
+            } else if (cmd.equals("fields")) {
                 Field[] fieldarray = stack.peek().getFirst().getClass().getDeclaredFields();
 
                 for (Field field : fieldarray) {
@@ -167,6 +188,11 @@ public class CommandParser {
 
         Object root;
 
+        root = typedefs.get(fieldName);
+
+        if (root != null)
+            return root;
+
         if(fieldName.equals("this")) {
             return stack.peek().getFirst();
         }
@@ -240,7 +266,14 @@ public class CommandParser {
         return  (statement.contains("(") && statement.contains(")"));
     }
 
-    private Object execStatement(String statement)  throws NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException {
+    private Object execStatement(String statement)
+            throws
+            NoSuchFieldException,
+            NoSuchMethodException,
+            IllegalAccessException,
+            InstantiationException,
+            InvocationTargetException
+    {
 
         if(!isMethod(statement)) {
             return getField(statement);
@@ -350,6 +383,9 @@ public class CommandParser {
                     break;
                 }
             }
+
+            if (invoked == null)
+                throw new NoSuchMethodException("No " + methodName + " method. Check if its public.");
 
             ret = invoked.invoke(field, evaluatedArgs.toArray());
         }
