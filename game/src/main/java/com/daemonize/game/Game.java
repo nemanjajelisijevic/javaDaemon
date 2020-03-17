@@ -53,6 +53,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import daemon.com.commandparser.CommandParser;
+import daemon.com.commandparser.CommandParserDaemon;
+
 public class Game {
 
     //running flag

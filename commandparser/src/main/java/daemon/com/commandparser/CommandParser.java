@@ -1,4 +1,4 @@
-package com.daemonize.game;
+package daemon.com.commandparser;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
@@ -22,7 +22,6 @@ import java.util.Stack;
 public class CommandParser {
 
     private static String listCmd = "ls";
-
 
     private class NonEmptyStack<T> {
         private Stack<T> stack = new Stack();

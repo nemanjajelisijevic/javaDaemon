@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/androidgraphics2d/androidgraphics2d.iml" filepath="$PROJECT_DIR$/androidgraphics2d/androidgraphics2d.iml" />
       <module fileurl="file://$PROJECT_DIR$/androidsound/androidsound.iml" filepath="$PROJECT_DIR$/androidsound/androidsound.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commandparser/commandparser.iml" filepath="$PROJECT_DIR$/commandparser/commandparser.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonengine/daemonengine.iml" filepath="$PROJECT_DIR$/daemonengine/daemonengine.iml" />
       <module fileurl="file://$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" filepath="$PROJECT_DIR$/daemonprocessor/daemonprocessor.iml" />
       <module fileurl="file://$PROJECT_DIR$/game/game.iml" filepath="$PROJECT_DIR$/game/game.iml" />
