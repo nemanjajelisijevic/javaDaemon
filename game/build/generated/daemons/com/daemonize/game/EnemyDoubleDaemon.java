@@ -37,15 +37,15 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
-
   protected EagerMainQuestDaemonEngine goToDaemonEngine;
+
+  protected EagerMainQuestDaemonEngine reloadDaemonEngine;
 
   public EnemyDoubleDaemon(Consumer consumer, Enemy prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
-    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
+    this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -321,6 +321,13 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Enemy#rotateTowards} */
+  public EnemyDoubleDaemon rotateTowards(Pair<Float, Float> coords) {
+    mainDaemonEngine.pursueQuest(new RotateTowardsMainQuest(coords).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Enemy#rotate} */
   public EnemyDoubleDaemon rotate(int angle) {
     mainDaemonEngine.pursueQuest(new RotateMainQuest(angle).setConsumer(mainDaemonEngine.getConsumer()));
@@ -337,7 +344,7 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   /**
    * Prototype method {@link com.daemonize.game.Enemy#rotateTowards} */
   public EnemyDoubleDaemon rotateTowards(float x, float y) {
-    mainDaemonEngine.pursueQuest(new RotateTowardsMainQuest(x, y).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new RotateTowardsIMainQuest(x, y).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -586,6 +593,22 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     }
   }
 
+  private final class RotateTowardsMainQuest extends VoidMainQuest {
+    private Pair<Float, Float> coords;
+
+    private RotateTowardsMainQuest(Pair<Float, Float> coords) {
+      super();
+      this.coords = coords;
+      this.description = "rotateTowards";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.rotateTowards(coords);
+      return null;
+    }
+  }
+
   private final class RotateMainQuest extends VoidMainQuest {
     private int angle;
 
@@ -624,12 +647,12 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     }
   }
 
-  private final class RotateTowardsMainQuest extends VoidMainQuest {
+  private final class RotateTowardsIMainQuest extends VoidMainQuest {
     private float x;
 
     private float y;
 
-    private RotateTowardsMainQuest(float x, float y) {
+    private RotateTowardsIMainQuest(float x, float y) {
       super();
       this.x = x;
       this.y = y;

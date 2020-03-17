@@ -8,6 +8,7 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -145,6 +146,7 @@ public class CommandParser {
                     if (method.getName().equals(methodName)) {
 
                         Class<?>[] params =  method.getParameterTypes();
+                        //Parameter[] paramInst = method.getParameters();
 
                         System.out.println(DaemonUtils.tag() + stack.peek().getFirst().getClass().getSimpleName() + "/"
                                 + stack.peek().getFirst().getClass().getSimpleName() + "-> "
@@ -155,7 +157,6 @@ public class CommandParser {
                         }
                     }
                 }
-
 
             } else if(cmd.startsWith("toString")) {
                 System.out.println(stack.peek().getFirst().toString());
