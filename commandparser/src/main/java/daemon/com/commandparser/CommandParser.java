@@ -100,7 +100,7 @@ public class CommandParser {
                 }
 
                 String key = split[0].trim();
-                Object val = getField(split[1].trim());
+                Object val = execStatement(split[1].trim());//getField(split[1].trim());
 
                 typedefs.put(key, val);
 
