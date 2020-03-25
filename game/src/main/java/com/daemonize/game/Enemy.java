@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.AwaitedClosure;
@@ -38,11 +39,11 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     private PositionedImage hBar = new PositionedImage();
     private PositionedImage paralyzedPosImage = new PositionedImage();
 
-    public Enemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
-        super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
+    public Enemy(Image[] sprite, int hp, Pair<Float, Float> startingPos, float dXY) {
+        super(Arrays.copyOf(sprite, 1), startingPos, dXY);
         this.hp = hp;
         this.hpMax = hp;
-        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
+        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, startingPos, dXY);
     }
 
     public ImageView getParalyzedView() {
@@ -178,8 +179,8 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     @GenerateRunnable
     @Daemonize
     @Override
-    public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
-        rotationMover.pushSprite(sprite, velocity);
+    public void pushSprite(Image [] sprite) throws InterruptedException {
+        rotationMover.pushSprite(sprite);
     }
 
     @Daemonize
@@ -247,7 +248,6 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() throws InterruptedException {
 
         Pair<Float, Float> lastCoord = getLastCoordinates();
-
         PositionedImage enemyPosBmp = super.animate();
 
         if (enemyPosBmp == null)

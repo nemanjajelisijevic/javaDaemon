@@ -16,6 +16,7 @@ import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.imagemovers.ImageMover;
+import com.daemonize.imagemovers.Movable;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -37,15 +38,15 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine goToDaemonEngine;
-
   protected EagerMainQuestDaemonEngine reloadDaemonEngine;
+
+  protected EagerMainQuestDaemonEngine goToDaemonEngine;
 
   public EnemyDoubleDaemon(Consumer consumer, Enemy prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
-    this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
     this.reloadDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - reloadDaemonEngine");
+    this.goToDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - goToDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -117,6 +118,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   @Override
+  public Movable.AnimationWaiter getAnimationWaiter() {
+    return prototype.getAnimationWaiter();
+  }
+
+  @Override
   public EnemyDoubleDaemon setMaxHp(int maxhp) {
     prototype.setMaxHp(maxhp);
     return this;
@@ -149,11 +155,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> animateEnemy() throws
       InterruptedException {
     return prototype.animateEnemy();
-  }
-
-  public EnemyDoubleDaemon setOutOfBordersClosure(Runnable closure) {
-    prototype.setOutOfBordersClosure(closure);
-    return this;
   }
 
   @Override
@@ -215,11 +216,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return prototype.setDirectionToPoint(x, y);
   }
 
-  public EnemyDoubleDaemon setBorders(float x1, float x2, float y1, float y2) {
-    prototype.setBorders(x1, x2, y1, y2);
-    return this;
-  }
-
   public float getdXY() {
     return prototype.getdXY();
   }
@@ -260,11 +256,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return this;
   }
 
-  public EnemyDoubleDaemon setOutOfBordersConsumer(Consumer consumer) {
-    prototype.setOutOfBordersConsumer(consumer);
-    return this;
-  }
-
   public EnemyDoubleDaemon setParalyzedView(ImageView paralyzedview) {
     prototype.setParalyzedView(paralyzedview);
     return this;
@@ -286,6 +277,13 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Enemy#pushSprite} */
+  public EnemyDoubleDaemon pushSprite(Image[] sprite, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Enemy#rotAndGo} */
   public EnemyDoubleDaemon rotAndGo(Pair<Float, Float> coords, float velocityint) {
     goToDaemonEngine.pursueQuest(new RotAndGoMainQuest(coords, velocityint).setConsumer(goToDaemonEngine.getConsumer()));
@@ -303,13 +301,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
    * Prototype method {@link com.daemonize.game.Enemy#go} */
   public EnemyDoubleDaemon go(float x, float y, float velocityint) {
     goToDaemonEngine.pursueQuest(new GoMainQuest(x, y, velocityint).setConsumer(goToDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Enemy#pushSprite} */
-  public EnemyDoubleDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -498,6 +489,23 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     }
   }
 
+  private final class PushSpriteMainQuest extends ReturnVoidMainQuest {
+    private Image[] sprite;
+
+    private PushSpriteMainQuest(Image[] sprite, Runnable retRun,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
+      this.sprite = sprite;
+      this.description = "pushSprite";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.pushSprite(sprite);
+      return null;
+    }
+  }
+
   private final class RotAndGoMainQuest extends VoidMainQuest {
     private Pair<Float, Float> coords;
 
@@ -557,26 +565,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     @Override
     public final Void pursue() throws Exception {
       prototype.go(x, y, velocityint);
-      return null;
-    }
-  }
-
-  private final class PushSpriteMainQuest extends ReturnVoidMainQuest {
-    private Image[] sprite;
-
-    private float velocity;
-
-    private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun,
-        ClosureExecutionWaiter closureAwaiter) {
-      super(retRun, closureAwaiter);
-      this.sprite = sprite;
-      this.velocity = velocity;
-      this.description = "pushSprite";
-    }
-
-    @Override
-    public final Void pursue() throws Exception {
-      prototype.pushSprite(sprite, velocity);
       return null;
     }
   }

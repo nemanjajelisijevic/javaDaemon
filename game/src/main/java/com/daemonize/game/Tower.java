@@ -80,7 +80,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     );
 
     public Tower(Image[] rotationSprite, Image[] healthBarImage, Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
-        super(rotationSprite, rotationSprite[18], 0, startingPos, dXY);
+        super(rotationSprite, rotationSprite[18], startingPos, dXY);
         this.ret.positionX = startingPos.getFirst();
         this.ret.positionY = startingPos.getSecond();
         this.range = range;
@@ -199,8 +199,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     @Daemonize
     @GenerateRunnable
     @Override
-    public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
-        super.pushSprite(sprite, velocity);
+    public void pushSprite(Image[] sprite) throws InterruptedException {
+        super.pushSprite(sprite);
     }
 
     public void addTarget(Target target) {
@@ -245,6 +245,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     protected void rotateTo(Target target) throws InterruptedException {
         if (target.isShootable())
             rotateTowards(
+                    getLastCoordinates().getFirst(),
+                    getLastCoordinates().getSecond(),
                     target.getLastCoordinates().getFirst(),
                     target.getLastCoordinates().getSecond()
             );

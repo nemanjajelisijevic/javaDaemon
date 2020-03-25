@@ -470,7 +470,7 @@ public class Game {
             this.running = true;
             this.paused = false;
             commandParser = new CommandParserDaemon(new CommandParser(this));
-            commandParser.setParseSideQuest(gameConsumer);
+            commandParser.setParseSideQuest();
             commandParser.start();
         });
         return this;
@@ -1235,7 +1235,7 @@ public class Game {
                         enemy.getParalyzedView().hide().setAbsoluteX(0).setAbsoluteY(0);
                     });
 
-                    enemy.pushSprite(explodeSprite, 0, () -> {
+                    enemy.pushSprite(explodeSprite, () -> {
                         renderer.consume(() -> enemy.getView().hide().setAbsoluteX(0).setAbsoluteY(0));
                         enemy.popSprite().setPreviousField(null).setCoordinates(grid.getStartingX(), grid.getStartingY());
                     }).queueStop();
@@ -1328,7 +1328,6 @@ public class Game {
                         gameConsumer,
                         new Enemy(
                                 enemySprite,
-                                enemyVelocity,
                                 enemyHp,
                                 Pair.create(grid.getStartingX(), grid.getStartingY()),
                                 dXY
@@ -1370,16 +1369,8 @@ public class Game {
                         )
                 ).setName(enemyName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-                enemy.getPrototype().setBorders(
-                        0,
-                        (grid.getStartingX() + grid.getGridWidth()),
-                        0,
-                        (grid.getStartingY() + grid.getGridHeight())
-                );
-
-                enemy.setOutOfBordersConsumer(gameConsumer)
-                        .setOutOfBordersClosure(() -> enemyRepo.add(enemy.clearAndInterrupt()))
-                        .setAnimateEnemySideQuest(renderer)
+                enemy.setVelocity(enemyVelocity);
+                enemy.setAnimateEnemySideQuest(renderer)
                         .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 enemyRepo.getStructure().add(enemy);
@@ -1394,7 +1385,6 @@ public class Game {
                         gameConsumer,
                         new Bullet(
                                 bulletSprite,
-                                0,
                                 Pair.create((float) 0, (float) 0),
                                 bulletDamage,
                                 bulletSprite[0].getWidth(),
@@ -1429,16 +1419,6 @@ public class Game {
                         )
                 ).setName(bulletName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-                bulletDoubleDaemon.getPrototype().setBorders(
-                        grid.getStartingX(),//TODO fix offset
-                        (grid.getStartingX() + grid.getGridWidth()),
-                        grid.getStartingY(),
-                        (grid.getStartingY() + grid.getGridHeight())
-                );
-
-                bulletDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
-                        .setOutOfBordersClosure(() -> bulletRepo.add(bulletDoubleDaemon.clearAndInterrupt()));
-
                 bulletDoubleDaemon.setAnimateBulletSideQuest(renderer)
                         .setClosure(new MultiViewAnimateClosure()::onReturn);
 
@@ -1454,7 +1434,6 @@ public class Game {
                         gameConsumer,
                         new Bullet(
                                 bulletSpriteRocket,
-                                0,
                                 Pair.create(0F, 0F),
                                 bulletDamage,
                                 bulletSpriteRocket[0].getWidth(),
@@ -1489,11 +1468,7 @@ public class Game {
                         )
                 ).setName(rocketName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-                rocketDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY);
-
-                rocketDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
-                        .setOutOfBordersClosure(() -> rocketRepo.add(rocketDoubleDaemon.clearAndInterrupt()))
-                        .setAnimateBulletSideQuest(renderer)
+                rocketDoubleDaemon.setAnimateBulletSideQuest(renderer)
                         .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 rocketRepo.getStructure().push(rocketDoubleDaemon);
@@ -1508,7 +1483,6 @@ public class Game {
                         gameConsumer,
                         new Bullet(
                                 enemyMissileSprite,
-                                0,
                                 Pair.create((float) 0, (float) 0),
                                 bulletDamage,
                                 enemyMissileSprite[0].getWidth(),
@@ -1543,11 +1517,7 @@ public class Game {
                         )
                 ).setName(rocketName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-                missileDoubleDaemon.getPrototype().setBorders(0, borderX, 0, borderY);
-
-                missileDoubleDaemon.setOutOfBordersConsumer(gameConsumer)
-                        .setOutOfBordersClosure(() -> enemyMissileRepo.add(missileDoubleDaemon.clearAndInterrupt()))
-                        .setAnimateBulletSideQuest(renderer)
+                missileDoubleDaemon.setAnimateBulletSideQuest(renderer)
                         .setClosure(new MultiViewAnimateClosure()::onReturn);
 
                 enemyMissileRepo.getStructure().push(missileDoubleDaemon);
@@ -1560,27 +1530,22 @@ public class Game {
             //laser init
             laser = new LaserBulletDaemon(
                     gameConsumer,
-                    new LaserBullet(laserSprite, 40, Pair.create(0F, 0F), bulletDamage, dXY)
+                    new LaserBullet(laserSprite, Pair.create(0F, 0F), bulletDamage, dXY)
             ).setViews(laserViews).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
+            laser.setVelocity(40);
             laser.setAnimateLaserSideQuest(renderer).setClosure(new LaserAnimateClosure(laserViews));
 
             //init moneyDaemon
             moneyDaemon = new MoneyHandlerDaemon(
                     gameConsumer,
-                    new MoneyHandler(moneyNumbersImages, dollarSign, dXY).setBorders(0, borderX, 0, borderY)
+                    new MoneyHandler(moneyNumbersImages, dollarSign, dXY)
             ).setName("Money handler Daemon")
                     .setUncaughtExceptionHandler(uncaughtExceptionHandler)
                     .setCoordinates(scoreTitleView.getAbsoluteX(), scoreTitleView.getAbsoluteY())
-                    .setAmount(0)
-                    .setOutOfBordersConsumer(gameConsumer)
-                    .setOutOfBordersClosure(() -> {
-                        moneyDaemon.clearAndInterrupt();
-                        renderer.consume(() -> {
-                            moneyView.getFirst().hide();
-                            moneyView.getSecond().hide();
-                        });
-                    });
+                    .setAmount(0);
+
+
 
             moneyDaemon.setAnimateMoneySideQuest(renderer).setClosure(ret -> {
                 Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> result = ret.get();
@@ -1600,7 +1565,6 @@ public class Game {
                     gameConsumer,
                     new Enemy(
                             enemySprite,
-                            enemyVelocity,
                             enemyHp,
                             Pair.create(0F, 0F),
                             dXY
@@ -1642,16 +1606,9 @@ public class Game {
                     )
             ).setName(enemyName).setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
-            ie.getPrototype().setBorders(
-                    0,
-                    (grid.getStartingX() + grid.getGridWidth()),
-                    0,
-                    (grid.getStartingY() + grid.getGridHeight())
-            );
+            ie.setVelocity(enemyVelocity);
 
-            ie.setOutOfBordersConsumer(gameConsumer)
-                    .setOutOfBordersClosure(() -> enemyRepo.add(ie.clearAndInterrupt()))
-                    .setAnimateEnemySideQuest(renderer)
+            ie.setAnimateEnemySideQuest(renderer)
                     .setClosure(new MultiViewAnimateClosure()::onReturn);
 
             //prepare the scene and start the renderer
@@ -1811,7 +1768,7 @@ public class Game {
 
                                                 currentSoundManager.playSound(bigExplosion);
 
-                                                target.clearAndInterrupt().pushSprite(explodeSprite, 0, () -> {
+                                                target.clearAndInterrupt().pushSprite(explodeSprite, () -> {
                                                     target.setShootable(false);
                                                     renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
                                                     renderer.consume(target.getView()::hide);
@@ -2274,7 +2231,7 @@ public class Game {
                 destructionClosure.run();
 
             currentSoundManager.playSound(bulletSound);
-            bulletDoubleDaemon.pushSprite(bulletExplodeSprite, 0, () -> bulletRepo.add(bulletDoubleDaemon));
+            bulletDoubleDaemon.pushSprite(bulletExplodeSprite, () -> bulletRepo.add(bulletDoubleDaemon));
         });
     }
 
@@ -2363,7 +2320,7 @@ public class Game {
                             }
 
                             currentSoundManager.playSound(rocketExplosionSound);
-                            rocketDoubleDaemon.pushSprite(rocketExplodeSprite, 0, () -> repo.add(rocketDoubleDaemon));
+                            rocketDoubleDaemon.pushSprite(rocketExplodeSprite, () -> repo.add(rocketDoubleDaemon));
                         }
                 );
             }

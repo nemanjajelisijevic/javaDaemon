@@ -8,8 +8,8 @@ import com.daemonize.graphics2d.images.Image;
 
 public class ImmortalEnemy extends Enemy {
 
-    public ImmortalEnemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
-        super(sprite, velocity, hp, startingPos, dXY);
+    public ImmortalEnemy(Image[] sprite, int hp, Pair<Float, Float> startingPos, float dXY) {
+        super(sprite, hp, startingPos, dXY);
     }
 
     @Override

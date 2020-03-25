@@ -36,11 +36,11 @@ public class Bullet extends CoordinatedImageTranslationMover {
 
     private RotatingSpriteImageMover rotationMover;
 
-    public Bullet(Image [] sprite, float velocity, Pair<Float, Float> startingPos, int damage, int spaceBetweenBullets, float dXY) {
-        super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
+    public Bullet(Image [] sprite, Pair<Float, Float> startingPos, int damage, int spaceBetweenBullets, float dXY) {
+        super(Arrays.copyOf(sprite, 1), startingPos, dXY);
         this.damage = damage;
         this.spaceBetweenBullets = spaceBetweenBullets;
-        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
+        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, startingPos, dXY);
     }
 
     @Override
@@ -115,9 +115,8 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @GenerateRunnable
     @Daemonize
     @Override
-    public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
-        this.velocity.intensity = velocity;
-        rotationMover.pushSprite(sprite, velocity);
+    public void pushSprite(Image [] sprite) throws InterruptedException {
+        rotationMover.pushSprite(sprite);
     }
 
     @Override
@@ -134,7 +133,7 @@ public class Bullet extends CoordinatedImageTranslationMover {
     @Daemonize
     public boolean rotateAndGoTo(int angle, float x, float y, float velocityInt) throws InterruptedException {
         clearVelocity();
-        rotationMover.rotate(angle);
+        rotationMover.rotate( angle);
         return goTo(x, y, velocityInt);
     }
 

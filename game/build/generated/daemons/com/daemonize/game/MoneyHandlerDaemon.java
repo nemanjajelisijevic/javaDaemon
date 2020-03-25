@@ -13,6 +13,7 @@ import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.imagemovers.ImageMover;
+import com.daemonize.imagemovers.Movable;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -20,7 +21,6 @@ import java.lang.IllegalStateException;
 import java.lang.Integer;
 import java.lang.InterruptedException;
 import java.lang.Override;
-import java.lang.Runnable;
 import java.lang.String;
 import java.lang.Thread;
 import java.util.ArrayList;
@@ -65,13 +65,13 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return this;
   }
 
-  public MoneyHandlerDaemon pushSprite(Image[] sprite, float velocity) throws InterruptedException {
-    prototype.pushSprite(sprite, velocity);
-    return this;
-  }
-
   public int getSize() {
     return prototype.getSize();
+  }
+
+  public MoneyHandlerDaemon pushSprite(Image[] sprite) throws InterruptedException {
+    prototype.pushSprite(sprite);
+    return this;
   }
 
   public Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> animateMoney() throws
@@ -79,13 +79,12 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return prototype.animateMoney();
   }
 
-  public boolean setDirectionToPoint(float x, float y) {
-    return prototype.setDirectionToPoint(x, y);
+  public Movable.AnimationWaiter getAnimationWaiter() {
+    return prototype.getAnimationWaiter();
   }
 
-  public MoneyHandlerDaemon setBorders(float x1, float x2, float y1, float y2) {
-    prototype.setBorders(x1, x2, y1, y2);
-    return this;
+  public boolean setDirectionToPoint(float x, float y) {
+    return prototype.setDirectionToPoint(x, y);
   }
 
   public MoneyHandlerDaemon setDirection(ImageMover.Direction direction) {
@@ -112,11 +111,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
 
   public Image iterateSprite() {
     return prototype.iterateSprite();
-  }
-
-  public MoneyHandlerDaemon setOutOfBordersClosure(Runnable closure) {
-    prototype.setOutOfBordersClosure(closure);
-    return this;
   }
 
   public ImageMover.Velocity getVelocity() {
@@ -152,11 +146,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
 
   public MoneyHandlerDaemon setCoordinates(float lastx, float lasty) {
     prototype.setCoordinates(lastx, lasty);
-    return this;
-  }
-
-  public MoneyHandlerDaemon setOutOfBordersConsumer(Consumer consumer) {
-    prototype.setOutOfBordersConsumer(consumer);
     return this;
   }
 

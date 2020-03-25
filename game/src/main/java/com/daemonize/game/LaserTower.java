@@ -47,9 +47,9 @@ public class LaserTower extends Tower {
     }
 
     @Override
-    public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
+    public void pushSprite(Image[] sprite) throws InterruptedException {
         animateFollowTarget = false;
-        super.pushSprite(sprite, velocity);
+        super.pushSprite(sprite);
         animateFollowTarget = true;
     }
 

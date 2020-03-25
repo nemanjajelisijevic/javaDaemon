@@ -50,6 +50,6 @@ public final class Pair<K, V> {
 
     @Override
     public String toString() {
-        return "Pair{" + String.valueOf(first) + " " + String.valueOf(second) + "}";
+        return "Pair{" + String.valueOf(first) + ", " + String.valueOf(second) + "}";
     }
 }

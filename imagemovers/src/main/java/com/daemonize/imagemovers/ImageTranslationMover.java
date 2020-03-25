@@ -17,28 +17,31 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     private double dX = 0;
     private double dY = 0;
 
-    private float dXY;
-
-    protected float borderX1;
-    protected float borderX2;
-
-    protected float borderY1;
-    protected float borderY2;
+    private final Float dXY;
 
     protected SpriteIterator spriteIterator;
-    protected float initVelocity;
+
     protected volatile Velocity velocity;
 
-    private Consumer outOfBordersConsumer;
-    private Runnable outOfBordersClosure;
     private PositionedImage ret = new PositionedImage();
 
     protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore().setName("Animate Semaphore");
 
-    public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
+    private AnimationWaiter animationSemaphoreWaiterWrapper = new AnimationWaiter() {
+        @Override
+        public void await() throws InterruptedException {
+            animateSemaphore.await();
+        }
+    };
+
+    @Override
+    public AnimationWaiter getAnimationWaiter() {
+        return animationSemaphoreWaiterWrapper;
+    }
+
+    public ImageTranslationMover(Image[] sprite, Pair<Float, Float> startingPos, float dXY) {
         this.spriteIterator = new BasicSpriteIterator(sprite);
-        this.initVelocity = velocity;
-        this.velocity = new Velocity(velocity, new Direction(0, 0));
+        this.velocity = new Velocity(0, new Direction(0, 0));
         this.dXY = dXY;
         lastX = startingPos.getFirst();
         lastY = startingPos.getSecond();
@@ -141,25 +144,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         ret = setDirectionToPoint(x, y);
         velocity.intensity = velocityInt;
         return ret;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public ImageTranslationMover setBorders(float x1, float x2, float y1, float y2) {
-        this.borderX1 = x1;
-        this.borderX2 = x2;
-        this.borderY1 = y1;
-        this.borderY2 = y2;
-        return this;
-    }
-
-
-    public void setOutOfBordersConsumer(Consumer consumer) {
-        this.outOfBordersConsumer = consumer;
-    }
-
-    public void setOutOfBordersClosure(Runnable closure) {
-        this.outOfBordersClosure = closure;
     }
 
     @Override

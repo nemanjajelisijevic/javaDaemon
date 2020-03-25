@@ -16,6 +16,7 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
+import com.daemonize.imagemovers.Movable;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -87,13 +88,12 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return this;
   }
 
-  public boolean setDirectionToPoint(float x, float y) {
-    return prototype.setDirectionToPoint(x, y);
+  public Movable.AnimationWaiter getAnimationWaiter() {
+    return prototype.getAnimationWaiter();
   }
 
-  public BulletDoubleDaemon setBorders(float x1, float x2, float y1, float y2) {
-    prototype.setBorders(x1, x2, y1, y2);
-    return this;
+  public boolean setDirectionToPoint(float x, float y) {
+    return prototype.setDirectionToPoint(x, y);
   }
 
   public BulletDoubleDaemon setDirection(ImageMover.Direction direction) {
@@ -145,11 +145,6 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.iterateSprite();
   }
 
-  public BulletDoubleDaemon setOutOfBordersClosure(Runnable closure) {
-    prototype.setOutOfBordersClosure(closure);
-    return this;
-  }
-
   public ImageMover.Velocity getVelocity() {
     return prototype.getVelocity();
   }
@@ -190,11 +185,6 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return this;
   }
 
-  public BulletDoubleDaemon setOutOfBordersConsumer(Consumer consumer) {
-    prototype.setOutOfBordersConsumer(consumer);
-    return this;
-  }
-
   public boolean setDirectionAndMove(float x, float y, float velocityint) {
     return prototype.setDirectionAndMove(x, y, velocityint);
   }
@@ -205,8 +195,8 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
 
   /**
    * Prototype method {@link com.daemonize.game.Bullet#pushSprite} */
-  public BulletDoubleDaemon pushSprite(Image[] sprite, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, velocity, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
+  public BulletDoubleDaemon pushSprite(Image[] sprite, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -346,19 +336,16 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   private final class PushSpriteMainQuest extends ReturnVoidMainQuest {
     private Image[] sprite;
 
-    private float velocity;
-
-    private PushSpriteMainQuest(Image[] sprite, float velocity, Runnable retRun,
+    private PushSpriteMainQuest(Image[] sprite, Runnable retRun,
         ClosureExecutionWaiter closureAwaiter) {
       super(retRun, closureAwaiter);
       this.sprite = sprite;
-      this.velocity = velocity;
       this.description = "pushSprite";
     }
 
     @Override
     public final Void pursue() throws Exception {
-      prototype.pushSprite(sprite, velocity);
+      prototype.pushSprite(sprite);
       return null;
     }
   }

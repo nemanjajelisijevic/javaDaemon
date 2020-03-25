@@ -27,13 +27,21 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         return Pair.create(targetX, targetY);
     }
 
-    public  CoordinatedImageTranslationMover(
+    public CoordinatedImageTranslationMover(
             Image [] sprite,
-            float velocity,
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        super(sprite, velocity, startingPos, dXY);
+        super(sprite, startingPos, dXY);
+        setTargetCoordinates(Float.NaN, Float.NaN);
+    }
+
+    public CoordinatedImageTranslationMover(
+            Image startImage,
+            Pair<Float, Float> startingPos,
+            float dXY
+    ) {
+        this(new Image[]{startImage}, startingPos, dXY);
     }
 
     public boolean redirect(float x, float y) {
@@ -79,8 +87,8 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
                 && Math.abs(ret.positionY - targetY)  <= velocity.intensity * getdXY()) {
             coordinateLock.lock();
             coordinatesReached = true;
-            setTargetCoordinates(Float.NaN, Float.NaN);
-            coordinateReachedCondition.signal();
+            setCoordinates(targetX, targetY);
+            coordinateReachedCondition.signalAll();
             coordinateLock.unlock();
             return null;
         }

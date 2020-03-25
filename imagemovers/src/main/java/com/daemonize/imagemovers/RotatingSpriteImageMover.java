@@ -31,32 +31,30 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     public RotatingSpriteImageMover(
             Image[] rotationSprite,
             Image startingImage,
-            float velocity,
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        super(new Image[]{startingImage}, velocity, startingPos, dXY);
+        super(new Image[]{startingImage}, startingPos, dXY);
         setRotationSprite(rotationSprite);
     }
 
     public RotatingSpriteImageMover(
             Image[] rotationSprite,
             DaemonCountingSemaphore animateSemaphore,
-            float velocity,
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        this(rotationSprite, Arrays.copyOfRange(rotationSprite, 0, 1)[0], velocity, startingPos, dXY);
+        this(rotationSprite, Arrays.copyOfRange(rotationSprite, 0, 1)[0], startingPos, dXY);
         this.animateSemaphore = animateSemaphore;
     }
 
-    public void rotateTowards(float x, float y) throws InterruptedException {
-        rotate((int) getAngle(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y));
+    public void rotateTowards(float lastX, float lastY, float targetX, float targetY) throws InterruptedException {
+        rotate((int) getAngle(lastX, lastY, targetX, targetY));
     }
 
     public void rotate(int targetAngle) throws InterruptedException {
         Image[] rotateSprite = getRotationSprite(targetAngle);
-        pushSprite(rotateSprite, velocity.intensity);
+        pushSprite(rotateSprite);
     }
 
     protected synchronized Image[] getRotationSprite(int targetAngle) throws InterruptedException {

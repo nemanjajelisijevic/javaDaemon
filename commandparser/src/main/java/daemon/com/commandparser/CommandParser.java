@@ -174,17 +174,16 @@ public class CommandParser {
 
         for(int i = 0; i < elements.size(); ++i) {
 
-            if(i == elements.size() - 1) {
+            if(i == elements.size() - 1)
                 path.append(elements.get(i).getSecond());
-            } else {
+            else
                 path.append(elements.get(i).getSecond() + ".");
-            }
         }
 
         System.out.print(DaemonUtils.tag() + stack.peek().getFirst().getClass().getSimpleName() + "(" + path.toString() + ")>");
     }
 
-    private Object getField(String fieldName) throws NoSuchFieldException, IllegalAccessException, InstantiationException {
+        private Object getField(String fieldName) throws NoSuchFieldException, IllegalAccessException, InstantiationException {
 
         Object root;
 
@@ -303,10 +302,8 @@ public class CommandParser {
 
         if (argsString.isEmpty()) { //method has no args
 
-
             //find method
             Method[] methods = field.getClass().getMethods();
-
             Method invoked = null;
 
             for (Method method : methods) {
@@ -316,11 +313,10 @@ public class CommandParser {
                 }
             }
 
-            if (invoked.getReturnType().equals(void.class)) {
+            if (invoked.getReturnType().equals(void.class))
                 invoked.invoke(field);
-            } else {
+            else
                 ret = invoked.invoke(field);
-            }
 
         } else {
 
@@ -389,7 +385,6 @@ public class CommandParser {
 
             ret = invoked.invoke(field, evaluatedArgs.toArray());
         }
-
 
         return ret;
     }
