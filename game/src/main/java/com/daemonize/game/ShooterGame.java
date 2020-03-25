@@ -5,8 +5,7 @@ import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.controller.MovableController;
-import com.daemonize.game.controller.MovableControllerDaemon;
+import com.daemonize.game.controller.DirectionControllerDaemon;
 import com.daemonize.game.grid.Grid;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
@@ -15,7 +14,6 @@ import com.daemonize.graphics2d.scene.Scene2D;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.ImageMover;
-import com.daemonize.imagemovers.Movable;
 
 import java.io.IOException;
 import java.util.Random;
@@ -46,7 +44,6 @@ public class ShooterGame {
                     .setImage(result[1].image);
         }
     }
-
 
     private static class CameraImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
@@ -140,32 +137,20 @@ public class ShooterGame {
 
     //player
     private PlayerDaemon player;
-    //private EnemyDoubleDaemon ie;
-    private float enemyVelocity = 1;
-    private int enemyHp = 500;
 
-    private Image[] enemySprite;
+    private Image[] playerSprite;
     private Image[] healthBarSprite;
-    private Image[] enemyMissileSprite;
-
-    private Image paralyzed;
-
-    private Image target;
 
     //controller
-    private MovableControllerDaemon controller;
+    private DirectionControllerDaemon controller;
 
-    public MovableControllerDaemon getController() {
+    public DirectionControllerDaemon getController() {
         return controller;
     }
 
     //construct
-    public ShooterGame(
-            Renderer2D renderer,
-            ImageManager imageManager,
-            int width,
-            int height
-    ) {
+    public ShooterGame(Renderer2D renderer, ImageManager imageManager, int width, int height) {
+
         this.renderer = renderer;
         this.imageManager = imageManager;
 
@@ -174,7 +159,7 @@ public class ShooterGame {
         this.cameraWidth = width;
         this.cameraHeight = height;
 
-        int screenToMapRatio = 6;
+        int screenToMapRatio = 5;
         this.borderX = width * screenToMapRatio;
         this.borderY = height * screenToMapRatio;
 
@@ -183,22 +168,23 @@ public class ShooterGame {
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
 
-        this.controller = new MovableControllerDaemon(gameConsumer, new PlayerController(null)).setName("Player Controller");
+        this.controller = new DirectionControllerDaemon(gameConsumer, new PlayerController(null)).setName("Player Controller");
     }
 
     public ShooterGame run() {
+
         gameConsumer.start().consume(() -> {
 
             this.running = true;
             this.paused = false;
             commandParser = new CommandParserDaemon(new CommandParser(this));
             commandParser.setParseSideQuest();
-            commandParser.start();
+            //commandParser.start();
             gameConsumer.consume(stateChain::run);
         });
+
         return this;
     }
-
 
     {
         stateChain.addState(()->{ //image loading
@@ -226,10 +212,10 @@ public class ShooterGame {
                 int enemyWidth = cameraWidth / 10;
                 int enemyHeight = cameraHeight / 10;
 
-                enemySprite = new Image[36];
+                playerSprite = new Image[36];
 
                 for (int i = 0; i < 36; i++) {
-                    enemySprite[i] = imageManager.loadImageFromAssets(
+                    playerSprite[i] = imageManager.loadImageFromAssets(
                             "plane" + i + "0.png",
                             enemyWidth,
                             enemyHeight
@@ -241,14 +227,17 @@ public class ShooterGame {
 
                 healthBarSprite = new Image[10];
                 for (int i = 0; i < healthBarSprite.length; ++i) {
-                    healthBarSprite[i] = imageManager.loadImageFromAssets("health_bar_" + (i + 1) + "0.png", width_hp, height_hp);
+                    healthBarSprite[i] = imageManager.loadImageFromAssets(
+                            "health_bar_" + (i + 1) + "0.png",
+                            width_hp, height_hp
+                    );
                 }
 
                 //init player
                 player = new PlayerDaemon(
                         gameConsumer,
                         new Player(
-                                enemySprite,
+                                playerSprite,
                                 healthBarSprite,
                                 Pair.create((float)(borderX / 2), (float) (borderY / 2)),
                                 dXY,
@@ -261,7 +250,7 @@ public class ShooterGame {
 
                 {
                     ImageView mainView = scene.addImageView(new ImageViewImpl("Player Main View"))
-                            .setImage(enemySprite[0])
+                            .setImage(playerSprite[0])
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
                             .setZindex(10);
@@ -288,18 +277,6 @@ public class ShooterGame {
                 controller.setPrototype(new PlayerController(player.start()));
                 controller.setControlSideQuest();
                 controller.start();
-
-//
-//                player.start().rotateTowards(borderX / 2, 0).goTo(borderX / 2, 0, 1.5F, new Closure<Boolean>() {
-//                    @Override
-//                    public void onReturn(Return<Boolean> ret) {
-//
-//                        if (player.getLastCoordinates().getSecond() < 1)
-//                            player.rotateTowards(borderX / 2, borderY / 2).goTo(borderX / 2, borderY / 2, 4.5F, this::onReturn);
-//                        else
-//                            player.rotateTowards(borderX / 2, 0).goTo(borderX / 2, 0, 6.5F, this::onReturn);
-//                    }
-//                });
 
             } catch (IOException e) {
                 e.printStackTrace();

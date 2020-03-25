@@ -1,28 +1,38 @@
 package com.daemonize.game;
 
-import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.controller.MovableController;
-import com.daemonize.imagemovers.Movable;
+import com.daemonize.game.controller.DirectionController;
 
 import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class PlayerController implements MovableController {
+public class PlayerController implements DirectionController {
 
     private PlayerDaemon player;
 
     private float distanceOffset;
     private float diagonalDistanceOffset;
 
-    private float controllerVelocity;
+    private final float controllerVelocity;
+    private final float speedUpVelocity;
+
+    private volatile float currentVelocity;
 
     private LinkedList<Direction> pressedDirections;
     private Lock queueLock;
     private Condition queueEmptyCondition;
+
+    private DaemonSemaphore playerMovementSemaphore;
+
+    //on PlayerDaemons consumer
+    private int playerMovementCounter;
+    private Runnable playerMovementClosure = () -> {
+        if (++playerMovementCounter % 2 == 0)
+            playerMovementSemaphore.go();
+    };
 
     public PlayerController(PlayerDaemon player) {
         this.player = player;
@@ -32,6 +42,9 @@ public class PlayerController implements MovableController {
         this.distanceOffset = 10;
         this.diagonalDistanceOffset = distanceOffset * 0.71F;
         this.controllerVelocity = 4.5F;
+        this.speedUpVelocity = controllerVelocity * 3;
+        this.currentVelocity = controllerVelocity;
+        this.playerMovementSemaphore = new DaemonSemaphore();
     }
 
     @Override
@@ -76,9 +89,21 @@ public class PlayerController implements MovableController {
     }
 
     @Override
+    public void speedUp() {
+        currentVelocity = speedUpVelocity;
+    }
+
+    @Override
+    public void speedDown() {
+        currentVelocity = controllerVelocity;
+    }
+
+    @Override
     public void control() throws InterruptedException {
 
         try {
+
+            playerMovementSemaphore.await();
 
             queueLock.lock();
 
@@ -89,7 +114,7 @@ public class PlayerController implements MovableController {
 
             if(pressedDirections.size() == 1) {
 
-                MovableController.Direction dir = pressedDirections.peek();
+                DirectionController.Direction dir = pressedDirections.peek();
 
                 switch (dir) {
 
@@ -113,30 +138,14 @@ public class PlayerController implements MovableController {
                         throw new IllegalStateException("Unknown direction" + dir);
                 }
 
-                if (player.getEnginesQueueSizes().get(0).equals(0)) {
-                    player.clearAndInterrupt().rotateTowards(playerCoord).goTo(
-                            playerCoord,
-                            controllerVelocity,
-                            ret -> System.err.println(
-                                    DaemonUtils.tag()
-                                            + "Player coords after movement: "
-                                            + playerCoord.toString()
-                                            + ", velocity: " + player.getVelocity().intensity
-                            )
-                    );
-
-//                    player.rotAndGo(
-//                            playerCoord,
-//                            controllerVelocity,
-//                            ret -> System.err.println(DaemonUtils.tag() + "Player coords after movement: " + playerCoord.toString())
-//                    );
-
-                }
+                playerMovementSemaphore.stop();
+                player.rotateTowards(playerCoord, playerMovementClosure)
+                        .goTo(playerCoord, currentVelocity, playerMovementClosure);
 
             } else if (pressedDirections.size() == 2) {
 
-                MovableController.Direction dirOne = pressedDirections.get(0);
-                MovableController.Direction dirTwo = pressedDirections.get(1);
+                DirectionController.Direction dirOne = pressedDirections.get(0);
+                DirectionController.Direction dirTwo = pressedDirections.get(1);
 
                 switch (dirOne) {
                     case UP:
@@ -186,18 +195,10 @@ public class PlayerController implements MovableController {
 
                 }
 
-                if (player.getEnginesQueueSizes().get(0).equals(0)) {
-                    player.clearAndInterrupt().rotateTowards(playerCoord).goTo(
-                            playerCoord,
-                            controllerVelocity,
-                            ret -> System.err.println(
-                                    DaemonUtils.tag()
-                                            + "Player coords after movement: "
-                                            + playerCoord.toString()
-                                            + ", velocity: " + player.getVelocity().intensity
-                            )
-                    );
-                }
+                playerMovementSemaphore.stop();
+                player.rotateTowards(playerCoord, playerMovementClosure)
+                        .goTo(playerCoord, currentVelocity, playerMovementClosure);
+
             }
 
         } finally {

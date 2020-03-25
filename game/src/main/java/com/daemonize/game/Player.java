@@ -48,6 +48,7 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     }
 
     @Daemonize
+    @GenerateRunnable
     @DedicatedThread(engineName = "rotate")
     public void rotateTowards(Pair<Float, Float> coords) throws InterruptedException {
         rotateTowards(coords.getFirst(), coords.getSecond());
@@ -60,8 +61,9 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     }
 
     @Daemonize
-    public boolean goTo(Pair<Float, Float> coords, float velocity) throws InterruptedException {
-        return super.goTo(coords.getFirst(), coords.getSecond(), velocity);
+    @GenerateRunnable
+    public void goTo(Pair<Float, Float> coords, float velocity) throws InterruptedException {
+        super.goTo(coords.getFirst(), coords.getSecond(), velocity);
     }
 
     @Daemonize
@@ -136,7 +138,7 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         return rotationMover.iterateSprite();
     }
 
-    @SideQuest(SLEEP = 25, blockingClosure = true)
+    @SideQuest(SLEEP = 15, blockingClosure = true)
     public PositionedImage[] animatePlayer() throws InterruptedException {
 
         this.ret[0] = super.animate();

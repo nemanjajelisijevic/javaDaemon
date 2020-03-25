@@ -1,8 +1,8 @@
 package com.daemonize.javafxmain;
 
 import com.daemonize.game.ShooterGame;
-import com.daemonize.game.controller.MovableController;
-import com.daemonize.game.controller.MovableControllerDaemon;
+import com.daemonize.game.controller.DirectionController;
+import com.daemonize.game.controller.DirectionControllerDaemon;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.javafxgraphics2d.JavaFXRenderer;
@@ -19,6 +19,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 
 public class Main extends Application {
@@ -35,21 +36,26 @@ public class Main extends Application {
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
+        //int borderX = ((int) primaryScreenBounds.getWidth()) - 200;
+
         int borderX = Math.min((int)primaryScreenBounds.getWidth(), ((int) primaryScreenBounds.getHeight()));
 
         //(int)primaryScreenBounds.getWidth() > ((int) primaryScreenBounds.getHeight()) ? ((int) primaryScreenBounds.getHeight()) : (int)primaryScreenBounds.getWidth();
         //(int) primaryScreenBounds.getWidth() / 2 > 800 ? (int) primaryScreenBounds.getWidth() / 2 : 800;
         //int borderY = 200;
+//
+//        int rows = 6;
+//        int columns = 9;
+//
+//        int gridWidth = (borderX * 70) / 100;
+//
+//        int width = gridWidth / columns;
+//        int height = width; //160
 
-        int rows = 6;
-        int columns = 9;
+        int borderY = borderX * 3 / 4;
+        //int borderY = (rows + 2) * height;
 
-        int gridWidth = (borderX * 70) / 100;
-
-        int width = gridWidth / columns;
-        int height = width; //160
-
-        int borderY = (rows + 2) * height;
+        //int borderY = ((int) primaryScreenBounds.getHeight()) - 200;
 
         Canvas canvas = new Canvas(borderX, borderY);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -71,7 +77,7 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.setAlwaysOnTop(true);
-        //primaryStage.initStyle(StageStyle.UNDECORATED);
+        primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
 
 //        scene.setCursor(Cursor.HAND);
@@ -96,26 +102,27 @@ public class Main extends Application {
         game.run();
 
 
-        MovableControllerDaemon controller = game.getController();
+        DirectionControllerDaemon controller = game.getController();
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 
             switch(event.getCode()) {
 
                 case W:
-                    controller.pressDirection(MovableController.Direction.UP);
+                    controller.pressDirection(DirectionController.Direction.UP);
                     break;
                 case S:
-                    controller.pressDirection(MovableController.Direction.DOWN);
+                    controller.pressDirection(DirectionController.Direction.DOWN);
                     break;
                 case A:
-                    controller.pressDirection(MovableController.Direction.LEFT);
+                    controller.pressDirection(DirectionController.Direction.LEFT);
                     break;
                 case D:
-                    controller.pressDirection(MovableController.Direction.RIGHT);
+                    controller.pressDirection(DirectionController.Direction.RIGHT);
                     break;
-
-
+                case SPACE:
+                    controller.speedUp();
+                    break;
             }
         });
 
@@ -123,16 +130,19 @@ public class Main extends Application {
             switch(event.getCode()) {
 
                 case W:
-                    controller.releaseDirection(MovableController.Direction.UP);
+                    controller.releaseDirection(DirectionController.Direction.UP);
                     break;
                 case S:
-                    controller.releaseDirection(MovableController.Direction.DOWN);
+                    controller.releaseDirection(DirectionController.Direction.DOWN);
                     break;
                 case A:
-                    controller.releaseDirection(MovableController.Direction.LEFT);
+                    controller.releaseDirection(DirectionController.Direction.LEFT);
                     break;
                 case D:
-                    controller.releaseDirection(MovableController.Direction.RIGHT);
+                    controller.releaseDirection(DirectionController.Direction.RIGHT);
+                    break;
+                case SPACE:
+                    controller.speedDown();
                     break;
             }
         });
