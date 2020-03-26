@@ -8,6 +8,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
+import com.daemonize.daemonengine.quests.ReturnVoidMainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
@@ -22,6 +23,7 @@ import java.lang.IllegalStateException;
 import java.lang.Integer;
 import java.lang.InterruptedException;
 import java.lang.Override;
+import java.lang.Runnable;
 import java.lang.String;
 import java.lang.Thread;
 import java.lang.Void;
@@ -227,8 +229,8 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   /**
    * Prototype method {@link com.daemonize.game.Player#rotateTowards} */
-  public PlayerDaemon rotateTowards(Pair<Float, Float> coords) {
-    rotateDaemonEngine.pursueQuest(new RotateTowardsMainQuest(coords).setConsumer(rotateDaemonEngine.getConsumer()));
+  public PlayerDaemon rotateTowards(Pair<Float, Float> coords, Runnable retRun) {
+    rotateDaemonEngine.pursueQuest(new RotateTowardsMainQuest(coords, retRun, null).setConsumer(rotateDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -255,8 +257,8 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   /**
    * Prototype method {@link com.daemonize.game.Player#goTo} */
-  public PlayerDaemon goTo(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure) {
-    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
+  public PlayerDaemon goTo(Pair<Float, Float> coords, float velocity, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -440,11 +442,12 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     }
   }
 
-  private final class RotateTowardsMainQuest extends VoidMainQuest {
+  private final class RotateTowardsMainQuest extends ReturnVoidMainQuest {
     private Pair<Float, Float> coords;
 
-    private RotateTowardsMainQuest(Pair<Float, Float> coords) {
-      super();
+    private RotateTowardsMainQuest(Pair<Float, Float> coords, Runnable retRun,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
       this.coords = coords;
       this.description = "rotateTowards";
     }
@@ -519,22 +522,23 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     }
   }
 
-  private final class GoToIMainQuest extends MainQuest<Boolean> {
+  private final class GoToIMainQuest extends ReturnVoidMainQuest {
     private Pair<Float, Float> coords;
 
     private float velocity;
 
-    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure,
+    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Runnable retRun,
         ClosureExecutionWaiter closureAwaiter) {
-      super(closure, closureAwaiter);
+      super(retRun, closureAwaiter);
       this.coords = coords;
       this.velocity = velocity;
       this.description = "goTo";
     }
 
     @Override
-    public final Boolean pursue() throws Exception {
-      return prototype.goTo(coords, velocity);
+    public final Void pursue() throws Exception {
+      prototype.goTo(coords, velocity);
+      return null;
     }
   }
 }

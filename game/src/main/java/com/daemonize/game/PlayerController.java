@@ -49,7 +49,7 @@ public class PlayerController implements DirectionController {
         this.pressedDirections = new LinkedList<>();
         this.queueLock = new ReentrantLock();
         this.queueEmptyCondition = queueLock.newCondition();
-        this.distanceOffset = 20;
+        this.distanceOffset = 50;
         this.diagonalDistanceOffset = distanceOffset * 0.7F;
         this.controllerVelocity = 4.5F;
         this.speedUpVelocity = controllerVelocity * 4;

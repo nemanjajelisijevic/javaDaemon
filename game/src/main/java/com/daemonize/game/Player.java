@@ -19,6 +19,7 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
 
     private final int screenCenterX, screenCenterY;
     private Image[] spriteHealthBarImage;
+    private Image searchlight;
 
     private volatile int hpMax;
     private volatile int hp;
@@ -27,16 +28,31 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     private PositionedImage[] ret;
     private RotatingSpriteImageMover rotationMover;
 
-    public Player(Image[] sprite, Image[] hpSprite, Pair<Float, Float> startingPos, float dXY, int screenCenterX, int screenCenterY, int hpMax, int hp) {
+    public Player(
+            Image[] sprite,
+            Image[] hpSprite,
+            Image searchlight,
+            Pair<Float, Float> startingPos,
+            float dXY,
+            int screenCenterX,
+            int screenCenterY,
+            int hpMax,
+            int hp
+    ) {
         super(sprite[0], startingPos, dXY);
         this.spriteHealthBarImage = hpSprite;
+        this.searchlight = searchlight;
         this.screenCenterX = screenCenterX;
         this.screenCenterY = screenCenterY;
         this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, startingPos, dXY);
-        this.ret = new PositionedImage[2];
+        this.ret = new PositionedImage[3];
         this.ret[1] = new PositionedImage();
         this.ret[1].positionX = this.screenCenterX;
         this.ret[1].positionY = this.screenCenterY - (sprite[0].getHeight() / 2);
+        this.ret[2] = new PositionedImage();
+        this.ret[2].positionX = this.screenCenterX;
+        this.ret[2].positionY = this.screenCenterY + this.searchlight.getHeight() / 2;
+        this.ret[2].image = this.searchlight;
         this.hp = hp;
         this.hpMax = hpMax;
     }

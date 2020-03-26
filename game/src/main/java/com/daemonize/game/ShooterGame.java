@@ -26,11 +26,12 @@ public class ShooterGame {
     //animate closure def
     private static class PlayerCameraClosure implements Closure<ImageMover.PositionedImage[]> {
 
-        private ImageView mainView, hpView;
+        private ImageView mainView, hpView, searchlight;
 
-        public PlayerCameraClosure(ImageView mainView, ImageView hpView) {
+        public PlayerCameraClosure(ImageView mainView, ImageView hpView, ImageView searchlight) {
             this.mainView = mainView;
             this.hpView = hpView;
+            this.searchlight = searchlight;
         }
 
         @Override
@@ -42,6 +43,9 @@ public class ShooterGame {
             hpView.setAbsoluteX(result[1].positionX)
                     .setAbsoluteY(result[1].positionY)
                     .setImage(result[1].image);
+            searchlight.setAbsoluteX(result[2].positionX)
+                    .setAbsoluteY(result[2].positionY)
+                    .setImage(result[2].image);
         }
     }
 
@@ -140,6 +144,7 @@ public class ShooterGame {
 
     private Image[] playerSprite;
     private Image[] healthBarSprite;
+    private Image searchlight;
 
     //controller
     private DirectionControllerDaemon controller;
@@ -209,21 +214,21 @@ public class ShooterGame {
                 camera.addStaticView(backgroundView);
 
                 //init player sprites
-                int enemyWidth = cameraWidth / 10;
-                int enemyHeight = cameraHeight / 10;
+                int playerWidth = cameraWidth / 10;
+                int playerHeight = cameraHeight / 10;
 
                 playerSprite = new Image[36];
 
                 for (int i = 0; i < 36; i++) {
                     playerSprite[i] = imageManager.loadImageFromAssets(
                             "plane" + i + "0.png",
-                            enemyWidth,
-                            enemyHeight
+                            playerWidth,
+                            playerHeight
                     );
                 }
 
-                int width_hp = (enemyWidth * 3) / 4;
-                int height_hp = enemyHeight / 5;
+                int width_hp = (playerWidth * 3) / 4;
+                int height_hp = playerHeight / 5;
 
                 healthBarSprite = new Image[10];
                 for (int i = 0; i < healthBarSprite.length; ++i) {
@@ -233,12 +238,15 @@ public class ShooterGame {
                     );
                 }
 
+                searchlight = imageManager.loadImageFromAssets("searchlight.png", playerWidth / 2, playerHeight);
+
                 //init player
                 player = new PlayerDaemon(
                         gameConsumer,
                         new Player(
                                 playerSprite,
                                 healthBarSprite,
+                                searchlight,
                                 Pair.create((float)(borderX / 2), (float) (borderY / 2)),
                                 dXY,
                                 cameraWidth / 2,
@@ -261,12 +269,20 @@ public class ShooterGame {
                             .setAbsoluteY(borderY / 2)
                             .setZindex(10);
 
+                    ImageView searchlightView = scene.addImageView(new ImageViewImpl("Player Searchlight View")
+                            .setImage(searchlight)
+                            .setAbsoluteX(borderX / 2)
+                            .setAbsoluteY(borderY / 2)
+                            .setZindex(9)
+                    );
+
                     renderer.consume(() -> {
                         mainView.show();
                         hpView.show();
+                        searchlightView.show();
                     });
 
-                    player.setAnimatePlayerSideQuest(renderer).setClosure(new PlayerCameraClosure(mainView, hpView));
+                    player.setAnimatePlayerSideQuest(renderer).setClosure(new PlayerCameraClosure(mainView, hpView, searchlightView));
                 }
 
                 renderer.setScene(scene.lockViews()).start();

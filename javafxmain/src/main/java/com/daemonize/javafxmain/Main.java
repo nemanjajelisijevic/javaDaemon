@@ -36,9 +36,9 @@ public class Main extends Application {
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
-        //int borderX = ((int) primaryScreenBounds.getWidth()) - 200;
+        int borderX = ((int) primaryScreenBounds.getWidth()) - 200;
 
-        int borderX = Math.min((int)primaryScreenBounds.getWidth(), ((int) primaryScreenBounds.getHeight()));
+        //int borderX = Math.min((int)primaryScreenBounds.getWidth(), ((int) primaryScreenBounds.getHeight()));
 
         //(int)primaryScreenBounds.getWidth() > ((int) primaryScreenBounds.getHeight()) ? ((int) primaryScreenBounds.getHeight()) : (int)primaryScreenBounds.getWidth();
         //(int) primaryScreenBounds.getWidth() / 2 > 800 ? (int) primaryScreenBounds.getWidth() / 2 : 800;
