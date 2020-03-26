@@ -138,7 +138,7 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         return rotationMover.iterateSprite();
     }
 
-    @SideQuest(SLEEP = 15, blockingClosure = true)
+    @SideQuest(SLEEP = 25, blockingClosure = true)
     public PositionedImage[] animatePlayer() throws InterruptedException {
 
         this.ret[0] = super.animate();

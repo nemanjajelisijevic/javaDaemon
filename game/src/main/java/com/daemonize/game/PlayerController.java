@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.closure.BareClosure;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.DirectionController;
@@ -28,9 +29,18 @@ public class PlayerController implements DirectionController {
     private DaemonSemaphore playerMovementSemaphore;
 
     //on PlayerDaemons consumer
-    private int playerMovementCounter;
-    private Runnable playerMovementClosure = () -> {
-        if (++playerMovementCounter % 2 == 0)
+    //first for rotation second for translation
+    private Pair<Boolean, Boolean> contorlMovementCondition;
+
+    private Runnable rotationControlClosure = () -> {
+        contorlMovementCondition.setFirst(true);
+        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond())
+            playerMovementSemaphore.go();
+    };
+
+    private Runnable translationControlClosure = () -> {
+        contorlMovementCondition.setSecond(true);
+        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond())
             playerMovementSemaphore.go();
     };
 
@@ -39,12 +49,13 @@ public class PlayerController implements DirectionController {
         this.pressedDirections = new LinkedList<>();
         this.queueLock = new ReentrantLock();
         this.queueEmptyCondition = queueLock.newCondition();
-        this.distanceOffset = 10;
-        this.diagonalDistanceOffset = distanceOffset * 0.71F;
+        this.distanceOffset = 20;
+        this.diagonalDistanceOffset = distanceOffset * 0.7F;
         this.controllerVelocity = 4.5F;
-        this.speedUpVelocity = controllerVelocity * 3;
+        this.speedUpVelocity = controllerVelocity * 4;
         this.currentVelocity = controllerVelocity;
         this.playerMovementSemaphore = new DaemonSemaphore();
+        this.contorlMovementCondition = Pair.create(false, false);
     }
 
     @Override
@@ -138,10 +149,6 @@ public class PlayerController implements DirectionController {
                         throw new IllegalStateException("Unknown direction" + dir);
                 }
 
-                playerMovementSemaphore.stop();
-                player.rotateTowards(playerCoord, playerMovementClosure)
-                        .goTo(playerCoord, currentVelocity, playerMovementClosure);
-
             } else if (pressedDirections.size() == 2) {
 
                 DirectionController.Direction dirOne = pressedDirections.get(0);
@@ -194,12 +201,12 @@ public class PlayerController implements DirectionController {
                         throw new IllegalStateException("Unknown direction" + dirOne + ", dirTwo " + dirTwo);
 
                 }
-
-                playerMovementSemaphore.stop();
-                player.rotateTowards(playerCoord, playerMovementClosure)
-                        .goTo(playerCoord, currentVelocity, playerMovementClosure);
-
             }
+
+            playerMovementSemaphore.stop();
+            contorlMovementCondition.setFirst(false).setSecond(false);
+            player.rotateTowards(playerCoord, rotationControlClosure)
+                    .goTo(playerCoord, currentVelocity, translationControlClosure);
 
         } finally {
             queueLock.unlock();

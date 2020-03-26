@@ -54,7 +54,7 @@ public class Camera {
         return this;
     }
 
-    @SideQuest(SLEEP = 15)
+    @SideQuest(SLEEP = 25)
     public void follow() throws InterruptedException {
 
         target.getAnimationWaiter().await();
