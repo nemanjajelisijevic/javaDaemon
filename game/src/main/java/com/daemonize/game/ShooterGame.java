@@ -294,6 +294,8 @@ public class ShooterGame {
                 controller.setControlSideQuest();
                 controller.start();
 
+                player.rotateTowards(borderX / 2, borderY / 2 + 10).go(borderX / 2, borderY / 2 + 10, 1F);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

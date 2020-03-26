@@ -46,6 +46,8 @@ public class Camera {
 
     public Camera setTarget(Movable target) {
         this.target = target;
+        this.x = target.getLastCoordinates().getFirst().intValue();
+        this.y = target.getLastCoordinates().getSecond().intValue();
         return this;
     }
 

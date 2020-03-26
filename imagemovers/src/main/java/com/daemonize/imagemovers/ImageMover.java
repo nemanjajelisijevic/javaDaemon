@@ -69,5 +69,5 @@ public interface ImageMover extends Movable {
 
     @SideQuest(SLEEP = 25)
     PositionedImage animate() throws InterruptedException;
-
+    
 }
