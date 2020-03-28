@@ -10,7 +10,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class KeyBoardController implements DirectionController {
+public class KeyBoardController implements DirectionController<PlayerDaemon> {
 
     private PlayerDaemon controllable;
 
@@ -103,8 +103,8 @@ public class KeyBoardController implements DirectionController {
     }
 
     @Override
-    public void setPlayer(Movable player) {
-        this.controllable = ((PlayerDaemon) player);
+    public void setPlayer(PlayerDaemon player) {
+        this.controllable = player;
     }
 
     @Override

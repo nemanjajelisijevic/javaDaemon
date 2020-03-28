@@ -7,6 +7,7 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.HybridDaemonEngine;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.SleepSideQuest;
+import com.daemonize.imagemovers.Movable;
 import java.lang.Exception;
 import java.lang.Integer;
 import java.lang.InterruptedException;
@@ -17,12 +18,12 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DirectionControllerDaemon implements Daemon<DirectionControllerDaemon> {
-  private DirectionController prototype;
+public class DirectionControllerDaemon<M extends Movable> implements Daemon<DirectionControllerDaemon> {
+  private DirectionController<M> prototype;
 
   protected HybridDaemonEngine daemonEngine;
 
-  public DirectionControllerDaemon(Consumer consumer, DirectionController prototype) {
+  public DirectionControllerDaemon(Consumer consumer, DirectionController<M> prototype) {
     this.daemonEngine = new HybridDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.prototype = prototype;
   }
@@ -64,11 +65,16 @@ public class DirectionControllerDaemon implements Daemon<DirectionControllerDaem
     return this;
   }
 
-  public DirectionController getPrototype() {
+  public DirectionControllerDaemon setPlayer(M player) {
+    prototype.setPlayer(player);
+    return this;
+  }
+
+  public DirectionController<M> getPrototype() {
     return prototype;
   }
 
-  public DirectionControllerDaemon setPrototype(DirectionController prototype) {
+  public DirectionControllerDaemon setPrototype(DirectionController<M> prototype) {
     this.prototype = prototype;
     return this;
   }

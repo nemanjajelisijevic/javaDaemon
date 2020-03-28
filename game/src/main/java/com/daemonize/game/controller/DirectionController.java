@@ -5,7 +5,7 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.imagemovers.Movable;
 
 @Daemon
-public interface DirectionController {
+public interface DirectionController<M extends Movable> {
 
     static enum Direction {
         UP,
@@ -18,7 +18,7 @@ public interface DirectionController {
         RIGHT
     }
 
-    void setPlayer(Movable player);
+    void setPlayer(M player);
 
     void pressDirection(Direction dir);
     void releaseDirection(Direction dir);
