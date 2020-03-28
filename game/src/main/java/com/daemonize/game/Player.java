@@ -17,7 +17,6 @@ import java.util.Arrays;
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true)
 public class Player extends CoordinatedImageTranslationMover implements Target<Player> {
 
-    private final int screenCenterX, screenCenterY;
     private Image[] spriteHealthBarImage;
     private Image searchlight;
 
@@ -43,10 +42,10 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
             int hp
     ) {
         super(sprite[0], startingPos, dXY);
+
         this.spriteHealthBarImage = hpSprite;
         this.searchlight = searchlight;
-        this.screenCenterX = screenCenterX;
-        this.screenCenterY = screenCenterY;
+
         this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, startingPos, dXY);
 
         this.hpYOffset = sprite[0].getHeight() / 2;
@@ -54,12 +53,13 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
 
         this.ret = new PositionedImage[3];
         this.ret[1] = new PositionedImage();
-        this.ret[1].positionX = this.screenCenterX;
-        this.ret[1].positionY = this.screenCenterY - (sprite[0].getHeight() / 2);
+        this.ret[1].positionX = screenCenterX;
+        this.ret[1].positionY = screenCenterY - (sprite[0].getHeight() / 2);
         this.ret[2] = new PositionedImage();
-        this.ret[2].positionX = this.screenCenterX;
-        this.ret[2].positionY = this.screenCenterY + this.searchlight.getHeight() / 2;
+        this.ret[2].positionX = screenCenterX;
+        this.ret[2].positionY = screenCenterY + this.searchlight.getHeight() / 2;
         this.ret[2].image = this.searchlight;
+
         this.hp = hp;
         this.hpMax = hpMax;
     }
@@ -171,10 +171,10 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
 
         this.ret[1].image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
         this.ret[1].positionX = this.ret[0].positionX;
-        this.ret[1].positionY = this.ret[0].positionY - hpYOffset;
+        this.ret[1].positionY = this.ret[0].positionY - this.hpYOffset;
 
-        this.ret[2].positionX = this.screenCenterX;
-        this.ret[2].positionY = this.screenCenterY + this.searchLightYOffset;
+        this.ret[2].positionX = this.ret[0].positionX;
+        this.ret[2].positionY = this.ret[0].positionY + this.searchLightYOffset;
 
         return this.ret;
     }
