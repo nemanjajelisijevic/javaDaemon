@@ -8,6 +8,8 @@ import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.DirectionController;
 import com.daemonize.game.controller.DirectionControllerDaemon;
 import com.daemonize.game.grid.Grid;
+import com.daemonize.graphics2d.camera.Camera2D;
+import com.daemonize.graphics2d.camera.FixedCamera;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
@@ -87,7 +89,7 @@ public class ShooterGame {
     private ImageView[][] gridViewMatrix;
 
     //camera
-    private CameraDaemon camera;
+    private Camera2D camera;
 
     //cmd parser
     private CommandParserDaemon commandParser;
@@ -131,8 +133,7 @@ public class ShooterGame {
         this.borderX = width * screenToMapRatio;
         this.borderY = height * screenToMapRatio;
 
-        this.camera = new CameraDaemon(gameConsumer, new Camera(width, height, borderX, borderY));
-
+        this.camera = new FollowCamera(width, height);
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
 
@@ -173,8 +174,6 @@ public class ShooterGame {
                         .show();
 
                 scene.addImageView(backgroundView);
-
-                camera.addStaticView(backgroundView);
 
                 //init player sprites
                 int playerWidth = cameraWidth / 10;
@@ -250,8 +249,9 @@ public class ShooterGame {
 
                 renderer.setScene(scene.lockViews()).start();
 
-                camera.setFollowSideQuest();
-                camera.setRenderer(renderer).setTarget(player).start();
+                ((FollowCamera) camera).setTarget(player);
+
+                renderer.setCamera(camera);
 
                 //controller.setPrototype(new KeyBoardController(player.start()));
                 controller.getPrototype().setPlayer(player.start());

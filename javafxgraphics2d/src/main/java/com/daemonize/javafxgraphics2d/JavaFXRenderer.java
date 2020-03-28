@@ -1,5 +1,6 @@
 package com.daemonize.javafxgraphics2d;
 
+import com.daemonize.graphics2d.camera.Camera2D;
 import com.daemonize.graphics2d.renderer.DrawConsumer;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 
@@ -8,6 +9,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import com.daemonize.graphics2d.scene.Scene2D;
+import com.daemonize.graphics2d.scene.SceneDrawer;
 import com.daemonize.graphics2d.scene.views.ImageView;
 
 
@@ -22,6 +24,46 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
     private volatile boolean dirtyFlag;
 
     private GraphicsContext gc;
+
+    private class CameraSceneDrawer implements SceneDrawer {
+
+        private Camera2D camera2D;
+
+        public CameraSceneDrawer(Camera2D camera2D) {
+            this.camera2D = camera2D;
+        }
+
+        @Override
+        public void drawScene(Scene2D scene2D) {
+            gc.fillRect(0, 0, width, height);
+
+            int cameraX = camera2D.getX();
+            int cameraY = camera2D.getY();
+
+            for (ImageView view : scene.getViews())
+                if (view.isShowing())
+                    gc.drawImage(
+                            (javafx.scene.image.Image) view.getImage().getImageImp(),
+                            view.getStartingX() - cameraX,
+                            view.getStartingY() - cameraY
+                    );
+        }
+    }
+
+    private SceneDrawer sceneDrawer = new SceneDrawer() {
+        @Override
+        public void drawScene(Scene2D scene2D) {
+            gc.fillRect(0, 0, width, height);
+            for (ImageView view : scene.getViews())
+                if (view.isShowing())
+                    gc.drawImage(
+                            (javafx.scene.image.Image) view.getImage().getImageImp(),
+                            view.getStartingX(),
+                            view.getStartingY()
+                    );
+        }
+    };
+
     private AnimationTimer animationTimer = new AnimationTimer() {
         @Override
         public void handle(long l) {
@@ -38,6 +80,12 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         this.width = width;
         this.height = height;
         this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer", closureQueueSize);
+    }
+
+    @Override
+    public JavaFXRenderer setCamera(Camera2D camera) {
+        this.sceneDrawer = new CameraSceneDrawer(camera);
+        return this;
     }
 
     @Override
@@ -87,14 +135,7 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
     @Override
     public JavaFXRenderer drawScene() {
-        gc.fillRect(0, 0, width, height);
-        for (ImageView view : scene.getViews())
-            if (view.isShowing())
-                gc.drawImage(
-                        (javafx.scene.image.Image) view.getImage().getImageImp(),
-                        view.getStartingX(),
-                        view.getStartingY()
-                );
+        sceneDrawer.drawScene(scene);
         return this;
     }
 

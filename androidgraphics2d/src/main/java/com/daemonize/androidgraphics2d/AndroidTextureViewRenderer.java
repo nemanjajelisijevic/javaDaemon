@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.view.TextureView;
 import android.view.View;
 
+import com.daemonize.graphics2d.camera.Camera2D;
 import com.daemonize.graphics2d.renderer.DrawConsumer;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
@@ -40,6 +41,11 @@ public class AndroidTextureViewRenderer implements Renderer2D<AndroidTextureView
         this.dirtyFlag = true;
         dirtyCondition.signal();
         dirtyLock.unlock();
+        return this;
+    }
+
+    @Override
+    public AndroidTextureViewRenderer setCamera(Camera2D camera) {
         return this;
     }
 

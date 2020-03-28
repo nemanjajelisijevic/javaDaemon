@@ -21,6 +21,9 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     private Image[] spriteHealthBarImage;
     private Image searchlight;
 
+    private final int hpYOffset;
+    private final int searchLightYOffset;
+
     private volatile int hpMax;
     private volatile int hp;
     private volatile boolean shootable = true;
@@ -45,6 +48,10 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         this.screenCenterX = screenCenterX;
         this.screenCenterY = screenCenterY;
         this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, startingPos, dXY);
+
+        this.hpYOffset = sprite[0].getHeight() / 2;
+        this.searchLightYOffset = this.searchlight.getHeight() / 2;
+
         this.ret = new PositionedImage[3];
         this.ret[1] = new PositionedImage();
         this.ret[1].positionX = this.screenCenterX;
@@ -162,9 +169,12 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         if(this.ret[0] == null)
             return null;
 
-        this.ret[0].positionX = screenCenterX;
-        this.ret[0].positionY = screenCenterY;
         this.ret[1].image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
+        this.ret[1].positionX = this.ret[0].positionX;
+        this.ret[1].positionY = this.ret[0].positionY - hpYOffset;
+
+        this.ret[2].positionX = this.screenCenterX;
+        this.ret[2].positionY = this.screenCenterY + this.searchLightYOffset;
 
         return this.ret;
     }
