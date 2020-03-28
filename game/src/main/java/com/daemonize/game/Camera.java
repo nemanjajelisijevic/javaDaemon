@@ -20,6 +20,8 @@ public class Camera {
     private final int borderXOffset, borderYOffset;
     private final int xOffset, yOffset;
 
+    private final Pair<Integer, Integer> bordersX, bordersY;
+
     private Movable target;
     private List<ImageView> staticViews;
     private Renderer2D renderer;
@@ -29,6 +31,8 @@ public class Camera {
         this.yOffset = height / 2;
         this.borderXOffset = borderX / 2;
         this.borderYOffset = borderY / 2;
+        this.bordersX = Pair.create(this.xOffset, borderX - this.xOffset);
+        this.bordersY = Pair.create(this.yOffset, borderY - this.yOffset);
         this.staticViews = new ArrayList<>(1);
     }
 
@@ -66,13 +70,19 @@ public class Camera {
         int currentTargetX = targetLastCoordinates.getFirst().intValue();
         int currentTargetY = targetLastCoordinates.getSecond().intValue();
 
-        x = currentTargetX - xOffset;
-        y = currentTargetY - yOffset;
+        if (
+                currentTargetX > bordersX.getFirst() && currentTargetX < bordersX.getSecond()
+                && currentTargetY > bordersY.getFirst() && currentTargetY < bordersY.getSecond()
+        ) {
 
-        renderer.consume(() -> {
-            for (ImageView staticView : staticViews)
-                staticView.setAbsoluteX(borderXOffset - x)
-                        .setAbsoluteY(borderYOffset - y);
-        });
+            x = currentTargetX - xOffset;
+            y = currentTargetY - yOffset;
+
+            renderer.consume(() -> {
+                for (ImageView staticView : staticViews)
+                    staticView.setAbsoluteX(borderXOffset - x)
+                            .setAbsoluteY(borderYOffset - y);
+            });
+        }
     }
 }

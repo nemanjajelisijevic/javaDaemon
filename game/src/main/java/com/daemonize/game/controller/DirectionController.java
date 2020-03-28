@@ -8,7 +8,11 @@ public interface DirectionController {
 
     static enum Direction {
         UP,
+        UP_LEFT,
+        UP_RIGHT,
         DOWN,
+        DWN_LEFT,
+        DOWN_RIGHT,
         LEFT,
         RIGHT
     }

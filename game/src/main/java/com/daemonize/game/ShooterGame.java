@@ -49,44 +49,6 @@ public class ShooterGame {
         }
     }
 
-    private static class CameraImageAnimateClosure implements Closure<ImageMover.PositionedImage> {
-
-        private ImageView view;
-        private CameraDaemon camera;
-
-        public CameraImageAnimateClosure(CameraDaemon camera, ImageView view) {
-            this.camera = camera;
-            this.view = view;
-        }
-
-        @Override
-        public void onReturn(Return<ImageMover.PositionedImage> aReturn) {
-            ImageMover.PositionedImage posBmp = aReturn.get();
-            view.setAbsoluteX(posBmp.positionX - camera.getX())
-                    .setAbsoluteY(posBmp.positionY - camera.getY())
-                    .setImage(posBmp.image);
-        }
-    }
-
-    private static class CameraMultiViewAnimateClosure implements Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-
-        private CameraDaemon camera;
-
-        public CameraMultiViewAnimateClosure(CameraDaemon camera) {
-            this.camera = camera;
-        }
-
-        @Override
-        public void onReturn(Return<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> aReturn) {
-            GenericNode.forEach(aReturn.runtimeCheckAndGet(), arg -> {
-                ImageMover.PositionedImage image = arg.getFirst();
-                arg.getSecond().setAbsoluteX(image.positionX - camera.getX())
-                        .setAbsoluteY(image.positionY - camera.getY())
-                        .setImage(image.image);
-            });
-        }
-    }
-
     //running flag
     private volatile boolean running;
 
@@ -173,7 +135,7 @@ public class ShooterGame {
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
 
-        this.controller = new DirectionControllerDaemon(gameConsumer, new PlayerController(null)).setName("Player Controller");
+        this.controller = new DirectionControllerDaemon(gameConsumer, new KeyBoardController(null)).setName("Player Controller");
     }
 
     public ShooterGame run() {
@@ -290,7 +252,7 @@ public class ShooterGame {
                 camera.setFollowSideQuest();
                 camera.setRenderer(renderer).setTarget(player).start();
 
-                controller.setPrototype(new PlayerController(player.start()));
+                controller.setPrototype(new KeyBoardController(player.start()));
                 controller.setControlSideQuest();
                 controller.start();
 

@@ -1,6 +1,5 @@
 package com.daemonize.game;
 
-import com.daemonize.daemonengine.closure.BareClosure;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.DirectionController;
@@ -10,9 +9,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class PlayerController implements DirectionController {
+public class KeyBoardController implements DirectionController {
 
-    private PlayerDaemon player;
+    private PlayerDaemon controllable;
 
     private float distanceOffset;
     private float diagonalDistanceOffset;
@@ -44,12 +43,12 @@ public class PlayerController implements DirectionController {
             playerMovementSemaphore.go();
     };
 
-    public PlayerController(PlayerDaemon player) {
-        this.player = player;
+    public KeyBoardController(PlayerDaemon player) {
+        this.controllable = player;
         this.pressedDirections = new LinkedList<>();
         this.queueLock = new ReentrantLock();
         this.queueEmptyCondition = queueLock.newCondition();
-        this.distanceOffset = 50;
+        this.distanceOffset = 100;
         this.diagonalDistanceOffset = distanceOffset * 0.7F;
         this.controllerVelocity = 4.5F;
         this.speedUpVelocity = controllerVelocity * 4;
@@ -121,7 +120,7 @@ public class PlayerController implements DirectionController {
             while (pressedDirections.isEmpty())
                 queueEmptyCondition.await();
 
-            Pair<Float, Float> playerCoord = player.getLastCoordinates();
+            Pair<Float, Float> playerCoord = controllable.getLastCoordinates();
 
             if(pressedDirections.size() == 1) {
 
@@ -205,7 +204,7 @@ public class PlayerController implements DirectionController {
 
             playerMovementSemaphore.stop();
             contorlMovementCondition.setFirst(false).setSecond(false);
-            player.rotateTowards(playerCoord, rotationControlClosure)
+            controllable.rotateTowards(playerCoord, rotationControlClosure)
                     .goTo(playerCoord, currentVelocity, translationControlClosure);
 
         } finally {
