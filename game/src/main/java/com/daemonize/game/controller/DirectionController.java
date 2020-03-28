@@ -2,6 +2,7 @@ package com.daemonize.game.controller;
 
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
+import com.daemonize.imagemovers.Movable;
 
 @Daemon
 public interface DirectionController {
@@ -16,6 +17,8 @@ public interface DirectionController {
         LEFT,
         RIGHT
     }
+
+    void setPlayer(Movable player);
 
     void pressDirection(Direction dir);
     void releaseDirection(Direction dir);

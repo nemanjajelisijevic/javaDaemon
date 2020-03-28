@@ -5,6 +5,7 @@ import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.game.controller.DirectionController;
 import com.daemonize.game.controller.DirectionControllerDaemon;
 import com.daemonize.game.grid.Grid;
 import com.daemonize.graphics2d.images.Image;
@@ -116,7 +117,7 @@ public class ShooterGame {
     }
 
     //construct
-    public ShooterGame(Renderer2D renderer, ImageManager imageManager, int width, int height) {
+    public ShooterGame(Renderer2D renderer, ImageManager imageManager, DirectionController controller, int width, int height) {
 
         this.renderer = renderer;
         this.imageManager = imageManager;
@@ -135,7 +136,7 @@ public class ShooterGame {
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
 
-        this.controller = new DirectionControllerDaemon(gameConsumer, new KeyBoardController(null)).setName("Player Controller");
+        this.controller = new DirectionControllerDaemon(gameConsumer, controller).setName("Player con");
     }
 
     public ShooterGame run() {
@@ -252,7 +253,8 @@ public class ShooterGame {
                 camera.setFollowSideQuest();
                 camera.setRenderer(renderer).setTarget(player).start();
 
-                controller.setPrototype(new KeyBoardController(player.start()));
+                //controller.setPrototype(new KeyBoardController(player.start()));
+                controller.getPrototype().setPlayer(player.start());
                 controller.setControlSideQuest();
                 controller.start();
 

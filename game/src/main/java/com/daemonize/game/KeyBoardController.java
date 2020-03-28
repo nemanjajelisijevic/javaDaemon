@@ -3,6 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.DirectionController;
+import com.daemonize.imagemovers.Movable;
 
 import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
@@ -21,7 +22,10 @@ public class KeyBoardController implements DirectionController {
 
     private volatile float currentVelocity;
 
+    private volatile Direction currentDir;
+
     private LinkedList<Direction> pressedDirections;
+
     private Lock queueLock;
     private Condition queueEmptyCondition;
 
@@ -96,6 +100,11 @@ public class KeyBoardController implements DirectionController {
             pressedDirections.remove(1);
 
         queueLock.unlock();
+    }
+
+    @Override
+    public void setPlayer(Movable player) {
+        this.controllable = ((PlayerDaemon) player);
     }
 
     @Override

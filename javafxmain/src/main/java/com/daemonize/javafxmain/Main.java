@@ -1,5 +1,6 @@
 package com.daemonize.javafxmain;
 
+import com.daemonize.game.KeyBoardController;
 import com.daemonize.game.ShooterGame;
 import com.daemonize.game.controller.DirectionController;
 import com.daemonize.game.controller.DirectionControllerDaemon;
@@ -67,7 +68,7 @@ public class Main extends Application {
         //SoundManager soundManager = new JavaFxSoundManager(4);
         //game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
-        game = new ShooterGame(renderer, imageManager, borderX, borderY);
+        game = new ShooterGame(renderer, imageManager, new KeyBoardController(null), borderX, borderY);
 
         Group root = new Group(canvas);
         root.setCache(true);
