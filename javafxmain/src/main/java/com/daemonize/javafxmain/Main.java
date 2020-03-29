@@ -68,7 +68,7 @@ public class Main extends Application {
         //SoundManager soundManager = new JavaFxSoundManager(4);
         //game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
-        game = new ShooterGame(renderer, imageManager, new KeyBoardController(null), borderX, borderY);
+        game = new ShooterGame(renderer, imageManager, new KeyBoardController(), borderX, borderY);
 
         Group root = new Group(canvas);
         root.setCache(true);
