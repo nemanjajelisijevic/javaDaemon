@@ -9,7 +9,6 @@ import com.daemonize.game.controller.DirectionController;
 import com.daemonize.game.controller.DirectionControllerDaemon;
 import com.daemonize.game.grid.Grid;
 import com.daemonize.graphics2d.camera.Camera2D;
-import com.daemonize.graphics2d.camera.FixedCamera;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
@@ -133,7 +132,7 @@ public class ShooterGame {
         this.borderX = width * screenToMapRatio;
         this.borderY = height * screenToMapRatio;
 
-        this.camera = new FollowCamera(width, height);
+        this.camera = new FollowingCamera(width, height);
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
 
@@ -249,12 +248,12 @@ public class ShooterGame {
 
                 renderer.setScene(scene.lockViews()).start();
 
-                ((FollowCamera) camera).setTarget(player);
+                ((FollowingCamera) camera).setTarget(player);
 
                 renderer.setCamera(camera);
 
                 //controller.setPrototype(new KeyBoardController(player.start()));
-                controller.getPrototype().setPlayer(player.start());
+                controller.getPrototype().setControllable(player.start());
                 controller.setControlSideQuest();
                 controller.start();
 

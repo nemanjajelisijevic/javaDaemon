@@ -35,6 +35,7 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
         @Override
         public void drawScene(Scene2D scene2D) {
+
             gc.fillRect(0, 0, width, height);
 
             int cameraX = camera2D.getX();

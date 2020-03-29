@@ -3,7 +3,6 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.DirectionController;
-import com.daemonize.imagemovers.Movable;
 
 import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
@@ -21,30 +20,25 @@ public class KeyBoardController implements DirectionController<PlayerDaemon> {
     private final float speedUpVelocity;
 
     private volatile float currentVelocity;
-
-    private volatile Direction currentDir;
-
     private LinkedList<Direction> pressedDirections;
 
     private Lock queueLock;
     private Condition queueEmptyCondition;
 
-    private DaemonSemaphore playerMovementSemaphore;
-
-    //on PlayerDaemons consumer
-    //first for rotation second for translation
     private Pair<Boolean, Boolean> contorlMovementCondition;
+    private DaemonSemaphore controlBlockingSemaphore;
 
+    //first for rotation second for translation
     private Runnable rotationControlClosure = () -> {
         contorlMovementCondition.setFirst(true);
         if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond())
-            playerMovementSemaphore.go();
+            controlBlockingSemaphore.go();
     };
 
     private Runnable translationControlClosure = () -> {
         contorlMovementCondition.setSecond(true);
         if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond())
-            playerMovementSemaphore.go();
+            controlBlockingSemaphore.go();
     };
 
     public KeyBoardController(PlayerDaemon player) {
@@ -52,12 +46,12 @@ public class KeyBoardController implements DirectionController<PlayerDaemon> {
         this.pressedDirections = new LinkedList<>();
         this.queueLock = new ReentrantLock();
         this.queueEmptyCondition = queueLock.newCondition();
-        this.distanceOffset = 100;
+        this.distanceOffset = 70;
         this.diagonalDistanceOffset = distanceOffset * 0.7F;
         this.controllerVelocity = 4.5F;
         this.speedUpVelocity = controllerVelocity * 4;
         this.currentVelocity = controllerVelocity;
-        this.playerMovementSemaphore = new DaemonSemaphore();
+        this.controlBlockingSemaphore = new DaemonSemaphore();
         this.contorlMovementCondition = Pair.create(false, false);
     }
 
@@ -103,18 +97,20 @@ public class KeyBoardController implements DirectionController<PlayerDaemon> {
     }
 
     @Override
-    public void setPlayer(PlayerDaemon player) {
+    public void setControllable(PlayerDaemon player) {
         this.controllable = player;
     }
 
     @Override
     public void speedUp() {
         currentVelocity = speedUpVelocity;
+        controllable.setVelocity(currentVelocity);
     }
 
     @Override
     public void speedDown() {
         currentVelocity = controllerVelocity;
+        controllable.setVelocity(currentVelocity);
     }
 
     @Override
@@ -122,7 +118,7 @@ public class KeyBoardController implements DirectionController<PlayerDaemon> {
 
         try {
 
-            playerMovementSemaphore.await();
+            controlBlockingSemaphore.await();
 
             queueLock.lock();
 
@@ -211,7 +207,7 @@ public class KeyBoardController implements DirectionController<PlayerDaemon> {
                 }
             }
 
-            playerMovementSemaphore.stop();
+            controlBlockingSemaphore.stop();
             contorlMovementCondition.setFirst(false).setSecond(false);
             controllable.rotateTowards(playerCoord, rotationControlClosure)
                     .goTo(playerCoord, currentVelocity, translationControlClosure);

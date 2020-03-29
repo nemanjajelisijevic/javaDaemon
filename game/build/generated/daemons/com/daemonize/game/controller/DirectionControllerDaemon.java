@@ -50,6 +50,11 @@ public class DirectionControllerDaemon<M extends Movable> implements Daemon<Dire
     return this;
   }
 
+  public DirectionControllerDaemon setControllable(M player) {
+    prototype.setControllable(player);
+    return this;
+  }
+
   public DirectionControllerDaemon releaseDirection(DirectionController.Direction dir) {
     prototype.releaseDirection(dir);
     return this;
@@ -62,11 +67,6 @@ public class DirectionControllerDaemon<M extends Movable> implements Daemon<Dire
 
   public DirectionControllerDaemon speedDown() {
     prototype.speedDown();
-    return this;
-  }
-
-  public DirectionControllerDaemon setPlayer(M player) {
-    prototype.setPlayer(player);
     return this;
   }
 

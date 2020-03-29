@@ -18,7 +18,7 @@ public interface DirectionController<M extends Movable> {
         RIGHT
     }
 
-    void setPlayer(M player);
+    void setControllable(M player);
 
     void pressDirection(Direction dir);
     void releaseDirection(Direction dir);
