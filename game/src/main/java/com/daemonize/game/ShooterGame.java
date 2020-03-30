@@ -320,6 +320,8 @@ public class ShooterGame {
                         intervals.add(1000L);
                         intervals.add(300L);
                         intervals.add(150L);
+                        intervals.add(3000L);
+                        intervals.add(200L);
                         intervalIterator = intervals.iterator();
                     }
 

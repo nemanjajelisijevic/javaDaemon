@@ -170,6 +170,11 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
                 MovementController.Direction dir = pressedDirections.peek();
                 nextCoords = dirMapper.map(dir);
 
+                controlBlockingSemaphore.stop();
+                contorlMovementCondition.setFirst(false).setSecond(false);
+                controllable.rotateTowards(nextCoords, rotationControlClosure)
+                        .goTo(nextCoords, currentVelocity, translationControlClosure);
+
             } else if (pressedDirections.size() == 2) {
 
                 MovementController.Direction dirOne = pressedDirections.get(0);
@@ -215,23 +220,30 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
                     default:
                         throw new IllegalStateException("Unknown direction" + dirOne + ", dirTwo " + dirTwo);
 
+
                 }
+
+                controlBlockingSemaphore.stop();
+                contorlMovementCondition.setFirst(false).setSecond(false);
+                controllable.rotateTowards(nextCoords, rotationControlClosure)
+                        .goTo(nextCoords, currentVelocity, translationControlClosure);
+
             } else {
                 throw new IllegalStateException("Dir buffer: " + pressedDirections.toString());
             }
 
-            if(nextCoords == null)
-                throw new NullPointerException();
-            else if (nextCoords.getFirst() == null)
-                throw new NullPointerException();
-            else if (nextCoords.getSecond() == null)
-                throw new NullPointerException();
+//            if(nextCoords == null)
+//                throw new NullPointerException();
+//            else if (nextCoords.getFirst() == null)
+//                throw new NullPointerException();
+//            else if (nextCoords.getSecond() == null)
+//                throw new NullPointerException();
 
-
-            controlBlockingSemaphore.stop();
-            contorlMovementCondition.setFirst(false).setSecond(false);
-            controllable.rotateTowards(nextCoords, rotationControlClosure)
-                    .goTo(nextCoords, currentVelocity, translationControlClosure);
+//
+//            controlBlockingSemaphore.stop();
+//            contorlMovementCondition.setFirst(false).setSecond(false);
+//            controllable.rotateTowards(nextCoords, rotationControlClosure)
+//                    .goTo(nextCoords, currentVelocity, translationControlClosure);
 
         } finally {
             queueLock.unlock();
