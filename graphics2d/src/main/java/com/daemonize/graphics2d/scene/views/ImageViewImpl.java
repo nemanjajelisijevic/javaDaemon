@@ -1,6 +1,7 @@
 package com.daemonize.graphics2d.scene.views;
 
 import com.daemonize.graphics2d.images.Image;
+import com.daemonize.graphics2d.scene.SceneDrawer;
 
 import java.util.List;
 
@@ -181,5 +182,10 @@ public class ImageViewImpl implements ImageView<ImageViewImpl> {
     @Override
     public String toString() {
         return viewName + ", isShowing: " + showing + ", Z index: " + zIndex;
+    }
+
+    @Override
+    public void draw(SceneDrawer sceneDrawer) {
+        sceneDrawer.drawView(this);
     }
 }

@@ -1,6 +1,7 @@
 package com.daemonize.graphics2d.scene.views;
 
 import com.daemonize.graphics2d.images.Image;
+import com.daemonize.graphics2d.scene.SceneDrawer;
 
 import java.util.List;
 
@@ -44,4 +45,5 @@ public interface ImageView<V extends ImageView> extends Comparable<ImageView> {
 
     List<ImageView> getAllViews ();
 
+    void draw(SceneDrawer sceneDrawer);
 }

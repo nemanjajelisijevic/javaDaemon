@@ -137,12 +137,6 @@ public class Field<T> implements  IHeapItem , Comparable {
         } else
             return 0;
     }
-
-
-    @Override
-    public String toString() {
-        return "Field[" +  row + "][" + column + "] CenterX: " + centerX + ", CenterY: " + centerY;
-    }
 }
 
 

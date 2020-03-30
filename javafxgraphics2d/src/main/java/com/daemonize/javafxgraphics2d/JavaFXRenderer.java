@@ -34,6 +34,20 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         }
 
         @Override
+        public void drawView(ImageView view, float x, float y) {
+            gc.drawImage((javafx.scene.image.Image) view.getImage().getImageImp(), x, y);
+        }
+
+        @Override
+        public void drawView(ImageView view) {
+            gc.drawImage(
+                    (javafx.scene.image.Image) view.getImage().getImageImp(),
+                    view.getStartingX() - camera2D.getX(),
+                    view.getStartingY() - camera2D.getY()
+            );
+        }
+
+        @Override
         public void drawScene(Scene2D scene2D) {
 
             gc.fillRect(0, 0, width, height);
@@ -43,25 +57,28 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
             for (ImageView view : scene.getViews())
                 if (view.isShowing())
-                    gc.drawImage(
-                            (javafx.scene.image.Image) view.getImage().getImageImp(),
-                            view.getStartingX() - cameraX,
-                            view.getStartingY() - cameraY
-                    );
+                    view.draw(this);
         }
     }
 
     private SceneDrawer sceneDrawer = new SceneDrawer() {
+
+        @Override
+        public void drawView(ImageView view, float x, float y) {
+            gc.drawImage((javafx.scene.image.Image) view.getImage().getImageImp(), x, y);
+        }
+
+        @Override
+        public void drawView(ImageView view) {
+            drawView(view, view.getStartingX(), view.getStartingY());
+        }
+
         @Override
         public void drawScene(Scene2D scene2D) {
             gc.fillRect(0, 0, width, height);
             for (ImageView view : scene.getViews())
                 if (view.isShowing())
-                    gc.drawImage(
-                            (javafx.scene.image.Image) view.getImage().getImageImp(),
-                            view.getStartingX(),
-                            view.getStartingY()
-                    );
+                    view.draw(this);
         }
     };
 
