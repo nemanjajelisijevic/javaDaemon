@@ -282,10 +282,12 @@ public class ShooterGame {
 //
 //                testTrinity.getDaemon().start();
 
-                Image streetLampImage = imageManager.loadImageFromAssets("streetLamp.png", playerWidth, playerWidth * 3 / 2);
-                Image lampLightImage = imageManager.loadImageFromAssets("searchlight.png", playerWidth * 2, playerWidth * 3 / 2);
+                Image streetLampImage = imageManager.loadImageFromAssets("streetLamp.png", playerWidth, playerWidth );
+                Image lampLightImage = imageManager.loadImageFromAssets("searchlight.png", playerWidth * 2, playerWidth); //* 4 / 3);
 
                 Field lampField = grid.getField(25, 34);
+                Field lampField2 = grid.getField(6, 45);
+                Field lampField3 = grid.getField(35, 61);
 
                 streetLamp.addView(
                         "streetLamp",
@@ -298,10 +300,52 @@ public class ShooterGame {
                 );
 
                 streetLamp.addView(
+                        "streetLamp2",
+                        scene.addImageView(new ImageViewImpl("Street Lamp View 2"))
+                                .setAbsoluteX(lampField2.getCenterX())
+                                .setAbsoluteY(lampField2.getCenterY())
+                                .setImage(streetLampImage)
+                                .setZindex(5)
+                                .show()
+                );
+
+                streetLamp.addView(
+                        "streetLamp3",
+                        scene.addImageView(new ImageViewImpl("Street Lamp View 3"))
+                                .setAbsoluteX(lampField3.getCenterX())
+                                .setAbsoluteY(lampField3.getCenterY())
+                                .setImage(streetLampImage)
+                                .setZindex(5)
+                                .show()
+                );
+
+                streetLamp.addView(
                         "streetLampLight",
                         scene.addImageView(new ImageViewImpl("Street Lamp Light"))
                                 .setAbsoluteX(lampField.getCenterX())
-                                .setAbsoluteY(lampField.getCenterY() + playerHeight / 3)
+                                .setAbsoluteY(lampField.getCenterY() + playerHeight / 4)
+                                .setImage(lampLightImage)
+                                .setZindex(6)
+                                .show()
+
+                );
+
+                streetLamp.addView(
+                        "streetLampLight2",
+                        scene.addImageView(new ImageViewImpl("Street Lamp Light 2"))
+                                .setAbsoluteX(lampField2.getCenterX())
+                                .setAbsoluteY(lampField2.getCenterY() + playerHeight / 4)
+                                .setImage(lampLightImage)
+                                .setZindex(6)
+                                .show()
+
+                );
+
+                streetLamp.addView(
+                        "streetLampLight3",
+                        scene.addImageView(new ImageViewImpl("Street Lamp Light 3"))
+                                .setAbsoluteX(lampField3.getCenterX())
+                                .setAbsoluteY(lampField3.getCenterY() + playerHeight / 4)
                                 .setImage(lampLightImage)
                                 .setZindex(6)
                                 .show()
@@ -337,11 +381,18 @@ public class ShooterGame {
                 streetLamp.getDaemon().setClosure(() -> {
 
                     ImageView lightView = streetLamp.getView("streetLampLight");
+                    ImageView lightView2 = streetLamp.getView("streetLampLight2");
+                    ImageView lightView3 = streetLamp.getView("streetLampLight3");
 
-                    if(lightView.isShowing())
+                    if(lightView.isShowing()) {
                         lightView.hide();
-                    else
+                        lightView2.hide();
+                        lightView3.hide();
+                    } else {
                         lightView.show();
+                        lightView2.show();
+                        lightView3.show();
+                    }
 
                 });
 
