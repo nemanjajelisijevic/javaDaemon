@@ -25,12 +25,30 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
     private GraphicsContext gc;
 
+
     private class CameraSceneDrawer implements SceneDrawer {
 
         private Camera2D camera2D;
+        private int cameraX, cameraY;
 
         public CameraSceneDrawer(Camera2D camera2D) {
             this.camera2D = camera2D;
+            this.cameraX = camera2D.getX();
+            this.cameraY = camera2D.getY();
+        }
+
+        @Override
+        public void drawView(ImageView view, float x, float y) {
+            gc.drawImage((javafx.scene.image.Image) view.getImage().getImageImp(), x, y);
+        }
+
+        @Override
+        public void drawView(ImageView view) {
+            gc.drawImage(
+                    (javafx.scene.image.Image) view.getImage().getImageImp(),
+                    view.getStartingX() - cameraX,
+                    view.getStartingY() - cameraY
+            );
         }
 
         @Override
@@ -38,30 +56,37 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
             gc.fillRect(0, 0, width, height);
 
-            int cameraX = camera2D.getX();
-            int cameraY = camera2D.getY();
+            cameraX = camera2D.getX();
+            cameraY = camera2D.getY();
 
             for (ImageView view : scene.getViews())
                 if (view.isShowing())
-                    gc.drawImage(
-                            (javafx.scene.image.Image) view.getImage().getImageImp(),
-                            view.getStartingX() - cameraX,
-                            view.getStartingY() - cameraY
-                    );
+                    view.draw(this);
         }
     }
 
     private SceneDrawer sceneDrawer = new SceneDrawer() {
+
+        @Override
+        public void drawView(ImageView view, float x, float y) {
+            gc.drawImage(
+                    (javafx.scene.image.Image) view.getImage().getImageImp(),
+                    x,
+                    y
+            );
+        }
+
+        @Override
+        public void drawView(ImageView view) {
+            drawView(view, view.getStartingX(), view.getStartingY());
+        }
+
         @Override
         public void drawScene(Scene2D scene2D) {
             gc.fillRect(0, 0, width, height);
             for (ImageView view : scene.getViews())
                 if (view.isShowing())
-                    gc.drawImage(
-                            (javafx.scene.image.Image) view.getImage().getImageImp(),
-                            view.getStartingX(),
-                            view.getStartingY()
-                    );
+                    drawView(view);
         }
     };
 

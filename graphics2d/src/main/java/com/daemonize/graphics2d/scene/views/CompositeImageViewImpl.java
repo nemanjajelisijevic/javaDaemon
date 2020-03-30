@@ -1,6 +1,7 @@
 package com.daemonize.graphics2d.scene.views;
 
 import com.daemonize.graphics2d.images.Image;
+import com.daemonize.graphics2d.scene.SceneDrawer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -325,4 +326,10 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
         }
         return compositeImageView;
     }
+
+    @Override
+    public void draw(SceneDrawer sceneDrawer) {
+        sceneDrawer.drawView(this);
+    }
 }
+
