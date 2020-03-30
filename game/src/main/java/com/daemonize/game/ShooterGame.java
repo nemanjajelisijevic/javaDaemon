@@ -83,7 +83,7 @@ public class ShooterGame {
     int cameraWidth, cameraHeight;
 
     //grid
-    private Grid<TowerDaemon> grid;
+    private Grid<TowerDaemon> grwwid;
     private int rows;
     private int columns;
     private ImageView[][] gridViewMatrix;
