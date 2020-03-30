@@ -74,7 +74,12 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     @GenerateRunnable
     @DedicatedThread(engineName = "rotate")
     public void rotateTowards(Pair<Float, Float> coords) throws InterruptedException {
-        rotateTowards(coords.getFirst(), coords.getSecond());
+        rotateTowards(
+                coords
+                        .getFirst(),
+                coords.
+                        getSecond()
+        );
     }
 
     @Daemonize

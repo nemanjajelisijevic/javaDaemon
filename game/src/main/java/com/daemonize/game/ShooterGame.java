@@ -135,6 +135,9 @@ public class ShooterGame {
         return controller;
     }
 
+    //test
+    private UnholyTrinity<SpriteAnimatorDaemon> testTrinity = new UnholyTrinity<>();
+
     //construct
     public ShooterGame(Renderer2D renderer, ImageManager imageManager, MovementController controller, int width, int height) {
 
@@ -154,7 +157,7 @@ public class ShooterGame {
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
 
-        this.controller = new MovementControllerDaemon(gameConsumer, controller).setName("Player con");
+        this.controller = new MovementControllerDaemon(gameConsumer, controller).setName("Player controller");
 
         this.fieldWidth = 50;
         this.rows = borderY / fieldWidth;
@@ -250,14 +253,40 @@ public class ShooterGame {
                 }
 
                 searchlight = imageManager.loadImageFromAssets("searchlight.png", playerWidth / 2, playerHeight);
+
+                //test sprite
+                Image[] explodeSprite = new Image[33];
+                for (int i = 0; i < explodeSprite.length; ++i) {
+                    explodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", playerWidth, playerHeight);
+                }
+
+                testTrinity.addSprite("test", explodeSprite);
+                testTrinity.addView("test", scene.addImageView(new ImageViewImpl("test")).setZindex(6).show());
+                testTrinity.setDaemon(
+                        new SpriteAnimatorDaemon(
+                                renderer,
+                                new ConstantSpriteAnimator(borderX / 2, borderY / 2, explodeSprite)
+                        )
+                );
+
+                testTrinity.getDaemon().setAnimateSideQuest(renderer).setClosure(ret -> {
+                    ImageMover.PositionedImage positionedImage = ret.runtimeCheckAndGet();
+                    testTrinity.getView("test").setAbsoluteX(positionedImage.positionX)
+                            .setAbsoluteY(positionedImage.positionY)
+                            .setImage(positionedImage.image);
+                });
+
+                testTrinity.getDaemon().start();
+
+
                 healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth / 2, playerWidth /2 );
 
                 healthPackFields.add(grid.getField(21, 25));
                 healthPackFields.add(grid.getField(11, 15));
                 healthPackFields.add(grid.getField(11, 35));
                 healthPackFields.add(grid.getField(2, 15));
-                healthPackFields.add(grid.getField(getRandomInt(0, rows), getRandomInt(0, columns)));
-                healthPackFields.add(grid.getField(getRandomInt(0, rows), getRandomInt(0, columns)));
+                healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
+                healthPackFields.add(grid.getField(getRandomInt(0, rows- 1), getRandomInt(0, columns- 1)));
 
                 for(Field<Interactable<PlayerDaemon>> current : healthPackFields) {
                     current.setObject(
@@ -369,6 +398,14 @@ public class ShooterGame {
                                 throw new IllegalStateException("No dir: " + dir);
 
                         }
+//
+//                        if(ret == null)
+//                            throw new NullPointerException();
+//                        else if (ret.getFirst() == null)
+//                            throw new NullPointerException();
+//                        else if (ret.getSecond() == null)
+//                            throw new NullPointerException();
+
 
                         return ret;
                     }

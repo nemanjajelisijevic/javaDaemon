@@ -37,6 +37,11 @@ public interface ImageMover extends Movable {
             clone.positionY = this.positionY;
             return clone;
         }
+
+        @Override
+        public String toString() {
+            return "PositionedImage - x: " + positionX + ", y: " + positionY + ", Image: " + image.getImageImp().toString();
+        }
     }
 
     class Direction {

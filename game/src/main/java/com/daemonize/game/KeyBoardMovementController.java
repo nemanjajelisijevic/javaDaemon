@@ -216,7 +216,17 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
                         throw new IllegalStateException("Unknown direction" + dirOne + ", dirTwo " + dirTwo);
 
                 }
+            } else {
+                throw new IllegalStateException("Dir buffer: " + pressedDirections.toString());
             }
+
+//            if(nextCoords == null)
+//                throw new NullPointerException();
+//            else if (nextCoords.getFirst() == null)
+//                throw new NullPointerException();
+//            else if (nextCoords.getSecond() == null)
+//                throw new NullPointerException();
+
 
             controlBlockingSemaphore.stop();
             contorlMovementCondition.setFirst(false).setSecond(false);
