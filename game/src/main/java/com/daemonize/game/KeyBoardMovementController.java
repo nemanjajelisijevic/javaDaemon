@@ -1,17 +1,22 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.controller.DirectionController;
+import com.daemonize.game.controller.MovementController;
 
 import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class KeyBoardController implements DirectionController<PlayerDaemon> {
+public class KeyBoardMovementController implements MovementController<PlayerDaemon> {
 
     private PlayerDaemon controllable;
+    private Consumer consumer;
+    private OnMovementCompleteCallback<PlayerDaemon> movementCallback;
+
+    private DirectionToCoordinateMapper dirMapper;
 
     private float distanceOffset;
     private float diagonalDistanceOffset;
@@ -31,28 +36,59 @@ public class KeyBoardController implements DirectionController<PlayerDaemon> {
     //first for rotation second for translation
     private Runnable rotationControlClosure = () -> {
         contorlMovementCondition.setFirst(true);
-        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond())
+        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
             controlBlockingSemaphore.go();
+            if (movementCallback != null)
+                consumer.consume(() -> movementCallback.onMovementComplete(controllable));
+        }
     };
 
     private Runnable translationControlClosure = () -> {
         contorlMovementCondition.setSecond(true);
-        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond())
+        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
             controlBlockingSemaphore.go();
+            if (movementCallback != null)
+                consumer.consume(() -> movementCallback.onMovementComplete(controllable));
+        }
     };
 
-    public KeyBoardController(PlayerDaemon player) {
-        this.controllable = player;
+    public KeyBoardMovementController() {
+
         this.pressedDirections = new LinkedList<>();
         this.queueLock = new ReentrantLock();
         this.queueEmptyCondition = queueLock.newCondition();
-        this.distanceOffset = 70;
-        this.diagonalDistanceOffset = distanceOffset * 0.7F;
+
         this.controllerVelocity = 4.5F;
         this.speedUpVelocity = controllerVelocity * 4;
         this.currentVelocity = controllerVelocity;
+
         this.controlBlockingSemaphore = new DaemonSemaphore();
         this.contorlMovementCondition = Pair.create(false, false);
+    }
+
+    public KeyBoardMovementController setConsumer(Consumer consumer) {
+        this.consumer = consumer;
+        return this;
+    }
+
+    public KeyBoardMovementController setDistanceOffset(float distanceOffset) {
+        this.distanceOffset = distanceOffset;
+        return this;
+    }
+
+    public KeyBoardMovementController setDiagonalDistanceOffset(float diagonalDistanceOffset) {
+        this.diagonalDistanceOffset = diagonalDistanceOffset;
+        return this;
+    }
+
+    public KeyBoardMovementController setMovementCallback(OnMovementCompleteCallback<PlayerDaemon> movementCallback) {
+        this.movementCallback = movementCallback;
+        return this;
+    }
+
+    public KeyBoardMovementController setDirMapper(DirectionToCoordinateMapper dirMapper) {
+        this.dirMapper = dirMapper;
+        return this;
     }
 
     @Override
@@ -127,77 +163,52 @@ public class KeyBoardController implements DirectionController<PlayerDaemon> {
 
             Pair<Float, Float> playerCoord = controllable.getLastCoordinates();
 
+            Pair<Float, Float> nextCoords = null;
+
             if(pressedDirections.size() == 1) {
 
-                DirectionController.Direction dir = pressedDirections.peek();
-
-                switch (dir) {
-
-                    case UP:
-                        playerCoord.setSecond(playerCoord.getSecond() - distanceOffset);
-                        break;
-
-                    case DOWN:
-                        playerCoord.setSecond(playerCoord.getSecond() + distanceOffset);
-                        break;
-
-                    case LEFT:
-                        playerCoord.setFirst(playerCoord.getFirst() - distanceOffset);
-                        break;
-
-                    case RIGHT:
-                        playerCoord.setFirst(playerCoord.getFirst() + distanceOffset);
-                        break;
-
-                    default:
-                        throw new IllegalStateException("Unknown direction" + dir);
-                }
+                MovementController.Direction dir = pressedDirections.peek();
+                nextCoords = dirMapper.map(dir);
 
             } else if (pressedDirections.size() == 2) {
 
-                DirectionController.Direction dirOne = pressedDirections.get(0);
-                DirectionController.Direction dirTwo = pressedDirections.get(1);
+                MovementController.Direction dirOne = pressedDirections.get(0);
+                MovementController.Direction dirTwo = pressedDirections.get(1);
 
                 switch (dirOne) {
                     case UP:
 
-                        playerCoord.setSecond(playerCoord.getSecond() - diagonalDistanceOffset);
-
                         if (dirTwo.equals(Direction.RIGHT))
-                            playerCoord.setFirst(playerCoord.getFirst() + diagonalDistanceOffset);
+                            nextCoords = dirMapper.map(Direction.UP_RIGHT);
                         else if (dirTwo.equals(Direction.LEFT))
-                            playerCoord.setFirst(playerCoord.getFirst() - diagonalDistanceOffset);
+                            nextCoords = dirMapper.map(Direction.UP_LEFT);
 
                         break;
 
                     case DOWN:
 
-                        playerCoord.setSecond(playerCoord.getSecond() + diagonalDistanceOffset);
-
                         if (dirTwo.equals(Direction.RIGHT))
-                            playerCoord.setFirst(playerCoord.getFirst() + diagonalDistanceOffset);
+                            nextCoords = dirMapper.map(Direction.DOWN_RIGHT);
                         else if (dirTwo.equals(Direction.LEFT))
-                            playerCoord.setFirst(playerCoord.getFirst() - diagonalDistanceOffset);
+                            nextCoords = dirMapper.map(Direction.DOWN_LEFT);
 
                         break;
 
                     case LEFT:
-                        playerCoord.setFirst(playerCoord.getFirst() - diagonalDistanceOffset);
 
                         if (dirTwo.equals(Direction.UP))
-                            playerCoord.setSecond(playerCoord.getSecond() - diagonalDistanceOffset);
+                            nextCoords = dirMapper.map(Direction.UP_LEFT);
                         else if (dirTwo.equals(Direction.DOWN))
-                            playerCoord.setSecond(playerCoord.getSecond() + diagonalDistanceOffset);
+                            nextCoords = dirMapper.map(Direction.DOWN_LEFT);
 
                         break;
 
                     case RIGHT:
-                        playerCoord.setFirst(playerCoord.getFirst() + diagonalDistanceOffset);
 
                         if (dirTwo.equals(Direction.UP))
-                            playerCoord.setSecond(playerCoord.getSecond() - diagonalDistanceOffset);
+                            nextCoords = dirMapper.map(Direction.UP_RIGHT);
                         else if (dirTwo.equals(Direction.DOWN))
-                            playerCoord.setSecond(playerCoord.getSecond() + diagonalDistanceOffset);
+                            nextCoords = dirMapper.map(Direction.DOWN_RIGHT);
 
                         break;
 
@@ -209,8 +220,8 @@ public class KeyBoardController implements DirectionController<PlayerDaemon> {
 
             controlBlockingSemaphore.stop();
             contorlMovementCondition.setFirst(false).setSecond(false);
-            controllable.rotateTowards(playerCoord, rotationControlClosure)
-                    .goTo(playerCoord, currentVelocity, translationControlClosure);
+            controllable.rotateTowards(nextCoords, rotationControlClosure)
+                    .goTo(nextCoords, currentVelocity, translationControlClosure);
 
         } finally {
             queueLock.unlock();

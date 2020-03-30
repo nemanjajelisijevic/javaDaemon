@@ -47,3 +47,4 @@ public interface ImageView<V extends ImageView> extends Comparable<ImageView> {
 
     void draw(SceneDrawer sceneDrawer);
 }
+

@@ -25,12 +25,16 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
     private GraphicsContext gc;
 
+
     private class CameraSceneDrawer implements SceneDrawer {
 
         private Camera2D camera2D;
+        private int cameraX, cameraY;
 
         public CameraSceneDrawer(Camera2D camera2D) {
             this.camera2D = camera2D;
+            this.cameraX = camera2D.getX();
+            this.cameraY = camera2D.getY();
         }
 
         @Override
@@ -42,8 +46,8 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         public void drawView(ImageView view) {
             gc.drawImage(
                     (javafx.scene.image.Image) view.getImage().getImageImp(),
-                    view.getStartingX() - camera2D.getX(),
-                    view.getStartingY() - camera2D.getY()
+                    view.getStartingX() - cameraX,
+                    view.getStartingY() - cameraY
             );
         }
 
@@ -52,8 +56,8 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
             gc.fillRect(0, 0, width, height);
 
-            int cameraX = camera2D.getX();
-            int cameraY = camera2D.getY();
+            cameraX = camera2D.getX();
+            cameraY = camera2D.getY();
 
             for (ImageView view : scene.getViews())
                 if (view.isShowing())
@@ -65,7 +69,11 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
         @Override
         public void drawView(ImageView view, float x, float y) {
-            gc.drawImage((javafx.scene.image.Image) view.getImage().getImageImp(), x, y);
+            gc.drawImage(
+                    (javafx.scene.image.Image) view.getImage().getImageImp(),
+                    x,
+                    y
+            );
         }
 
         @Override
@@ -78,7 +86,7 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
             gc.fillRect(0, 0, width, height);
             for (ImageView view : scene.getViews())
                 if (view.isShowing())
-                    view.draw(this);
+                    drawView(view);
         }
     };
 
