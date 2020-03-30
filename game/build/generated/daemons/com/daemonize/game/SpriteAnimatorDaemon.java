@@ -11,18 +11,19 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.imagemovers.ImageMover;
 import java.lang.Exception;
 import java.lang.Integer;
+import java.lang.InterruptedException;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.Thread;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpriteAnimatorDaemon implements Daemon<SpriteAnimatorDaemon> {
-  private SpriteAnimator prototype;
+public class SpriteAnimatorDaemon<T extends SpriteAnimator> implements Daemon<SpriteAnimatorDaemon> {
+  private SpriteAnimator<T> prototype;
 
   protected HybridDaemonEngine daemonEngine;
 
-  public SpriteAnimatorDaemon(Consumer consumer, SpriteAnimator prototype) {
+  public SpriteAnimatorDaemon(Consumer consumer, SpriteAnimator<T> prototype) {
     this.daemonEngine = new HybridDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.prototype = prototype;
   }
@@ -39,20 +40,23 @@ public class SpriteAnimatorDaemon implements Daemon<SpriteAnimatorDaemon> {
     return sideQuest;
   }
 
-  public SpriteAnimatorDaemon setSprite(Image[] sprite) {
-    prototype.setSprite(sprite);
-    return this;
+  public T setCoords(float x, float y) {
+    return prototype.setCoords(x, y);
   }
 
-  public ImageMover.PositionedImage animate() {
+  public T setSprite(Image[] sprite) {
+    return prototype.setSprite(sprite);
+  }
+
+  public ImageMover.PositionedImage animate() throws InterruptedException {
     return prototype.animate();
   }
 
-  public SpriteAnimator getPrototype() {
+  public SpriteAnimator<T> getPrototype() {
     return prototype;
   }
 
-  public SpriteAnimatorDaemon setPrototype(SpriteAnimator prototype) {
+  public SpriteAnimatorDaemon setPrototype(SpriteAnimator<T> prototype) {
     this.prototype = prototype;
     return this;
   }
