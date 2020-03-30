@@ -1,9 +1,9 @@
 package com.daemonize.javafxmain;
 
-import com.daemonize.game.KeyBoardController;
+import com.daemonize.game.KeyBoardMovementController;
 import com.daemonize.game.ShooterGame;
-import com.daemonize.game.controller.DirectionController;
-import com.daemonize.game.controller.DirectionControllerDaemon;
+import com.daemonize.game.controller.MovementController;
+import com.daemonize.game.controller.MovementControllerDaemon;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.javafxgraphics2d.JavaFXRenderer;
@@ -68,7 +68,7 @@ public class Main extends Application {
         //SoundManager soundManager = new JavaFxSoundManager(4);
         //game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
-        game = new ShooterGame(renderer, imageManager, new KeyBoardController(), borderX, borderY);
+        game = new ShooterGame(renderer, imageManager, new KeyBoardMovementController(), borderX, borderY);
 
         Group root = new Group(canvas);
         root.setCache(true);
@@ -104,23 +104,23 @@ public class Main extends Application {
         game.run();
 
 
-        DirectionControllerDaemon controller = game.getController();
+        MovementControllerDaemon controller = game.getController();
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 
             switch(event.getCode()) {
 
                 case W:
-                    controller.pressDirection(DirectionController.Direction.UP);
+                    controller.pressDirection(MovementController.Direction.UP);
                     break;
                 case S:
-                    controller.pressDirection(DirectionController.Direction.DOWN);
+                    controller.pressDirection(MovementController.Direction.DOWN);
                     break;
                 case A:
-                    controller.pressDirection(DirectionController.Direction.LEFT);
+                    controller.pressDirection(MovementController.Direction.LEFT);
                     break;
                 case D:
-                    controller.pressDirection(DirectionController.Direction.RIGHT);
+                    controller.pressDirection(MovementController.Direction.RIGHT);
                     break;
                 case SPACE:
                     controller.speedUp();
@@ -132,16 +132,16 @@ public class Main extends Application {
             switch(event.getCode()) {
 
                 case W:
-                    controller.releaseDirection(DirectionController.Direction.UP);
+                    controller.releaseDirection(MovementController.Direction.UP);
                     break;
                 case S:
-                    controller.releaseDirection(DirectionController.Direction.DOWN);
+                    controller.releaseDirection(MovementController.Direction.DOWN);
                     break;
                 case A:
-                    controller.releaseDirection(DirectionController.Direction.LEFT);
+                    controller.releaseDirection(MovementController.Direction.LEFT);
                     break;
                 case D:
-                    controller.releaseDirection(DirectionController.Direction.RIGHT);
+                    controller.releaseDirection(MovementController.Direction.RIGHT);
                     break;
                 case SPACE:
                     controller.speedDown();

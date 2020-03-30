@@ -6,8 +6,8 @@ import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.game.controller.DirectionController;
-import com.daemonize.game.controller.DirectionControllerDaemon;
+import com.daemonize.game.controller.MovementController;
+import com.daemonize.game.controller.MovementControllerDaemon;
 import com.daemonize.game.grid.Field;
 import com.daemonize.game.grid.Grid;
 import com.daemonize.game.interactables.Interactable;
@@ -17,6 +17,7 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
+import com.daemonize.graphics2d.scene.views.FixedView;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.ImageMover;
@@ -91,7 +92,7 @@ public class ShooterGame {
     private Grid<Interactable<PlayerDaemon>> grid;
     private int rows;
     private int columns;
-    private ImageView[][] gridViewMatrix;
+    //private ImageView[][] gridViewMatrix;
 
     private int fieldWidth;
 
@@ -128,14 +129,14 @@ public class ShooterGame {
     private List<Field<Interactable<PlayerDaemon>>> healthPackFields;
 
     //controller
-    private DirectionControllerDaemon controller;
+    private MovementControllerDaemon controller;
 
-    public DirectionControllerDaemon getController() {
+    public MovementControllerDaemon getController() {
         return controller;
     }
 
     //construct
-    public ShooterGame(Renderer2D renderer, ImageManager imageManager, DirectionController controller, int width, int height) {
+    public ShooterGame(Renderer2D renderer, ImageManager imageManager, MovementController controller, int width, int height) {
 
         this.renderer = renderer;
         this.imageManager = imageManager;
@@ -153,7 +154,7 @@ public class ShooterGame {
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
 
-        this.controller = new DirectionControllerDaemon(gameConsumer, controller).setName("Player con");
+        this.controller = new MovementControllerDaemon(gameConsumer, controller).setName("Player con");
 
         this.fieldWidth = 50;
         this.rows = borderY / fieldWidth;
@@ -211,17 +212,17 @@ public class ShooterGame {
                 accessibleField = imageManager.loadImageFromAssets("greenOctagon.png", fieldWidth, fieldWidth);
                 inaccessibleField = imageManager.loadImageFromAssets("redOctagon.png", fieldWidth, fieldWidth);
 
-                gridViewMatrix = new ImageView[rows][columns];
-
-                for (int j = 0; j < rows; ++j ) {
-                    for (int i = 0; i < columns; ++i)
-                        gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl("Grid [" + j + "][" + i +"]"))
-                                .setAbsoluteX(grid.getGrid()[j][i].getCenterX())
-                                .setAbsoluteY(grid.getGrid()[j][i].getCenterY())
-                                .setImage(grid.getField(j, i).isWalkable() ? accessibleField : inaccessibleField)
-                                .setZindex(3)
-                                .hide();
-                }
+//                gridViewMatrix = new ImageView[rows][columns];
+//
+//                for (int j = 0; j < rows; ++j ) {
+//                    for (int i = 0; i < columns; ++i)
+//                        gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl("Grid [" + j + "][" + i +"]"))
+//                                .setAbsoluteX(grid.getGrid()[j][i].getCenterX())
+//                                .setAbsoluteY(grid.getGrid()[j][i].getCenterY())
+//                                .setImage(grid.getField(j, i).isWalkable() ? accessibleField : inaccessibleField)
+//                                .setZindex(3)
+//                                .hide();
+//                }
 
                 //init player sprites
                 int playerWidth = cameraWidth / 10;
@@ -249,12 +250,12 @@ public class ShooterGame {
                 }
 
                 searchlight = imageManager.loadImageFromAssets("searchlight.png", playerWidth / 2, playerHeight);
-                healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth, playerWidth);
+                healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth / 2, playerWidth /2 );
 
                 healthPackFields.add(grid.getField(21, 25));
-                healthPackFields.add(grid.getField(31, 15));
-                healthPackFields.add(grid.getField(41, 65));
-                healthPackFields.add(grid.getField(2, 45));
+                healthPackFields.add(grid.getField(11, 15));
+                healthPackFields.add(grid.getField(11, 35));
+                healthPackFields.add(grid.getField(2, 15));
                 healthPackFields.add(grid.getField(getRandomInt(0, rows), getRandomInt(0, columns)));
                 healthPackFields.add(grid.getField(getRandomInt(0, rows), getRandomInt(0, columns)));
 
@@ -286,19 +287,19 @@ public class ShooterGame {
                 ).setName("Player");
 
                 {
-                    ImageView mainView = scene.addImageView(new ImageViewImpl("Player Main View"))
+                    ImageView mainView = scene.addImageView(new FixedView("Player Main View", cameraWidth / 2, cameraHeight / 2))
                             .setImage(playerSprite[0])
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
                             .setZindex(10);
 
-                    ImageView hpView = scene.addImageView(new ImageViewImpl("Player HP View"))
+                    ImageView hpView = scene.addImageView(new FixedView("Player HP View", cameraWidth / 2, cameraHeight / 2 - playerSprite[0].getHeight() / 2))
                             .setImage(healthBarSprite[0])
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
                             .setZindex(10);
 
-                    ImageView searchlightView = scene.addImageView(new ImageViewImpl("Player Searchlight View")
+                    ImageView searchlightView = scene.addImageView(new FixedView("Player Searchlight View", cameraWidth / 2, cameraHeight / 2 + playerSprite[0].getHeight() / 2)
                             .setImage(searchlight)
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
@@ -320,21 +321,15 @@ public class ShooterGame {
 
                 renderer.setCamera(camera);
 
-                //controller.setPrototype(new KeyBoardController(player.start()));
-
-
-
                 controller.getPrototype().setControllable(player.start());
 
-                KeyBoardController controllerPrototype = ((KeyBoardController) controller.getPrototype());
+                KeyBoardMovementController controllerPrototype = ((KeyBoardMovementController) controller.getPrototype());
 
                 controllerPrototype.setConsumer(gameConsumer);
-                controllerPrototype.setDistanceOffset(fieldWidth);
-                controllerPrototype.setDiagonalDistanceOffset(((float) Math.sqrt(2 * (fieldWidth * fieldWidth))));
 
-                controllerPrototype.setDirMapper(new DirectionController.DirectionToCoordinateMapper() {
+                controllerPrototype.setDirMapper(new MovementController.DirectionToCoordinateMapper() {
                     @Override
-                    public Pair<Float, Float> map(DirectionController.Direction dir) {
+                    public Pair<Float, Float> map(MovementController.Direction dir) {
 
                         Field currentField = grid.getField(
                                 player.getLastCoordinates().getFirst(),
@@ -385,7 +380,7 @@ public class ShooterGame {
                     System.out.println(DaemonUtils.tag() + "Actual player coordinates: " + player.getLastCoordinates().toString());
                     System.err.println(DaemonUtils.tag() + "Player at field: " + field.toString());
 
-                    renderer.consume(gridViewMatrix[field.getRow()][field.getColumn()]::show);
+                    //renderer.consume(gridViewMatrix[field.getRow()][field.getColumn()]::show);
 
                     Interactable<PlayerDaemon> item = field.getObject();
 
