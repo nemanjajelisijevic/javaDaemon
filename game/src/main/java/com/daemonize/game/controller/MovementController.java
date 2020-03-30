@@ -1,6 +1,5 @@
 package com.daemonize.game.controller;
 
-import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.imagemovers.Movable;
@@ -8,22 +7,12 @@ import com.daemonize.imagemovers.Movable;
 @Daemon
 public interface MovementController<M extends Movable> {
 
-    @FunctionalInterface
-    public interface OnMovementCompleteCallback<M> {
-        void onMovementComplete(M controllable);
-    }
-
-    @FunctionalInterface
-    public interface DirectionToCoordinateMapper {
-        Pair<Float, Float> map(Direction dir);
-    }
-
     static enum Direction {
         UP,
         UP_LEFT,
         UP_RIGHT,
         DOWN,
-        DOWN_LEFT,
+        DWN_LEFT,
         DOWN_RIGHT,
         LEFT,
         RIGHT
