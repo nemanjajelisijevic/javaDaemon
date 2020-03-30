@@ -5,7 +5,7 @@ import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 
-public class ConstantSpriteAnimator implements SpriteAnimator {
+public class ConstantSpriteAnimator implements SpriteAnimator<ConstantSpriteAnimator> {
 
     private ImageMover.PositionedImage posImg;
     private SpriteIterator spriteIterator;
@@ -17,6 +17,7 @@ public class ConstantSpriteAnimator implements SpriteAnimator {
         this.spriteIterator = new BasicSpriteIterator(sprite);
     }
 
+    @Override
     public ConstantSpriteAnimator setCoords(float x, float y) {
         posImg.positionX = x;
         posImg.positionY = y;
@@ -24,8 +25,9 @@ public class ConstantSpriteAnimator implements SpriteAnimator {
     }
 
     @Override
-    public void setSprite(Image[] sprite) {
+    public ConstantSpriteAnimator setSprite(Image[] sprite) {
         spriteIterator.setSprite(sprite);
+        return this;
     }
 
     @Override

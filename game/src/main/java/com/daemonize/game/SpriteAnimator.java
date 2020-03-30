@@ -6,8 +6,9 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.imagemovers.ImageMover;
 
 @Daemon
-public interface SpriteAnimator {
-    void setSprite(Image[] sprite);
+public interface SpriteAnimator<T extends SpriteAnimator> {
+    T setSprite(Image[] sprite);
+    T setCoords(float x, float y);
     @SideQuest(SLEEP = 25, blockingClosure = true)
-    ImageMover.PositionedImage animate();
+    ImageMover.PositionedImage animate() throws InterruptedException;
 }

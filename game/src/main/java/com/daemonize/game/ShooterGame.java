@@ -4,6 +4,7 @@ import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
+import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.MovementController;
@@ -23,6 +24,7 @@ import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.ImageMover;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -136,7 +138,9 @@ public class ShooterGame {
     }
 
     //test
-    private UnholyTrinity<SpriteAnimatorDaemon> testTrinity = new UnholyTrinity<>();
+    //private UnholyTrinity<SpriteAnimatorDaemon<ConstantSpriteAnimator>> testTrinity = new UnholyTrinity<>();
+    private UnholyTrinity<DummyDaemon> streetLamp = new UnholyTrinity<>();
+
 
     //construct
     public ShooterGame(Renderer2D renderer, ImageManager imageManager, MovementController controller, int width, int height) {
@@ -260,25 +264,88 @@ public class ShooterGame {
                     explodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", playerWidth, playerHeight);
                 }
 
-                testTrinity.addSprite("test", explodeSprite);
-                testTrinity.addView("test", scene.addImageView(new ImageViewImpl("test")).setZindex(6).show());
-                testTrinity.setDaemon(
-                        new SpriteAnimatorDaemon(
-                                renderer,
-                                new ConstantSpriteAnimator(borderX / 2, borderY / 2, explodeSprite)
-                        )
+//                testTrinity.addSprite("test", explodeSprite);
+//                testTrinity.addView("test", scene.addImageView(new ImageViewImpl("test")).setZindex(6).show());
+//                testTrinity.setDaemon(
+//                        new SpriteAnimatorDaemon<ConstantSpriteAnimator>(
+//                                renderer,
+//                                new ConstantSpriteAnimator(borderX / 2, borderY / 2, explodeSprite)
+//                        )
+//                );
+//
+//                testTrinity.getDaemon().setAnimateSideQuest(renderer).setClosure(ret -> {
+//                    ImageMover.PositionedImage positionedImage = ret.runtimeCheckAndGet();
+//                    testTrinity.getView("test").setAbsoluteX(positionedImage.positionX)
+//                            .setAbsoluteY(positionedImage.positionY)
+//                            .setImage(positionedImage.image);
+//                });
+//
+//                testTrinity.getDaemon().start();
+
+                Image streetLampImage = imageManager.loadImageFromAssets("streetLamp.png", playerWidth, playerWidth * 3 / 2);
+                Image lampLightImage = imageManager.loadImageFromAssets("searchlight.png", playerWidth * 2, playerWidth * 3 / 2);
+
+                Field lampField = grid.getField(25, 34);
+
+                streetLamp.addView(
+                        "streetLamp",
+                        scene.addImageView(new ImageViewImpl("Street Lamp View"))
+                                .setAbsoluteX(lampField.getCenterX())
+                                .setAbsoluteY(lampField.getCenterY())
+                                .setImage(streetLampImage)
+                                .setZindex(5)
+                                .show()
                 );
 
-                testTrinity.getDaemon().setAnimateSideQuest(renderer).setClosure(ret -> {
-                    ImageMover.PositionedImage positionedImage = ret.runtimeCheckAndGet();
-                    testTrinity.getView("test").setAbsoluteX(positionedImage.positionX)
-                            .setAbsoluteY(positionedImage.positionY)
-                            .setImage(positionedImage.image);
+                streetLamp.addView(
+                        "streetLampLight",
+                        scene.addImageView(new ImageViewImpl("Street Lamp Light"))
+                                .setAbsoluteX(lampField.getCenterX())
+                                .setAbsoluteY(lampField.getCenterY() + playerHeight / 3)
+                                .setImage(lampLightImage)
+                                .setZindex(6)
+                                .show()
+
+                );
+
+                DaemonUtils.IntervalRegulator lampBlinking = new DaemonUtils.IntervalRegulator() {
+
+                    private List<Long> intervals = new LinkedList<>();
+                    private Iterator<Long> intervalIterator;
+
+                    {
+                        intervals.add(1000L);
+                        intervals.add(100L);
+                        intervals.add(200L);
+                        intervals.add(1000L);
+                        intervals.add(300L);
+                        intervals.add(150L);
+                        intervalIterator = intervals.iterator();
+                    }
+
+                    @Override
+                    public long getSleepInterval() {
+                        if (!intervalIterator.hasNext())
+                            intervalIterator = intervals.iterator();
+                        return intervalIterator.next();
+                    }
+                };
+
+                streetLamp.setDaemon(DummyDaemon.create(renderer, lampBlinking));
+                streetLamp.getDaemon().setClosure(() -> {
+
+                    ImageView lightView = streetLamp.getView("streetLampLight");
+
+                    if(lightView.isShowing())
+                        lightView.hide();
+                    else
+                        lightView.show();
+
                 });
 
-                testTrinity.getDaemon().start();
+                streetLamp.getDaemon().start();
 
-
+                //picakbles
                 healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth / 2, playerWidth /2 );
 
                 healthPackFields.add(grid.getField(21, 25));
@@ -398,13 +465,13 @@ public class ShooterGame {
                                 throw new IllegalStateException("No dir: " + dir);
 
                         }
-//
-//                        if(ret == null)
-//                            throw new NullPointerException();
-//                        else if (ret.getFirst() == null)
-//                            throw new NullPointerException();
-//                        else if (ret.getSecond() == null)
-//                            throw new NullPointerException();
+
+                        if(ret == null)
+                            throw new NullPointerException();
+                        else if (ret.getFirst() == null)
+                            throw new NullPointerException();
+                        else if (ret.getSecond() == null)
+                            throw new NullPointerException();
 
 
                         return ret;
