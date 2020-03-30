@@ -13,7 +13,6 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
-import com.daemonize.graphics2d.scene.views.FixedView;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.ImageMover;
@@ -83,7 +82,7 @@ public class ShooterGame {
     int cameraWidth, cameraHeight;
 
     //grid
-    private Grid<TowerDaemon> grwwid;
+    private Grid<TowerDaemon> grid;
     private int rows;
     private int columns;
     private ImageView[][] gridViewMatrix;
@@ -219,19 +218,19 @@ public class ShooterGame {
                 ).setName("Player");
 
                 {
-                    ImageView mainView = scene.addImageView(new FixedView("Player Main View", cameraWidth / 2, cameraHeight / 2))
+                    ImageView mainView = scene.addImageView(new ImageViewImpl("Player Main View"))
                             .setImage(playerSprite[0])
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
                             .setZindex(10);
 
-                    ImageView hpView = scene.addImageView(new FixedView("Player HP View", cameraWidth / 2, cameraHeight / 2 - playerSprite[0].getHeight() / 2))
+                    ImageView hpView = scene.addImageView(new ImageViewImpl("Player HP View"))
                             .setImage(healthBarSprite[0])
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
                             .setZindex(10);
 
-                    ImageView searchlightView = scene.addImageView(new FixedView("Player Searchlight View", cameraWidth / 2, cameraHeight / 2 + playerSprite[0].getHeight() / 2)
+                    ImageView searchlightView = scene.addImageView(new ImageViewImpl("Player Searchlight View")
                             .setImage(searchlight)
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
