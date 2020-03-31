@@ -19,28 +19,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ButtonDisablerDaemon implements EagerDaemon<ButtonDisablerDaemon> {
-  private Game.ButtonDisabler prototype;
+  private TowerDefenseGame.ButtonDisabler prototype;
 
   public EagerMainQuestDaemonEngine daemonEngine;
 
-  public ButtonDisablerDaemon(Consumer consumer, Game.ButtonDisabler prototype) {
+  public ButtonDisablerDaemon(Consumer consumer, TowerDefenseGame.ButtonDisabler prototype) {
     this.daemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.prototype = prototype;
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.Game.ButtonDisabler#disableButton} */
+   * Prototype method {@link com.daemonize.game.TowerDefenseGame.ButtonDisabler#disableButton} */
   public ButtonDisablerDaemon disableButton(Button button, Image disabled, Image enabled,
       Consumer consumer, Runnable retRun) {
     daemonEngine.pursueQuest(new DisableButtonMainQuest(button, disabled, enabled, retRun, null).setConsumer(consumer));
     return this;
   }
 
-  public Game.ButtonDisabler getPrototype() {
+  public TowerDefenseGame.ButtonDisabler getPrototype() {
     return prototype;
   }
 
-  public ButtonDisablerDaemon setPrototype(Game.ButtonDisabler prototype) {
+  public ButtonDisablerDaemon setPrototype(TowerDefenseGame.ButtonDisabler prototype) {
     this.prototype = prototype;
     return this;
   }
