@@ -6,7 +6,7 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.imagemovers.Movable;
 
 @Daemon
-public interface MovementController<M extends Movable> {
+public interface MovementController<M extends Movable> extends Controller {
 
 
     @FunctionalInterface

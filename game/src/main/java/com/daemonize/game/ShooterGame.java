@@ -264,24 +264,6 @@ public class ShooterGame {
                     explodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", playerWidth, playerHeight);
                 }
 
-//                testTrinity.addSprite("test", explodeSprite);
-//                testTrinity.addView("test", scene.addImageView(new ImageViewImpl("test")).setZindex(6).show());
-//                testTrinity.setDaemon(
-//                        new SpriteAnimatorDaemon<ConstantSpriteAnimator>(
-//                                renderer,
-//                                new ConstantSpriteAnimator(borderX / 2, borderY / 2, explodeSprite)
-//                        )
-//                );
-//
-//                testTrinity.getDaemon().setAnimateSideQuest(renderer).setClosure(ret -> {
-//                    ImageMover.PositionedImage positionedImage = ret.runtimeCheckAndGet();
-//                    testTrinity.getView("test").setAbsoluteX(positionedImage.positionX)
-//                            .setAbsoluteY(positionedImage.positionY)
-//                            .setImage(positionedImage.image);
-//                });
-//
-//                testTrinity.getDaemon().start();
-
                 Image streetLampImage = imageManager.loadImageFromAssets("streetLamp.png", playerWidth, playerWidth );
                 Image lampLightImage = imageManager.loadImageFromAssets("searchlight.png", playerWidth * 2, playerWidth); //* 4 / 3);
 

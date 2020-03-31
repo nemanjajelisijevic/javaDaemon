@@ -27,7 +27,7 @@ public class Grid<T> {
     }
 
     private Field<T>[][] grid;
-    int fieldWith ;
+    int fieldWith;
 
     private List<Field> path;
 
