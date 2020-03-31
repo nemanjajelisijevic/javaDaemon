@@ -9,6 +9,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.MovementController;
 import com.daemonize.game.controller.MovementControllerDaemon;
+import com.daemonize.game.game.DaemonApp;
 import com.daemonize.game.grid.Field;
 import com.daemonize.game.grid.Grid;
 import com.daemonize.game.interactables.Interactable;
@@ -32,7 +33,7 @@ import java.util.Random;
 import daemon.com.commandparser.CommandParser;
 import daemon.com.commandparser.CommandParserDaemon;
 
-public class ShooterGame {
+public class ShooterGame implements DaemonApp<ShooterGame> {
 
     //animate closure def
     private static class PlayerCameraClosure implements Closure<ImageMover.PositionedImage[]> {
@@ -101,7 +102,6 @@ public class ShooterGame {
     private Image accessibleField;
     private Image inaccessibleField;
 
-
     //camera
     private Camera2D camera;
 
@@ -141,21 +141,19 @@ public class ShooterGame {
     //private UnholyTrinity<SpriteAnimatorDaemon<ConstantSpriteAnimator>> testTrinity = new UnholyTrinity<>();
     private UnholyTrinity<DummyDaemon> streetLamp = new UnholyTrinity<>();
 
-
     //construct
-    public ShooterGame(Renderer2D renderer, ImageManager imageManager, MovementController controller, int width, int height) {
+    public ShooterGame(Renderer2D renderer, ImageManager imageManager, MovementController controller, int width, int height, int cameraToMapRatio) {
 
         this.renderer = renderer;
         this.imageManager = imageManager;
 
-        this.gameConsumer = new DaemonConsumer("Game Consumer");
+        this.gameConsumer = new DaemonConsumer("TowerDefenseGame Consumer");
 
         this.cameraWidth = width;
         this.cameraHeight = height;
 
-        int screenToMapRatio = 5;
-        this.borderX = width * screenToMapRatio;
-        this.borderY = height * screenToMapRatio;
+        this.borderX = width * cameraToMapRatio;
+        this.borderY = height * cameraToMapRatio;
 
         this.camera = new FollowingCamera(width, height);
         this.scene = new Scene2D();
@@ -180,6 +178,7 @@ public class ShooterGame {
         this.healthPackFields = new LinkedList<>();
     }
 
+    @Override
     public ShooterGame run() {
 
         gameConsumer.start().consume(() -> {
@@ -500,14 +499,6 @@ public class ShooterGame {
                                 throw new IllegalStateException("No dir: " + dir);
 
                         }
-
-                        if(ret == null)
-                            throw new NullPointerException();
-                        else if (ret.getFirst() == null)
-                            throw new NullPointerException();
-                        else if (ret.getSecond() == null)
-                            throw new NullPointerException();
-
 
                         return ret;
                     }

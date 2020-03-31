@@ -12,6 +12,7 @@ import com.daemonize.daemonprocessor.annotations.ConsumerArg;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
+import com.daemonize.game.game.DaemonApp;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
@@ -56,7 +57,7 @@ import java.util.Set;
 import daemon.com.commandparser.CommandParser;
 import daemon.com.commandparser.CommandParserDaemon;
 
-public class Game {
+public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
 
     //running flag
     private volatile boolean running;
@@ -393,7 +394,7 @@ public class Game {
     };
 
     //construct
-    public Game(
+    public TowerDefenseGame(
             Renderer2D renderer,
             ImageManager imageManager,
             SoundManager soundManager,
@@ -412,7 +413,7 @@ public class Game {
         this.borderX = borderX;
         this.borderY = borderY;
         this.scene = new Scene2D();
-        this.gameConsumer = new DaemonConsumer("Game Consumer");
+        this.gameConsumer = new DaemonConsumer("TowerDefenseGame Consumer");
         this.rows = rows;
         this.columns = columns;
         this.grid = new Grid<TowerDaemon>(
@@ -455,7 +456,7 @@ public class Game {
             renderer.cont();
             paused = false;
         });
-        //System.err.println(DaemonUtils.tag() + " Game Consumer queue size: " + gameConsumer.closureQueueSize());
+        //System.err.println(DaemonUtils.tag() + " TowerDefenseGame Consumer queue size: " + gameConsumer.closureQueueSize());
         //System.err.println(DaemonUtils.tag() + " Renderer queue size: " + renderer.closureQueueSize());
         gameConsumer.cont();
     }
@@ -464,7 +465,8 @@ public class Game {
         return running;
     }
 
-    public Game run() {
+    @Override
+    public TowerDefenseGame run() {
         gameConsumer.start().consume(() -> {
             gameConsumer.consume(stateChain::run);
             this.running = true;
@@ -476,7 +478,7 @@ public class Game {
         return this;
     }
 
-    public Game stop(){
+    public TowerDefenseGame stop(){
         gameConsumer.consume(() -> {
             towerSpriteUpgrader.stop();
             fieldEraserEngine.stop();
@@ -513,7 +515,7 @@ public class Game {
 
     private TouchController touchController = ((x, y) -> {});
 
-    public Game onTouch(float x, float y) {
+    public TowerDefenseGame onTouch(float x, float y) {
         touchController.onTouch(x, y);
         return this;
     }
@@ -1891,7 +1893,7 @@ public class Game {
                     .start();
 
             buttonDisabler = new ButtonDisablerDaemon(gameConsumer, new ButtonDisabler(100, renderer))
-                    .setName("Button Disabler")
+                    .setName("MouseButton Disabler")
                     .start();
 
             fieldEraserEngine = new EagerMainQuestDaemonEngine(renderer).setName("Field Eraser")

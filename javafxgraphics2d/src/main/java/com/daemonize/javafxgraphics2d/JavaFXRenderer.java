@@ -60,7 +60,6 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
             cameraY = camera2D.getY();
 
             for (ImageView view : scene.getViews())
-                if (view.isShowing())
                     view.draw(this);
         }
     }
@@ -69,11 +68,7 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
         @Override
         public void drawView(ImageView view, float x, float y) {
-            gc.drawImage(
-                    (javafx.scene.image.Image) view.getImage().getImageImp(),
-                    x,
-                    y
-            );
+            gc.drawImage((javafx.scene.image.Image) view.getImage().getImageImp(), x, y);
         }
 
         @Override

@@ -4,6 +4,7 @@ import com.daemonize.game.KeyBoardMovementController;
 import com.daemonize.game.ShooterGame;
 import com.daemonize.game.controller.MovementController;
 import com.daemonize.game.controller.MovementControllerDaemon;
+import com.daemonize.game.game.DaemonApp;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.javafxgraphics2d.JavaFXRenderer;
@@ -25,8 +26,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    //private Game game;
-    private ShooterGame game;
+    private DaemonApp game;
 
     @Override
     public void start(Stage primaryStage) {
@@ -36,7 +36,7 @@ public class Main extends Application {
         ///////////////////////////////////////////////////////////////////////////////////////////
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-        int borderX = ((int) primaryScreenBounds.getWidth()) - 300;
+        int cameraWidth = ((int) primaryScreenBounds.getWidth()) - 300;
 
         //int borderX = Math.min((int)primaryScreenBounds.getWidth(), ((int) primaryScreenBounds.getHeight()));
 
@@ -52,29 +52,29 @@ public class Main extends Application {
 //        int width = gridWidth / columns;
 //        int height = width; //160
 
-        int borderY = borderX / 2;
+        int cameraHeight = cameraWidth / 2;
 
         //int borderY = borderX * 3 / 4;
         //int borderY = (rows + 2) * height;
 
         //int borderY = ((int) primaryScreenBounds.getHeight()) - 200;
 
-        Canvas canvas = new Canvas(borderX, borderY);
+        Canvas canvas = new Canvas(cameraWidth, cameraHeight);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Renderer2D renderer = new JavaFXRenderer(gc, borderX, borderY, 200);
+        Renderer2D renderer = new JavaFXRenderer(gc, cameraWidth, cameraHeight, 200);
         ImageManager imageManager = new JavaFxImageManager("");
 
         //SoundManager soundManager = new JavaFxSoundManager(4);
-        //game = new Game(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
+        //game = new TowerDefenseGame(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
-        game = new ShooterGame(renderer, imageManager, new KeyBoardMovementController(), borderX, borderY);
+        game = new ShooterGame(renderer, imageManager, new KeyBoardMovementController(), cameraWidth, cameraHeight, 5);
 
         Group root = new Group(canvas);
         root.setCache(true);
         root.setCacheHint(CacheHint.SPEED);
         //primaryStage.setTitle("Tower Defense");
-        primaryStage.setTitle("Shooter Game");
+        primaryStage.setTitle("Shooter TowerDefenseGame");
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
@@ -104,7 +104,7 @@ public class Main extends Application {
         game.run();
 
 
-        MovementControllerDaemon controller = game.getController();
+        MovementControllerDaemon controller = ((ShooterGame) game).getController();
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 

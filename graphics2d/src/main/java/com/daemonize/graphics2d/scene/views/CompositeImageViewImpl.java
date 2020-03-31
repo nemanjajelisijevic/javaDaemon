@@ -329,7 +329,11 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
 
     @Override
     public void draw(SceneDrawer sceneDrawer) {
-        sceneDrawer.drawView(this);
+        if (isShowing()) {
+            sceneDrawer.drawView(this);
+            for(CompositeImageViewImpl child : childrenViews)
+                child.draw(sceneDrawer);
+        }
     }
 }
 

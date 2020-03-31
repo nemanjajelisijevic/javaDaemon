@@ -18,7 +18,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovementControllerDaemon<M extends Movable> implements Daemon<MovementControllerDaemon> {
+public class MovementControllerDaemon<M extends Movable> implements Daemon<MovementControllerDaemon>, Controller {
   private MovementController<M> prototype;
 
   protected HybridDaemonEngine daemonEngine;
@@ -45,9 +45,9 @@ public class MovementControllerDaemon<M extends Movable> implements Daemon<Movem
     return this;
   }
 
-  public MovementControllerDaemon control() throws InterruptedException {
+  @Override
+  public void control() throws InterruptedException {
     prototype.control();
-    return this;
   }
 
   public MovementControllerDaemon setControllable(M player) {
@@ -67,6 +67,16 @@ public class MovementControllerDaemon<M extends Movable> implements Daemon<Movem
 
   public MovementControllerDaemon speedDown() {
     prototype.speedDown();
+    return this;
+  }
+
+  public MovementControllerDaemon setMovementCallback(MovementController.OnMovementCompleteCallback<M> movementcallback) {
+    prototype.setMovementCallback(movementcallback);
+    return this;
+  }
+
+  public MovementControllerDaemon setDirMapper(MovementController.DirectionToCoordinateMapper dirmapper) {
+    prototype.setDirMapper(dirmapper);
     return this;
   }
 

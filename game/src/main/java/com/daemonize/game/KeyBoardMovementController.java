@@ -81,14 +81,14 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
         return this;
     }
 
-    public KeyBoardMovementController setMovementCallback(OnMovementCompleteCallback<PlayerDaemon> movementCallback) {
+    @Override
+    public void setMovementCallback(OnMovementCompleteCallback<PlayerDaemon> movementCallback) {
         this.movementCallback = movementCallback;
-        return this;
     }
 
-    public KeyBoardMovementController setDirMapper(DirectionToCoordinateMapper dirMapper) {
+    @Override
+    public void setDirMapper(DirectionToCoordinateMapper dirMapper) {
         this.dirMapper = dirMapper;
-        return this;
     }
 
     @Override
@@ -187,6 +187,8 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
                             nextCoords = dirMapper.map(Direction.UP_RIGHT);
                         else if (dirTwo.equals(Direction.LEFT))
                             nextCoords = dirMapper.map(Direction.UP_LEFT);
+                        else
+                            nextCoords = playerCoord;
 
                         break;
 
@@ -196,6 +198,8 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
                             nextCoords = dirMapper.map(Direction.DOWN_RIGHT);
                         else if (dirTwo.equals(Direction.LEFT))
                             nextCoords = dirMapper.map(Direction.DOWN_LEFT);
+                        else
+                            nextCoords = playerCoord;
 
                         break;
 
@@ -205,6 +209,8 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
                             nextCoords = dirMapper.map(Direction.UP_LEFT);
                         else if (dirTwo.equals(Direction.DOWN))
                             nextCoords = dirMapper.map(Direction.DOWN_LEFT);
+                        else
+                            nextCoords = playerCoord;
 
                         break;
 
@@ -214,6 +220,8 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
                             nextCoords = dirMapper.map(Direction.UP_RIGHT);
                         else if (dirTwo.equals(Direction.DOWN))
                             nextCoords = dirMapper.map(Direction.DOWN_RIGHT);
+                        else
+                            nextCoords = playerCoord;
 
                         break;
 
@@ -231,19 +239,6 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
             } else {
                 throw new IllegalStateException("Dir buffer: " + pressedDirections.toString());
             }
-
-//            if(nextCoords == null)
-//                throw new NullPointerException();
-//            else if (nextCoords.getFirst() == null)
-//                throw new NullPointerException();
-//            else if (nextCoords.getSecond() == null)
-//                throw new NullPointerException();
-
-//
-//            controlBlockingSemaphore.stop();
-//            contorlMovementCondition.setFirst(false).setSecond(false);
-//            controllable.rotateTowards(nextCoords, rotationControlClosure)
-//                    .goTo(nextCoords, currentVelocity, translationControlClosure);
 
         } finally {
             queueLock.unlock();

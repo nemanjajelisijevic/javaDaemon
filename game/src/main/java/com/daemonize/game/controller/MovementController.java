@@ -5,7 +5,7 @@ import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.imagemovers.Movable;
 
-@Daemon
+@Daemon(implementPrototypeInterfaces = true)
 public interface MovementController<M extends Movable> extends Controller {
 
 
@@ -31,6 +31,8 @@ public interface MovementController<M extends Movable> extends Controller {
     }
 
     void setControllable(M player);
+    void setMovementCallback(OnMovementCompleteCallback<M> movementCallback);
+    void setDirMapper(DirectionToCoordinateMapper dirMapper);
 
     void pressDirection(Direction dir);
     void releaseDirection(Direction dir);

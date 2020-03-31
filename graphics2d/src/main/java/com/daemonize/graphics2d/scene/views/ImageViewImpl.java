@@ -186,6 +186,7 @@ public class ImageViewImpl implements ImageView<ImageViewImpl> {
 
     @Override
     public void draw(SceneDrawer sceneDrawer) {
-        sceneDrawer.drawView(this);
+        if (showing)
+            sceneDrawer.drawView(this);
     }
 }

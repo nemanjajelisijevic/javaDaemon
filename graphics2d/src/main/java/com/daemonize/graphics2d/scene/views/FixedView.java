@@ -14,6 +14,7 @@ public class FixedView extends ImageViewImpl {
 
     @Override
     public void draw(SceneDrawer sceneDrawer) {
-        sceneDrawer.drawView(this, fixedX - xOffset, fixedY - yOffset);
+        if (showing)
+            sceneDrawer.drawView(this, fixedX - xOffset, fixedY - yOffset);
     }
 }
