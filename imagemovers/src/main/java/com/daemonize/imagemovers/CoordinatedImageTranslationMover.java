@@ -1,5 +1,6 @@
 package com.daemonize.imagemovers;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.graphics2d.images.Image;

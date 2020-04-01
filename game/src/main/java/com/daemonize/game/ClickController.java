@@ -2,16 +2,23 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.controller.MouseController;
+import com.daemonize.graphics2d.camera.Camera2D;
 
 public class ClickController implements MouseController {
 
-    ClickCoordinateClosure clickCoordinateClosure;
+    private ClickCoordinateClosure clickCoordinateClosure;
+    private Camera2D camera;
+
 
     private volatile float clickedX, clickedY;
     private volatile MouseButton currentClickedButton;
 
-
     private DaemonSemaphore clickSemaphore = new DaemonSemaphore().setName("Click Semaphore");
+
+
+    public void setCamera(Camera2D camera) {
+        this.camera = camera;
+    }
 
     @Override
     public void setOnClick(ClickCoordinateClosure clickCoordinateClosure) {
@@ -47,14 +54,11 @@ public class ClickController implements MouseController {
 
     @Override
     public void control() throws InterruptedException {
-
         try{
-
             while(currentClickedButton == null)
                 clickSemaphore.await();
 
-            clickCoordinateClosure.onClick(clickedX, clickedY, currentClickedButton);
-
+            clickCoordinateClosure.onClick(camera.getX() + clickedX, camera.getY() + clickedY, currentClickedButton);
         } finally {}
     }
 }

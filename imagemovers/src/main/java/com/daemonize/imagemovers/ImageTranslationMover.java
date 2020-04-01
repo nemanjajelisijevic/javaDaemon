@@ -3,6 +3,7 @@ package com.daemonize.imagemovers;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
@@ -93,9 +94,9 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     @Override
     public Image iterateSprite() {
         Image ret = spriteIterator.iterateSprite();
-
-        if (ret == null)
-            throw new IllegalStateException("Sprite image can not be null!");
+//
+//        if (ret == null)
+//            throw new IllegalStateException("Sprite image can not be null!");
 
         return ret;
     }

@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
@@ -49,16 +50,16 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, startingPos, dXY);
 
         this.hpYOffset = sprite[0].getHeight() / 2;
-        this.searchLightYOffset = this.searchlight.getHeight() / 2;
+        this.searchLightYOffset = 0;//this.searchlight.getHeight() / 2;
 
         this.ret = new PositionedImage[3];
         this.ret[1] = new PositionedImage();
         this.ret[1].positionX = screenCenterX;
         this.ret[1].positionY = screenCenterY - (sprite[0].getHeight() / 2);
-        this.ret[2] = new PositionedImage();
-        this.ret[2].positionX = screenCenterX;
-        this.ret[2].positionY = screenCenterY + this.searchlight.getHeight() / 2;
-        this.ret[2].image = this.searchlight;
+//        this.ret[2] = new PositionedImage();
+//        this.ret[2].positionX = screenCenterX;
+//        this.ret[2].positionY = screenCenterY + this.searchlight.getHeight() / 2;
+//        this.ret[2].image = this.searchlight;
 
         this.hp = hp;
         this.hpMax = hpMax;
@@ -173,13 +174,13 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
 
         if(this.ret[0] == null)
             return null;
-
-        this.ret[1].image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
-        this.ret[1].positionX = this.ret[0].positionX;
-        this.ret[1].positionY = this.ret[0].positionY - this.hpYOffset;
-
-        this.ret[2].positionX = this.ret[0].positionX;
-        this.ret[2].positionY = this.ret[0].positionY + this.searchLightYOffset;
+//
+//        this.ret[1].image = spriteHealthBarImage[(hp * 100 / hpMax - 1) / spriteHealthBarImage.length];
+//        this.ret[1].positionX = this.ret[0].positionX;
+//        this.ret[1].positionY = this.ret[0].positionY - this.hpYOffset;
+//
+//        this.ret[2].positionX = this.ret[0].positionX;
+//        this.ret[2].positionY = this.ret[0].positionY + this.searchLightYOffset;
 
         return this.ret;
     }

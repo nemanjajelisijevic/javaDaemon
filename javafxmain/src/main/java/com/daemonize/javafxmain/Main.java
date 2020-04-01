@@ -1,7 +1,10 @@
 package com.daemonize.javafxmain;
 
+import com.daemonize.game.ClickController;
 import com.daemonize.game.KeyBoardMovementController;
-import com.daemonize.game.ShooterGame;
+import com.daemonize.game.MapEditor;
+import com.daemonize.game.controller.MouseController;
+import com.daemonize.game.controller.MouseControllerDaemon;
 import com.daemonize.game.controller.MovementController;
 import com.daemonize.game.controller.MovementControllerDaemon;
 import com.daemonize.game.game.DaemonApp;
@@ -19,6 +22,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -68,13 +72,20 @@ public class Main extends Application {
         //SoundManager soundManager = new JavaFxSoundManager(4);
         //game = new TowerDefenseGame(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
-        game = new ShooterGame(renderer, imageManager, new KeyBoardMovementController(), cameraWidth, cameraHeight, 5);
+        //game = new ShooterGame(renderer, imageManager, new KeyBoardMovementController(), cameraWidth, cameraHeight, 5);
+
+        game = new MapEditor(
+                renderer,
+                imageManager,
+                new KeyBoardMovementController(),
+                new ClickController(),
+                "map_1.png", cameraWidth, cameraHeight, cameraWidth / 12, 5);
 
         Group root = new Group(canvas);
         root.setCache(true);
         root.setCacheHint(CacheHint.SPEED);
         //primaryStage.setTitle("Tower Defense");
-        primaryStage.setTitle("Shooter TowerDefenseGame");
+        primaryStage.setTitle("Map Editor");
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
@@ -104,7 +115,7 @@ public class Main extends Application {
         game.run();
 
 
-        MovementControllerDaemon controller = ((ShooterGame) game).getController();
+        MovementControllerDaemon controller = ((MapEditor) game).getMovementController();
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 
@@ -148,11 +159,38 @@ public class Main extends Application {
                     break;
             }
         });
+
+        MouseControllerDaemon mouseControllerDaemon = ((MapEditor) game).getMouseController();
+
+        scene.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+
+            if(event.getButton().equals(MouseButton.PRIMARY)) {
+                mouseControllerDaemon.onClick(MouseController.MouseButton.LEFT, ((float) event.getX()), ((float) event.getY()));
+            } else if(event.getButton().equals(MouseButton.SECONDARY)) {
+                mouseControllerDaemon.onClick(MouseController.MouseButton.RIGHT, ((float) event.getX()), ((float) event.getY()));
+            }
+
+        });
+
+        scene.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+
+            if(event.getButton().equals(MouseButton.PRIMARY)) {
+                mouseControllerDaemon.onRelease(MouseController.MouseButton.LEFT);
+            } else if(event.getButton().equals(MouseButton.SECONDARY)) {
+                mouseControllerDaemon.onRelease(MouseController.MouseButton.RIGHT);
+            }
+
+        });
+
+        scene.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
+            mouseControllerDaemon.onMove(((float) event.getX()), ((float) event.getY()));
+        });
+
     }
 
     @Override
     public void stop() throws Exception {
-        //game.stop();
+        //g
         super.stop();
     }
 

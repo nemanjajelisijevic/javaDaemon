@@ -6,7 +6,7 @@ public interface Controller {
 
     void control() throws InterruptedException;
 
-//    default <T extends Controller> T getController(Class<T> controllerClass) {
+//    default <T extends Controller> T getMovementController(Class<T> controllerClass) {
 //
 //
 //        Class<MovementController> claz = MovementController.class;
