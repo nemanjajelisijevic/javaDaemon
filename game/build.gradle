@@ -10,6 +10,7 @@ dependencies {
     implementation project (':daemonengine')
     implementation project (':daemonprocessor')
     annotationProcessor project(':daemonprocessor')
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.3'
 }
 
 sourceCompatibility = "1.8"
@@ -18,6 +19,7 @@ targetCompatibility = "1.8"
 def daemonsSource = "/generated/daemons"
 
 compileJava {
+
     options.compilerArgs << "-s"
     options.compilerArgs << "$buildDir$daemonsSource"
 

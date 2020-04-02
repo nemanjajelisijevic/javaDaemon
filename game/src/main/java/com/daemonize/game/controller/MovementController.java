@@ -34,12 +34,6 @@ public interface MovementController<M extends Movable> extends Controller {
     void setMovementCallback(OnMovementCompleteCallback<M> movementCallback);
     void setDirMapper(DirectionToCoordinateMapper dirMapper);
 
-    void pressDirection(Direction dir);
-    void releaseDirection(Direction dir);
-
-    void speedUp();
-    void speedDown();
-
     @SideQuest(SLEEP = 50)
     void control() throws InterruptedException;
 }

@@ -6,10 +6,30 @@ public class FixedView extends ImageViewImpl {
 
     private final int fixedX, fixedY;
 
-    public FixedView(String name, int fixedX, int fixedY) {
-        super(name);
+    public FixedView(String name, int fixedX, int fixedY, int zIndex, float width, float height) {
+        super(name, zIndex, fixedX, fixedY, width, height);
         this.fixedX = fixedX;
         this.fixedY = fixedY;
+    }
+
+    @Override
+    public float getStartingX() {
+        return fixedX;
+    }
+
+    @Override
+    public float getStartingY() {
+        return fixedY;
+    }
+
+    @Override
+    public float getEndX() {
+        return fixedX + 2 * xOffset;
+    }
+
+    @Override
+    public float getEndY() {
+        return fixedY + 2 * yOffset;
     }
 
     @Override

@@ -31,6 +31,6 @@ public interface MouseController extends Controller {
 
     void onMove(float x, float y);
 
-    @SideQuest(SLEEP = 50)
+    @SideQuest(SLEEP = 100)
     void control() throws InterruptedException;
 }

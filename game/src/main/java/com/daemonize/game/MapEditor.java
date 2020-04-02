@@ -18,6 +18,8 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
+import com.daemonize.graphics2d.scene.views.FixedButton;
+import com.daemonize.graphics2d.scene.views.FixedView;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
@@ -101,6 +103,9 @@ public class MapEditor implements DaemonApp<MapEditor> {
 
     private PlayerDaemon centerPointer;
 
+    private FixedButton saveButton;
+    private Image saveButtonImage;
+
     public MapEditor(
             Renderer2D renderer,
             ImageManager imageManager,
@@ -137,13 +142,12 @@ public class MapEditor implements DaemonApp<MapEditor> {
 
             scene.addImageView(backgroundView);
 
-            Image centerImage = imageManager.loadImageFromAssets("greenPhoton.png", cameraWidth / 50, cameraWidth / 50);
+            Image centerImage = imageManager.loadImageFromAssets("greenPhoton.png", cameraWidth / 100, cameraWidth / 100);
 
-            ImageView centerView = scene.addImageView(new ImageViewImpl("Center View"))
+            ImageView centerView = scene.addImageView(new FixedView("Center View", cameraWidth / 2, cameraHeight /2, 5, cameraWidth, cameraHeight))
                     .setAbsoluteX(borderX / 2)
                     .setAbsoluteY(borderY / 2)
                     .setImage(centerImage)
-                    .setZindex(5)
                     .show();
 
             this.centerPointer = new PlayerDaemon(
@@ -174,6 +178,18 @@ public class MapEditor implements DaemonApp<MapEditor> {
 
             this.camera = new FollowingCamera(cameraWidth, cameraHeight).setTarget(centerPointer);
             this.renderer.setCamera(this.camera);
+
+            this.saveButtonImage = imageManager.loadImageFromAssets("ButtonSale.png", cameraWidth / 10, cameraHeight / 10);
+
+            this.saveButton = new FixedButton(
+                    "Save Button",
+                    cameraWidth * 8 / 10,
+                    cameraHeight * 8 / 10,
+                    3,
+                    saveButtonImage
+            );
+            this.saveButton.enable().show();
+            scene.addImageView(saveButton);
 
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -209,8 +225,6 @@ public class MapEditor implements DaemonApp<MapEditor> {
                         .show();
         }
 
-        //this.centerPointer = new CenterPointerDaemon(mainConsumer, new CenterPointer(Pair.create((float) borderX / 2, (float) borderY / 2), dXY));
-
         ((ClickController) this.mouseController.getPrototype()).setCamera(camera);
         this.mouseController.setControlSideQuest();
         this.movementController.setControlSideQuest();
@@ -234,9 +248,11 @@ public class MapEditor implements DaemonApp<MapEditor> {
     }
 
     {
-        stateChain.addState(() -> { // controller setup state
+        stateChain.addState(() -> { //controller setup state
 
-           mouseController.setOnClick((x, y, mouseButton) -> {
+            ((ClickController) mouseController.getPrototype()).addButton(saveButton);
+
+            mouseController.setOnClick((x, y, mouseButton) -> {
 
                Field currentField = grid.getField(x, y);
 
@@ -277,8 +293,6 @@ public class MapEditor implements DaemonApp<MapEditor> {
                } else if (currentField.getColumn() == columns - 1) {
                    if(dir.equals(MovementController.Direction.RIGHT ) || dir.equals(MovementController.Direction.DOWN_RIGHT) || dir.equals(MovementController.Direction.UP_RIGHT))
                        return Pair.create(currentField.getCenterX(), currentField.getCenterY());
-
-                   //return Pair.create(currentField.getCenterX(), currentField.getCenterY());
                }
 
                List<Field> neighbors = grid.getNeighbors(currentField);
@@ -316,11 +330,15 @@ public class MapEditor implements DaemonApp<MapEditor> {
                return ret;
            });
 
+            saveButton.onClick(()-> {
+                System.out.println(DaemonUtils.tag() + saveButton.getName() + "clicked");
+            });
 
-            Field firstField = grid.getField(rows / 2, columns / 2);
 
-            centerPointer.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
-                    .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
+           Field firstField = grid.getField(rows / 2, columns / 2);
+
+           centerPointer.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
+                   .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
 
 
         });

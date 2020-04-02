@@ -1,8 +1,10 @@
 package com.daemonize.javafxmain;
 
 import com.daemonize.game.ClickController;
-import com.daemonize.game.KeyBoardMovementController;
+import com.daemonize.game.KeyBoardMovementControllerImpl;
 import com.daemonize.game.MapEditor;
+import com.daemonize.game.PlayerDaemon;
+import com.daemonize.game.controller.KeyboardController;
 import com.daemonize.game.controller.MouseController;
 import com.daemonize.game.controller.MouseControllerDaemon;
 import com.daemonize.game.controller.MovementController;
@@ -72,12 +74,14 @@ public class Main extends Application {
         //SoundManager soundManager = new JavaFxSoundManager(4);
         //game = new TowerDefenseGame(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
 
-        //game = new ShooterGame(renderer, imageManager, new KeyBoardMovementController(), cameraWidth, cameraHeight, 5);
+        //game = new ShooterGame(renderer, imageManager, new KeyBoardMovementControllerImpl(), cameraWidth, cameraHeight, 5);
+
+        KeyboardController controller = new KeyBoardMovementControllerImpl();
 
         game = new MapEditor(
                 renderer,
                 imageManager,
-                new KeyBoardMovementController(),
+                controller,
                 new ClickController(),
                 "map_1.png", cameraWidth, cameraHeight, cameraWidth / 12, 5);
 
@@ -115,7 +119,7 @@ public class Main extends Application {
         game.run();
 
 
-        MovementControllerDaemon controller = ((MapEditor) game).getMovementController();
+        //MovementControllerDaemon controller = ((MapEditor) game).getMovementController();
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 

@@ -417,19 +417,17 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 ).setName("Player");
 
                 {
-                    ImageView mainView = scene.addImageView(new FixedView("Player Main View", cameraWidth / 2, cameraHeight / 2))
+                    ImageView mainView = scene.addImageView(new FixedView("Player Main View", cameraWidth / 2, cameraHeight / 2, 10, playerSprite[0].getWidth(), playerSprite[0].getHeight()))
                             .setImage(playerSprite[0])
                             .setAbsoluteX(borderX / 2)
-                            .setAbsoluteY(borderY / 2)
-                            .setZindex(10);
+                            .setAbsoluteY(borderY / 2);
 
-                    ImageView hpView = scene.addImageView(new FixedView("Player HP View", cameraWidth / 2, cameraHeight / 2 - playerSprite[0].getHeight() / 2))
+                    ImageView hpView = scene.addImageView(new FixedView("Player HP View", cameraWidth / 2, cameraHeight / 2 - playerSprite[0].getHeight() / 2, 10, healthBarSprite[0].getWidth(), healthBarSprite[0].getHeight()))
                             .setImage(healthBarSprite[0])
                             .setAbsoluteX(borderX / 2)
-                            .setAbsoluteY(borderY / 2)
-                            .setZindex(10);
+                            .setAbsoluteY(borderY / 2);
 
-                    ImageView searchlightView = scene.addImageView(new FixedView("Player Searchlight View", cameraWidth / 2, cameraHeight / 2 + playerSprite[0].getHeight() / 2)
+                    ImageView searchlightView = scene.addImageView(new FixedView("Player Searchlight View", cameraWidth / 2, cameraHeight / 2 + playerSprite[0].getHeight() / 2, 9, searchlight.getWidth(), searchlight.getHeight())
                             .setImage(searchlight)
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
@@ -453,7 +451,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 controller.getPrototype().setControllable(player.start());
 
-                KeyBoardMovementController controllerPrototype = ((KeyBoardMovementController) controller.getPrototype());
+                KeyBoardMovementControllerImpl controllerPrototype = ((KeyBoardMovementControllerImpl) controller.getPrototype());
 
                 controllerPrototype.setConsumer(gameConsumer);
 

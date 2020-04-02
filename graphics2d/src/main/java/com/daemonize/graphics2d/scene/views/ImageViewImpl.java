@@ -32,15 +32,15 @@ public class ImageViewImpl implements ImageView<ImageViewImpl> {
             int zIndex,
             float absoluteX,
             float absoluteY,
-            float xOffset,
-            float yOffset
+            float width,
+            float height
     ) {
         this(name);
         this.zIndex = zIndex;
         this.absoluteX = absoluteX;
         this.absoluteY = absoluteY;
-        this.xOffset = xOffset;
-        this.yOffset = yOffset;
+        this.xOffset = width / 2;
+        this.yOffset = height / 2;
         this.startingX = absoluteX - xOffset;
         this.startingY = absoluteY - yOffset;
     }

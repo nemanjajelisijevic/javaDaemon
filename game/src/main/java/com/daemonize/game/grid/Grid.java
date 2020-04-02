@@ -14,7 +14,6 @@ public class Grid<T> {
     Pair<Integer, Integer> startPoint;
     Pair<Integer, Integer> endPoint;
 
-
     private float xCoordinateInReal;
     private float yCoordinateInReal;
 

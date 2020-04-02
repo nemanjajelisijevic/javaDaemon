@@ -3,18 +3,27 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.controller.MouseController;
 import com.daemonize.graphics2d.camera.Camera2D;
+import com.daemonize.graphics2d.scene.views.FixedButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClickController implements MouseController {
 
     private ClickCoordinateClosure clickCoordinateClosure;
     private Camera2D camera;
 
-
     private volatile float clickedX, clickedY;
     private volatile MouseButton currentClickedButton;
 
     private DaemonSemaphore clickSemaphore = new DaemonSemaphore().setName("Click Semaphore");
 
+    private List<FixedButton> buttons = new ArrayList<>();
+
+    public ClickController addButton(FixedButton button) {
+        this.buttons.add(button);
+        return this;
+    }
 
     public void setCamera(Camera2D camera) {
         this.camera = camera;
@@ -57,6 +66,10 @@ public class ClickController implements MouseController {
         try{
             while(currentClickedButton == null)
                 clickSemaphore.await();
+
+            for(FixedButton button : buttons)
+                if (button.checkCoordinates(clickedX, clickedY))
+                    return;
 
             clickCoordinateClosure.onClick(camera.getX() + clickedX, camera.getY() + clickedY, currentClickedButton);
         } finally {}

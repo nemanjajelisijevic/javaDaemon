@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl> {
 
-    private ImageViewImpl view;
+    protected ImageViewImpl view;
 
     protected List<CompositeImageViewImpl> childrenViews;
     private boolean isRoot = false;
@@ -236,8 +236,8 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
     public void addChild(CompositeImageViewImpl child) {
         if(child.isRoot)
             throw new IllegalArgumentException("Can not add a child view that is root. Please use non root constructor for this child view(" + child.getName() + ")");
-        child.setAbsoluteX((view.startingX + child.getRelativeX()));//TODO check this -- need this because of root child
-        child.setAbsoluteY((view.startingY + child.getRelativeY()));//TODO check this
+        child.setAbsoluteX((view.getStartingX() + child.getRelativeX()));//TODO check this -- need this because of root child
+        child.setAbsoluteY((view.getStartingX() + child.getRelativeY()));//TODO check this
         child.setZindex(this.getZindex() + 1);
         this.addCh(child);
     }
@@ -245,8 +245,8 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
     private void addCh(CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : this.childrenViews){
             if (child.checkRootCoordinates(newChild.getStartingX(), newChild.getStartingY())){
-                newChild.setRelativeX(newChild.getRelativeX() - (child.getStartingX() - this.view.startingX));
-                newChild.setRelativeY(newChild.getRelativeY() - (child.getStartingY() - this.view.startingY));
+                newChild.setRelativeX(newChild.getRelativeX() - (child.getStartingX() - this.view.getStartingX()));
+                newChild.setRelativeY(newChild.getRelativeY() - (child.getStartingY() - this.view.getStartingY()));
                 newChild.setAbsoluteX((child.getStartingX() + newChild.getRelativeX()));//TODO check this reson to stay duble check
                 newChild.setAbsoluteY((child.getStartingY() + newChild.getRelativeY()));//TODO check this
                 newChild.setZindex(child.getZindex() + 1);

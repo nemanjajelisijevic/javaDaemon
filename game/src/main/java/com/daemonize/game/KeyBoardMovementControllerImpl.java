@@ -3,6 +3,7 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.game.controller.KeyboardController;
 import com.daemonize.game.controller.MovementController;
 
 import java.util.LinkedList;
@@ -10,7 +11,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class KeyBoardMovementController implements MovementController<PlayerDaemon> {
+public class KeyBoardMovementControllerImpl implements KeyboardController<PlayerDaemon> {
 
     private PlayerDaemon controllable;
     private Consumer consumer;
@@ -52,7 +53,7 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
         }
     };
 
-    public KeyBoardMovementController() {
+    public KeyBoardMovementControllerImpl() {
 
         this.pressedDirections = new LinkedList<>();
         this.queueLock = new ReentrantLock();
@@ -66,17 +67,17 @@ public class KeyBoardMovementController implements MovementController<PlayerDaem
         this.contorlMovementCondition = Pair.create(false, false);
     }
 
-    public KeyBoardMovementController setConsumer(Consumer consumer) {
+    public KeyBoardMovementControllerImpl setConsumer(Consumer consumer) {
         this.consumer = consumer;
         return this;
     }
 
-    public KeyBoardMovementController setDistanceOffset(float distanceOffset) {
+    public KeyBoardMovementControllerImpl setDistanceOffset(float distanceOffset) {
         this.distanceOffset = distanceOffset;
         return this;
     }
 
-    public KeyBoardMovementController setDiagonalDistanceOffset(float diagonalDistanceOffset) {
+    public KeyBoardMovementControllerImpl setDiagonalDistanceOffset(float diagonalDistanceOffset) {
         this.diagonalDistanceOffset = diagonalDistanceOffset;
         return this;
     }

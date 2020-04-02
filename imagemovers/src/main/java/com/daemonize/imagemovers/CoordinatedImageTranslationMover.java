@@ -94,6 +94,8 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
             return null;
         }
 
+        updateCoordinates();
+
         return ret;
     }
 

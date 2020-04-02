@@ -147,17 +147,17 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return ret;
     }
 
+    protected synchronized void updateCoordinates() {
+        ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY);
+        ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * dXY);
+    }
+
     @Override
     public PositionedImage animate() throws InterruptedException {
 
         animateSemaphore.await();
-
         ret.image = iterateSprite();
-
-        synchronized (this) {
-            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY);
-            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * dXY);
-        }
+        updateCoordinates();
 
         return ret;
     }
