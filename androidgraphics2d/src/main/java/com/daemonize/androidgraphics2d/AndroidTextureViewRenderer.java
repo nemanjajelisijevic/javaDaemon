@@ -134,8 +134,8 @@ public class AndroidTextureViewRenderer implements Renderer2D<AndroidTextureView
                 if (view.isShowing()) {
                     canvas.drawBitmap(
                             ((Bitmap) view.getImage().getImageImp()),
-                            view.getStartingX(),
-                            view.getStartingY(),
+                            view.getRenderingX(),
+                            view.getRenderingY(),
                             paint
                     );
                 }

@@ -76,8 +76,8 @@ public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWA
             if (view.isShowing()) {
                 canvas.drawBitmap(
                         ((Bitmap) view.getImage().getImageImp()),
-                        view.getStartingX(),
-                        view.getStartingY(),
+                        view.getRenderingX(),
+                        view.getRenderingY(),
                         paint
                 );
             }

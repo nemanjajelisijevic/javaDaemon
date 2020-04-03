@@ -1,9 +1,7 @@
 package com.daemonize.game.controller;
 
-import com.daemonize.daemonprocessor.annotations.Daemon;
-import com.daemonize.daemonprocessor.annotations.SideQuest;
+import com.daemonize.daemonengine.consumer.Consumer;
 
-@Daemon(implementPrototypeInterfaces = true)
 public interface MouseController extends Controller {
 
     public enum MouseButton {
@@ -23,14 +21,16 @@ public interface MouseController extends Controller {
         void onHoover(float x, float y);
     }
 
+    void setConsumer(Consumer consumer);
+
     void setOnClick(ClickCoordinateClosure clickCoordinateClosure);
     void setOnHoover(HooverCoordinateClosure hooverCoordinateClosure);
 
     void onClick(MouseButton mouseButton, float x, float y);
     void onRelease(MouseButton mouseButton);
 
-    void onMove(float x, float y);
 
-    @SideQuest(SLEEP = 100)
+
+    void onMove(float x, float y);
     void control() throws InterruptedException;
 }

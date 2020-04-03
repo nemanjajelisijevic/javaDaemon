@@ -15,6 +15,7 @@ import com.daemonize.game.grid.Grid;
 import com.daemonize.game.interactables.Interactable;
 import com.daemonize.game.interactables.health.HealthPack;
 import com.daemonize.graphics2d.camera.Camera2D;
+import com.daemonize.graphics2d.camera.FixedCamera;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
@@ -28,7 +29,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import daemon.com.commandparser.CommandParser;
 import daemon.com.commandparser.CommandParserDaemon;
@@ -38,12 +41,27 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     //animate closure def
     private static class PlayerCameraClosure implements Closure<ImageMover.PositionedImage[]> {
 
-        private ImageView mainView, hpView, searchlight;
+        private ImageView mainView, hpView, searchlightView;
 
-        public PlayerCameraClosure(ImageView mainView, ImageView hpView, ImageView searchlight) {
+        public PlayerCameraClosure setMainView(ImageView mainView) {
+            this.mainView = mainView;
+            return this;
+        }
+
+        public PlayerCameraClosure setHpView(ImageView hpView) {
+            this.hpView = hpView;
+            return this;
+        }
+
+        public PlayerCameraClosure setSearchlightView(ImageView searchlightView) {
+            this.searchlightView = searchlightView;
+            return this;
+        }
+
+        public PlayerCameraClosure(ImageView mainView, ImageView hpView, ImageView searchlightView) {
             this.mainView = mainView;
             this.hpView = hpView;
-            this.searchlight = searchlight;
+            this.searchlightView = searchlightView;
         }
 
         @Override
@@ -55,7 +73,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
             hpView.setAbsoluteX(result[1].positionX)
                     .setAbsoluteY(result[1].positionY)
                     .setImage(result[1].image);
-            searchlight.setAbsoluteX(result[2].positionX)
+            searchlightView.setAbsoluteX(result[2].positionX)
                     .setAbsoluteY(result[2].positionY)
                     .setImage(result[2].image);
         }
@@ -89,7 +107,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Integer borderY;
 
     //screen borders
-    int cameraWidth, cameraHeight;
+    private int cameraWidth, cameraHeight;
 
     //grid
     private Grid<Interactable<PlayerDaemon>> grid;
@@ -102,8 +120,13 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Image accessibleField;
     private Image inaccessibleField;
 
-    //camera
-    private Camera2D camera;
+    //following camera
+    private Camera2D followingCamera;
+
+    //fixed camera
+    private Camera2D fixedCamera;
+
+    private DummyDaemon cameraSwitcher;
 
     //cmd parser
     private CommandParserDaemon commandParser;
@@ -125,6 +148,9 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Image[] healthBarSprite;
     private Image searchlight;
 
+    private Map<String, ImageView> playerViewMap = new TreeMap<>();
+    private PlayerCameraClosure playerAnimateClosure;
+
     private Image healthPackImage;
     private ImageView healthPackView;
 
@@ -133,13 +159,14 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     //controller
     private MovementControllerDaemon controller;
 
-    public MovementControllerDaemon getController() {
+    public MovementControllerDaemon getMovementController() {
         return controller;
     }
 
     //test
     //private UnholyTrinity<SpriteAnimatorDaemon<ConstantSpriteAnimator>> testTrinity = new UnholyTrinity<>();
     private UnholyTrinity<DummyDaemon> streetLamp = new UnholyTrinity<>();
+
 
     //construct
     public ShooterGame(Renderer2D renderer, ImageManager imageManager, MovementController controller, int width, int height, int cameraToMapRatio) {
@@ -155,7 +182,9 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
         this.borderX = width * cameraToMapRatio;
         this.borderY = height * cameraToMapRatio;
 
-        this.camera = new FollowingCamera(width, height);
+        this.followingCamera = new FollowingCamera(width, height);
+        this.fixedCamera = new FixedCamera(borderX / 2, borderY / 2);
+
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
 
@@ -217,18 +246,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 //init grid views
                 accessibleField = imageManager.loadImageFromAssets("greenOctagon.png", fieldWidth, fieldWidth);
                 inaccessibleField = imageManager.loadImageFromAssets("redOctagon.png", fieldWidth, fieldWidth);
-
-//                gridViewMatrix = new ImageView[rows][columns];
-//
-//                for (int j = 0; j < rows; ++j ) {
-//                    for (int i = 0; i < columns; ++i)
-//                        gridViewMatrix[j][i] = scene.addImageView(new ImageViewImpl("Grid [" + j + "][" + i +"]"))
-//                                .setAbsoluteX(grid.getGrid()[j][i].getCenterX())
-//                                .setAbsoluteY(grid.getGrid()[j][i].getCenterY())
-//                                .setImage(grid.getField(j, i).isWalkable() ? accessibleField : inaccessibleField)
-//                                .setZindex(3)
-//                                .hide();
-//                }
 
                 //init player sprites
                 int playerWidth = cameraWidth / 10;
@@ -387,12 +404,12 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 healthPackFields.add(grid.getField(11, 35));
                 healthPackFields.add(grid.getField(2, 15));
                 healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
-                healthPackFields.add(grid.getField(getRandomInt(0, rows- 1), getRandomInt(0, columns- 1)));
+                healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
 
                 for(Field<Interactable<PlayerDaemon>> current : healthPackFields) {
                     current.setObject(
                             HealthPack.generateHealthPack(
-                                    70,
+                                    20,
                                     ((int) current.getCenterX()),
                                     ((int) current.getCenterY()),
                                     healthPackImage, scene
@@ -431,8 +448,48 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             .setImage(searchlight)
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
-                            .setZindex(9)
                     );
+
+                    ImageView mainViewFixedCam = scene.addImageView(
+                            new ImageViewImpl(
+                                    "Player Main View Fixed Cam",
+                                    10,
+                                    borderX / 2,
+                                    borderY / 2,
+                                    playerSprite[0].getWidth(),
+                                    playerSprite[0].getHeight()
+                            )
+                    ).setImage(playerSprite[0]).hide();
+
+                    ImageView hpViewFixedCam = scene.addImageView(
+                            new ImageViewImpl(
+                                    "Player HP View Fixed Cam",
+                                    10,
+                                    borderX / 2,
+                                    borderY / 2 - playerSprite[0].getHeight() / 2,
+                                    healthBarSprite[0].getWidth(),
+                                    healthBarSprite[0].getHeight()
+                            )
+                    ).setImage(healthBarSprite[0]).hide();
+
+                    ImageView searchlightViewFixedCam = scene.addImageView(
+                            new ImageViewImpl("Player Searchlight View Fixed Cam",
+                                    9,
+                                    borderX / 2,
+                                    borderY / 2 + playerSprite[0].getHeight() / 2,
+                                    searchlight.getWidth(),
+                                    searchlight.getHeight()
+                            ).setImage(searchlight).hide()
+                    );
+
+                    playerViewMap.put("main", mainView);
+                    playerViewMap.put("hp", hpView);
+                    playerViewMap.put("searchlightView", searchlightView);
+
+                    playerViewMap.put("mainFC", mainViewFixedCam);
+                    playerViewMap.put("hpFC", hpViewFixedCam);
+                    playerViewMap.put("searchlightFC", searchlightViewFixedCam);
+
 
                     renderer.consume(() -> {
                         mainView.show();
@@ -440,14 +497,16 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                         searchlightView.show();
                     });
 
-                    player.setAnimatePlayerSideQuest(renderer).setClosure(new PlayerCameraClosure(mainView, hpView, searchlightView));
+                    playerAnimateClosure = new PlayerCameraClosure(mainView, hpView, searchlightView);
+
+                    player.setAnimatePlayerSideQuest(renderer).setClosure(playerAnimateClosure);
                 }
 
                 renderer.setScene(scene.lockViews()).start();
 
-                ((FollowingCamera) camera).setTarget(player);
+                ((FollowingCamera) followingCamera).setTarget(player);
 
-                renderer.setCamera(camera);
+                renderer.setCamera(followingCamera);
 
                 controller.getPrototype().setControllable(player.start());
 
@@ -505,10 +564,9 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 controllerPrototype.setMovementCallback(player -> {
 
                     Field<Interactable<PlayerDaemon>> field = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
-                    System.out.println(DaemonUtils.tag() + "Actual player coordinates: " + player.getLastCoordinates().toString());
-                    System.err.println(DaemonUtils.tag() + "Player at field: " + field.toString());
 
-                    //renderer.consume(gridViewMatrix[field.getRow()][field.getColumn()]::show);
+                    System.out.println(DaemonUtils.tag() + "Actual player coordinates: " + player.getLastCoordinates().toString());
+                    System.out.println(DaemonUtils.tag() + "Player at field: " + field.toString());
 
                     Interactable<PlayerDaemon> item = field.getObject();
 
@@ -526,6 +584,60 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
                         .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
+
+                //camera switcher init
+                cameraSwitcher = DummyDaemon.create(gameConsumer, 5000L).setClosure(new Runnable() {
+
+                    private Camera2D currentCamera = followingCamera;
+
+                    @Override
+                    public void run() {
+
+                        if (currentCamera.equals(followingCamera)) {
+
+                            playerAnimateClosure.setMainView(playerViewMap.get("mainFC"))
+                                    .setHpView(playerViewMap.get("hpFC"))
+                                    .setSearchlightView(playerViewMap.get("searchlightFC"));
+
+                            currentCamera = fixedCamera.setX(followingCamera.getX())
+                                    .setY(followingCamera.getY());
+
+                            renderer.consume(() -> {
+                                playerViewMap.get("main").hide();
+                                playerViewMap.get("hp").hide();
+                                playerViewMap.get("searchlightView").hide();
+
+                                playerViewMap.get("mainFC").show();
+                                playerViewMap.get("hpFC").show();
+                                playerViewMap.get("searchlightFC").show();
+                            });
+
+                        } else {
+
+                            playerAnimateClosure.setMainView(playerViewMap.get("main"))
+                                    .setHpView(playerViewMap.get("hp"))
+                                    .setSearchlightView(playerViewMap.get("searchlightView"));
+
+                            currentCamera = followingCamera;
+
+                            renderer.consume(() -> {
+
+                                playerViewMap.get("mainFC").hide();
+                                playerViewMap.get("hpFC").hide();
+                                playerViewMap.get("searchlightFC").hide();
+
+                                playerViewMap.get("main").show();
+                                playerViewMap.get("hp").show();
+                                playerViewMap.get("searchlightView").show();
+
+                            });
+                        }
+
+                        renderer.setCamera(currentCamera);
+                    }
+                });
+
+                cameraSwitcher.start();
 
             } catch (IOException e) {
                 e.printStackTrace();

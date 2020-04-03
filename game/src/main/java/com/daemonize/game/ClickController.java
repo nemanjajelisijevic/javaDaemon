@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.controller.MouseController;
 import com.daemonize.graphics2d.camera.Camera2D;
@@ -10,19 +11,25 @@ import java.util.List;
 
 public class ClickController implements MouseController {
 
+    private Consumer consumer;
+
     private ClickCoordinateClosure clickCoordinateClosure;
     private Camera2D camera;
 
     private volatile float clickedX, clickedY;
     private volatile MouseButton currentClickedButton;
 
-    private DaemonSemaphore clickSemaphore = new DaemonSemaphore().setName("Click Semaphore");
-
+    //private DaemonSemaphore clickSemaphore = new DaemonSemaphore().setName("Click Semaphore");
     private List<FixedButton> buttons = new ArrayList<>();
 
     public ClickController addButton(FixedButton button) {
         this.buttons.add(button);
         return this;
+    }
+
+    @Override
+    public void setConsumer(Consumer consumer) {
+        this.consumer = consumer;
     }
 
     public void setCamera(Camera2D camera) {
@@ -42,14 +49,15 @@ public class ClickController implements MouseController {
         currentClickedButton = mouseButton;
         clickedX = x;
         clickedY = y;
-        clickSemaphore.go();
+        //clickSemaphore.go();
+        control();
     }
 
     @Override
     public void onRelease(MouseButton mouseButton) {
         if (currentClickedButton.equals(mouseButton)) {
             currentClickedButton = null;
-            clickSemaphore.stop();
+            //clickSemaphore.stop();
         }
     }
 
@@ -58,20 +66,25 @@ public class ClickController implements MouseController {
         if (currentClickedButton != null) {
             clickedX = x;
             clickedY = y;
+            control();
         }
     }
 
     @Override
-    public void control() throws InterruptedException {
+    public void control() {
         try{
-            while(currentClickedButton == null)
-                clickSemaphore.await();
+//            while(currentClickedButton == null)
+//                clickSemaphore.await();
 
-            for(FixedButton button : buttons)
-                if (button.checkCoordinates(clickedX, clickedY))
-                    return;
+            consumer.consume(() -> {
 
-            clickCoordinateClosure.onClick(camera.getX() + clickedX, camera.getY() + clickedY, currentClickedButton);
+                for(FixedButton button : buttons)
+                    if (button.checkCoordinates(clickedX, clickedY))
+                        return;
+
+                clickCoordinateClosure.onClick(camera.getX() + clickedX, camera.getY() + clickedY, currentClickedButton);
+            });
+
         } finally {}
     }
 }

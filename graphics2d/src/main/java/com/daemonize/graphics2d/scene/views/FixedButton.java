@@ -30,8 +30,8 @@ public class FixedButton extends FixedView {
         if (!enabled || onClickCallback == null)
             return false;
 
-        if (x >= getStartingX() && x <= getEndX()) {
-            if (y >= getStartingY() && y <= getEndY() && isShowing()) {
+        if (x >= getRenderingX() && x <= getEndX()) {
+            if (y >= getRenderingY() && y <= getEndY() && isShowing()) {
                 onClickCallback.run();//TODO should this be here?????
                 return true;
             }

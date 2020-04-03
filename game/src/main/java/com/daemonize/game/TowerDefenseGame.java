@@ -274,8 +274,6 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
     //resolution scaling attribute
     private float dXY;
 
-
-
     private EnemyDoubleDaemon ie;
 
     //animate closures

@@ -31,10 +31,11 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         private Camera2D camera2D;
         private int cameraX, cameraY;
 
-        public CameraSceneDrawer(Camera2D camera2D) {
+        public CameraSceneDrawer setCamera2D(Camera2D camera2D) {
             this.camera2D = camera2D;
             this.cameraX = camera2D.getX();
             this.cameraY = camera2D.getY();
+            return this;
         }
 
         @Override
@@ -44,10 +45,14 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
         @Override
         public void drawView(ImageView view) {
+
+            if (view.getImage().getImageImp() == null)
+                throw new IllegalStateException(view.getName() + " Image is null");
+
             gc.drawImage(
                     (javafx.scene.image.Image) view.getImage().getImageImp(),
-                    view.getStartingX() - cameraX,
-                    view.getStartingY() - cameraY
+                    view.getRenderingX() - cameraX,
+                    view.getRenderingY() - cameraY
             );
         }
 
@@ -64,26 +69,7 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         }
     }
 
-    private SceneDrawer sceneDrawer = new SceneDrawer() {
-
-        @Override
-        public void drawView(ImageView view, float x, float y) {
-            gc.drawImage((javafx.scene.image.Image) view.getImage().getImageImp(), x, y);
-        }
-
-        @Override
-        public void drawView(ImageView view) {
-            drawView(view, view.getStartingX(), view.getStartingY());
-        }
-
-        @Override
-        public void drawScene(Scene2D scene2D) {
-            gc.fillRect(0, 0, width, height);
-            for (ImageView view : scene.getViews())
-                if (view.isShowing())
-                    drawView(view);
-        }
-    };
+    private SceneDrawer sceneDrawer;
 
     private AnimationTimer animationTimer = new AnimationTimer() {
         @Override
@@ -101,11 +87,12 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         this.width = width;
         this.height = height;
         this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer", closureQueueSize);
+        this.sceneDrawer = new CameraSceneDrawer();
     }
 
     @Override
     public JavaFXRenderer setCamera(Camera2D camera) {
-        this.sceneDrawer = new CameraSceneDrawer(camera);
+        ((CameraSceneDrawer) sceneDrawer).setCamera2D(camera);
         return this;
     }
 

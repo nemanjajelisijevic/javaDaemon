@@ -13,12 +13,12 @@ public class FixedView extends ImageViewImpl {
     }
 
     @Override
-    public float getStartingX() {
+    public float getRenderingX() {
         return fixedX;
     }
 
     @Override
-    public float getStartingY() {
+    public float getRenderingY() {
         return fixedY;
     }
 

@@ -15,8 +15,8 @@ public interface ImageView<V extends ImageView> extends Comparable<ImageView> {
     float getAbsoluteX();
     float getAbsoluteY();
 
-    float getStartingX();
-    float getStartingY();
+    float getRenderingX();
+    float getRenderingY();
 
     float getEndX();
     float getEndY();

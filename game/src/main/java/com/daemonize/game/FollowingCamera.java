@@ -25,12 +25,7 @@ public class FollowingCamera implements Camera2D<FollowingCamera> {
 
     @Override
     public int getX() {
-        return
-                target
-                        .getLastCoordinates()
-                        .getFirst()
-                        .intValue()
-                        - xOffset;
+        return target.getLastCoordinates().getFirst().intValue() - xOffset;
     }
 
     @Override

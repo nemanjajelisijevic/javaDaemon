@@ -1,5 +1,6 @@
 package com.daemonize.graphics2d.scene.views;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.SceneDrawer;
 
@@ -64,12 +65,12 @@ public class ImageViewImpl implements ImageView<ImageViewImpl> {
     }
 
     @Override
-    public float getStartingX() {
+    public float getRenderingX() {
         return startingX;
     }
 
     @Override
-    public float getStartingY() {
+    public float getRenderingY() {
         return startingY;
     }
 
@@ -152,8 +153,8 @@ public class ImageViewImpl implements ImageView<ImageViewImpl> {
 
     @Override
     public boolean checkCoordinates(float x, float y) {
-        if (x >= getStartingX() && x <= getEndX()) {
-            if (y >= getStartingY() && y <= getEndY())
+        if (x >= getRenderingX() && x <= getEndX()) {
+            if (y >= getRenderingY() && y <= getEndY())
                 return true;
         }
 
@@ -171,17 +172,22 @@ public class ImageViewImpl implements ImageView<ImageViewImpl> {
 
     @Override
     public float getWidth() {
-        return getEndX() - getStartingX();
+        return getEndX() - getRenderingX();
     }
 
     @Override
     public float getHeight() {
-        return getEndY() - getStartingY();
+        return getEndY() - getRenderingY();
     }
 
     @Override
     public String toString() {
-        return viewName + ", isShowing: " + showing + ", Z index: " + zIndex;
+        return viewName + ", isShowing: "
+                + showing + ", Z index: "
+                + zIndex + ", Coords - absX: "
+                + absoluteX + ", absY: " + absoluteY
+                + ", startingX: " + startingX
+                + ", startingY: " + startingY;
     }
 
     @Override

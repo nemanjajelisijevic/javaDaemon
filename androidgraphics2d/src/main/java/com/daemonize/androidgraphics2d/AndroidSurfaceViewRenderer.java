@@ -143,8 +143,8 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
                 if (view.isShowing()) {
                     canvas.drawBitmap(
                             ((Bitmap) view.getImage().getImageImp()),
-                            view.getStartingX(),
-                            view.getStartingY(),
+                            view.getRenderingX(),
+                            view.getRenderingY(),
                             paint
                     );
                 }

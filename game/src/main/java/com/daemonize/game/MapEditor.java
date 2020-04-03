@@ -4,9 +4,7 @@ import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.game.controller.MouseController;
-import com.daemonize.game.controller.MouseControllerDaemon;
 import com.daemonize.game.controller.MovementController;
 import com.daemonize.game.controller.MovementControllerDaemon;
 import com.daemonize.game.game.DaemonApp;
@@ -22,9 +20,7 @@ import com.daemonize.graphics2d.scene.views.FixedButton;
 import com.daemonize.graphics2d.scene.views.FixedView;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
-import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.imagemovers.ImageMover;
-import com.daemonize.imagemovers.Movable;
 
 import java.io.IOException;
 import java.util.List;
@@ -89,15 +85,14 @@ public class MapEditor implements DaemonApp<MapEditor> {
     //movement movementController
     private MovementControllerDaemon movementController;
 
-
     public MovementControllerDaemon getMovementController() {
         return movementController;
     }
 
     //mouse controller
-    private MouseControllerDaemon mouseController;
+    private MouseController mouseController;
 
-    public MouseControllerDaemon getMouseController() {
+    public MouseController getMouseController() {
         return mouseController;
     }
 
@@ -196,7 +191,7 @@ public class MapEditor implements DaemonApp<MapEditor> {
         }
 
         this.movementController = new MovementControllerDaemon(mainConsumer, movementController).setName("Movement movementController");
-        this.mouseController = new MouseControllerDaemon(mainConsumer, mouseController).setName("Mouse Controller");
+        this.mouseController = mouseController;
 
         this.fieldWidth = fieldWidth;
 
@@ -225,8 +220,9 @@ public class MapEditor implements DaemonApp<MapEditor> {
                         .show();
         }
 
-        ((ClickController) this.mouseController.getPrototype()).setCamera(camera);
-        this.mouseController.setControlSideQuest();
+        ((ClickController) this.mouseController).setCamera(camera);
+        this.mouseController.setConsumer(mainConsumer);
+
         this.movementController.setControlSideQuest();
         this.movementController.setControllable(centerPointer);
 
@@ -241,7 +237,6 @@ public class MapEditor implements DaemonApp<MapEditor> {
             commandParser.start();
             renderer.start();
             movementController.start();
-            mouseController.start();
             mainConsumer.consume(stateChain::run);
         });
         return this;
@@ -250,7 +245,7 @@ public class MapEditor implements DaemonApp<MapEditor> {
     {
         stateChain.addState(() -> { //controller setup state
 
-            ((ClickController) mouseController.getPrototype()).addButton(saveButton);
+            ((ClickController) mouseController).addButton(saveButton);
 
             mouseController.setOnClick((x, y, mouseButton) -> {
 
