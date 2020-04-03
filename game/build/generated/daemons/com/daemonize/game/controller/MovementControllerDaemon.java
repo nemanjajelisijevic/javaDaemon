@@ -40,11 +40,6 @@ public class MovementControllerDaemon<M extends Movable> implements Daemon<Movem
     return sideQuest;
   }
 
-  public MovementControllerDaemon pressDirection(MovementController.Direction dir) {
-    prototype.pressDirection(dir);
-    return this;
-  }
-
   @Override
   public void control() throws InterruptedException {
     prototype.control();
@@ -52,21 +47,6 @@ public class MovementControllerDaemon<M extends Movable> implements Daemon<Movem
 
   public MovementControllerDaemon setControllable(M player) {
     prototype.setControllable(player);
-    return this;
-  }
-
-  public MovementControllerDaemon releaseDirection(MovementController.Direction dir) {
-    prototype.releaseDirection(dir);
-    return this;
-  }
-
-  public MovementControllerDaemon speedUp() {
-    prototype.speedUp();
-    return this;
-  }
-
-  public MovementControllerDaemon speedDown() {
-    prototype.speedDown();
     return this;
   }
 

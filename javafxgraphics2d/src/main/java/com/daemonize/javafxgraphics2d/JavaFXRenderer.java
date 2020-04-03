@@ -45,10 +45,6 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
         @Override
         public void drawView(ImageView view) {
-
-            if (view.getImage().getImageImp() == null)
-                throw new IllegalStateException(view.getName() + " Image is null");
-
             gc.drawImage(
                     (javafx.scene.image.Image) view.getImage().getImageImp(),
                     view.getRenderingX() - cameraX,
