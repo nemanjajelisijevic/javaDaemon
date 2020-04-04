@@ -444,8 +444,15 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2);
 
-                    ImageView searchlightView = scene.addImageView(new FixedView("Player Searchlight View", cameraWidth / 2, cameraHeight / 2 + playerSprite[0].getHeight() / 2, 9, searchlight.getWidth(), searchlight.getHeight())
-                            .setImage(searchlight)
+                    ImageView searchlightView = scene.addImageView(
+                            new FixedView(
+                                    "Player Searchlight View",
+                                    cameraWidth / 2,
+                                    cameraHeight / 2 + playerSprite[0].getHeight() / 2,
+                                    9,
+                                    searchlight.getWidth(),
+                                    searchlight.getHeight()
+                            ).setImage(searchlight)
                             .setAbsoluteX(borderX / 2)
                             .setAbsoluteY(borderY / 2)
                     );
