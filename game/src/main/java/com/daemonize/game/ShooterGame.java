@@ -167,7 +167,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     //private UnholyTrinity<SpriteAnimatorDaemon<ConstantSpriteAnimator>> testTrinity = new UnholyTrinity<>();
     private UnholyTrinity<DummyDaemon> streetLamp = new UnholyTrinity<>();
 
-
     //construct
     public ShooterGame(Renderer2D renderer, ImageManager imageManager, MovementController controller, int width, int height, int cameraToMapRatio) {
 
@@ -497,7 +496,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     playerViewMap.put("hpFC", hpViewFixedCam);
                     playerViewMap.put("searchlightFC", searchlightViewFixedCam);
 
-
                     renderer.consume(() -> {
                         mainView.show();
                         hpView.show();
@@ -614,7 +612,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             currentCamera = fixedCamera.setX(followingCamera.getRenderingX())
                                     .setY(followingCamera.getRenderingY());
 
-
                             playerViewMap.get("mainFC")
                                     .setAbsoluteX(playerViewMap.get("main").getAbsoluteX())
                                     .setAbsoluteY(playerViewMap.get("main").getAbsoluteY())
@@ -627,7 +624,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             playerViewMap.get("searchlightFC").setAbsoluteX(playerViewMap.get("searchlightView").getAbsoluteX())
                                     .setAbsoluteY(playerViewMap.get("searchlightView").getAbsoluteY())
                                     .setImage(playerViewMap.get("searchlightView").getImage());
-
 
                             renderer.consume(() -> {
                                 playerViewMap.get("main").hide();
@@ -651,25 +647,52 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             dummyPlayer.goTo(
                                     player.getLastCoordinates(),
                                     35,
-                                    () -> {
+                                    new Runnable() {
+                                        @Override
+                                        public void run() {
 
-                                        playerAnimateClosure.setMainView(playerViewMap.get("main"))
-                                                .setHpView(playerViewMap.get("hp"))
-                                                .setSearchlightView(playerViewMap.get("searchlightView"));
+                                            if (Math.abs(dummyPlayer.getLastCoordinates().getFirst() - player.getLastCoordinates().getFirst()) > 50
+                                                    && Math.abs(dummyPlayer.getLastCoordinates().getSecond() - player.getLastCoordinates().getSecond()) > 50) {
+                                                dummyPlayer.goTo(player.getLastCoordinates(), 20, this::run);
+                                                return;
+                                            }
 
-                                        ((FollowingCamera) followingCamera).setTarget(player);
 
-                                        renderer.consume(() -> {
+                                            playerViewMap.get("main")
+                                                    .setAbsoluteX(playerViewMap.get("mainFC").getAbsoluteX())
+                                                    .setAbsoluteY(playerViewMap.get("mainFC").getAbsoluteY())
+                                                    .setImage(playerViewMap.get("mainFC").getImage());
 
-                                            playerViewMap.get("mainFC").hide();
-                                            playerViewMap.get("hpFC").hide();
-                                            playerViewMap.get("searchlightFC").hide();
+                                            playerViewMap.get("hp")
+                                                    .setAbsoluteX(playerViewMap.get("hpFC").getAbsoluteX())
+                                                    .setAbsoluteY(playerViewMap.get("hpFC").getAbsoluteY())
+                                                    .setImage(playerViewMap.get("hpFC").getImage());
 
-                                            playerViewMap.get("main").show();
-                                            playerViewMap.get("hp").show();
-                                            playerViewMap.get("searchlightView").show();
+                                            playerViewMap.get("searchlightView")
+                                                    .setAbsoluteX(playerViewMap.get("searchlightFC").getAbsoluteX())
+                                                    .setAbsoluteY(playerViewMap.get("searchlightFC").getAbsoluteY())
+                                                    .setImage(playerViewMap.get("searchlightFC").getImage());
 
-                                        });
+
+
+                                            playerAnimateClosure.setMainView(playerViewMap.get("main"))
+                                                        .setHpView(playerViewMap.get("hp"))
+                                                        .setSearchlightView(playerViewMap.get("searchlightView"));
+
+                                            ((FollowingCamera) followingCamera).setTarget(player);
+
+                                            renderer.consume(() -> {
+
+                                                playerViewMap.get("mainFC").hide();
+                                                playerViewMap.get("hpFC").hide();
+                                                playerViewMap.get("searchlightFC").hide();
+
+                                                playerViewMap.get("main").show();
+                                                playerViewMap.get("hp").show();
+                                                playerViewMap.get("searchlightView").show();
+
+                                            });
+                                        }
                                     });
                         }
                     }
@@ -682,5 +705,4 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
             }
         });
     }
-
 }
