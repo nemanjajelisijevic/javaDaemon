@@ -475,7 +475,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 renderer.setScene(scene.lockViews()).start();
 
-                ((FollowingCamera) followingCamera).setTarget(player);
+                followingCamera.setTarget(player);
 
                 renderer.setCamera(followingCamera);
 
@@ -556,7 +556,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
                         .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
 
-
                 dummyPlayer = new DummyPlayerDaemon(gameConsumer, new DummyPlayer(playerSprite[0], player.getLastCoordinates(), dXY));
                 dummyPlayer.setAnimateDummyPlayerSideQuest(renderer).setClosure(ret -> {});
                 dummyPlayer.start();
@@ -565,6 +564,11 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 cameraSwitcher = DummyDaemon.create(gameConsumer, 5000L).setClosure(new Runnable() {
 
                     private Camera2D currentCamera = followingCamera;
+
+                    private void setCamera(Camera2D camera) {
+                        this.currentCamera = camera;
+                        renderer.setCamera(camera);
+                    }
 
                     @Override
                     public void run() {
@@ -575,7 +579,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                     .setHpView(playerViewMap.get("hpFC"))
                                     .setSearchlightView(playerViewMap.get("searchlightFC"));
 
-                            currentCamera = fixedCamera.setX(followingCamera.getRenderingX())
+                            fixedCamera.setX(followingCamera.getRenderingX())
                                     .setY(followingCamera.getRenderingY());
 
                             playerViewMap.get("mainFC")
@@ -601,13 +605,12 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                 playerViewMap.get("searchlightFC").show();
                             });
 
-                            renderer.setCamera(currentCamera);
+                            setCamera(fixedCamera);
 
                         } else {
 
                             dummyPlayer.setCoordinates(fixedCamera.getCenterX(), fixedCamera.getCenterY());
-                            currentCamera = followingCamera.setTarget(dummyPlayer);
-                            renderer.setCamera(currentCamera);
+                            setCamera(followingCamera.setTarget(dummyPlayer));
 
                             dummyPlayer.goTo(
                                     player.getLastCoordinates(),
