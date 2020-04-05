@@ -1,12 +1,17 @@
 package com.daemonize.graphics2d.camera;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
+
 public class FixedCamera implements Camera2D<FixedCamera> {
 
     private volatile int x, y;
+    private final int cameraWidth, cameraHeight;
 
-    public FixedCamera(int x, int y) {
+    public FixedCamera(int x, int y,int cameraWidth, int cameraHeight) {
         this.x = x;
         this.y = y;
+        this.cameraWidth = cameraWidth;
+        this.cameraHeight = cameraHeight;
     }
 
     @Override
@@ -22,12 +27,22 @@ public class FixedCamera implements Camera2D<FixedCamera> {
     }
 
     @Override
-    public int getX() {
+    public int getRenderingX() {
         return x;
     }
 
     @Override
-    public int getY() {
+    public int getRenderingY() {
         return y;
+    }
+
+    @Override
+    public int getCenterX() {
+        return x + cameraWidth / 2;
+    }
+
+    @Override
+    public int getCenterY() {
+        return y + cameraHeight / 2;
     }
 }

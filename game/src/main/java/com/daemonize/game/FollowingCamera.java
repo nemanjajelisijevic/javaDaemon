@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.graphics2d.camera.Camera2D;
 import com.daemonize.imagemovers.Movable;
 
@@ -24,13 +25,23 @@ public class FollowingCamera implements Camera2D<FollowingCamera> {
     }
 
     @Override
-    public int getX() {
+    public int getRenderingX() {
         return target.getLastCoordinates().getFirst().intValue() - xOffset;
     }
 
     @Override
-    public int getY() {
+    public int getRenderingY() {
         return target.getLastCoordinates().getSecond().intValue() - yOffset;
+    }
+
+    @Override
+    public int getCenterX() {
+        return target.getLastCoordinates().getFirst().intValue();
+    }
+
+    @Override
+    public int getCenterY() {
+        return target.getLastCoordinates().getSecond().intValue();
     }
 
     public FollowingCamera setTarget(Movable target) {

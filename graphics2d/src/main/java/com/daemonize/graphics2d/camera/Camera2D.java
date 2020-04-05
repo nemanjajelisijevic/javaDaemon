@@ -5,6 +5,9 @@ public interface Camera2D<C extends Camera2D> {
     C setX(int x);
     C setY(int y);
 
-    int getX();
-    int getY();
+    int getRenderingX();
+    int getRenderingY();
+
+    int getCenterX();
+    int getCenterY();
 }

@@ -167,9 +167,9 @@ public class Main extends Application {
 //        scene.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
 //
 //            if(event.getButton().equals(MouseButton.PRIMARY)) {
-//                mouseControllerDaemon.onClick(MouseController.MouseButton.LEFT, ((float) event.getX()), ((float) event.getY()));
+//                mouseControllerDaemon.onClick(MouseController.MouseButton.LEFT, ((float) event.getRenderingX()), ((float) event.getRenderingY()));
 //            } else if(event.getButton().equals(MouseButton.SECONDARY)) {
-//                mouseControllerDaemon.onClick(MouseController.MouseButton.RIGHT, ((float) event.getX()), ((float) event.getY()));
+//                mouseControllerDaemon.onClick(MouseController.MouseButton.RIGHT, ((float) event.getRenderingX()), ((float) event.getRenderingY()));
 //            }
 //
 //        });
@@ -185,7 +185,7 @@ public class Main extends Application {
 //        });
 //
 //        scene.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-//            mouseControllerDaemon.onMove(((float) event.getX()), ((float) event.getY()));
+//            mouseControllerDaemon.onMove(((float) event.getRenderingX()), ((float) event.getRenderingY()));
 //        });
 
     }

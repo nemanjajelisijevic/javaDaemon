@@ -33,8 +33,8 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
         public CameraSceneDrawer setCamera2D(Camera2D camera2D) {
             this.camera2D = camera2D;
-            this.cameraX = camera2D.getX();
-            this.cameraY = camera2D.getY();
+            this.cameraX = camera2D.getRenderingX();
+            this.cameraY = camera2D.getRenderingY();
             return this;
         }
 
@@ -57,8 +57,8 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
 
             gc.fillRect(0, 0, width, height);
 
-            cameraX = camera2D.getX();
-            cameraY = camera2D.getY();
+            cameraX = camera2D.getRenderingX();
+            cameraY = camera2D.getRenderingY();
 
             for (ImageView view : scene.getViews())
                     view.draw(this);

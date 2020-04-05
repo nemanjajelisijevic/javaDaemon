@@ -122,7 +122,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
     //following camera
     private Camera2D followingCamera;
-
     //fixed camera
     private Camera2D fixedCamera;
 
@@ -143,6 +142,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
     //player
     private PlayerDaemon player;
+    private DummyPlayerDaemon dummyPlayer;
 
     private Image[] playerSprite;
     private Image[] healthBarSprite;
@@ -183,7 +183,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
         this.borderY = height * cameraToMapRatio;
 
         this.followingCamera = new FollowingCamera(width, height);
-        this.fixedCamera = new FixedCamera(borderX / 2, borderY / 2);
+        this.fixedCamera = new FixedCamera(borderX / 2, borderY / 2 , width, height);
 
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
@@ -229,7 +229,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
             try {
 
                 backgroundImage = imageManager.loadImageFromAssets(
-                        "map_1.png",
+                        "emptyMap.png", //"map_1.png",
                         this.borderX,
                         this.borderY
                 );
@@ -592,6 +592,11 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
                         .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
 
+
+                dummyPlayer = new DummyPlayerDaemon(gameConsumer, new DummyPlayer(playerSprite[0], player.getLastCoordinates(), dXY));
+                dummyPlayer.setAnimateDummyPlayerSideQuest(renderer).setClosure(ret -> {});
+                dummyPlayer.start();
+
                 //camera switcher init
                 cameraSwitcher = DummyDaemon.create(gameConsumer, 5000L).setClosure(new Runnable() {
 
@@ -606,8 +611,23 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                     .setHpView(playerViewMap.get("hpFC"))
                                     .setSearchlightView(playerViewMap.get("searchlightFC"));
 
-                            currentCamera = fixedCamera.setX(followingCamera.getX())
-                                    .setY(followingCamera.getY());
+                            currentCamera = fixedCamera.setX(followingCamera.getRenderingX())
+                                    .setY(followingCamera.getRenderingY());
+
+
+                            playerViewMap.get("mainFC")
+                                    .setAbsoluteX(playerViewMap.get("main").getAbsoluteX())
+                                    .setAbsoluteY(playerViewMap.get("main").getAbsoluteY())
+                                    .setImage(playerViewMap.get("main").getImage());
+
+                            playerViewMap.get("hpFC").setAbsoluteX(playerViewMap.get("hp").getAbsoluteX())
+                                    .setAbsoluteY(playerViewMap.get("hp").getAbsoluteY())
+                                    .setImage(playerViewMap.get("hp").getImage());
+
+                            playerViewMap.get("searchlightFC").setAbsoluteX(playerViewMap.get("searchlightView").getAbsoluteX())
+                                    .setAbsoluteY(playerViewMap.get("searchlightView").getAbsoluteY())
+                                    .setImage(playerViewMap.get("searchlightView").getImage());
+
 
                             renderer.consume(() -> {
                                 playerViewMap.get("main").hide();
@@ -619,28 +639,39 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                 playerViewMap.get("searchlightFC").show();
                             });
 
+                            renderer.setCamera(currentCamera);
+
                         } else {
 
-                            playerAnimateClosure.setMainView(playerViewMap.get("main"))
-                                    .setHpView(playerViewMap.get("hp"))
-                                    .setSearchlightView(playerViewMap.get("searchlightView"));
-
+                            dummyPlayer.setCoordinates(fixedCamera.getCenterX(), fixedCamera.getCenterY());
+                            ((FollowingCamera) followingCamera).setTarget(dummyPlayer);
                             currentCamera = followingCamera;
+                            renderer.setCamera(currentCamera);
 
-                            renderer.consume(() -> {
+                            dummyPlayer.goTo(
+                                    player.getLastCoordinates(),
+                                    35,
+                                    () -> {
 
-                                playerViewMap.get("mainFC").hide();
-                                playerViewMap.get("hpFC").hide();
-                                playerViewMap.get("searchlightFC").hide();
+                                        playerAnimateClosure.setMainView(playerViewMap.get("main"))
+                                                .setHpView(playerViewMap.get("hp"))
+                                                .setSearchlightView(playerViewMap.get("searchlightView"));
 
-                                playerViewMap.get("main").show();
-                                playerViewMap.get("hp").show();
-                                playerViewMap.get("searchlightView").show();
+                                        ((FollowingCamera) followingCamera).setTarget(player);
 
-                            });
+                                        renderer.consume(() -> {
+
+                                            playerViewMap.get("mainFC").hide();
+                                            playerViewMap.get("hpFC").hide();
+                                            playerViewMap.get("searchlightFC").hide();
+
+                                            playerViewMap.get("main").show();
+                                            playerViewMap.get("hp").show();
+                                            playerViewMap.get("searchlightView").show();
+
+                                        });
+                                    });
                         }
-
-                        renderer.setCamera(currentCamera);
                     }
                 });
 

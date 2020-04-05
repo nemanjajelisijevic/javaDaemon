@@ -1,7 +1,6 @@
 package com.daemonize.game;
 
 import com.daemonize.daemonengine.consumer.Consumer;
-import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.game.controller.MouseController;
 import com.daemonize.graphics2d.camera.Camera2D;
 import com.daemonize.graphics2d.scene.views.FixedButton;
@@ -82,7 +81,7 @@ public class ClickController implements MouseController {
                     if (button.checkCoordinates(clickedX, clickedY))
                         return;
 
-                clickCoordinateClosure.onClick(camera.getX() + clickedX, camera.getY() + clickedY, currentClickedButton);
+                clickCoordinateClosure.onClick(camera.getRenderingX() + clickedX, camera.getRenderingY() + clickedY, currentClickedButton);
             });
 
         } finally {}
