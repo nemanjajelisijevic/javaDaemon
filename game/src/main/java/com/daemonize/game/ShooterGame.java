@@ -80,9 +80,9 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Image inaccessibleField;
 
     //following camera
-    private Camera2D followingCamera;
+    private FollowingCamera followingCamera;
     //fixed camera
-    private Camera2D fixedCamera;
+    private FixedCamera fixedCamera;
 
     private DummyDaemon cameraSwitcher;
 
@@ -127,12 +127,19 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private UnholyTrinity<DummyDaemon> streetLamp = new UnholyTrinity<>();
 
     //construct
-    public ShooterGame(Renderer2D renderer, ImageManager imageManager, MovementController controller, int width, int height, int cameraToMapRatio) {
+    public ShooterGame(
+            Renderer2D renderer,
+            ImageManager imageManager,
+            MovementController controller,
+            int width,
+            int height,
+            int cameraToMapRatio
+    ) {
 
         this.renderer = renderer;
         this.imageManager = imageManager;
 
-        this.gameConsumer = new DaemonConsumer("TowerDefenseGame Consumer");
+        this.gameConsumer = new DaemonConsumer("Shooter Game Consumer");
 
         this.cameraWidth = width;
         this.cameraHeight = height;
@@ -599,8 +606,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                         } else {
 
                             dummyPlayer.setCoordinates(fixedCamera.getCenterX(), fixedCamera.getCenterY());
-                            ((FollowingCamera) followingCamera).setTarget(dummyPlayer);
-                            currentCamera = followingCamera;
+                            currentCamera = followingCamera.setTarget(dummyPlayer);
                             renderer.setCamera(currentCamera);
 
                             dummyPlayer.goTo(
@@ -615,7 +621,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                                 dummyPlayer.goTo(player.getLastCoordinates(), 20, this::run);
                                                 return;
                                             }
-
 
                                             playerViewMap.get("main")
                                                     .setAbsoluteX(playerViewMap.get("mainFC").getAbsoluteX())
@@ -632,13 +637,11 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                                     .setAbsoluteY(playerViewMap.get("searchlightFC").getAbsoluteY())
                                                     .setImage(playerViewMap.get("searchlightFC").getImage());
 
-
-
                                             playerAnimateClosure.setMainView(playerViewMap.get("main"))
                                                         .setHpView(playerViewMap.get("hp"))
                                                         .setSearchlightView(playerViewMap.get("searchlightView"));
 
-                                            ((FollowingCamera) followingCamera).setTarget(player);
+                                            followingCamera.setTarget(player);
 
                                             renderer.consume(() -> {
 
