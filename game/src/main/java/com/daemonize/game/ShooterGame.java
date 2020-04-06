@@ -26,6 +26,7 @@ import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.ImageMover;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,23 @@ import daemon.com.commandparser.CommandParser;
 import daemon.com.commandparser.CommandParserDaemon;
 
 public class ShooterGame implements DaemonApp<ShooterGame> {
+
+    private static class ZombieAnimateClosure implements Closure<ImageMover.PositionedImage> {
+
+        private ImageView view;
+
+        public ZombieAnimateClosure(ImageView view) {
+            this.view = view;
+        }
+
+        @Override
+        public void onReturn(Return<ImageMover.PositionedImage> ret) {
+            ImageMover.PositionedImage posImg = ret.runtimeCheckAndGet();
+            view.setAbsoluteX(posImg.positionX)
+                    .setAbsoluteY(posImg.positionY)
+                    .setImage(posImg.image);
+        }
+    }
 
     //running flag
     private volatile boolean running;
@@ -114,6 +132,12 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private ImageView healthPackView;
 
     private List<Field<Interactable<PlayerDaemon>>> healthPackFields;
+
+    //zombie
+    private Image[] zombieSprite;
+
+    private ImageView[] zombieViews;
+    private List<SpriteAnimatorDaemon<ConstantSpriteAnimator>> zombieAnimators;
 
     //controller
     private MovementControllerDaemon controller;
@@ -207,6 +231,43 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                         .show();
 
                 scene.addImageView(backgroundView);
+
+                //zombie sprite
+
+                zombieSprite = imageManager.loadSheet("zombieSheet.png", 8, 36, cameraWidth / 4, cameraHeight / 4);
+
+                int noOfZombies = 100;
+
+                zombieViews = new ImageView[noOfZombies];
+                zombieAnimators = new ArrayList<>(noOfZombies);
+
+                for(int i = 0; i < noOfZombies; ++i) {
+
+
+                    int currentZombieX = getRandomInt(0, borderX);
+                    int currentZombieY = getRandomInt(0, borderY);
+
+                    zombieViews[i] = scene.addImageView(new ImageViewImpl("Zombie View No. " + i))
+                            .setAbsoluteX(currentZombieX)
+                            .setAbsoluteY(currentZombieY)
+                            .setImage(zombieSprite[0])
+                            .setZindex(4)
+                            .show();
+
+
+                    SpriteAnimatorDaemon<ConstantSpriteAnimator> zombieAnimator = new SpriteAnimatorDaemon(
+                            gameConsumer,
+                            new ConstantSpriteAnimator(
+                                    currentZombieX,
+                                    currentZombieY,
+                                    zombieSprite
+                            )
+                    ).setName("Zombie Animator No. " + i);
+
+                    zombieAnimator.setAnimateSideQuest(renderer).setSleepInterval(100).setClosure(new ZombieAnimateClosure(zombieViews[i]));
+
+                    zombieAnimators.add(zombieAnimator.start());
+                }
 
                 //init grid views
                 accessibleField = imageManager.loadImageFromAssets("greenOctagon.png", fieldWidth, fieldWidth);
