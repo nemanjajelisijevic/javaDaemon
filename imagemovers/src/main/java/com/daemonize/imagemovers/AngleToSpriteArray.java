@@ -14,6 +14,8 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
     private List<Image[]> roationSpriteList;
     private int noOfDirections;
+    private int step;
+    private int currentAngleSetter;
 
 
     @Override
@@ -26,20 +28,24 @@ public class AngleToSpriteArray implements AngleToImageArray {
         return 0;
     }
 
-    public AngleToSpriteArray(Image[] sprite) {
-
-    }
-
     public AngleToSpriteArray(int directionsNo) {
 
         if (directionsNo < 4 && directionsNo % 4 != 0)
             throw new IllegalArgumentException("directionsNo cant be less than 4 and must be divisible by 4. Argument: " + directionsNo);
         this.roationSpriteList = new ArrayList<>(360);
         this.noOfDirections = directionsNo;
+        this.step = 360 / noOfDirections;
+        this.currentAngleSetter = 0;
+
     }
 
     public AngleToSpriteArray addSprite(AngleToSpriteMapper mapper) {
 
+        if (currentAngleSetter > 360 - step)
+            return this;
+
+        Image[] sprite = mapper.map(currentAngleSetter);
+        currentAngleSetter += step;
         //TODO
         return this;
     }
