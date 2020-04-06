@@ -53,20 +53,19 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     @Daemonize
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
 
-        if (!super.setDirectionAndMove(x, y, velocityInt))
+        if (!super.setDirectionToPoint(x, y))
             return false;
 
         coordinateLock.lock();
         setTargetCoordinates(x, y);
-
-        animateSemaphore.subscribe();
+        setVelocity(velocityInt);
 
         try {
             while (!coordinatesReached)
                 coordinateReachedCondition.await();
         } finally {
             coordinatesReached = false;
-            animateSemaphore.unsubscribe();
+            setVelocity(0);
             coordinateLock.unlock();
         }
 

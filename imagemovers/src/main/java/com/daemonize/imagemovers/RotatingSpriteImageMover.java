@@ -16,7 +16,7 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     public synchronized void setRotationSprite(Image[] rotationSprite) {
         int currentAngle = spriteBuffer != null ? spriteBuffer.getCurrentAngle() : 0;
         int step = 360 / rotationSprite.length;
-        this.spriteBuffer = new AngleToImageArray(rotationSprite, step);
+        this.spriteBuffer = new AngleToSingleImageArray(rotationSprite, step);
         this.currentRotationSprite = new Image[(180 / step) + 1];
         this.size = 0;
         popSprite();

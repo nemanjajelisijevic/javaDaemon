@@ -68,7 +68,7 @@ public interface ImageMover extends Movable {
 
     boolean setDirectionToPoint(float x, float y);
 
-    boolean setDirectionAndMove(float x, float y, float velocityInt);
+    //boolean setDirectionAndMove(float x, float y);
 
     void setVelocity(float velocity);
 

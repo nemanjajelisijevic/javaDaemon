@@ -113,6 +113,28 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     @Override
     public void setVelocity(float velocity) {
+
+        if (velocity > 0) {
+
+            if (this.getVelocity().intensity <= 0) {
+                animateSemaphore.subscribe();
+            }
+
+        } else {
+            velocity = 0;
+            if (this.getVelocity().intensity > 0)
+                animateSemaphore.unsubscribe();
+
+        }
+
+
+//        if (getVelocity().intensity  < 0.1 && velocity > 0.1)
+//            animateSemaphore.subscribe();
+//        else if (getVelocity().intensity  > 0.1 && velocity < 0.1) {
+//            velocity = 0;
+//            animateSemaphore.unsubscribe();
+//        }
+
         this.velocity.intensity = velocity;
     }
 
@@ -136,15 +158,6 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         velocity.direction.coeficientY = (float) dY;
 
         return true;
-    }
-
-    @Override
-    public boolean setDirectionAndMove(float x, float y, float velocityInt) {
-        boolean ret = false;
-        velocity.intensity = 0;
-        ret = setDirectionToPoint(x, y);
-        velocity.intensity = velocityInt;
-        return ret;
     }
 
     protected synchronized void updateCoordinates() {

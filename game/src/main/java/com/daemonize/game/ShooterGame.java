@@ -680,8 +680,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                         @Override
                                         public void run() {
 
-                                            if (Math.abs(dummyPlayer.getLastCoordinates().getFirst() - player.getLastCoordinates().getFirst()) > 50
-                                                    && Math.abs(dummyPlayer.getLastCoordinates().getSecond() - player.getLastCoordinates().getSecond()) > 50) {
+                                            if (Math.abs(dummyPlayer.getLastCoordinates().getFirst() - player.getLastCoordinates().getFirst()) > 30
+                                                    && Math.abs(dummyPlayer.getLastCoordinates().getSecond() - player.getLastCoordinates().getSecond()) > 25) {
                                                 dummyPlayer.goTo(player.getLastCoordinates(), 20, this::run);
                                                 return;
                                             }
