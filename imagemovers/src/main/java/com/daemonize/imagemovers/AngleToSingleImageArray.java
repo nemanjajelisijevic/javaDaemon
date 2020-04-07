@@ -17,6 +17,7 @@ public class AngleToSingleImageArray implements AngleToImageArray {
         if (degrees < 0 || degrees > 359) {
             throw new IllegalArgumentException("Arg degrees must be > 0 && < 360, set: " + degrees);
         }
+
         pointer = degrees;
     }
 

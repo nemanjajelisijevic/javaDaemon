@@ -23,6 +23,7 @@ import com.daemonize.graphics2d.scene.Scene2D;
 import com.daemonize.graphics2d.scene.views.FixedView;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
+import com.daemonize.imagemovers.AngleToSpriteArray;
 import com.daemonize.imagemovers.ImageMover;
 
 import java.io.IOException;
@@ -135,6 +136,15 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
     //zombie
     private Image[] zombieSprite;
+
+    private Image[] zombieMove0;
+    private Image[] zombieMove45;
+    private Image[] zombieMove90;
+    private Image[] zombieMove135;
+    private Image[] zombieMove180;
+    private Image[] zombieMove225;
+    private Image[] zombieMove270;
+    private Image[] zombieMove315;
 
     private ImageView[] zombieViews;
     private List<SpriteAnimatorDaemon<ConstantSpriteAnimator>> zombieAnimators;
@@ -725,6 +735,14 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 });
 
                 cameraSwitcher.start();
+
+//
+//                AngleToSpriteArray angleToSpriteArray = new AngleToSpriteArray(36);
+//
+//                angleToSpriteArray.mapAllAngles(angle -> {
+//                    System.out.println(DaemonUtils.tag() + "ANGLE: " + angle);
+//                    return new Image[]{playerSprite[angle / 10]};
+//                });
 
             } catch (IOException e) {
                 e.printStackTrace();
