@@ -22,6 +22,11 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     protected SpriteIterator spriteIterator;
 
+    public ImageTranslationMover setSpriteIterator(SpriteIterator spriteIterator) {
+        this.spriteIterator = spriteIterator;
+        return this;
+    }
+
     protected volatile Velocity velocity;
 
     private PositionedImage ret = new PositionedImage();

@@ -47,7 +47,7 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         this.spriteHealthBarImage = hpSprite;
         this.searchlight = searchlight;
 
-        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, startingPos, dXY);
+        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, startingPos, dXY).setRotaterName("PlayerRotater");
 
         this.hpYOffset = sprite[0].getHeight() / 2;
         this.searchLightYOffset = this.searchlight.getHeight() / 2;

@@ -80,7 +80,6 @@ public class AngleToSpriteArray implements AngleToImageArray {
         startIndex = step % 2 != 0 ? currentAngleSetter - step / 2 : currentAngleSetter - (step / 2 - 1);
         endIndex = currentAngleSetter + step / 2;
 
-
         if(currentAngleSetter == 0)
 
             for (int i = startIndex; i <= endIndex; i++) {

@@ -57,6 +57,23 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
         }
     }
 
+    private static class ZombieSpriteAnimateClosure implements Closure<ImageMover.PositionedImage[]> {
+
+        private ImageView view;
+
+        public ZombieSpriteAnimateClosure(ImageView view) {
+            this.view = view;
+        }
+
+        @Override
+        public void onReturn(Return<ImageMover.PositionedImage[]> ret) {
+            ImageMover.PositionedImage[] posImg = ret.runtimeCheckAndGet();
+            view.setAbsoluteX(posImg[0].positionX)
+                    .setAbsoluteY(posImg[0].positionY)
+                    .setImage(posImg[0].image);
+        }
+    }
+
     //running flag
     private volatile boolean running;
 
@@ -69,6 +86,11 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
     //image loader
     private ImageManager imageManager;
+
+    @FunctionalInterface
+    private interface SpriteSheetCutter {
+        Image[] cut(int startIndex, int endIndex, Image[] spriteSheet);
+    }
 
     //daemonState holder
     private DaemonChainScript stateChain = new DaemonChainScript();
@@ -121,6 +143,9 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     //player
     private PlayerDaemon player;
     private DummyPlayerDaemon dummyPlayer;
+
+    //controllable zombie
+    private ZombieDaemon zombie;
 
     private Image[] playerSprite;
     private Image[] healthBarSprite;
@@ -243,8 +268,88 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 scene.addImageView(backgroundView);
 
                 //zombie sprite
-
                 zombieSprite = imageManager.loadSheet("zombieSheet.png", 8, 36, cameraWidth / 4, cameraHeight / 4);
+
+                SpriteSheetCutter sheetCutter = (start, end, sheet) -> {
+
+                    Image[] ret = new Image[end - start];
+                    for(int i = start; i < end; i++)
+                        ret[i - start] = sheet[i];
+
+                    return ret;
+                };
+
+                //controllable zombie
+                zombieMove0 = sheetCutter.cut(148, 156, zombieSprite);
+                zombieMove45 = sheetCutter.cut(112, 120, zombieSprite);
+                zombieMove90 = sheetCutter.cut(76, 84, zombieSprite);
+                zombieMove135 = sheetCutter.cut(40, 48, zombieSprite);
+                zombieMove180 = sheetCutter.cut(4, 12, zombieSprite);
+                zombieMove225 = sheetCutter.cut(256, 264, zombieSprite);
+                zombieMove270 = sheetCutter.cut(220, 228, zombieSprite);
+                zombieMove315 = sheetCutter.cut(184, 192, zombieSprite);
+
+
+                SpriteAnimatorDaemon<ConstantSpriteAnimator> zombieWalkTester = new SpriteAnimatorDaemon<>(
+                        gameConsumer,
+                        new ConstantSpriteAnimator(borderX / 2 - 50, borderY /2, zombieMove225)
+                ).setName("Zombie Direction Walk Tester");
+
+                zombieWalkTester.setAnimateSideQuest(renderer).setSleepInterval(100).setClosure(new ZombieAnimateClosure(
+                        scene.addImageView(new ImageViewImpl("Zombie Direction Walk Tester View"))
+                            .setAbsoluteX(borderX / 2 - 50)
+                            .setAbsoluteY(borderY / 2)
+                            .setZindex(6)
+                            .setImage(zombieMove270[0])
+                            .show()
+                        )
+                );
+
+                zombieWalkTester.start();
+
+                AngleToSpriteArray zombieMoveAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
+                    switch (angle) {
+                        case 0:
+                            return zombieMove0;
+                        case 45:
+                            return zombieMove45;
+                        case 90:
+                            return zombieMove90;
+                        case 135:
+                            return zombieMove135;
+                        case 180:
+                            return zombieMove180;
+                        case 225:
+                            return zombieMove225;
+                        case 270:
+                            return zombieMove270;
+                        case 315:
+                            return zombieMove315;
+                        default:
+                            throw new IllegalArgumentException("Angle: " +angle);
+                    }
+                });
+
+                ImageView controllableZombieView = scene.addImageView(new ImageViewImpl("Controllable Zombie View"))
+                        .setAbsoluteX(borderX / 2)
+                        .setAbsoluteY(borderY / 2)
+                        .setZindex(6)
+                        .setImage(zombieMove270[0])
+                        .show();
+
+                zombie = new ZombieDaemon(
+                        gameConsumer,
+                        new Zombie(
+                                zombieMove270[0],
+                                zombieMoveAnimation,
+                                Pair.create(((float) borderX) / 4, ((float) borderY) /4),
+                                dXY
+                        )
+                ).setName("Zombie");
+
+                zombie.setAnimateZombieSideQuest(renderer)
+                        .setSleepInterval(80)
+                        .setClosure(new ZombieSpriteAnimateClosure(controllableZombieView));
 
                 int noOfZombies = 100;
 
@@ -252,7 +357,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 zombieAnimators = new ArrayList<>(noOfZombies);
 
                 for(int i = 0; i < noOfZombies; ++i) {
-
 
                     int currentZombieX = getRandomInt(0, borderX);
                     int currentZombieY = getRandomInt(0, borderY);
@@ -263,7 +367,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             .setImage(zombieSprite[0])
                             .setZindex(4)
                             .show();
-
 
                     SpriteAnimatorDaemon<ConstantSpriteAnimator> zombieAnimator = new SpriteAnimatorDaemon(
                             gameConsumer,
@@ -735,6 +838,18 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 });
 
                 cameraSwitcher.start();
+
+
+                zombie.start().rotateTowards(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond(), ()-> System.err.println(DaemonUtils.tag() + "Zombie returned from rotation first time")).goTo(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond(), 6.4F, new Closure<Boolean>() {
+
+                    @Override
+                    public void onReturn(Return<Boolean> ret) {
+                        ret.runtimeCheckAndGet();
+
+                        zombie.clearAndInterrupt().rotateTowards(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond(), ()-> System.err.println(DaemonUtils.tag() + "Zombie returned from rotation"))
+                                .goTo(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond(), 6, this::onReturn);
+                    }
+                });
 
 //
 //                AngleToSpriteArray angleToSpriteArray = new AngleToSpriteArray(36);
