@@ -121,7 +121,6 @@ public class Grid<T> {
 
         boolean acceptTower = pathFinding.recalculate(this);
 
-
         if (acceptTower) {
             return true;
         } else {
@@ -129,6 +128,12 @@ public class Grid<T> {
             pathFinding.recalculate(this);
             return false;
         }
+    }
+
+    public void setCoordsAndRecalculate(int row, int column) {
+        startPoint = Pair.create(row, column);
+        endPoint = Pair.create(row, column);
+        pathFinding.recalculate(this);
     }
 
     public boolean destroyObject(float x, float y) {

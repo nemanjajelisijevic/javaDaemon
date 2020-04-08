@@ -14,8 +14,8 @@ public class AngleToSpriteArray implements AngleToImageArray {
     }
 
     private Image[][] roationSpriteList;
-    private int noOfDirections;
-    private int step;
+    private final int noOfDirections;
+    private final int step;
 
     private volatile int pointerRot, pointerTra;
 
@@ -29,7 +29,7 @@ public class AngleToSpriteArray implements AngleToImageArray {
     }
 
     @Override
-    public void setCurrentAngle(int degrees) {
+    public synchronized void setCurrentAngle(int degrees) {
         if (degrees >= 360)
             degrees = degrees - 360;
 
@@ -101,27 +101,28 @@ public class AngleToSpriteArray implements AngleToImageArray {
     }
 
     @Override
-    public Image getCurrent() {
+    public synchronized Image getCurrent() {
 
         Image[] currentSprite = roationSpriteList[pointerRot];
 
-        if (pointerTra >= currentSprite.length)
+        if (pointerTra >= currentSprite.length - 1)
             pointerTra = 0;
 
-        Image ret = currentSprite[pointerTra++];
+        Image ret = currentSprite[pointerTra];
 
-        pointerTra %= currentSprite.length;
+        pointerTra++;
+        pointerTra = pointerTra % currentSprite.length;
 
         return ret;
     }
 
     @Override
-    public int getCurrentAngle() {
+    public synchronized int getCurrentAngle() {
         return pointerRot;
     }
 
     @Override
-    public Image getIncrementedByStep() {
+    public synchronized Image getIncrementedByStep() {
         int diff = pointerRot + step - roationSpriteList.length;
 
         if(diff >= 0) {
@@ -136,7 +137,7 @@ public class AngleToSpriteArray implements AngleToImageArray {
     }
 
     @Override
-    public Image getDecrementedByStep() {
+    public synchronized Image getDecrementedByStep() {
         int diff = pointerRot - step;
         if (diff < 0) {
             pointerRot = roationSpriteList.length + diff;

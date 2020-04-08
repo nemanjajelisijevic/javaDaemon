@@ -163,6 +163,21 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         return rotationMover.iterateSprite();
     }
 
+    @Daemonize
+    @DedicatedThread(engineName = "rotate")
+    @Override
+    public synchronized void pushSprite(Image[] sprite) throws InterruptedException {
+        super.pushSprite(sprite);
+    }
+
+
+    @Daemonize
+    @DedicatedThread
+    @GenerateRunnable
+    public void interact(long sleepTimeMs) throws InterruptedException{
+        Thread.sleep(sleepTimeMs);
+    }
+
     @SideQuest(SLEEP = 25, blockingClosure = true)
     public PositionedImage[] animatePlayer() throws InterruptedException {
 

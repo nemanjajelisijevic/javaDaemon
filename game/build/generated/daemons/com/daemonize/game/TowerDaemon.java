@@ -17,6 +17,7 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.Movable;
+import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import java.lang.Exception;
 import java.lang.Float;
 import java.lang.IllegalStateException;
@@ -193,6 +194,11 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return this;
   }
 
+  public TowerDaemon setRotaterName(String name) {
+    prototype.setRotaterName(name);
+    return this;
+  }
+
   public TowerDaemon setRotationSprite(Image[] rotationsprite) {
     prototype.setRotationSprite(rotationsprite);
     return this;
@@ -237,6 +243,11 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   public ImageView getView() {
     return prototype.getView();
+  }
+
+  public TowerDaemon setSpriteIterator(SpriteIterator spriteiterator) {
+    prototype.setSpriteIterator(spriteiterator);
+    return this;
   }
 
   public TowerDaemon rotate(int targetangle) throws InterruptedException {
@@ -302,10 +313,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> activateTower() throws
       InterruptedException {
     return prototype.activateTower();
-  }
-
-  public boolean setDirectionAndMove(float x, float y, float velocityint) {
-    return prototype.setDirectionAndMove(x, y, velocityint);
   }
 
   public SideQuest getCurrentSideQuest() {

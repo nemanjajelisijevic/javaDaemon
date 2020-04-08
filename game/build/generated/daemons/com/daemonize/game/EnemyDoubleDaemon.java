@@ -17,6 +17,7 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.Movable;
+import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -208,6 +209,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     return prototype.getView();
   }
 
+  public EnemyDoubleDaemon setSpriteIterator(SpriteIterator spriteiterator) {
+    prototype.setSpriteIterator(spriteiterator);
+    return this;
+  }
+
   public Pair<Integer, Integer> getPreviousField() {
     return prototype.getPreviousField();
   }
@@ -259,10 +265,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon setParalyzedView(ImageView paralyzedview) {
     prototype.setParalyzedView(paralyzedview);
     return this;
-  }
-
-  public boolean setDirectionAndMove(float x, float y, float velocityint) {
-    return prototype.setDirectionAndMove(x, y, velocityint);
   }
 
   public SideQuest getCurrentSideQuest() {

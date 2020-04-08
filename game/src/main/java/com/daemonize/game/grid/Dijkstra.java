@@ -23,7 +23,7 @@ public class Dijkstra extends PathFinding {
 
             if (currentNode.equals(endNode)) {
                 startNode.gCost = 0;
-                //System.out.println("MATRICA \n" +  grid.gridToString().toString());
+                System.out.println("MATRICA \n" +  grid.gridToString().toString());
                 return true;
             }
 

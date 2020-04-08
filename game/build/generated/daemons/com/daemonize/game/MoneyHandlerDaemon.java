@@ -14,6 +14,7 @@ import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.Movable;
+import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -71,6 +72,11 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
 
   public MoneyHandlerDaemon pushSprite(Image[] sprite) throws InterruptedException {
     prototype.pushSprite(sprite);
+    return this;
+  }
+
+  public MoneyHandlerDaemon setSpriteIterator(SpriteIterator spriteiterator) {
+    prototype.setSpriteIterator(spriteiterator);
     return this;
   }
 
@@ -147,10 +153,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
   public MoneyHandlerDaemon setCoordinates(float lastx, float lasty) {
     prototype.setCoordinates(lastx, lasty);
     return this;
-  }
-
-  public boolean setDirectionAndMove(float x, float y, float velocityint) {
-    return prototype.setDirectionAndMove(x, y, velocityint);
   }
 
   public SideQuest getCurrentSideQuest() {

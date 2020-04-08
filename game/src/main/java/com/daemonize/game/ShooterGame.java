@@ -25,6 +25,7 @@ import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.AngleToSpriteArray;
 import com.daemonize.imagemovers.ImageMover;
+import com.daemonize.imagemovers.ImageTranslationMover;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -144,8 +145,10 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private PlayerDaemon player;
     private DummyPlayerDaemon dummyPlayer;
 
+    private Image[] explosionSprite;
+
     //controllable zombie
-    private ZombieDaemon zombie;
+    //private ZombieDaemon zombie;
 
     private Image[] playerSprite;
     private Image[] healthBarSprite;
@@ -172,7 +175,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Image[] zombieMove315;
 
     private ImageView[] zombieViews;
-    private List<SpriteAnimatorDaemon<ConstantSpriteAnimator>> zombieAnimators;
+    //private List<SpriteAnimatorDaemon<ConstantSpriteAnimator>> zombieAnimators;
 
     //controller
     private MovementControllerDaemon controller;
@@ -289,24 +292,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 zombieMove270 = sheetCutter.cut(220, 228, zombieSprite);
                 zombieMove315 = sheetCutter.cut(184, 192, zombieSprite);
 
-
-                SpriteAnimatorDaemon<ConstantSpriteAnimator> zombieWalkTester = new SpriteAnimatorDaemon<>(
-                        gameConsumer,
-                        new ConstantSpriteAnimator(borderX / 2 - 50, borderY /2, zombieMove225)
-                ).setName("Zombie Direction Walk Tester");
-
-                zombieWalkTester.setAnimateSideQuest(renderer).setSleepInterval(100).setClosure(new ZombieAnimateClosure(
-                        scene.addImageView(new ImageViewImpl("Zombie Direction Walk Tester View"))
-                            .setAbsoluteX(borderX / 2 - 50)
-                            .setAbsoluteY(borderY / 2)
-                            .setZindex(6)
-                            .setImage(zombieMove270[0])
-                            .show()
-                        )
-                );
-
-                zombieWalkTester.start();
-
                 AngleToSpriteArray zombieMoveAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
                     switch (angle) {
                         case 0:
@@ -330,57 +315,10 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     }
                 });
 
-                ImageView controllableZombieView = scene.addImageView(new ImageViewImpl("Controllable Zombie View"))
-                        .setAbsoluteX(borderX / 2)
-                        .setAbsoluteY(borderY / 2)
-                        .setZindex(6)
-                        .setImage(zombieMove270[0])
-                        .show();
 
-                zombie = new ZombieDaemon(
-                        gameConsumer,
-                        new Zombie(
-                                zombieMove270[0],
-                                zombieMoveAnimation,
-                                Pair.create(((float) borderX) / 4, ((float) borderY) /4),
-                                dXY
-                        )
-                ).setName("Zombie");
-
-                zombie.setAnimateZombieSideQuest(renderer)
-                        .setSleepInterval(80)
-                        .setClosure(new ZombieSpriteAnimateClosure(controllableZombieView));
-
-                int noOfZombies = 100;
-
-                zombieViews = new ImageView[noOfZombies];
-                zombieAnimators = new ArrayList<>(noOfZombies);
-
-                for(int i = 0; i < noOfZombies; ++i) {
-
-                    int currentZombieX = getRandomInt(0, borderX);
-                    int currentZombieY = getRandomInt(0, borderY);
-
-                    zombieViews[i] = scene.addImageView(new ImageViewImpl("Zombie View No. " + i))
-                            .setAbsoluteX(currentZombieX)
-                            .setAbsoluteY(currentZombieY)
-                            .setImage(zombieSprite[0])
-                            .setZindex(4)
-                            .show();
-
-                    SpriteAnimatorDaemon<ConstantSpriteAnimator> zombieAnimator = new SpriteAnimatorDaemon(
-                            gameConsumer,
-                            new ConstantSpriteAnimator(
-                                    currentZombieX,
-                                    currentZombieY,
-                                    zombieSprite
-                            )
-                    ).setName("Zombie Animator No. " + i);
-
-                    zombieAnimator.setAnimateSideQuest(renderer).setSleepInterval(100).setClosure(new ZombieAnimateClosure(zombieViews[i]));
-
-                    zombieAnimators.add(zombieAnimator.start());
-                }
+                explosionSprite = new Image[33];
+                for (int i = 0; i < explosionSprite.length; ++i)
+                    explosionSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", fieldWidth, fieldWidth);
 
                 //init grid views
                 accessibleField = imageManager.loadImageFromAssets("greenOctagon.png", fieldWidth, fieldWidth);
@@ -567,8 +505,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                 dXY,
                                 cameraWidth / 2,
                                 cameraHeight / 2,
-                                100,
-                                10
+                                500,
+                                500
                         )
                 ).setName("Player");
 
@@ -645,6 +583,24 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     playerAnimateClosure = new PlayerCameraClosure(mainView, hpView, searchlightView);
 
                     player.setAnimatePlayerSideQuest(renderer).setClosure(playerAnimateClosure);
+                }
+
+
+                int noOfZombies = 50;
+
+                zombieViews = new ImageView[noOfZombies];
+
+                for(int i = 0; i < noOfZombies; ++i) {
+
+                    int currentZombieX = getRandomInt(0, borderX);
+                    int currentZombieY = getRandomInt(0, borderY);
+
+                    zombieViews[i] = scene.addImageView(new ImageViewImpl("Zombie View No. " + i))
+                            .setAbsoluteX(currentZombieX)
+                            .setAbsoluteY(currentZombieY)
+                            .setZindex(6)
+                            .setImage(zombieMove270[0])
+                            .show();
                 }
 
                 renderer.setScene(scene.lockViews()).start();
@@ -837,20 +793,79 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     }
                 });
 
+
+                Field currentField = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
+
+                grid.setCoordsAndRecalculate(currentField.getRow(), currentField.getColumn());
+//
+//                player.interact(1000, new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        Field currentField = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
+//
+//                        grid.setCoordsAndRecalculate(currentField.getRow(), currentField.getColumn());
+//
+//                        System.err.println(DaemonUtils.tag() + "MATRICA \n" +  grid.gridToString().toString());
+//                        player.interact(1000, this::run);
+//                    }
+//                });
+
                 cameraSwitcher.start();
 
+                for(int i = 0; i < noOfZombies; ++i) {
 
-                zombie.start().rotateTowards(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond(), ()-> System.err.println(DaemonUtils.tag() + "Zombie returned from rotation first time")).goTo(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond(), 6.4F, new Closure<Boolean>() {
+                    //TODO
 
-                    @Override
-                    public void onReturn(Return<Boolean> ret) {
-                        ret.runtimeCheckAndGet();
+                    ZombieDaemon zombie = new ZombieDaemon(
+                            gameConsumer,
+                            new Zombie(
+                                    zombieMove270[0],
+                                    zombieMoveAnimation,
+                                    Pair.create(zombieViews[i].getAbsoluteX(), zombieViews[i].getAbsoluteY()),
+                                    dXY
+                            )
+                    ).setName("Zombie");
 
-                        zombie.clearAndInterrupt().rotateTowards(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond(), ()-> System.err.println(DaemonUtils.tag() + "Zombie returned from rotation"))
-                                .goTo(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond(), 6, this::onReturn);
-                    }
-                });
+                    zombie.setAnimateZombieSideQuest(renderer)
+                            .setSleepInterval(80)
+                            .setClosure(new ZombieSpriteAnimateClosure(zombieViews[i]));
 
+
+                    Field zeroField = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
+
+                    Field firstF = grid.getMinWeightOfNeighbors(zeroField);
+
+                    zombie.start().rotateTowards(firstF.getCenterX(), firstF.getCenterY())
+                            .goTo(firstF.getCenterX(), firstF.getCenterY(), 6.4F, new Closure<Boolean>() {
+
+                        @Override
+                        public void onReturn(Return<Boolean> ret) {
+                            ret.runtimeCheckAndGet();
+
+
+                            Field curr = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
+
+                            Field next = grid.getMinWeightOfNeighbors(curr);
+
+                            System.out.println(DaemonUtils.tag() + curr);
+
+                            if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) < 10) {
+
+                                if (player.getHp() - 100 < 1)
+                                    player.pushSprite(explosionSprite);
+                                else
+                                    player.setHp(player.getHp() - 100);
+
+                                zombie.attack(1000, () ->
+                                        zombie.rotateTowards(next.getCenterX(), next.getCenterY())
+                                        .goTo(next.getCenterX(), next.getCenterY(), 6, this::onReturn));
+                            } else
+                                zombie.rotateTowards(next.getCenterX(), next.getCenterY())
+                                    .goTo(next.getCenterX(), next.getCenterY(), 6, this::onReturn);
+                        }
+                    });
+                }
 //
 //                AngleToSpriteArray angleToSpriteArray = new AngleToSpriteArray(36);
 //

@@ -17,6 +17,7 @@ import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.Movable;
+import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -93,6 +94,11 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
 
   public int getDamage() {
     return prototype.getDamage();
+  }
+
+  public LaserBulletDaemon setSpriteIterator(SpriteIterator spriteiterator) {
+    prototype.setSpriteIterator(spriteiterator);
+    return this;
   }
 
   public LaserBulletDaemon setLevel(int level) {
@@ -200,10 +206,6 @@ public class LaserBulletDaemon implements EagerDaemon<LaserBulletDaemon> {
   public LaserBulletDaemon setCoordinates(float lastx, float lasty) {
     prototype.setCoordinates(lastx, lasty);
     return this;
-  }
-
-  public boolean setDirectionAndMove(float x, float y, float velocityint) {
-    return prototype.setDirectionAndMove(x, y, velocityint);
   }
 
   public SideQuest getCurrentSideQuest() {

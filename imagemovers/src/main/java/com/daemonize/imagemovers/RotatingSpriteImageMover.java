@@ -75,7 +75,8 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
 
     public void rotate(int targetAngle) throws InterruptedException {
         Image[] rotateSprite = getRotationSprite(targetAngle);
-        pushSprite(rotateSprite);
+        if (rotateSprite.length > 0) //TODO figure it out...
+            pushSprite(rotateSprite);
     }
 
     protected synchronized Image[] getRotationSprite(int targetAngle) throws InterruptedException {
@@ -114,17 +115,25 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
                         direction ? spriteBuffer.getIncrementedByStep()
                                 : spriteBuffer.getDecrementedByStep();
 
-            return Arrays.copyOf(currentRotationSprite, size);
+            Image[] ret = Arrays.copyOf(currentRotationSprite, size);
+
+            return ret;
         }
     }
 
     @Override
     public Image iterateSprite() {
 
-        if (name.equals("ZombieRotater"))
-            return spriteBuffer.getCurrent();
+        if (cache.isValid())
+            return cache.getNext();
         else
-            return super.iterateSprite();
+            return spriteBuffer.getCurrent();
+
+//
+//        if (name.equals("ZombieRotater"))
+//            return spriteBuffer.getCurrent();
+//        else
+//            return super.iterateSprite();
     }
 
     public static double getAngle(Pair<Float, Float> one, Pair<Float, Float> two) {

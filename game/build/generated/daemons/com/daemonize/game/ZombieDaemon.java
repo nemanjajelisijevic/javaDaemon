@@ -11,11 +11,10 @@ import com.daemonize.daemonengine.quests.MainQuest;
 import com.daemonize.daemonengine.quests.ReturnVoidMainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.SleepSideQuest;
+import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
-import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.imagemovers.ImageMover;
-import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.Movable;
 import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import java.lang.Boolean;
@@ -32,23 +31,26 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
-  private Bullet prototype;
+public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDaemon>, Movable {
+  private Zombie prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  public BulletDoubleDaemon(Consumer consumer, Bullet prototype) {
+  protected EagerMainQuestDaemonEngine rotateDaemonEngine;
+
+  public ZombieDaemon(Consumer consumer, Zombie prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
+    this.rotateDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - rotateDaemonEngine");
     this.prototype = prototype;
   }
 
   /**
-   * Prototype method {@link Bullet#animateBullet} */
-  public SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> setAnimateBulletSideQuest(Consumer consumer) {
-    SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> sideQuest = new AnimateBulletSideQuest(sideDaemonEngine.getClosureAwaiter());
+   * Prototype method {@link Zombie#animateZombie} */
+  public SleepSideQuest<ImageMover.PositionedImage[]> setAnimateZombieSideQuest(Consumer consumer) {
+    SleepSideQuest<ImageMover.PositionedImage[]> sideQuest = new AnimateZombieSideQuest(sideDaemonEngine.getClosureAwaiter());
     sideDaemonEngine.setSideQuest(sideQuest.setSleepInterval(25).setConsumer(consumer));
     return sideQuest;
   }
@@ -57,8 +59,9 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.redirect(x, y);
   }
 
-  public BulletDoubleDaemon popSprite() {
-    prototype.popSprite();
+  @Override
+  public ZombieDaemon setHp(int hp) {
+    prototype.setHp(hp);
     return this;
   }
 
@@ -66,13 +69,13 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.getTargetCoordinates();
   }
 
-  public BulletDoubleDaemon setVelocity(ImageMover.Velocity velocity) {
-    prototype.setVelocity(velocity);
+  public ZombieDaemon popSprite() {
+    prototype.popSprite();
     return this;
   }
 
-  public BulletDoubleDaemon setView3(ImageView view3) {
-    prototype.setView3(view3);
+  public ZombieDaemon setVelocity(ImageMover.Velocity velocity) {
+    prototype.setVelocity(velocity);
     return this;
   }
 
@@ -80,20 +83,27 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.getSize();
   }
 
-  public int getDamage() {
-    return prototype.getDamage();
+  @Override
+  public int getMaxHp() {
+    return prototype.getMaxHp();
   }
 
-  public BulletDoubleDaemon setSpriteIterator(SpriteIterator spriteiterator) {
+  @Override
+  public int getHp() {
+    return prototype.getHp();
+  }
+
+  public ZombieDaemon pushSprite(Image[] sprite) throws InterruptedException {
+    prototype.pushSprite(sprite);
+    return this;
+  }
+
+  public ZombieDaemon setSpriteIterator(SpriteIterator spriteiterator) {
     prototype.setSpriteIterator(spriteiterator);
     return this;
   }
 
-  public BulletDoubleDaemon setLevel(int level) {
-    prototype.setLevel(level);
-    return this;
-  }
-
+  @Override
   public Movable.AnimationWaiter getAnimationWaiter() {
     return prototype.getAnimationWaiter();
   }
@@ -102,7 +112,13 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.setDirectionToPoint(x, y);
   }
 
-  public BulletDoubleDaemon setDirection(ImageMover.Direction direction) {
+  @Override
+  public ZombieDaemon setMaxHp(int maxhp) {
+    prototype.setMaxHp(maxhp);
+    return this;
+  }
+
+  public ZombieDaemon setDirection(ImageMover.Direction direction) {
     prototype.setDirection(direction);
     return this;
   }
@@ -111,82 +127,56 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return prototype.animate();
   }
 
-  public BulletDoubleDaemon setDamage(int damage) {
-    prototype.setDamage(damage);
-    return this;
-  }
-
-  public BulletDoubleDaemon setVelocity(float velocity) {
-    prototype.setVelocity(velocity);
-    return this;
-  }
-
   public float getdXY() {
     return prototype.getdXY();
   }
 
-  public List<ImageView> getViews() {
-    return prototype.getViews();
-  }
-
-  public String toString() {
-    return prototype.toString();
-  }
-
-  public BulletDoubleDaemon setView2(ImageView view2) {
-    prototype.setView2(view2);
-    return this;
+  @Override
+  public void setVelocity(float velocity) {
+    prototype.setVelocity(velocity);
   }
 
   public double absDistance(float x1, float y1, float x2, float y2) {
     return prototype.absDistance(x1, y1, x2, y2);
   }
 
-  public BulletDoubleDaemon setCurrentAngle(int angle) {
-    prototype.setCurrentAngle(angle);
-    return this;
-  }
-
   public Image iterateSprite() {
     return prototype.iterateSprite();
   }
 
+  @Override
   public ImageMover.Velocity getVelocity() {
     return prototype.getVelocity();
   }
 
-  public BulletDoubleDaemon setView(ImageView view) {
-    prototype.setView(view);
-    return this;
+  public ImageMover.PositionedImage[] animateZombie() throws InterruptedException {
+    return prototype.animateZombie();
   }
 
+  @Override
   public Pair<Float, Float> getLastCoordinates() {
     return prototype.getLastCoordinates();
-  }
-
-  public ImageTranslationMover setSprite(Image[] sprite) {
-    return prototype.setSprite(sprite);
   }
 
   public Image[] getSprite() {
     return prototype.getSprite();
   }
 
+  public ZombieDaemon setSprite(Image[] sprite) {
+    prototype.setSprite(sprite);
+    return this;
+  }
+
   public double absDistance(Pair<Float, Float> source, Pair<Float, Float> dest) {
     return prototype.absDistance(source, dest);
   }
 
-  public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> animateBullet() throws
-      InterruptedException {
-    return prototype.animateBullet();
-  }
-
-  public BulletDoubleDaemon clearVelocity() {
+  public ZombieDaemon clearVelocity() {
     prototype.clearVelocity();
     return this;
   }
 
-  public BulletDoubleDaemon setCoordinates(float lastx, float lasty) {
+  public ZombieDaemon setCoordinates(float lastx, float lasty) {
     prototype.setCoordinates(lastx, lasty);
     return this;
   }
@@ -196,46 +186,39 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.Bullet#pushSprite} */
-  public BulletDoubleDaemon pushSprite(Image[] sprite, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, retRun, mainDaemonEngine.getClosureAwaiter()).setConsumer(mainDaemonEngine.getConsumer()));
-    return this;
-  }
-
-  /**
-   * Prototype method {@link com.daemonize.game.Bullet#rotate} */
-  public BulletDoubleDaemon rotate(int angle, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new RotateMainQuest(angle, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
+   * Prototype method {@link com.daemonize.game.Zombie#attack} */
+  public ZombieDaemon attack(long ms, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new AttackMainQuest(ms, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
   /**
    * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
-  public BulletDoubleDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
+  public ZombieDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
     mainDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.Bullet#rotateAndGoTo} */
-  public BulletDoubleDaemon rotateAndGoTo(int angle, float x, float y, float velocityint,
-      Closure<Boolean> closure) {
-    mainDaemonEngine.pursueQuest(new RotateAndGoToMainQuest(angle, x, y, velocityint, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
+   * Prototype method {@link com.daemonize.game.Zombie#rotateTowards} */
+  public ZombieDaemon rotateTowards(float x, float y) {
+    rotateDaemonEngine.pursueQuest(new RotateTowardsMainQuest(x, y).setConsumer(rotateDaemonEngine.getConsumer()));
     return this;
   }
 
-  public Bullet getPrototype() {
+  public Zombie getPrototype() {
     return prototype;
   }
 
-  public BulletDoubleDaemon setPrototype(Bullet prototype) {
+  public ZombieDaemon setPrototype(Zombie prototype) {
     this.prototype = prototype;
     return this;
   }
 
   @Override
-  public BulletDoubleDaemon start() {
+  public ZombieDaemon start() {
     mainDaemonEngine.start();
+    rotateDaemonEngine.start();
     sideDaemonEngine.start();
     return this;
   }
@@ -244,23 +227,26 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   public void stop() {
     mainDaemonEngine.stop();
     sideDaemonEngine.stop();
+    rotateDaemonEngine.stop();
   }
 
   @Override
-  public BulletDoubleDaemon queueStop() {
+  public ZombieDaemon queueStop() {
     mainDaemonEngine.queueStop(this);
     return this;
   }
 
   @Override
-  public BulletDoubleDaemon clear() {
+  public ZombieDaemon clear() {
     mainDaemonEngine.clear();
+    rotateDaemonEngine.clear();
     return this;
   }
 
   public List<DaemonState> getEnginesState() {
     List<DaemonState> ret = new ArrayList<DaemonState>();
     ret.add(mainDaemonEngine.getState());
+    ret.add(rotateDaemonEngine.getState());
     ret.add(sideDaemonEngine.getState());
     return ret;
   }
@@ -268,13 +254,15 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   public List<Integer> getEnginesQueueSizes() {
     List<Integer> ret = new ArrayList<Integer>();
     ret.add(mainDaemonEngine.queueSize());
+    ret.add(rotateDaemonEngine.queueSize());
     return ret;
   }
 
   @Override
-  public BulletDoubleDaemon setName(String engineName) {
+  public ZombieDaemon setName(String engineName) {
     mainDaemonEngine.setName(engineName);
     sideDaemonEngine.setName(engineName + " - SIDE");
+    rotateDaemonEngine.setName(engineName + " - rotateDaemonEngine");
     return this;
   }
 
@@ -283,18 +271,19 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     return mainDaemonEngine.getName();
   }
 
-  public BulletDoubleDaemon setMainQuestConsumer(Consumer consumer) {
+  public ZombieDaemon setMainQuestConsumer(Consumer consumer) {
     mainDaemonEngine.setConsumer(consumer);
+    rotateDaemonEngine.setConsumer(consumer);
     return this;
   }
 
-  public BulletDoubleDaemon setSideQuestConsumer(Consumer consumer) {
+  public ZombieDaemon setSideQuestConsumer(Consumer consumer) {
     sideDaemonEngine.setConsumer(consumer);
     return this;
   }
 
   @Override
-  public BulletDoubleDaemon setConsumer(Consumer consumer) {
+  public ZombieDaemon setConsumer(Consumer consumer) {
     throw new IllegalStateException("This method is unusable in DoubleDaemon. Please use setMainQuestConsumer(Consumer consumer) or setSideQuestConsumer(Consumer consumer)");
   }
 
@@ -304,66 +293,51 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   @Override
-  public BulletDoubleDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
+  public ZombieDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
     mainDaemonEngine.setUncaughtExceptionHandler(handler);
     sideDaemonEngine.setUncaughtExceptionHandler(handler);
+    rotateDaemonEngine.setUncaughtExceptionHandler(handler);
     return this;
   }
 
   @Override
-  public BulletDoubleDaemon interrupt() {
+  public ZombieDaemon interrupt() {
     mainDaemonEngine.interrupt();
+    rotateDaemonEngine.interrupt();
     return this;
   }
 
   @Override
-  public BulletDoubleDaemon clearAndInterrupt() {
+  public ZombieDaemon clearAndInterrupt() {
     mainDaemonEngine.clearAndInterrupt();
+    rotateDaemonEngine.clearAndInterrupt();
     return this;
   }
 
-  private final class AnimateBulletSideQuest extends SleepSideQuest<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> {
-    private AnimateBulletSideQuest(ClosureExecutionWaiter closureAwaiter) {
+  private final class AnimateZombieSideQuest extends SleepSideQuest<ImageMover.PositionedImage[]> {
+    private AnimateZombieSideQuest(ClosureExecutionWaiter closureAwaiter) {
       super(closureAwaiter);
-      this.description = "animateBullet";
+      this.description = "animateZombie";
     }
 
     @Override
-    public final GenericNode<Pair<ImageMover.PositionedImage, ImageView>> pursue() throws
-        Exception {
-      return prototype.animateBullet();
+    public final ImageMover.PositionedImage[] pursue() throws Exception {
+      return prototype.animateZombie();
     }
   }
 
-  private final class PushSpriteMainQuest extends ReturnVoidMainQuest {
-    private Image[] sprite;
+  private final class AttackMainQuest extends ReturnVoidMainQuest {
+    private long ms;
 
-    private PushSpriteMainQuest(Image[] sprite, Runnable retRun,
-        ClosureExecutionWaiter closureAwaiter) {
+    private AttackMainQuest(long ms, Runnable retRun, ClosureExecutionWaiter closureAwaiter) {
       super(retRun, closureAwaiter);
-      this.sprite = sprite;
-      this.description = "pushSprite";
+      this.ms = ms;
+      this.description = "attack";
     }
 
     @Override
     public final Void pursue() throws Exception {
-      prototype.pushSprite(sprite);
-      return null;
-    }
-  }
-
-  private final class RotateMainQuest extends ReturnVoidMainQuest {
-    private int angle;
-
-    private RotateMainQuest(int angle, Runnable retRun, ClosureExecutionWaiter closureAwaiter) {
-      super(retRun, closureAwaiter);
-      this.angle = angle;
-      this.description = "rotate";
-    }
-
-    @Override
-    public final Void pursue() throws Exception {
-      prototype.rotate(angle);
+      prototype.attack(ms);
       return null;
     }
   }
@@ -390,28 +364,22 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     }
   }
 
-  private final class RotateAndGoToMainQuest extends MainQuest<Boolean> {
-    private int angle;
-
+  private final class RotateTowardsMainQuest extends VoidMainQuest {
     private float x;
 
     private float y;
 
-    private float velocityint;
-
-    private RotateAndGoToMainQuest(int angle, float x, float y, float velocityint,
-        Closure<Boolean> closure, ClosureExecutionWaiter closureAwaiter) {
-      super(closure, closureAwaiter);
-      this.angle = angle;
+    private RotateTowardsMainQuest(float x, float y) {
+      super();
       this.x = x;
       this.y = y;
-      this.velocityint = velocityint;
-      this.description = "rotateAndGoTo";
+      this.description = "rotateTowards";
     }
 
     @Override
-    public final Boolean pursue() throws Exception {
-      return prototype.rotateAndGoTo(angle, x, y, velocityint);
+    public final Void pursue() throws Exception {
+      prototype.rotateTowards(x, y);
+      return null;
     }
   }
 }

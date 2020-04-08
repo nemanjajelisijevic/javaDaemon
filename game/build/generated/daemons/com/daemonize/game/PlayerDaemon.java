@@ -16,6 +16,7 @@ import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.Movable;
+import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -39,10 +40,13 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   protected EagerMainQuestDaemonEngine rotateDaemonEngine;
 
+  protected EagerMainQuestDaemonEngine interactDaemonEngine;
+
   public PlayerDaemon(Consumer consumer, Player prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
     this.rotateDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - rotateDaemonEngine");
+    this.interactDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - interactDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -104,8 +108,8 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     return prototype.getHp();
   }
 
-  public PlayerDaemon pushSprite(Image[] sprite) throws InterruptedException {
-    prototype.pushSprite(sprite);
+  public PlayerDaemon setSpriteIterator(SpriteIterator spriteiterator) {
+    prototype.setSpriteIterator(spriteiterator);
     return this;
   }
 
@@ -197,10 +201,6 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     return this;
   }
 
-  public boolean setDirectionAndMove(float x, float y, float velocityint) {
-    return prototype.setDirectionAndMove(x, y, velocityint);
-  }
-
   public SideQuest getCurrentSideQuest() {
     return this.sideDaemonEngine.getSideQuest();
   }
@@ -216,6 +216,20 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
    * Prototype method {@link com.daemonize.game.Player#go} */
   public PlayerDaemon go(float x, float y, float velocity) {
     mainDaemonEngine.pursueQuest(new GoIMainQuest(x, y, velocity).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Player#interact} */
+  public PlayerDaemon interact(long sleeptimems, Runnable retRun) {
+    interactDaemonEngine.pursueQuest(new InteractMainQuest(sleeptimems, retRun, null).setConsumer(interactDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Player#pushSprite} */
+  public PlayerDaemon pushSprite(Image[] sprite) {
+    rotateDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite).setConsumer(rotateDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -275,6 +289,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public PlayerDaemon start() {
     mainDaemonEngine.start();
     rotateDaemonEngine.start();
+    interactDaemonEngine.start();
     sideDaemonEngine.start();
     return this;
   }
@@ -284,6 +299,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     mainDaemonEngine.stop();
     sideDaemonEngine.stop();
     rotateDaemonEngine.stop();
+    interactDaemonEngine.stop();
   }
 
   @Override
@@ -296,6 +312,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public PlayerDaemon clear() {
     mainDaemonEngine.clear();
     rotateDaemonEngine.clear();
+    interactDaemonEngine.clear();
     return this;
   }
 
@@ -303,6 +320,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     List<DaemonState> ret = new ArrayList<DaemonState>();
     ret.add(mainDaemonEngine.getState());
     ret.add(rotateDaemonEngine.getState());
+    ret.add(interactDaemonEngine.getState());
     ret.add(sideDaemonEngine.getState());
     return ret;
   }
@@ -311,6 +329,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     List<Integer> ret = new ArrayList<Integer>();
     ret.add(mainDaemonEngine.queueSize());
     ret.add(rotateDaemonEngine.queueSize());
+    ret.add(interactDaemonEngine.queueSize());
     return ret;
   }
 
@@ -319,6 +338,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     mainDaemonEngine.setName(engineName);
     sideDaemonEngine.setName(engineName + " - SIDE");
     rotateDaemonEngine.setName(engineName + " - rotateDaemonEngine");
+    interactDaemonEngine.setName(engineName + " - interactDaemonEngine");
     return this;
   }
 
@@ -330,6 +350,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public PlayerDaemon setMainQuestConsumer(Consumer consumer) {
     mainDaemonEngine.setConsumer(consumer);
     rotateDaemonEngine.setConsumer(consumer);
+    interactDaemonEngine.setConsumer(consumer);
     return this;
   }
 
@@ -353,6 +374,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     mainDaemonEngine.setUncaughtExceptionHandler(handler);
     sideDaemonEngine.setUncaughtExceptionHandler(handler);
     rotateDaemonEngine.setUncaughtExceptionHandler(handler);
+    interactDaemonEngine.setUncaughtExceptionHandler(handler);
     return this;
   }
 
@@ -360,6 +382,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public PlayerDaemon interrupt() {
     mainDaemonEngine.interrupt();
     rotateDaemonEngine.interrupt();
+    interactDaemonEngine.interrupt();
     return this;
   }
 
@@ -367,6 +390,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public PlayerDaemon clearAndInterrupt() {
     mainDaemonEngine.clearAndInterrupt();
     rotateDaemonEngine.clearAndInterrupt();
+    interactDaemonEngine.clearAndInterrupt();
     return this;
   }
 
@@ -419,6 +443,39 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     @Override
     public final Void pursue() throws Exception {
       prototype.go(x, y, velocity);
+      return null;
+    }
+  }
+
+  private final class InteractMainQuest extends ReturnVoidMainQuest {
+    private long sleeptimems;
+
+    private InteractMainQuest(long sleeptimems, Runnable retRun,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
+      this.sleeptimems = sleeptimems;
+      this.description = "interact";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.interact(sleeptimems);
+      return null;
+    }
+  }
+
+  private final class PushSpriteMainQuest extends VoidMainQuest {
+    private Image[] sprite;
+
+    private PushSpriteMainQuest(Image[] sprite) {
+      super();
+      this.sprite = sprite;
+      this.description = "pushSprite";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.pushSprite(sprite);
       return null;
     }
   }
