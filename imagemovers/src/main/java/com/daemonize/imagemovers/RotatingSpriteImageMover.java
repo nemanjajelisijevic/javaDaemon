@@ -2,6 +2,7 @@ package com.daemonize.imagemovers;
 
 
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 
@@ -84,10 +85,13 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         int currentAngle = spriteBuffer.getCurrentAngle();
 
         if (currentAngle == targetAngle) {
+
             return new Image[]{spriteBuffer.getCurrent()};
+
         } else if (Math.abs(targetAngle - currentAngle) <= spriteBuffer.getStep()) { //TODO check how many steps is the limit?
 
             spriteBuffer.setCurrentAngle(targetAngle);
+
             Image[] last = new Image[1];
             last[0] = spriteBuffer.getCurrent();
 
@@ -101,22 +105,24 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
             boolean direction; //true for increasing angle
 
             if (targetAngle < 180) {
+
                 mirrorAngle = targetAngle + 180;
                 direction = !(currentAngle < mirrorAngle && currentAngle > targetAngle);
+
             } else {
+
                 mirrorAngle = targetAngle - 180;
                 direction = currentAngle < targetAngle && currentAngle > mirrorAngle;
             }
 
             while (!(Math.abs(targetAngle - spriteBuffer.getCurrentAngle())
                     < spriteBuffer.getStep())
-                    && size < currentRotationSprite.length)//TODO fix this!!!!!!
+                    && size < currentRotationSprite.length) //TODO fix this!!!!!!
                 currentRotationSprite[size++] =
                         direction ? spriteBuffer.getIncrementedByStep()
                                 : spriteBuffer.getDecrementedByStep();
 
             Image[] ret = Arrays.copyOf(currentRotationSprite, size);
-
             return ret;
         }
     }
@@ -124,11 +130,11 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     @Override
     public Image iterateSprite() {
 
-        if (cache.isValid())
+        if (cache.isValid()) {
             return cache.getNext();
-        else
+        } else {
             return spriteBuffer.getCurrent();
-
+        }
 //
 //        if (name.equals("ZombieRotater"))
 //            return spriteBuffer.getCurrent();

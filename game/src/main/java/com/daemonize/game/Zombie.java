@@ -36,7 +36,6 @@ public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Z
     }
 
     @Daemonize
-    @DedicatedThread(engineName = "rotate")
     public void rotateTowards(float x, float y) throws InterruptedException {
         rotationMover.rotateTowards(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y);
     }

@@ -1,6 +1,7 @@
 package com.daemonize.imagemovers;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
+import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class AngleToSpriteArray implements AngleToImageArray {
         Image[] map(int angle);
     }
 
-    private Image[][] roationSpriteList;
+    private final Image[][] roationSpriteList;
     private final int noOfDirections;
     private final int step;
 
@@ -30,12 +31,12 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
     @Override
     public synchronized void setCurrentAngle(int degrees) {
+
         if (degrees >= 360)
             degrees = degrees - 360;
 
-        if (degrees < 0 || degrees > 359) {
+        if (degrees < 0 || degrees > 359)
             throw new IllegalArgumentException("Arg degrees must be > 0 && < 360, set: " + degrees);
-        }
 
         pointerRot = degrees;
         pointerTra = 0;
@@ -61,9 +62,13 @@ public class AngleToSpriteArray implements AngleToImageArray {
         for (int i = 0; i < noOfDirections; i++)
             addSprite(mapper);
 
-        for(int j = 0; j < 360; j++)
-            System.out.println(DaemonUtils.tag() + "Image[" + j + "][]" + roationSpriteList[j][0]);
-
+        for(int j = 0; j < 360; j++) {
+            for (int k = 0; k < roationSpriteList[j].length; k++)
+            //for (int k = 0; k < angleList.get(j).getSecond().length; k++)
+                //System.out.print(DaemonUtils.timedTag()() + "Image[" + j + "][" + k + "]" + angleList.get(j).getSecond()[k]);
+                System.out.print(DaemonUtils.timedTag() + "Image[" + j + "][" + k + "]" + roationSpriteList[j][k]);
+            System.out.println("");
+        }
 
         return this;
     }
@@ -84,14 +89,18 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
             for (int i = startIndex; i <= endIndex; i++) {
                 if(i < 0)
+                    //angleList.get(360 + i).setSecond(sprite);
                     roationSpriteList[360 + i] = sprite;
                 else
+
+                    //angleList.get(i).setSecond(sprite);
                     roationSpriteList[i] = sprite;
             }
 
         else
 
             for (int i = startIndex; i <= endIndex; i++) {
+                //angleList.get(i).setSecond(sprite);
                 roationSpriteList[i] = sprite;
             }
 
@@ -105,12 +114,10 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
         Image[] currentSprite = roationSpriteList[pointerRot];
 
-        if (pointerTra >= currentSprite.length - 1)
+        if (pointerTra > currentSprite.length - 1)
             pointerTra = 0;
 
-        Image ret = currentSprite[pointerTra];
-
-        pointerTra++;
+        Image ret = currentSprite[pointerTra++];
         pointerTra = pointerTra % currentSprite.length;
 
         return ret;
@@ -123,8 +130,8 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
     @Override
     public synchronized Image getIncrementedByStep() {
-        int diff = pointerRot + step - roationSpriteList.length;
 
+        int diff = pointerRot + step - 360;
         if(diff >= 0) {
             pointerRot = diff;
         } else {
@@ -138,9 +145,10 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
     @Override
     public synchronized Image getDecrementedByStep() {
+
         int diff = pointerRot - step;
         if (diff < 0) {
-            pointerRot = roationSpriteList.length + diff;
+            pointerRot = 360 + diff;
         } else if (diff == 0){
             pointerRot = 0;
         } else {

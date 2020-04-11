@@ -126,7 +126,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     //fixed camera
     private FixedCamera fixedCamera;
 
-    private DummyDaemon cameraSwitcher;
+    //private DummyDaemon cameraSwitcher;
 
     //cmd parser
     private CommandParserDaemon commandParser;
@@ -291,30 +291,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 zombieMove225 = sheetCutter.cut(256, 264, zombieSprite);
                 zombieMove270 = sheetCutter.cut(220, 228, zombieSprite);
                 zombieMove315 = sheetCutter.cut(184, 192, zombieSprite);
-
-                AngleToSpriteArray zombieMoveAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
-                    switch (angle) {
-                        case 0:
-                            return zombieMove0;
-                        case 45:
-                            return zombieMove45;
-                        case 90:
-                            return zombieMove90;
-                        case 135:
-                            return zombieMove135;
-                        case 180:
-                            return zombieMove180;
-                        case 225:
-                            return zombieMove225;
-                        case 270:
-                            return zombieMove270;
-                        case 315:
-                            return zombieMove315;
-                        default:
-                            throw new IllegalArgumentException("Angle: " +angle);
-                    }
-                });
-
 
                 explosionSprite = new Image[33];
                 for (int i = 0; i < explosionSprite.length; ++i)
@@ -666,8 +642,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                     Field<Interactable<PlayerDaemon>> field = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
 
-                    System.out.println(DaemonUtils.tag() + "Actual player coordinates: " + player.getLastCoordinates().toString());
-                    System.out.println(DaemonUtils.tag() + "Player at field: " + field.toString());
+//                    System.out.println(DaemonUtils.tag() + "Actual player coordinates: " + player.getLastCoordinates().toString());
+//                    System.out.println(DaemonUtils.tag() + "Player at field: " + field.toString());
 
                     Interactable<PlayerDaemon> item = field.getObject();
 
@@ -685,113 +661,113 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
                         .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
-
-                dummyPlayer = new DummyPlayerDaemon(gameConsumer, new DummyPlayer(playerSprite[0], player.getLastCoordinates(), dXY));
-                dummyPlayer.setAnimateDummyPlayerSideQuest(renderer).setClosure(ret -> {});
-                dummyPlayer.start();
+//
+//                dummyPlayer = new DummyPlayerDaemon(gameConsumer, new DummyPlayer(playerSprite[0], player.getLastCoordinates(), dXY));
+//                dummyPlayer.setAnimateDummyPlayerSideQuest(renderer).setClosure(ret -> {});
+//                dummyPlayer.start();
 
                 //camera switcher init
-                cameraSwitcher = DummyDaemon.create(gameConsumer, 5000L).setClosure(new Runnable() {
-
-                    private Camera2D currentCamera = followingCamera;
-
-                    private void setCamera(Camera2D camera) {
-                        this.currentCamera = camera;
-                        renderer.setCamera(camera);
-                    }
-
-                    @Override
-                    public void run() {
-
-                        if (currentCamera.equals(followingCamera)) {
-
-                            playerAnimateClosure.setMainView(playerViewMap.get("mainFC"))
-                                    .setHpView(playerViewMap.get("hpFC"))
-                                    .setSearchlightView(playerViewMap.get("searchlightFC"));
-
-                            fixedCamera.setX(followingCamera.getRenderingX())
-                                    .setY(followingCamera.getRenderingY());
-
-                            playerViewMap.get("mainFC")
-                                    .setAbsoluteX(playerViewMap.get("main").getAbsoluteX())
-                                    .setAbsoluteY(playerViewMap.get("main").getAbsoluteY())
-                                    .setImage(playerViewMap.get("main").getImage());
-
-                            playerViewMap.get("hpFC").setAbsoluteX(playerViewMap.get("hp").getAbsoluteX())
-                                    .setAbsoluteY(playerViewMap.get("hp").getAbsoluteY())
-                                    .setImage(playerViewMap.get("hp").getImage());
-
-                            playerViewMap.get("searchlightFC").setAbsoluteX(playerViewMap.get("searchlightView").getAbsoluteX())
-                                    .setAbsoluteY(playerViewMap.get("searchlightView").getAbsoluteY())
-                                    .setImage(playerViewMap.get("searchlightView").getImage());
-
-                            renderer.consume(() -> {
-                                playerViewMap.get("main").hide();
-                                playerViewMap.get("hp").hide();
-                                playerViewMap.get("searchlightView").hide();
-
-                                playerViewMap.get("mainFC").show();
-                                playerViewMap.get("hpFC").show();
-                                playerViewMap.get("searchlightFC").show();
-                            });
-
-                            setCamera(fixedCamera);
-
-                        } else {
-
-                            dummyPlayer.setCoordinates(fixedCamera.getCenterX(), fixedCamera.getCenterY());
-                            setCamera(followingCamera.setTarget(dummyPlayer));
-
-                            dummyPlayer.goTo(
-                                    player.getLastCoordinates(),
-                                    35,
-                                    new Runnable() {
-                                        @Override
-                                        public void run() {
-
-                                            if (Math.abs(dummyPlayer.getLastCoordinates().getFirst() - player.getLastCoordinates().getFirst()) > 30
-                                                    && Math.abs(dummyPlayer.getLastCoordinates().getSecond() - player.getLastCoordinates().getSecond()) > 25) {
-                                                dummyPlayer.goTo(player.getLastCoordinates(), 20, this::run);
-                                                return;
-                                            }
-
-                                            playerViewMap.get("main")
-                                                    .setAbsoluteX(playerViewMap.get("mainFC").getAbsoluteX())
-                                                    .setAbsoluteY(playerViewMap.get("mainFC").getAbsoluteY())
-                                                    .setImage(playerViewMap.get("mainFC").getImage());
-
-                                            playerViewMap.get("hp")
-                                                    .setAbsoluteX(playerViewMap.get("hpFC").getAbsoluteX())
-                                                    .setAbsoluteY(playerViewMap.get("hpFC").getAbsoluteY())
-                                                    .setImage(playerViewMap.get("hpFC").getImage());
-
-                                            playerViewMap.get("searchlightView")
-                                                    .setAbsoluteX(playerViewMap.get("searchlightFC").getAbsoluteX())
-                                                    .setAbsoluteY(playerViewMap.get("searchlightFC").getAbsoluteY())
-                                                    .setImage(playerViewMap.get("searchlightFC").getImage());
-
-                                            playerAnimateClosure.setMainView(playerViewMap.get("main"))
-                                                        .setHpView(playerViewMap.get("hp"))
-                                                        .setSearchlightView(playerViewMap.get("searchlightView"));
-
-                                            followingCamera.setTarget(player);
-
-                                            renderer.consume(() -> {
-
-                                                playerViewMap.get("mainFC").hide();
-                                                playerViewMap.get("hpFC").hide();
-                                                playerViewMap.get("searchlightFC").hide();
-
-                                                playerViewMap.get("main").show();
-                                                playerViewMap.get("hp").show();
-                                                playerViewMap.get("searchlightView").show();
-
-                                            });
-                                        }
-                                    });
-                        }
-                    }
-                });
+//                cameraSwitcher = DummyDaemon.create(gameConsumer, 5000L).setClosure(new Runnable() {
+//
+//                    private Camera2D currentCamera = followingCamera;
+//
+//                    private void setCamera(Camera2D camera) {
+//                        this.currentCamera = camera;
+//                        renderer.setCamera(camera);
+//                    }
+//
+//                    @Override
+//                    public void run() {
+//
+//                        if (currentCamera.equals(followingCamera)) {
+//
+//                            playerAnimateClosure.setMainView(playerViewMap.get("mainFC"))
+//                                    .setHpView(playerViewMap.get("hpFC"))
+//                                    .setSearchlightView(playerViewMap.get("searchlightFC"));
+//
+//                            fixedCamera.setX(followingCamera.getRenderingX())
+//                                    .setY(followingCamera.getRenderingY());
+//
+//                            playerViewMap.get("mainFC")
+//                                    .setAbsoluteX(playerViewMap.get("main").getAbsoluteX())
+//                                    .setAbsoluteY(playerViewMap.get("main").getAbsoluteY())
+//                                    .setImage(playerViewMap.get("main").getImage());
+//
+//                            playerViewMap.get("hpFC").setAbsoluteX(playerViewMap.get("hp").getAbsoluteX())
+//                                    .setAbsoluteY(playerViewMap.get("hp").getAbsoluteY())
+//                                    .setImage(playerViewMap.get("hp").getImage());
+//
+//                            playerViewMap.get("searchlightFC").setAbsoluteX(playerViewMap.get("searchlightView").getAbsoluteX())
+//                                    .setAbsoluteY(playerViewMap.get("searchlightView").getAbsoluteY())
+//                                    .setImage(playerViewMap.get("searchlightView").getImage());
+//
+//                            renderer.consume(() -> {
+//                                playerViewMap.get("main").hide();
+//                                playerViewMap.get("hp").hide();
+//                                playerViewMap.get("searchlightView").hide();
+//
+//                                playerViewMap.get("mainFC").show();
+//                                playerViewMap.get("hpFC").show();
+//                                playerViewMap.get("searchlightFC").show();
+//                            });
+//
+//                            setCamera(fixedCamera);
+//
+//                        } else {
+//
+//                            dummyPlayer.setCoordinates(fixedCamera.getCenterX(), fixedCamera.getCenterY());
+//                            setCamera(followingCamera.setTarget(dummyPlayer));
+//
+//                            dummyPlayer.goTo(
+//                                    player.getLastCoordinates(),
+//                                    35,
+//                                    new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//
+//                                            if (Math.abs(dummyPlayer.getLastCoordinates().getFirst() - player.getLastCoordinates().getFirst()) > 30
+//                                                    && Math.abs(dummyPlayer.getLastCoordinates().getSecond() - player.getLastCoordinates().getSecond()) > 25) {
+//                                                dummyPlayer.goTo(player.getLastCoordinates(), 20, this::run);
+//                                                return;
+//                                            }
+//
+//                                            playerViewMap.get("main")
+//                                                    .setAbsoluteX(playerViewMap.get("mainFC").getAbsoluteX())
+//                                                    .setAbsoluteY(playerViewMap.get("mainFC").getAbsoluteY())
+//                                                    .setImage(playerViewMap.get("mainFC").getImage());
+//
+//                                            playerViewMap.get("hp")
+//                                                    .setAbsoluteX(playerViewMap.get("hpFC").getAbsoluteX())
+//                                                    .setAbsoluteY(playerViewMap.get("hpFC").getAbsoluteY())
+//                                                    .setImage(playerViewMap.get("hpFC").getImage());
+//
+//                                            playerViewMap.get("searchlightView")
+//                                                    .setAbsoluteX(playerViewMap.get("searchlightFC").getAbsoluteX())
+//                                                    .setAbsoluteY(playerViewMap.get("searchlightFC").getAbsoluteY())
+//                                                    .setImage(playerViewMap.get("searchlightFC").getImage());
+//
+//                                            playerAnimateClosure.setMainView(playerViewMap.get("main"))
+//                                                        .setHpView(playerViewMap.get("hp"))
+//                                                        .setSearchlightView(playerViewMap.get("searchlightView"));
+//
+//                                            followingCamera.setTarget(player);
+//
+//                                            renderer.consume(() -> {
+//
+//                                                playerViewMap.get("mainFC").hide();
+//                                                playerViewMap.get("hpFC").hide();
+//                                                playerViewMap.get("searchlightFC").hide();
+//
+//                                                playerViewMap.get("main").show();
+//                                                playerViewMap.get("hp").show();
+//                                                playerViewMap.get("searchlightView").show();
+//
+//                                            });
+//                                        }
+//                                    });
+//                        }
+//                    }
+//                });
 
 
                 Field currentField = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
@@ -811,11 +787,33 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 //                    }
 //                });
 
-                cameraSwitcher.start();
+//                cameraSwitcher.start();
 
                 for(int i = 0; i < noOfZombies; ++i) {
 
-                    //TODO
+                    AngleToSpriteArray zombieMoveAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
+                        switch (angle) {
+                            case 0:
+                                return zombieMove0;
+                            case 45:
+                                return zombieMove45;
+                            case 90:
+                                return zombieMove90;
+                            case 135:
+                                return zombieMove135;
+                            case 180:
+                                return zombieMove180;
+                            case 225:
+                                return zombieMove225;
+                            case 270:
+                                return zombieMove270;
+                            case 315:
+                                return zombieMove315;
+                            default:
+                                throw new IllegalArgumentException("Angle: " +angle);
+                        }
+                    });
+
 
                     ZombieDaemon zombie = new ZombieDaemon(
                             gameConsumer,
@@ -825,7 +823,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                     Pair.create(zombieViews[i].getAbsoluteX(), zombieViews[i].getAbsoluteY()),
                                     dXY
                             )
-                    ).setName("Zombie");
+                    ).setName( i % 50 ==0 ? "DebugZombie no: " + i : "Zombie");
 
                     zombie.setAnimateZombieSideQuest(renderer)
                             .setSleepInterval(80)
@@ -836,19 +834,22 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                     Field firstF = grid.getMinWeightOfNeighbors(zeroField);
 
-                    zombie.start().rotateTowards(firstF.getCenterX(), firstF.getCenterY())
-                            .goTo(firstF.getCenterX(), firstF.getCenterY(), 6.4F, new Closure<Boolean>() {
+                    zombie.start().rotateTowards(firstF.getCenterX(), firstF.getCenterY()).goTo(firstF.getCenterX(), firstF.getCenterY(), 6.4F, new Closure<Boolean>() {
 
                         @Override
                         public void onReturn(Return<Boolean> ret) {
+
                             ret.runtimeCheckAndGet();
 
-
-                            Field curr = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
+                            Field curr = grid.getField(
+                                    zombie.getLastCoordinates().getFirst(),
+                                    zombie.getLastCoordinates().getSecond()
+                            );
 
                             Field next = grid.getMinWeightOfNeighbors(curr);
 
-                            System.out.println(DaemonUtils.tag() + curr);
+                            if (zombie.getName().contains("DebugZombie"))
+                                System.err.println(DaemonUtils.timedTag() + zombie.getName() + " at " + curr);
 
                             if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) < 10) {
 
@@ -857,15 +858,22 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                 else
                                     player.setHp(player.getHp() - 100);
 
-                                zombie.attack(1000, () ->
-                                        zombie.rotateTowards(next.getCenterX(), next.getCenterY())
-                                        .goTo(next.getCenterX(), next.getCenterY(), 6, this::onReturn));
+                                zombie.attack(1000,
+                                        () -> zombie.rotateTowards(next.getCenterX(), next.getCenterY())
+                                                //() ->
+                                                        .goTo(next.getCenterX(), next.getCenterY(), 6, this::onReturn)
+                                        //)
+                                );
                             } else
-                                zombie.rotateTowards(next.getCenterX(), next.getCenterY())
-                                    .goTo(next.getCenterX(), next.getCenterY(), 6, this::onReturn);
+                                zombie.rotateTowards(next.getCenterX(), next.getCenterY()).goTo(next.getCenterX(), next.getCenterY(), 6, this::onReturn);
+                                //);
                         }
                     });
                 }
+
+
+
+
 //
 //                AngleToSpriteArray angleToSpriteArray = new AngleToSpriteArray(36);
 //

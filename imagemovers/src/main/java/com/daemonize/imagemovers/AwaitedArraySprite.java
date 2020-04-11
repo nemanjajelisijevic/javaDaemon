@@ -1,5 +1,6 @@
 package com.daemonize.imagemovers;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.graphics2d.images.Image;
 
 import java.util.concurrent.locks.Condition;
@@ -74,6 +75,4 @@ public class AwaitedArraySprite {
 
         return ret;
     }
-
-
 }
