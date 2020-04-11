@@ -17,7 +17,7 @@ public class DaemonUtils {
 
     public static String timedTag() {
         Date date = new Date(System.currentTimeMillis());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd, hh:mm:ss:SSS");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd, HH:mm:ss:SSS");
         return dateFormat.format(date) +  " " + tag();
     }
 

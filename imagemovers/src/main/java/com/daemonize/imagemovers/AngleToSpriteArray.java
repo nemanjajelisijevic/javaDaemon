@@ -1,11 +1,7 @@
 package com.daemonize.imagemovers;
 
 import com.daemonize.daemonengine.utils.DaemonUtils;
-import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AngleToSpriteArray implements AngleToImageArray {
 
@@ -14,7 +10,7 @@ public class AngleToSpriteArray implements AngleToImageArray {
         Image[] map(int angle);
     }
 
-    private final Image[][] roationSpriteList;
+    private static Image[][] rotationSpriteList;
     private final int noOfDirections;
     private final int step;
 
@@ -52,23 +48,26 @@ public class AngleToSpriteArray implements AngleToImageArray {
         if (directionsNo < 4 && directionsNo % 4 != 0)
             throw new IllegalArgumentException("Arg directionsNo cant be less than 4 and must be divisible by 4. Passed: " + directionsNo);
 
-        this.roationSpriteList = new Image[360][];
+        if (this.rotationSpriteList == null) {
+            System.err.println(DaemonUtils.timedTag() + "[AngleToSpriteArray] Rotation List Initialization!");
+            this.rotationSpriteList = new Image[360][];
+        }
         this.noOfDirections = directionsNo;
         this.step = 360 / noOfDirections;
         this.currentAngleSetter = 0;
+        this.pointerRot = 0;
+        this.pointerTra = 0;
     }
 
     public AngleToSpriteArray mapAllAngles(AngleToSpriteMapper mapper) {
         for (int i = 0; i < noOfDirections; i++)
             addSprite(mapper);
 
-        for(int j = 0; j < 360; j++) {
-            for (int k = 0; k < roationSpriteList[j].length; k++)
-            //for (int k = 0; k < angleList.get(j).getSecond().length; k++)
-                //System.out.print(DaemonUtils.timedTag()() + "Image[" + j + "][" + k + "]" + angleList.get(j).getSecond()[k]);
-                System.out.print(DaemonUtils.timedTag() + "Image[" + j + "][" + k + "]" + roationSpriteList[j][k]);
-            System.out.println("");
-        }
+//        for(int j = 0; j < 360; j++) {
+//            for (int k = 0; k < rotationSpriteList[j].length; k++)
+//                System.out.print(DaemonUtils.timedTag() + "Image[" + j + "][" + k + "]" + rotationSpriteList[j][k]);
+//            System.out.println("");
+//        }
 
         return this;
     }
@@ -89,30 +88,23 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
             for (int i = startIndex; i <= endIndex; i++) {
                 if(i < 0)
-                    //angleList.get(360 + i).setSecond(sprite);
-                    roationSpriteList[360 + i] = sprite;
+                    rotationSpriteList[360 + i] = sprite;
                 else
-
-                    //angleList.get(i).setSecond(sprite);
-                    roationSpriteList[i] = sprite;
+                    rotationSpriteList[i] = sprite;
             }
 
         else
-
-            for (int i = startIndex; i <= endIndex; i++) {
-                //angleList.get(i).setSecond(sprite);
-                roationSpriteList[i] = sprite;
-            }
+            for (int i = startIndex; i <= endIndex; i++)
+                rotationSpriteList[i] = sprite;
 
         currentAngleSetter += step;
-        //TODO
         return this;
     }
 
     @Override
     public synchronized Image getCurrent() {
 
-        Image[] currentSprite = roationSpriteList[pointerRot];
+        Image[] currentSprite = rotationSpriteList[pointerRot];
 
         if (pointerTra > currentSprite.length - 1)
             pointerTra = 0;
@@ -140,7 +132,7 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
         pointerTra = 0;
 
-        return roationSpriteList[pointerRot][pointerTra];
+        return rotationSpriteList[pointerRot][pointerTra];
     }
 
     @Override
@@ -157,11 +149,16 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
         pointerTra = 0;
 
-        return roationSpriteList[pointerRot][pointerTra];
+        return rotationSpriteList[pointerRot][pointerTra];
     }
 
     @Override
     public Image getByAngle(int degrees) {
-        return roationSpriteList[degrees][0];
+        return rotationSpriteList[degrees][0];
+    }
+
+    @Override
+    public AngleToSpriteArray clone() throws CloneNotSupportedException {
+        return new AngleToSpriteArray(this.noOfDirections);
     }
 }

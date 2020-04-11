@@ -789,37 +789,40 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
 //                cameraSwitcher.start();
 
+
+                AngleToSpriteArray zombieMoveAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
+                    switch (angle) {
+                        case 0:
+                            return zombieMove0;
+                        case 45:
+                            return zombieMove45;
+                        case 90:
+                            return zombieMove90;
+                        case 135:
+                            return zombieMove135;
+                        case 180:
+                            return zombieMove180;
+                        case 225:
+                            return zombieMove225;
+                        case 270:
+                            return zombieMove270;
+                        case 315:
+                            return zombieMove315;
+                        default:
+                            throw new IllegalArgumentException("Angle: " +angle);
+                    }
+                });
+
                 for(int i = 0; i < noOfZombies; ++i) {
 
-                    AngleToSpriteArray zombieMoveAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
-                        switch (angle) {
-                            case 0:
-                                return zombieMove0;
-                            case 45:
-                                return zombieMove45;
-                            case 90:
-                                return zombieMove90;
-                            case 135:
-                                return zombieMove135;
-                            case 180:
-                                return zombieMove180;
-                            case 225:
-                                return zombieMove225;
-                            case 270:
-                                return zombieMove270;
-                            case 315:
-                                return zombieMove315;
-                            default:
-                                throw new IllegalArgumentException("Angle: " +angle);
-                        }
-                    });
 
+                    AngleToSpriteArray animClone = zombieMoveAnimation.clone();
 
                     ZombieDaemon zombie = new ZombieDaemon(
                             gameConsumer,
                             new Zombie(
                                     zombieMove270[0],
-                                    zombieMoveAnimation,
+                                    animClone,
                                     Pair.create(zombieViews[i].getAbsoluteX(), zombieViews[i].getAbsoluteY()),
                                     dXY
                             )
@@ -883,6 +886,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 //                });
 
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }
         });
