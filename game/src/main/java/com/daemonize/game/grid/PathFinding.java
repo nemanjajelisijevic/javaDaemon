@@ -1,6 +1,11 @@
 package com.daemonize.game.grid;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class PathFinding {
+
+    public abstract <T> boolean recalculate(Field<T>[][] grid, int row, int column);
 
     public abstract <T> boolean recalculate(Grid<T> grid);
 

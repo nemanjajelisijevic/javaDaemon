@@ -10,4 +10,7 @@ public interface Camera2D<C extends Camera2D> {
 
     int getCenterX();
     int getCenterY();
+
+    int getWidth();
+    int getHeight();
 }

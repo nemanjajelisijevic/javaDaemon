@@ -10,6 +10,11 @@ public interface Movable {
         void await() throws InterruptedException;
     }
 
+    @FunctionalInterface
+    public interface CoordinateExporter {
+        void exportCoords(float x, float y);
+    }
+
     Pair<Float, Float> getLastCoordinates();
     void setVelocity(float velocity);
     ImageMover.Velocity getVelocity();

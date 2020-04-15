@@ -48,4 +48,14 @@ public class FollowingCamera implements Camera2D<FollowingCamera> {
         this.target = target;
         return this;
     }
+
+    @Override
+    public int getWidth() {
+        return 2 * xOffset;
+    }
+
+    @Override
+    public int getHeight() {
+        return 2 * yOffset;
+    }
 }

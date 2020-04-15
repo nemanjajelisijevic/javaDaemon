@@ -1,5 +1,7 @@
 package com.daemonize.game.grid;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
+
 public class Heap<T extends IHeapItem> {
     T[] items;
     int currentItemCount;
@@ -14,6 +16,7 @@ public class Heap<T extends IHeapItem> {
         items[currentItemCount] = item;
         sortUp(item);
         currentItemCount++;
+        System.out.println(DaemonUtils.timedTag() + " Item added: " + item);
     }
 
     public T removeFirst(){
@@ -22,6 +25,8 @@ public class Heap<T extends IHeapItem> {
         items[0] = items[currentItemCount];
         items[0].setHeapIndex(0);
         sortDown(items[0]);
+
+        System.out.println(DaemonUtils.timedTag() + " Removing item: " + firstItem);
         return firstItem;
 
     }

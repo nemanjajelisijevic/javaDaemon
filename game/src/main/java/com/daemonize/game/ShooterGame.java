@@ -484,7 +484,18 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                 500,
                                 500
                         )
-                ).setName("Player");
+                ).setName("Player")
+                        .setPlayerCoordinateExporter((x, y) -> {
+
+                    Field current = grid.getField(x, y);
+                    grid.setStartAndRecalculate(current.getRow(), current.getColumn());
+
+                }).broadCastCoordinates(1000, new Runnable() {
+                    @Override
+                    public void run() {
+                        player.broadCastCoordinates(500, this::run);
+                    }
+                });
 
                 {
                     ImageView mainView = scene.addImageView(new FixedView("Player Main View", cameraWidth / 2, cameraHeight / 2, 10, playerSprite[0].getWidth(), playerSprite[0].getHeight()))
@@ -661,113 +672,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
                         .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
-//
-//                dummyPlayer = new DummyPlayerDaemon(gameConsumer, new DummyPlayer(playerSprite[0], player.getLastCoordinates(), dXY));
-//                dummyPlayer.setAnimateDummyPlayerSideQuest(renderer).setClosure(ret -> {});
-//                dummyPlayer.start();
-
-                //camera switcher init
-//                cameraSwitcher = DummyDaemon.create(gameConsumer, 5000L).setClosure(new Runnable() {
-//
-//                    private Camera2D currentCamera = followingCamera;
-//
-//                    private void setCamera(Camera2D camera) {
-//                        this.currentCamera = camera;
-//                        renderer.setCamera(camera);
-//                    }
-//
-//                    @Override
-//                    public void run() {
-//
-//                        if (currentCamera.equals(followingCamera)) {
-//
-//                            playerAnimateClosure.setMainView(playerViewMap.get("mainFC"))
-//                                    .setHpView(playerViewMap.get("hpFC"))
-//                                    .setSearchlightView(playerViewMap.get("searchlightFC"));
-//
-//                            fixedCamera.setX(followingCamera.getRenderingX())
-//                                    .setY(followingCamera.getRenderingY());
-//
-//                            playerViewMap.get("mainFC")
-//                                    .setAbsoluteX(playerViewMap.get("main").getAbsoluteX())
-//                                    .setAbsoluteY(playerViewMap.get("main").getAbsoluteY())
-//                                    .setImage(playerViewMap.get("main").getImage());
-//
-//                            playerViewMap.get("hpFC").setAbsoluteX(playerViewMap.get("hp").getAbsoluteX())
-//                                    .setAbsoluteY(playerViewMap.get("hp").getAbsoluteY())
-//                                    .setImage(playerViewMap.get("hp").getImage());
-//
-//                            playerViewMap.get("searchlightFC").setAbsoluteX(playerViewMap.get("searchlightView").getAbsoluteX())
-//                                    .setAbsoluteY(playerViewMap.get("searchlightView").getAbsoluteY())
-//                                    .setImage(playerViewMap.get("searchlightView").getImage());
-//
-//                            renderer.consume(() -> {
-//                                playerViewMap.get("main").hide();
-//                                playerViewMap.get("hp").hide();
-//                                playerViewMap.get("searchlightView").hide();
-//
-//                                playerViewMap.get("mainFC").show();
-//                                playerViewMap.get("hpFC").show();
-//                                playerViewMap.get("searchlightFC").show();
-//                            });
-//
-//                            setCamera(fixedCamera);
-//
-//                        } else {
-//
-//                            dummyPlayer.setCoordinates(fixedCamera.getCenterX(), fixedCamera.getCenterY());
-//                            setCamera(followingCamera.setTarget(dummyPlayer));
-//
-//                            dummyPlayer.goTo(
-//                                    player.getLastCoordinates(),
-//                                    35,
-//                                    new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//
-//                                            if (Math.abs(dummyPlayer.getLastCoordinates().getFirst() - player.getLastCoordinates().getFirst()) > 30
-//                                                    && Math.abs(dummyPlayer.getLastCoordinates().getSecond() - player.getLastCoordinates().getSecond()) > 25) {
-//                                                dummyPlayer.goTo(player.getLastCoordinates(), 20, this::run);
-//                                                return;
-//                                            }
-//
-//                                            playerViewMap.get("main")
-//                                                    .setAbsoluteX(playerViewMap.get("mainFC").getAbsoluteX())
-//                                                    .setAbsoluteY(playerViewMap.get("mainFC").getAbsoluteY())
-//                                                    .setImage(playerViewMap.get("mainFC").getImage());
-//
-//                                            playerViewMap.get("hp")
-//                                                    .setAbsoluteX(playerViewMap.get("hpFC").getAbsoluteX())
-//                                                    .setAbsoluteY(playerViewMap.get("hpFC").getAbsoluteY())
-//                                                    .setImage(playerViewMap.get("hpFC").getImage());
-//
-//                                            playerViewMap.get("searchlightView")
-//                                                    .setAbsoluteX(playerViewMap.get("searchlightFC").getAbsoluteX())
-//                                                    .setAbsoluteY(playerViewMap.get("searchlightFC").getAbsoluteY())
-//                                                    .setImage(playerViewMap.get("searchlightFC").getImage());
-//
-//                                            playerAnimateClosure.setMainView(playerViewMap.get("main"))
-//                                                        .setHpView(playerViewMap.get("hp"))
-//                                                        .setSearchlightView(playerViewMap.get("searchlightView"));
-//
-//                                            followingCamera.setTarget(player);
-//
-//                                            renderer.consume(() -> {
-//
-//                                                playerViewMap.get("mainFC").hide();
-//                                                playerViewMap.get("hpFC").hide();
-//                                                playerViewMap.get("searchlightFC").hide();
-//
-//                                                playerViewMap.get("main").show();
-//                                                playerViewMap.get("hp").show();
-//                                                playerViewMap.get("searchlightView").show();
-//
-//                                            });
-//                                        }
-//                                    });
-//                        }
-//                    }
-//                });
 
 
                 Field currentField = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
@@ -855,12 +759,17 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                 System.err.println(DaemonUtils.timedTag() + zombie.getName() + " at " + curr);
 
                             if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) < 10) {
+//
+//                                if (player.getHp() - 100 < 1)
+//                                    player.pushSprite(explosionSprite);
+//                                else {
+//
+//                                    player.setHp(player.getHp() - 100);
+//
+//                                    player.pushSprite(explosionSprite);
+//                                }
 
-                                if (player.getHp() - 100 < 1)
-                                    player.pushSprite(explosionSprite);
-                                else
-                                    player.setHp(player.getHp() - 100);
-
+                                player.pushSprite(explosionSprite);
                                 zombie.attack(1000,
                                         () -> zombie.rotateTowards(next.getCenterX(), next.getCenterY())
                                                 //() ->

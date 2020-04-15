@@ -50,7 +50,6 @@ public class Grid<T> {
         pathFinding = new Dijkstra();
         grid = createFieldGround(row, column,realCoordX,realCoordY);
         pathFinding.recalculate(this);//new Pair<>(0,0),new Pair<>(row - 1,column - 1)
-
     }
 
     Field<T>[][] createFieldGround(int row, int column,float realCoordX, float realCoordY) {
@@ -130,9 +129,32 @@ public class Grid<T> {
         }
     }
 
+
+    public void setStartAndRecalculate(int row, int column) {
+
+        startPoint = Pair.create(row, column);
+        endPoint = Pair.create(0, 0);
+
+        //copy of grid
+        Field<T>[][] gridTemp = new Field[grid.length][grid[0].length];
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                Field<T> field = new Field(grid[i][j]);
+                gridTemp[i][j] = field;
+                gridTemp[i][j].gCost = Integer.MAX_VALUE;
+                //grid[i][j].gCost = Integer.MAX_VALUE;
+            }
+        }
+
+        pathFinding.recalculate(gridTemp, row, column);
+
+        grid = gridTemp;
+        System.out.println(gridToString(grid).toString());
+    }
+
     public void setCoordsAndRecalculate(int row, int column) {
         startPoint = Pair.create(row, column);
-        endPoint = Pair.create(row, column);
+        endPoint = Pair.create(0, 0);
         pathFinding.recalculate(this);
     }
 
@@ -222,17 +244,23 @@ public class Grid<T> {
         return neighbors.get(0);
     }
 
-    public StringBuilder gridToString() {
+
+
+    public static StringBuilder gridToString(Field[][] grid) {
         StringBuilder str = new StringBuilder("");
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
 
-                String pomstr = grid[i][j].isWalkable() ? (grid[i][j].fCost() == Integer.MAX_VALUE ? "H" : grid[i][j].fCost() + "") : "T";
+                String pomstr = grid[i][j].isWalkable() ? (grid[i][j].fCost() == Integer.MAX_VALUE ? "H" : grid[i][j].fCost() + "") : "NW";
                 str.append("\t" + pomstr + "\t");
             }
             str.append('\n');
         }
         return str;
+    }
+
+    public StringBuilder gridToString() {
+        return gridToString(grid);
     }
 
     public Pair<Integer, Integer> getEndPoint() {

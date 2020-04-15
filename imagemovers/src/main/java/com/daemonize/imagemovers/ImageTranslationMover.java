@@ -3,17 +3,22 @@ package com.daemonize.imagemovers;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
-import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import com.daemonize.graphics2d.images.Image;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     private volatile float lastX;
     private volatile float lastY;
+
+    private Lock coordUpdateLock = new ReentrantLock();
+
 
     private double dX = 0;
     private double dY = 0;
@@ -91,9 +96,11 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     @Override
-    public synchronized void setCoordinates(float lastX, float lastY) {
+    public void setCoordinates(float lastX, float lastY) {
+        this.coordUpdateLock.lock();
         this.lastX = lastX;
         this.lastY = lastY;
+        this.coordUpdateLock.unlock();
     }
 
     @Override
@@ -165,9 +172,11 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return true;
     }
 
-    protected synchronized void updateCoordinates() {
+    protected void updateCoordinates() {
+        coordUpdateLock.lock();
         ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY);
         ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * dXY);
+        coordUpdateLock.unlock();
     }
 
     @Override

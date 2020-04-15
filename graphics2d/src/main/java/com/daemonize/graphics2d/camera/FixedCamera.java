@@ -45,4 +45,14 @@ public class FixedCamera implements Camera2D<FixedCamera> {
     public int getCenterY() {
         return y + cameraHeight / 2;
     }
+
+    @Override
+    public int getWidth() {
+        return cameraWidth;
+    }
+
+    @Override
+    public int getHeight() {
+        return cameraHeight;
+    }
 }

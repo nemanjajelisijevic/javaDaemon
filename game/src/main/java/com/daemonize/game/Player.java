@@ -18,6 +18,9 @@ import java.util.Arrays;
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true)
 public class Player extends CoordinatedImageTranslationMover implements Target<Player> {
 
+
+    private CoordinateExporter playerCoordinateExporter;
+
     private Image[] spriteHealthBarImage;
     private Image searchlight;
 
@@ -66,6 +69,19 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         this.hpMax = hpMax;
     }
 
+    public Player setPlayerCoordinateExporter(CoordinateExporter playerCoordinateExporter) {
+        this.playerCoordinateExporter = playerCoordinateExporter;
+        return this;
+    }
+
+    @Daemonize
+    @GenerateRunnable
+    @DedicatedThread(engineName = "coordBroadcaster")
+    public void broadCastCoordinates(long pause) throws InterruptedException {
+        Thread.sleep(pause);
+        this.playerCoordinateExporter.exportCoords(getLastCoordinates().getFirst(), getLastCoordinates().getSecond());
+    }
+
     @Daemonize
     @DedicatedThread(engineName = "rotate")
     public void rotateTowards(float x, float y) throws InterruptedException {
@@ -78,6 +94,7 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     public void rotateTowards(Pair<Float, Float> coords) throws InterruptedException {
         rotateTowards(coords.getFirst(), coords.getSecond());
     }
+
 
     @Daemonize
     @Override
@@ -167,9 +184,9 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     @DedicatedThread(engineName = "rotate")
     @Override
     public synchronized void pushSprite(Image[] sprite) throws InterruptedException {
-        super.pushSprite(sprite);
-    }
+        rotationMover.pushSprite(sprite);
 
+    }
 
     @Daemonize
     @DedicatedThread

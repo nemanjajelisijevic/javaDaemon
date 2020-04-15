@@ -141,7 +141,12 @@ public class Field<T> implements  IHeapItem , Comparable {
 
     @Override
     public String toString() {
-        return "Field[" + row +"][" + column + "]" + " - CenterX: " + centerX + ", CenterY: " + centerY;
+        return "Field[" + row +"][" + column + "]" + " - CenterX: " + centerX
+                + ", CenterY: " + centerY
+                + ", Walkable : " + walkable
+                + ", Weight: " + weight
+                + ", GCost: " + gCost
+                + ", HCost: " + hCost;
     }
 }
 
