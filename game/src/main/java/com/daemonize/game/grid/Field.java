@@ -63,7 +63,7 @@ public class Field<T> implements  IHeapItem , Comparable {
         this.hCost = field.hCost;
         this.heapIndex = field.getHeapIndex();
         this.object = field.object;
-        zElevation.clear();
+        this.zElevation.clear();
 
         for(Integer eleveation : field.zElevation) {
             this.zElevation.add(eleveation);
