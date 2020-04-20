@@ -14,6 +14,34 @@ public class Grid<T> {
     Pair<Integer, Integer> startPoint;
     Pair<Integer, Integer> endPoint;
 
+    private int mapWidth;
+    private int mapHeight;
+
+    private String mapName;
+
+    public String getMapName() {
+        return mapName;
+    }
+
+    public Grid<T> setMapName(String mapName) {
+        this.mapName = mapName;
+        return this;
+    }
+
+    public Grid<T> setMapWidth(int mapWidth) {
+        this.mapWidth = mapWidth;
+        return this;
+    }
+
+    public Grid<T> setMapHeight(int mapHeight) {
+        this.mapHeight = mapHeight;
+        return this;
+    }
+
+    public int getMapWidth() {return mapWidth;}
+
+    public int getMapHeight() {return mapHeight;}
+
     private float xCoordinateInReal;
     private float yCoordinateInReal;
 
@@ -30,6 +58,8 @@ public class Grid<T> {
 
     private List<Field> path;
 
+    private List<Field<T>[]> walkableFields;
+
     public boolean isInsideOfGrid (float x, float y){
         boolean in = false;
         float x2 = xCoordinateInReal + grid[0].length * fieldWith;
@@ -41,15 +71,40 @@ public class Grid<T> {
         return in;
     }
 
-    public Grid(int row, int column, Pair<Integer, Integer> startPoint, Pair<Integer, Integer> endPoint, float realCoordX, float realCoordY, int fieldWith) {
+    public Grid(int rows, int columns, int mapWidth, int mapHeight){
+        this.startPoint = Pair.create(0,0);
+        this.endPoint = Pair.create(0,0);
+        this.xCoordinateInReal = 0;
+        this.yCoordinateInReal = 0;
+        this.fieldWith = mapWidth / columns;
+        this.mapWidth = mapWidth;
+        this.mapHeight = mapHeight;
+        pathFinding = new Dijkstra();
+        grid = createFieldGround(rows, columns,xCoordinateInReal,yCoordinateInReal);
+    }
+
+    public Grid(
+            int rows,
+            int columns,
+            Pair<Integer, Integer> startPoint,
+            Pair<Integer, Integer> endPoint,
+            float realCoordX,
+            float realCoordY,
+            int fieldWith,
+            int mapWidth,
+            int mapHeight
+    ) {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
         this.xCoordinateInReal = realCoordX;
         this.yCoordinateInReal = realCoordY;
         this.fieldWith = fieldWith;
         pathFinding = new Dijkstra();
-        grid = createFieldGround(row, column,realCoordX,realCoordY);
+        grid = createFieldGround(rows, columns,realCoordX,realCoordY);
         pathFinding.recalculate(this);//new Pair<>(0,0),new Pair<>(row - 1,column - 1)
+
+        this.mapWidth = mapWidth;
+        this.mapHeight = mapHeight;
     }
 
     Field<T>[][] createFieldGround(int row, int column,float realCoordX, float realCoordY) {
@@ -149,7 +204,7 @@ public class Grid<T> {
         pathFinding.recalculate(gridTemp, row, column);
 
         grid = gridTemp;
-        System.out.println(gridToString(grid).toString());
+        //System.out.println(gridToString(grid).toString());
     }
 
     public void setCoordsAndRecalculate(int row, int column) {
