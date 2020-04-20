@@ -1,6 +1,9 @@
 package com.daemonize.game.grid;
 
 public class Field<T> implements  IHeapItem , Comparable {
+
+    private int z;
+
     float centerX;
     float centerY;
 
@@ -23,6 +26,15 @@ public class Field<T> implements  IHeapItem , Comparable {
 
     public Field setObject(T object) {
         this.object = object;
+        return this;
+    }
+
+    public int getZ() {
+        return z;
+    }
+
+    public Field<T> setZ(int z) {
+        this.z = z;
         return this;
     }
 
