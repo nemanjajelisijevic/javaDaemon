@@ -16,8 +16,7 @@ import java.beans.IntrospectionException;
 import java.util.Arrays;
 
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true)
-public class Player extends CoordinatedImageTranslationMover implements Target<Player> {
-
+public class Player extends CoordinatedImageTranslationMover implements Target<Player>, ZElevatable {
 
     private CoordinateExporter playerCoordinateExporter;
 
@@ -33,6 +32,8 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
 
     private PositionedImage[] ret;
     private RotatingSpriteImageMover rotationMover;
+
+    private volatile int zElevation;
 
     public Player(
             Image[] sprite,
@@ -67,6 +68,17 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
 
         this.hp = hp;
         this.hpMax = hpMax;
+    }
+
+
+    @Override
+    public int getZElevation() {
+        return zElevation;
+    }
+
+    @Override
+    public void setZElevation(int zElevation) {
+        this.zElevation = zElevation;
     }
 
     public Player setPlayerCoordinateExporter(CoordinateExporter playerCoordinateExporter) {

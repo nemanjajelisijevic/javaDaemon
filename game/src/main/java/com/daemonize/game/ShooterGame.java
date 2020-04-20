@@ -114,7 +114,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private int cameraWidth, cameraHeight;
 
     //grid
-    private Grid<Interactable<PlayerDaemon>> grid;
+    private Grid<Interactable> grid;
     private int rows;
     private int columns;
     //private ImageView[][] gridViewMatrix;
@@ -163,7 +163,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Image healthPackImage;
     private ImageView healthPackView;
 
-    private List<Field<Interactable<PlayerDaemon>>> healthPackFields;
+    private List<Field<Interactable>> healthPackFields;
 
     //zombie
     private Image[] zombieSprite;
@@ -488,9 +488,10 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
                 healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
 
-                for(Field<Interactable<PlayerDaemon>> current : healthPackFields) {
+                for(Field<Interactable> current : healthPackFields) {
                     current.setObject(
                             HealthPack.generateHealthPack(
+                                    player,
                                     20,
                                     ((int) current.getCenterX()),
                                     ((int) current.getCenterY()),
@@ -637,6 +638,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     @Override
                     public Pair<Float, Float> map(MovementController.Direction dir) {
 
+                        int currentZElevation = player.getZElevation();
+
                         Field currentField = grid.getField(
                                 player.getLastCoordinates().getFirst(),
                                 player.getLastCoordinates().getSecond()
@@ -722,15 +725,15 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 controllerPrototype.setMovementCallback(player -> {
 
-                    Field<Interactable<PlayerDaemon>> field = grid.getField(
+                    Field<Interactable> field = grid.getField(
                             player.getLastCoordinates().getFirst(),
                             player.getLastCoordinates().getSecond()
                     );
 
-                    Interactable<PlayerDaemon> item = field.getObject();
+                    Interactable item = field.getObject();
 
                     if (item != null) {
-                        item.interact(player);
+                        item.interact();
                         renderer.consume(item.getView()::hide);
                         field.setObject(null);
                     }

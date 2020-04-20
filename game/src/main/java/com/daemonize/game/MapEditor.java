@@ -59,7 +59,7 @@ public class MapEditor implements DaemonApp<MapEditor> {
     int cameraWidth, cameraHeight;
 
     //grid
-    private Grid<Interactable<PlayerDaemon>> grid;
+    private Grid<Interactable> grid;
     private int rows;
     private int columns;
 
@@ -241,7 +241,7 @@ public class MapEditor implements DaemonApp<MapEditor> {
 //                fieldWidth
 //        );
 
-        this.grid = new Grid<Interactable<PlayerDaemon>>(
+        this.grid = new Grid<Interactable>(
                 rows,
                 columns,
                 borderX,
