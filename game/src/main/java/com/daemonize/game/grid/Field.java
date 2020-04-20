@@ -1,8 +1,11 @@
 package com.daemonize.game.grid;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Field<T> implements  IHeapItem , Comparable {
 
-    private int z;
+    private List<Integer> zElevation;
 
     float centerX;
     float centerY;
@@ -29,12 +32,13 @@ public class Field<T> implements  IHeapItem , Comparable {
         return this;
     }
 
-    public int getZ() {
-        return z;
+    public List<Integer> getZElevations() {
+        return zElevation;
     }
 
-    public Field<T> setZ(int z) {
-        this.z = z;
+    public Field<T> addZElevation(int z) {
+        if (!zElevation.contains(z))
+            zElevation.add(z);
         return this;
     }
 
@@ -45,6 +49,7 @@ public class Field<T> implements  IHeapItem , Comparable {
         this.column = column;
         this.walkable = walkable;
         this.weight = weight;
+        this.zElevation = new ArrayList<>(1);
     }
 
     public Field (Field<T> field) { // copy constructor
@@ -58,6 +63,11 @@ public class Field<T> implements  IHeapItem , Comparable {
         this.hCost = field.hCost;
         this.heapIndex = field.getHeapIndex();
         this.object = field.object;
+        zElevation.clear();
+
+        for(Integer eleveation : field.zElevation) {
+            this.zElevation.add(eleveation);
+        }
     }
 
     public float getCenterX() {
