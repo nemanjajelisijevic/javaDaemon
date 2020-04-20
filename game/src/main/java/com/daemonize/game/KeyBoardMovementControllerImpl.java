@@ -173,6 +173,7 @@ public class KeyBoardMovementControllerImpl implements KeyboardController<Player
 
                 controlBlockingSemaphore.stop();
                 contorlMovementCondition.setFirst(false).setSecond(false);
+
                 controllable.rotateTowards(nextCoords, rotationControlClosure)
                         .goTo(nextCoords, currentVelocity, translationControlClosure);
 

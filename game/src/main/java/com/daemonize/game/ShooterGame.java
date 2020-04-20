@@ -26,8 +26,11 @@ import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.AngleToSpriteArray;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -124,7 +127,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     //following camera
     private FollowingCamera followingCamera;
     //fixed camera
-    private FixedCamera fixedCamera;
+    //private FixedCamera fixedCamera;
 
     //private DummyDaemon cameraSwitcher;
 
@@ -206,30 +209,55 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
         this.cameraWidth = width;
         this.cameraHeight = height;
 
-        this.borderX = width * cameraToMapRatio;
-        this.borderY = height * cameraToMapRatio;
 
         this.followingCamera = new FollowingCamera(width, height);
-        this.fixedCamera = new FixedCamera(borderX / 2, borderY / 2 , width, height);
+        //this.fixedCamera = new FixedCamera(borderX / 2, borderY / 2 , width, height);
 
         this.scene = new Scene2D();
         this.dXY = ((float) cameraWidth) / 1000;
 
         this.controller = new MovementControllerDaemon(gameConsumer, controller).setName("Player controller");
 
-        this.fieldWidth = 50;
-        this.rows = borderY / fieldWidth;
-        this.columns = borderX / fieldWidth;
+//
+//        this.grid = new Grid<Interactable<PlayerDaemon>>(
+//                rows,
+//                columns,
+//                Pair.create(0, 0),
+//                Pair.create(rows - 1, columns - 1),
+//                0,
+//                0,
+//                borderX / columns,
+//                borderX,
+//                borderY
+//        );
 
-        this.grid = new Grid<Interactable<PlayerDaemon>>(
-                rows,
-                columns,
-                Pair.create(0, 0),
-                Pair.create(rows - 1, columns - 1),
-                0,
-                0,
-                borderX / columns
-        );
+        ObjectMapper gridLoader = new ObjectMapper();
+
+        //URL url = this.getClass().getProtectionDomain().getCodeSource().getLocation();
+
+        String path = getClass().getResource("/" + "test.json").getPath();
+        File jsonGrid = new File(path);
+
+
+        try {
+            this.grid = gridLoader.readValue(jsonGrid, Grid.class).calculateFieldWidth();
+
+
+            this.fieldWidth = grid.getFieldWith();
+
+
+            this.borderX = grid.getGridWidth();
+            this.borderY = grid.getGridHeight();
+
+
+            this.rows = borderY / fieldWidth;
+            this.columns = borderX / fieldWidth;
+
+
+
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
 
         this.healthPackFields = new LinkedList<>();
     }
@@ -256,9 +284,10 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
             try {
 
                 backgroundImage = imageManager.loadImageFromAssets(
-                        "emptyMap.png", //"map_1.png",
-                        this.borderX,
-                        this.borderY
+                        //"emptyMap.png", //"map_1.png",
+                        "mazeMap.jpg",
+                        grid.getGridWidth(),
+                        grid.getGridHeight()
                 );
 
                 ImageView backgroundView = new ImageViewImpl("Background View")
@@ -470,6 +499,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     );
                 }
 
+                Field initial = grid.getField(99, 199);
+
                 //init player
                 player = new PlayerDaemon(
                         gameConsumer,
@@ -478,24 +509,25 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                 healthBarSprite,
                                 searchlight,
                                 Pair.create((float)(borderX / 2), (float) (borderY / 2)),
+                                //Pair.create(initial.getCenterX(), initial.getCenterY()),
                                 dXY,
                                 cameraWidth / 2,
                                 cameraHeight / 2,
                                 500,
                                 500
                         )
-                ).setName("Player")
-                        .setPlayerCoordinateExporter((x, y) -> {
+                ).setName("Player").setPlayerCoordinateExporter((x, y) -> {
 
                     Field current = grid.getField(x, y);
                     grid.setStartAndRecalculate(current.getRow(), current.getColumn());
 
-                }).broadCastCoordinates(1000, new Runnable() {
-                    @Override
-                    public void run() {
-                        player.broadCastCoordinates(500, this::run);
-                    }
                 });
+//                        .exportCoordinates(3000, new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        player.exportCoordinates(500, this::run);
+//                    }
+//                });
 
                 {
                     ImageView mainView = scene.addImageView(new FixedView("Player Main View", cameraWidth / 2, cameraHeight / 2, 10, playerSprite[0].getWidth(), playerSprite[0].getHeight()))
@@ -572,23 +604,22 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     player.setAnimatePlayerSideQuest(renderer).setClosure(playerAnimateClosure);
                 }
 
+//                int noOfZombies = 50;
 
-                int noOfZombies = 50;
-
-                zombieViews = new ImageView[noOfZombies];
-
-                for(int i = 0; i < noOfZombies; ++i) {
-
-                    int currentZombieX = getRandomInt(0, borderX);
-                    int currentZombieY = getRandomInt(0, borderY);
-
-                    zombieViews[i] = scene.addImageView(new ImageViewImpl("Zombie View No. " + i))
-                            .setAbsoluteX(currentZombieX)
-                            .setAbsoluteY(currentZombieY)
-                            .setZindex(6)
-                            .setImage(zombieMove270[0])
-                            .show();
-                }
+//                zombieViews = new ImageView[noOfZombies];
+//
+//                for(int i = 0; i < noOfZombies; ++i) {
+//
+//                    int currentZombieX = getRandomInt(0, borderX);
+//                    int currentZombieY = getRandomInt(0, borderY);
+//
+//                    zombieViews[i] = scene.addImageView(new ImageViewImpl("Zombie View No. " + i))
+//                            .setAbsoluteX(currentZombieX)
+//                            .setAbsoluteY(currentZombieY)
+//                            .setZindex(6)
+//                            .setImage(zombieMove270[0])
+//                            .show();
+//                }
 
                 renderer.setScene(scene.lockViews()).start();
 
@@ -613,32 +644,72 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                         List<Field> neighbors = grid.getNeighbors(currentField);
 
-                        Pair<Float, Float> ret = null;
+                        Pair<Float, Float> ret = player.getLastCoordinates();
 
                         switch (dir) {
                             case UP:
-                                ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                if(neighbors.get(1).isWalkable())
+                                    ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                else if (neighbors.get(0).isWalkable())
+                                    ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                else if (neighbors.get(2).isWalkable())
+                                    ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
                                 break;
                             case DOWN:
-                                ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                if(neighbors.get(6).isWalkable())
+                                    ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                else if (neighbors.get(5).isWalkable())
+                                    ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                else if (neighbors.get(7).isWalkable())
+                                    ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
                                 break;
                             case RIGHT:
-                                ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                if(neighbors.get(4).isWalkable())
+                                    ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                else if (neighbors.get(2).isWalkable())
+                                    ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                else if (neighbors.get(7).isWalkable())
+                                    ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
                                 break;
                             case LEFT:
-                                ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                if(neighbors.get(3).isWalkable())
+                                    ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                else if (neighbors.get(0).isWalkable())
+                                    ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                else if (neighbors.get(5).isWalkable())
+                                    ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
                                 break;
                             case UP_RIGHT:
-                                ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                if(neighbors.get(2).isWalkable())
+                                    ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                else if (neighbors.get(1).isWalkable())
+                                    ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                else if (neighbors.get(4).isWalkable())
+                                    ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
                                 break;
                             case UP_LEFT:
-                                ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                if(neighbors.get(0).isWalkable())
+                                    ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                else if (neighbors.get(3).isWalkable())
+                                    ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                else if (neighbors.get(1).isWalkable())
+                                    ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
                                 break;
                             case DOWN_RIGHT:
-                                ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                if(neighbors.get(7).isWalkable())
+                                    ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                else if (neighbors.get(4).isWalkable())
+                                    ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                else if (neighbors.get(6).isWalkable())
+                                    ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
                                 break;
                             case DOWN_LEFT:
-                                ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                if(neighbors.get(5).isWalkable())
+                                    ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                else if (neighbors.get(3).isWalkable())
+                                    ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                else if (neighbors.get(6).isWalkable())
+                                    ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
                                 break;
                             default:
                                 throw new IllegalStateException("No dir: " + dir);
@@ -651,10 +722,10 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 controllerPrototype.setMovementCallback(player -> {
 
-                    Field<Interactable<PlayerDaemon>> field = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
-
-//                    System.out.println(DaemonUtils.tag() + "Actual player coordinates: " + player.getLastCoordinates().toString());
-//                    System.out.println(DaemonUtils.tag() + "Player at field: " + field.toString());
+                    Field<Interactable<PlayerDaemon>> field = grid.getField(
+                            player.getLastCoordinates().getFirst(),
+                            player.getLastCoordinates().getSecond()
+                    );
 
                     Interactable<PlayerDaemon> item = field.getObject();
 
@@ -668,31 +739,15 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 controller.setControlSideQuest();
                 controller.start();
 
-                Field firstField = grid.getField(rows / 2, columns / 2);
+                Field firstField = grid.getField(100, 200);
 
                 player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
-                        .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
+                        .go(firstField.getCenterX(), firstField.getCenterY(), 12F);
 
-
-                Field currentField = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
-
-                grid.setCoordsAndRecalculate(currentField.getRow(), currentField.getColumn());
 //
-//                player.interact(1000, new Runnable() {
-//                    @Override
-//                    public void run() {
+//                Field currentField = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
 //
-//                        Field currentField = grid.getField(player.getLastCoordinates().getFirst(), player.getLastCoordinates().getSecond());
-//
-//                        grid.setCoordsAndRecalculate(currentField.getRow(), currentField.getColumn());
-//
-//                        System.err.println(DaemonUtils.tag() + "MATRICA \n" +  grid.gridToString().toString());
-//                        player.interact(1000, this::run);
-//                    }
-//                });
-
-//                cameraSwitcher.start();
-
+//                grid.setCoordsAndRecalculate(currentField.getRow(), currentField.getColumn());
 
                 AngleToSpriteArray zombieMoveAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
                     switch (angle) {
@@ -717,71 +772,92 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     }
                 });
 
-                for(int i = 0; i < noOfZombies; ++i) {
 
 
-                    AngleToSpriteArray animClone = zombieMoveAnimation.clone();
 
-                    ZombieDaemon zombie = new ZombieDaemon(
-                            gameConsumer,
-                            new Zombie(
-                                    zombieMove270[0],
-                                    animClone,
-                                    Pair.create(zombieViews[i].getAbsoluteX(), zombieViews[i].getAbsoluteY()),
-                                    dXY
-                            )
-                    ).setName( i % 50 ==0 ? "DebugZombie no: " + i : "Zombie");
-
-                    zombie.setAnimateZombieSideQuest(renderer)
-                            .setSleepInterval(80)
-                            .setClosure(new ZombieSpriteAnimateClosure(zombieViews[i]));
-
-
-                    Field zeroField = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
-
-                    Field firstF = grid.getMinWeightOfNeighbors(zeroField);
-
-                    zombie.start().rotateTowards(firstF.getCenterX(), firstF.getCenterY()).goTo(firstF.getCenterX(), firstF.getCenterY(), 6.4F, new Closure<Boolean>() {
-
-                        @Override
-                        public void onReturn(Return<Boolean> ret) {
-
-                            ret.runtimeCheckAndGet();
-
-                            Field curr = grid.getField(
-                                    zombie.getLastCoordinates().getFirst(),
-                                    zombie.getLastCoordinates().getSecond()
-                            );
-
-                            Field next = grid.getMinWeightOfNeighbors(curr);
-
-                            if (zombie.getName().contains("DebugZombie"))
-                                System.err.println(DaemonUtils.timedTag() + zombie.getName() + " at " + curr);
-
-                            if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) < 10) {
+//                for(int i = 0; i < noOfZombies; ++i) {
 //
-//                                if (player.getHp() - 100 < 1)
+//
+//                    AngleToSpriteArray animClone = zombieMoveAnimation.clone();
+//
+//                    float zombieVelocity = 6.4F;
+//
+//                    if (i % 5 == 0)
+//                        zombieVelocity = 9.4F;
+//
+//
+//                    ZombieDaemon zombie = new ZombieDaemon(
+//                            gameConsumer,
+//                            new Zombie(
+//                                    zombieMove270[0],
+//                                    animClone,
+//                                    zombieVelocity,
+//                                    Pair.create(zombieViews[i].getAbsoluteX(), zombieViews[i].getAbsoluteY()),
+//                                    dXY
+//                            )
+//                    ).setName( i % 50 ==0 ? "DebugZombie no: " + i : "Zombie");
+//
+//                    zombie.setAnimateZombieSideQuest(renderer)
+//                            .setSleepInterval(80)
+//                            .setClosure(new ZombieSpriteAnimateClosure(zombieViews[i]));
+//
+//
+//                    Field zeroField = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
+//
+//                    Field firstF = grid.getMinWeightOfNeighbors(zeroField);
+//
+//
+//                    zombie.start().rotateTowards(firstF.getCenterX(), firstF.getCenterY()).goTo(firstF.getCenterX(), firstF.getCenterY(), zombie.getPrototype().recommendedVelocity, new Closure<Boolean>() {
+//
+//                        @Override
+//                        public void onReturn(Return<Boolean> ret) {
+//
+//                            ret.runtimeCheckAndGet();
+//
+//                            Field curr = grid.getField(
+//                                    zombie.getLastCoordinates().getFirst(),
+//                                    zombie.getLastCoordinates().getSecond()
+//                            );
+//
+//                            Field next = grid.getMinWeightOfNeighbors(curr);
+//
+//                            if (zombie.getName().contains("DebugZombie"))
+//                                System.err.println(DaemonUtils.timedTag() + zombie.getName() + " at " + curr);
+//
+//                            if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) < 10 && player.isShootable()) {
+//
+//
+//                                player.setShootable(false);
+//
+//
+//                                if (player.getHp() - 100 < 1) {
 //                                    player.pushSprite(explosionSprite);
-//                                else {
+//
+//                                } else {
 //
 //                                    player.setHp(player.getHp() - 100);
-//
 //                                    player.pushSprite(explosionSprite);
+////                                    renderer.consume(() -> {
+////                                        try {
+////                                            playerAnimateClosure.onReturn(new Return<>(player.animatePlayer()));
+////                                        } catch (InterruptedException e) {
+////                                            e.printStackTrace();
+////                                        }
+////                                    });
+//
 //                                }
-
-                                player.pushSprite(explosionSprite);
-                                zombie.attack(1000,
-                                        () -> zombie.rotateTowards(next.getCenterX(), next.getCenterY())
-                                                //() ->
-                                                        .goTo(next.getCenterX(), next.getCenterY(), 6, this::onReturn)
-                                        //)
-                                );
-                            } else
-                                zombie.rotateTowards(next.getCenterX(), next.getCenterY()).goTo(next.getCenterX(), next.getCenterY(), 6, this::onReturn);
-                                //);
-                        }
-                    });
-                }
+//
+//                                zombie.attack(1000,
+//                                        () -> {
+//                                            player.setShootable(true);
+//                                            zombie.rotateTowards(next.getCenterX(), next.getCenterY())
+//                                                    .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
+//                                        });
+//                            } else
+//                                zombie.rotateTowards(next.getCenterX(), next.getCenterY()).goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
+//                        }
+//                    });
+//                }
 
 
 
@@ -796,9 +872,10 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
             } catch (IOException e) {
                 e.printStackTrace();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
             }
+//            catch (CloneNotSupportedException e) {
+//                e.printStackTrace();
+//            }
         });
     }
 }

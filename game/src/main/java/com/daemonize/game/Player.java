@@ -77,7 +77,7 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     @Daemonize
     @GenerateRunnable
     @DedicatedThread(engineName = "coordBroadcaster")
-    public void broadCastCoordinates(long pause) throws InterruptedException {
+    public void exportCoordinates(long pause) throws InterruptedException {
         Thread.sleep(pause);
         this.playerCoordinateExporter.exportCoords(getLastCoordinates().getFirst(), getLastCoordinates().getSecond());
     }
@@ -183,9 +183,8 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     @Daemonize
     @DedicatedThread(engineName = "rotate")
     @Override
-    public synchronized void pushSprite(Image[] sprite) throws InterruptedException {
+    public void pushSprite(Image[] sprite) throws InterruptedException {
         rotationMover.pushSprite(sprite);
-
     }
 
     @Daemonize

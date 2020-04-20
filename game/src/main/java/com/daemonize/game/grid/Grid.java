@@ -5,7 +5,9 @@ import com.daemonize.daemonengine.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Grid<T> {
 
@@ -13,6 +15,8 @@ public class Grid<T> {
 
     Pair<Integer, Integer> startPoint;
     Pair<Integer, Integer> endPoint;
+
+    public Set<Field> multipleZFieldSet = Collections.synchronizedSet(new HashSet<>());
 
     private int mapWidth;
     private int mapHeight;
@@ -54,7 +58,11 @@ public class Grid<T> {
     }
 
     private Field<T>[][] grid;
-    int fieldWith;
+    private int fieldWith;
+
+    public int getFieldWith() {
+        return fieldWith;
+    }
 
     private List<Field> path;
 
@@ -71,6 +79,15 @@ public class Grid<T> {
         return in;
     }
 
+    public Grid<T> calculateFieldWidth() {
+        this.fieldWith = mapWidth / grid[0].length;
+        return this;
+    }
+
+    public Grid(){
+        this.pathFinding = new Dijkstra();
+    }
+
     public Grid(int rows, int columns, int mapWidth, int mapHeight){
         this.startPoint = Pair.create(0,0);
         this.endPoint = Pair.create(0,0);
@@ -79,8 +96,8 @@ public class Grid<T> {
         this.fieldWith = mapWidth / columns;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
-        pathFinding = new Dijkstra();
-        grid = createFieldGround(rows, columns,xCoordinateInReal,yCoordinateInReal);
+        this.pathFinding = new Dijkstra();
+        this.grid = createFieldGround(rows, columns,xCoordinateInReal,yCoordinateInReal);
     }
 
     public Grid(

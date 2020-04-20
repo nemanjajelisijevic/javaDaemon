@@ -421,7 +421,9 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                 Pair.create(rows - 1, columns - 1),
                 gridX,
                 gridY,
-                ((borderX * 70) / 100) / columns
+                ((borderX * 70) / 100) / columns,
+                borderX,
+                borderY
         );
 
         this.dXY = ((float) borderX) / 1000;

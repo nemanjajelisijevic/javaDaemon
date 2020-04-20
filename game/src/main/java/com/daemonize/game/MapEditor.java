@@ -2,6 +2,7 @@ package com.daemonize.game;
 
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
+import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.MouseController;
@@ -21,8 +22,10 @@ import com.daemonize.graphics2d.scene.views.FixedView;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.ImageMover;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
 
@@ -59,18 +62,39 @@ public class MapEditor implements DaemonApp<MapEditor> {
     private Grid<Interactable<PlayerDaemon>> grid;
     private int rows;
     private int columns;
+
     private ImageView[][] gridViewMatrix;
+
+    private ImageView[][] gridZElevationViewMatrix;
 
     private int fieldWidth;
 
     private Image accessibleField;
     private Image inaccessibleField;
+    private Image multipleZField;
+
+    private Image[] digits;
+
+    private volatile int currentElevation = 0;
+
+    @FunctionalInterface
+    public interface ZElevationController {
+        void onZElevationChange(int zElevation);
+    }
+
+    public ZElevationController elevationController = new ZElevationController() {
+        @Override
+        public void onZElevationChange(int zElevation) {
+            if (zElevation >= 0 && zElevation < 10)
+                currentElevation = zElevation;
+        }
+    };
 
     //camera
     private Camera2D camera;
 
     //cmd parser
-    private CommandParserDaemon commandParser;
+    //private CommandParserDaemon commandParser;
 
     //random int
     private Random random = new Random();
@@ -127,6 +151,14 @@ public class MapEditor implements DaemonApp<MapEditor> {
             this.backgroundImage = imageManager.loadImageFromAssets(mapName, borderX, borderY);
             this.accessibleField = imageManager.loadImageFromAssets("greenOctagon.png", fieldWidth, fieldWidth);
             this.inaccessibleField = imageManager.loadImageFromAssets("redOctagon.png", fieldWidth, fieldWidth);
+            this.multipleZField = imageManager.loadImageFromAssets("blueOctagon.png", fieldWidth, fieldWidth);
+
+            this.digits = new Image[10];
+
+            for (int i = 0; i < 10; i ++){
+                digits[i] = imageManager.loadImageFromAssets(Integer.toString(i)+"b.png",fieldWidth / 2, fieldWidth / 2);
+            }
+
 
             ImageView backgroundView = new ImageViewImpl("Background View")
                     .setAbsoluteX(borderX / 2)
@@ -184,6 +216,7 @@ public class MapEditor implements DaemonApp<MapEditor> {
                     saveButtonImage
             );
             this.saveButton.enable().show();
+
             scene.addImageView(saveButton);
 
         } catch (IOException e) {
@@ -198,15 +231,22 @@ public class MapEditor implements DaemonApp<MapEditor> {
         this.rows = borderY / fieldWidth;
         this.columns = borderX / fieldWidth;
 
+//        this.grid = new Grid<Interactable<PlayerDaemon>>(
+//                rows,
+//                columns,
+//                Pair.create(0, 0),
+//                Pair.create(rows - 1, columns - 1),
+//                0,
+//                0,
+//                fieldWidth
+//        );
+
         this.grid = new Grid<Interactable<PlayerDaemon>>(
                 rows,
                 columns,
-                Pair.create(0, 0),
-                Pair.create(rows - 1, columns - 1),
-                0,
-                0,
-                fieldWidth
-        );
+                borderX,
+                borderY
+        ).setMapName("Maze map");
 
         gridViewMatrix = new ImageView[rows][columns];
 
@@ -218,6 +258,18 @@ public class MapEditor implements DaemonApp<MapEditor> {
                         .setImage(inaccessibleField)
                         .setZindex(1)
                         .show();
+        }
+
+        gridZElevationViewMatrix = new ImageView[rows][columns];
+
+        for (int j = 0; j < rows; ++j ) {
+            for (int i = 0; i < columns; ++i)
+                gridZElevationViewMatrix[j][i] = scene.addImageView(new ImageViewImpl("Field Z Elev View [" + j + "][" + i +"]"))
+                        .setAbsoluteX(grid.getGrid()[j][i].getCenterX())
+                        .setAbsoluteY(grid.getGrid()[j][i].getCenterY())
+                        .setImage(digits[0])
+                        .setZindex(1)
+                        .hide();
         }
 
         ((ClickController) this.mouseController).setCamera(camera);
@@ -232,9 +284,9 @@ public class MapEditor implements DaemonApp<MapEditor> {
     @Override
     public MapEditor run() {
         mainConsumer.start().consume(() -> {
-            commandParser = new CommandParserDaemon(new CommandParser(this));
-            commandParser.setParseSideQuest();
-            commandParser.start();
+//            commandParser = new CommandParserDaemon(new CommandParser(this));
+//            commandParser.setParseSideQuest();
+//            commandParser.start();
             renderer.start();
             movementController.start();
             mainConsumer.consume(stateChain::run);
@@ -249,91 +301,144 @@ public class MapEditor implements DaemonApp<MapEditor> {
 
             mouseController.setOnClick((x, y, mouseButton) -> {
 
-               Field currentField = grid.getField(x, y);
+                Field currentField = grid.getField(x, y);
 
-               if(currentField == null)
+                if(currentField == null)
                     return;
 
-               if (mouseButton.equals(MouseController.MouseButton.LEFT)) {
+                if (mouseButton.equals(MouseController.MouseButton.LEFT)) {
 
-                   currentField.setWalkable(true);
-                   renderer.consume(() -> gridViewMatrix[currentField.getRow()][currentField.getColumn()].setImage(accessibleField));
+                    currentField.addZElevation(currentElevation);
 
-               } else if (mouseButton.equals(MouseController.MouseButton.RIGHT)) {
+                    if (currentField.zElevationsSize() > 1) {
+                        grid.multipleZFieldSet.add(currentField);
+                        renderer.consume(() -> {
+                            gridViewMatrix[currentField.getRow()][currentField.getColumn()].setImage(multipleZField);
+                        });
+                    } else {
+                        renderer.consume(() -> {
+                            gridViewMatrix[currentField.getRow()][currentField.getColumn()].setImage(accessibleField);
+                            gridZElevationViewMatrix[currentField.getRow()][currentField.getColumn()].setImage(digits[currentElevation]).show();
+                        });
+                    }
 
-                   currentField.setWalkable(false);
-                   renderer.consume(() -> gridViewMatrix[currentField.getRow()][currentField.getColumn()].setImage(inaccessibleField));
+                    currentField.setWalkable(true);
 
-               }
-           });
+                } else if (mouseButton.equals(MouseController.MouseButton.RIGHT)) {
 
-           movementController.setDirMapper(dir -> {
+                    currentField.clearElevations();
 
-               Field currentField = grid.getField(
-                       centerPointer.getLastCoordinates().getFirst(),
-                       centerPointer.getLastCoordinates().getSecond()
-               );
+                    if (grid.multipleZFieldSet.contains(currentField))
+                        grid.multipleZFieldSet.remove(currentField);
 
-               Pair<Float, Float> ret = null;
+                    currentField.setWalkable(false);
 
-               if (currentField.getRow() == 0) {
+                    renderer.consume(() -> {
+                        gridViewMatrix[currentField.getRow()][currentField.getColumn()].setImage(inaccessibleField);
+                        gridZElevationViewMatrix[currentField.getRow()][currentField.getColumn()].setImage(digits[0]).hide();
+                    });
+
+                }
+            });
+
+            movementController.setDirMapper(dir -> {
+
+                Field currentField = grid.getField(
+                        centerPointer.getLastCoordinates().getFirst(),
+                        centerPointer.getLastCoordinates().getSecond()
+                );
+
+                Pair<Float, Float> ret = null;
+
+                if (currentField.getRow() == 0) {
                     if(dir.equals(MovementController.Direction.UP ) || dir.equals(MovementController.Direction.UP_LEFT) || dir.equals(MovementController.Direction.UP_RIGHT))
                         return Pair.create(currentField.getCenterX(), currentField.getCenterY());
-               } else if (currentField.getRow() == rows - 1) {
-                   if(dir.equals(MovementController.Direction.DOWN ) || dir.equals(MovementController.Direction.DOWN_LEFT) || dir.equals(MovementController.Direction.DOWN_RIGHT))
-                       return Pair.create(currentField.getCenterX(), currentField.getCenterY());
-               } else if (currentField.getColumn() == 0) {
-                   if(dir.equals(MovementController.Direction.LEFT ) || dir.equals(MovementController.Direction.DOWN_LEFT) || dir.equals(MovementController.Direction.UP_LEFT))
-                       return Pair.create(currentField.getCenterX(), currentField.getCenterY());
-               } else if (currentField.getColumn() == columns - 1) {
-                   if(dir.equals(MovementController.Direction.RIGHT ) || dir.equals(MovementController.Direction.DOWN_RIGHT) || dir.equals(MovementController.Direction.UP_RIGHT))
-                       return Pair.create(currentField.getCenterX(), currentField.getCenterY());
-               }
+                } else if (currentField.getRow() == rows - 1) {
+                    if(dir.equals(MovementController.Direction.DOWN ) || dir.equals(MovementController.Direction.DOWN_LEFT) || dir.equals(MovementController.Direction.DOWN_RIGHT))
+                        return Pair.create(currentField.getCenterX(), currentField.getCenterY());
+                } else if (currentField.getColumn() == 0) {
+                    if(dir.equals(MovementController.Direction.LEFT ) || dir.equals(MovementController.Direction.DOWN_LEFT) || dir.equals(MovementController.Direction.UP_LEFT))
+                        return Pair.create(currentField.getCenterX(), currentField.getCenterY());
+                } else if (currentField.getColumn() == columns - 1) {
+                    if(dir.equals(MovementController.Direction.RIGHT ) || dir.equals(MovementController.Direction.DOWN_RIGHT) || dir.equals(MovementController.Direction.UP_RIGHT))
+                        return Pair.create(currentField.getCenterX(), currentField.getCenterY());
+                }
 
-               List<Field> neighbors = grid.getNeighbors(currentField);
+                List<Field> neighbors = grid.getNeighbors(currentField);
 
-               switch (dir) {
-                   case UP:
-                       ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
-                       break;
-                   case DOWN:
-                       ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
-                       break;
-                   case RIGHT:
-                       ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
-                       break;
-                   case LEFT:
-                       ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
-                       break;
-                   case UP_RIGHT:
-                       ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
-                       break;
-                   case UP_LEFT:
-                       ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
-                       break;
-                   case DOWN_RIGHT:
-                       ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
-                       break;
-                   case DOWN_LEFT:
-                       ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
-                       break;
-                   default:
-                       throw new IllegalStateException("No dir: " + dir);
+                switch (dir) {
+                    case UP:
+                        ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                        break;
+                    case DOWN:
+                        ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                        break;
+                    case RIGHT:
+                        ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                        break;
+                    case LEFT:
+                        ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                        break;
+                    case UP_RIGHT:
+                        ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                        break;
+                    case UP_LEFT:
+                        ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                        break;
+                    case DOWN_RIGHT:
+                        ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                        break;
+                    case DOWN_LEFT:
+                        ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                        break;
+                    default:
+                        throw new IllegalStateException("No dir: " + dir);
 
-               }
+                }
 
-               return ret;
-           });
+                return ret;
+            });
 
             saveButton.onClick(()-> {
                 System.out.println(DaemonUtils.tag() + saveButton.getName() + "clicked");
             });
 
 
-           Field firstField = grid.getField(rows / 2, columns / 2);
+            Field firstField = grid.getField(rows / 2, columns / 2);
 
-           centerPointer.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
-                   .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
+            centerPointer.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
+                    .go(firstField.getCenterX(), firstField.getCenterY(), 2F);
+
+            saveButton.onClick(() -> {
+//
+//                ObjectMapper objectmapper = new ObjectMapper();
+//
+//                try {
+//                    objectmapper.writeValue(Paths.get("E:\\test.json").toFile(), grid);
+//                } catch (IOException e) {
+//                    throw new IllegalStateException(e);
+//                }
+
+
+            });
+
+            DummyDaemon.create(mainConsumer, 1000).setClosure(() -> {
+
+
+
+                for (Field current : grid.multipleZFieldSet) {
+
+                    int currentZElev = current.iterateElevate();
+
+                    renderer.consume(() -> {
+                        gridZElevationViewMatrix[current.getRow()][current.getColumn()]
+                                .setImage(digits[currentZElev]);
+                    });
+
+
+                }
+
+            }).start();
 
 
         });

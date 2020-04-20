@@ -17,6 +17,8 @@ import javafx.geometry.Pos;
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true, daemonizeBaseMethods = true)
 public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Zombie>, Movable {
 
+    public final float recommendedVelocity;
+
     private volatile int hpMax;
     private volatile int hp;
     private volatile boolean shootable = true;
@@ -24,9 +26,10 @@ public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Z
     private PositionedImage[] ret = new PositionedImage[1];
     private RotatingSpriteImageMover rotationMover;
 
-    public Zombie(Image startImage, AngleToImageArray animation, Pair<Float, Float> startingPos, float dXY) {
+    public Zombie(Image startImage, AngleToImageArray animation, float recommendedVelocity, Pair<Float, Float> startingPos, float dXY) {
         super(startImage, startingPos, dXY);
         this.rotationMover = new RotatingSpriteImageMover(animation, animateSemaphore, startImage, startingPos, dXY).setRotaterName("ZombieRotater");
+        this.recommendedVelocity = recommendedVelocity;
     }
 
     @Daemonize

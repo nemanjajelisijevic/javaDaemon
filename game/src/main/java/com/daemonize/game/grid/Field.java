@@ -6,6 +6,7 @@ import java.util.List;
 public class Field<T> implements  IHeapItem , Comparable {
 
     private List<Integer> zElevation;
+    private volatile int zElevator;
 
     float centerX;
     float centerY;
@@ -32,14 +33,30 @@ public class Field<T> implements  IHeapItem , Comparable {
         return this;
     }
 
-    public List<Integer> getZElevations() {
-        return zElevation;
+    public synchronized int zElevationsSize() {
+        return zElevation.size();
     }
 
-    public Field<T> addZElevation(int z) {
+    public synchronized Field<T> addZElevation(int z) {
         if (!zElevation.contains(z))
             zElevation.add(z);
         return this;
+    }
+
+    public synchronized void clearElevations() {
+        zElevation.clear();
+    }
+
+    public synchronized int iterateElevate() {
+
+        zElevator = ++zElevator % zElevation.size();
+
+        return zElevation.get(zElevator);
+
+    }
+
+    public Field(){
+        this.zElevation = new ArrayList<>(1);
     }
 
     public Field(float centerX, float centerY, int row, int column, int weight, boolean walkable) {
