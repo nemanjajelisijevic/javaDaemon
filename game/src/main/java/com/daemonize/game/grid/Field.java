@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Field<T> implements  IHeapItem , Comparable {
 
-    private List<Integer> zElevation;
-    private volatile int zElevator;
+    public List<Integer> zElevation;
+    public volatile int zElevator;
 
     float centerX;
     float centerY;
@@ -80,7 +80,8 @@ public class Field<T> implements  IHeapItem , Comparable {
         this.hCost = field.hCost;
         this.heapIndex = field.getHeapIndex();
         this.object = field.object;
-        this.zElevation.clear();
+        this.zElevation = new ArrayList<>(field.zElevation.size());
+        //this.zElevation.clear();
 
         for(Integer eleveation : field.zElevation) {
             this.zElevation.add(eleveation);

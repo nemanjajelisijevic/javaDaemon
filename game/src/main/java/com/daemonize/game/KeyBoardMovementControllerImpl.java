@@ -3,6 +3,9 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.Daemon;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
+import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.game.controller.KeyboardController;
 import com.daemonize.game.controller.MovementController;
 
@@ -12,6 +15,24 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class KeyBoardMovementControllerImpl implements KeyboardController<PlayerDaemon> {
+
+    @Daemon
+    public static class SpeedBoostHolder {
+
+        private long boostDureationMs;
+
+        public SpeedBoostHolder(long boostDureationMs) {
+            this.boostDureationMs = boostDureationMs;
+        }
+
+        @Daemonize
+        @GenerateRunnable
+        public void holdBoost() throws InterruptedException {
+            Thread.sleep(boostDureationMs);
+        }
+    }
+
+    private SpeedBoostHolderDaemon boostHolder;
 
     private PlayerDaemon controllable;
     private Consumer consumer;
@@ -65,10 +86,12 @@ public class KeyBoardMovementControllerImpl implements KeyboardController<Player
 
         this.controlBlockingSemaphore = new DaemonSemaphore();
         this.contorlMovementCondition = Pair.create(false, false);
+        //this.boostHolder = new SpeedBoostHolderDaemon(null, new SpeedBoostHolder(1000)).setName("Boost Holder").start();
     }
 
     public KeyBoardMovementControllerImpl setConsumer(Consumer consumer) {
         this.consumer = consumer;
+        //this.boostHolder.setConsumer(consumer);
         return this;
     }
 
@@ -142,6 +165,14 @@ public class KeyBoardMovementControllerImpl implements KeyboardController<Player
     public void speedUp() {
         currentVelocity = speedUpVelocity;
         controllable.setVelocity(currentVelocity);
+//
+//        boostHolder.holdBoost(() -> {
+//
+//            currentVelocity = controllerVelocity;
+//            controllable.setVelocity(currentVelocity);
+//
+//        });
+
     }
 
     @Override

@@ -14,8 +14,6 @@ import com.daemonize.game.grid.Field;
 import com.daemonize.game.grid.Grid;
 import com.daemonize.game.interactables.Interactable;
 import com.daemonize.game.interactables.health.HealthPack;
-import com.daemonize.graphics2d.camera.Camera2D;
-import com.daemonize.graphics2d.camera.FixedCamera;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
@@ -30,8 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -235,15 +231,22 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
         //URL url = this.getClass().getProtectionDomain().getCodeSource().getLocation();
 
+        //        URL url = this.getClass().getProtectionDomain().getCodeSource().getLocation();
+//        try {
+//            String jarPath = URLDecoder.decode(url.getFile(), "UTF-8");
+//            activeSoundManager.setJarResourceLocation(jarPath, "");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+
         String path = getClass().getResource("/" + "test.json").getPath();
         File jsonGrid = new File(path);
-
 
         try {
             this.grid = gridLoader.readValue(jsonGrid, Grid.class).calculateFieldWidth();
 
 
-            this.fieldWidth = grid.getFieldWith();
+            this.fieldWidth = grid.getFieldWidth();
 
 
             this.borderX = grid.getGridWidth();
@@ -478,28 +481,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 streetLamp.getDaemon().start();
 
-                //picakbles
-                healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth / 2, playerWidth /2 );
-
-                healthPackFields.add(grid.getField(21, 25));
-                healthPackFields.add(grid.getField(11, 15));
-                healthPackFields.add(grid.getField(11, 35));
-                healthPackFields.add(grid.getField(2, 15));
-                healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
-                healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
-
-                for(Field<Interactable> current : healthPackFields) {
-                    current.setObject(
-                            HealthPack.generateHealthPack(
-                                    player,
-                                    20,
-                                    ((int) current.getCenterX()),
-                                    ((int) current.getCenterY()),
-                                    healthPackImage, scene
-                            )
-                    );
-                }
-
                 Field initial = grid.getField(99, 199);
 
                 //init player
@@ -522,13 +503,12 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     Field current = grid.getField(x, y);
                     grid.setStartAndRecalculate(current.getRow(), current.getColumn());
 
+                }).exportCoordinates(15000, new Runnable() {
+                    @Override
+                    public void run() {
+                        player.exportCoordinates(500, this::run);
+                    }
                 });
-//                        .exportCoordinates(3000, new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        player.exportCoordinates(500, this::run);
-//                    }
-//                });
 
                 {
                     ImageView mainView = scene.addImageView(new FixedView("Player Main View", cameraWidth / 2, cameraHeight / 2, 10, playerSprite[0].getWidth(), playerSprite[0].getHeight()))
@@ -605,22 +585,51 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     player.setAnimatePlayerSideQuest(renderer).setClosure(playerAnimateClosure);
                 }
 
-//                int noOfZombies = 50;
 
-//                zombieViews = new ImageView[noOfZombies];
-//
-//                for(int i = 0; i < noOfZombies; ++i) {
-//
-//                    int currentZombieX = getRandomInt(0, borderX);
-//                    int currentZombieY = getRandomInt(0, borderY);
-//
-//                    zombieViews[i] = scene.addImageView(new ImageViewImpl("Zombie View No. " + i))
-//                            .setAbsoluteX(currentZombieX)
-//                            .setAbsoluteY(currentZombieY)
-//                            .setZindex(6)
-//                            .setImage(zombieMove270[0])
-//                            .show();
-//                }
+                Field firstField = grid.getField(100, 200);
+
+                int noOfZombies = 2;
+
+                zombieViews = new ImageView[noOfZombies];
+
+                for(int i = 0; i < noOfZombies; ++i) {
+
+                    //int currentZombieX = getRandomInt(0, borderX);
+                    //int currentZombieY = getRandomInt(0, borderY);
+
+                    int currentZombieX = ((int) firstField.getCenterX() + getRandomInt(-40, 10));
+                    int currentZombieY = ((int) firstField.getCenterY()+ getRandomInt(-40, 10));
+
+                    zombieViews[i] = scene.addImageView(new ImageViewImpl("Zombie View No. " + i))
+                            .setAbsoluteX(currentZombieX)
+                            .setAbsoluteY(currentZombieY)
+                            .setZindex(6)
+                            .setImage(zombieMove270[0])
+                            .show();
+                }
+
+
+                //picakbles
+                healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth / 2, playerWidth /2 );
+
+                healthPackFields.add(grid.getField(21, 25));
+                healthPackFields.add(grid.getField(11, 15));
+                healthPackFields.add(grid.getField(11, 35));
+                healthPackFields.add(grid.getField(2, 15));
+                healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
+                healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
+
+                for(Field<Interactable> current : healthPackFields) {
+                    current.setObject(
+                            HealthPack.generateHealthPack(
+                                    player,
+                                    20,
+                                    ((int) current.getCenterX()),
+                                    ((int) current.getCenterY()),
+                                    healthPackImage, scene
+                            )
+                    );
+                }
 
                 renderer.setScene(scene.lockViews()).start();
 
@@ -742,8 +751,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 controller.setControlSideQuest();
                 controller.start();
 
-                Field firstField = grid.getField(100, 200);
-
                 player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
                         .go(firstField.getCenterX(), firstField.getCenterY(), 12F);
 
@@ -777,90 +784,86 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
 
 
+                for(int i = 0; i < noOfZombies; ++i) {
 
-//                for(int i = 0; i < noOfZombies; ++i) {
-//
-//
-//                    AngleToSpriteArray animClone = zombieMoveAnimation.clone();
-//
-//                    float zombieVelocity = 6.4F;
-//
-//                    if (i % 5 == 0)
-//                        zombieVelocity = 9.4F;
-//
-//
-//                    ZombieDaemon zombie = new ZombieDaemon(
-//                            gameConsumer,
-//                            new Zombie(
-//                                    zombieMove270[0],
-//                                    animClone,
-//                                    zombieVelocity,
-//                                    Pair.create(zombieViews[i].getAbsoluteX(), zombieViews[i].getAbsoluteY()),
-//                                    dXY
-//                            )
-//                    ).setName( i % 50 ==0 ? "DebugZombie no: " + i : "Zombie");
-//
-//                    zombie.setAnimateZombieSideQuest(renderer)
-//                            .setSleepInterval(80)
-//                            .setClosure(new ZombieSpriteAnimateClosure(zombieViews[i]));
-//
-//
-//                    Field zeroField = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
-//
-//                    Field firstF = grid.getMinWeightOfNeighbors(zeroField);
-//
-//
-//                    zombie.start().rotateTowards(firstF.getCenterX(), firstF.getCenterY()).goTo(firstF.getCenterX(), firstF.getCenterY(), zombie.getPrototype().recommendedVelocity, new Closure<Boolean>() {
-//
-//                        @Override
-//                        public void onReturn(Return<Boolean> ret) {
-//
-//                            ret.runtimeCheckAndGet();
-//
-//                            Field curr = grid.getField(
-//                                    zombie.getLastCoordinates().getFirst(),
-//                                    zombie.getLastCoordinates().getSecond()
-//                            );
-//
-//                            Field next = grid.getMinWeightOfNeighbors(curr);
-//
-//                            if (zombie.getName().contains("DebugZombie"))
-//                                System.err.println(DaemonUtils.timedTag() + zombie.getName() + " at " + curr);
-//
-//                            if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) < 10 && player.isShootable()) {
-//
-//
-//                                player.setShootable(false);
-//
-//
-//                                if (player.getHp() - 100 < 1) {
-//                                    player.pushSprite(explosionSprite);
-//
-//                                } else {
-//
-//                                    player.setHp(player.getHp() - 100);
-//                                    player.pushSprite(explosionSprite);
-////                                    renderer.consume(() -> {
-////                                        try {
-////                                            playerAnimateClosure.onReturn(new Return<>(player.animatePlayer()));
-////                                        } catch (InterruptedException e) {
-////                                            e.printStackTrace();
-////                                        }
-////                                    });
-//
-//                                }
-//
-//                                zombie.attack(1000,
-//                                        () -> {
-//                                            player.setShootable(true);
-//                                            zombie.rotateTowards(next.getCenterX(), next.getCenterY())
-//                                                    .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
-//                                        });
-//                            } else
-//                                zombie.rotateTowards(next.getCenterX(), next.getCenterY()).goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
-//                        }
-//                    });
-//                }
+
+                    AngleToSpriteArray animClone = zombieMoveAnimation.clone();
+
+                    float zombieVelocity = 6.4F;
+
+                    if (i % 2 == 0)
+                        zombieVelocity = 9.4F;
+
+
+                    ZombieDaemon zombie = new ZombieDaemon(
+                            gameConsumer,
+                            new Zombie(
+                                    zombieMove270[0],
+                                    animClone,
+                                    zombieVelocity,
+                                    Pair.create(zombieViews[i].getAbsoluteX(), zombieViews[i].getAbsoluteY()),
+                                    dXY
+                            )
+                    ).setName( i % 50 ==0 ? "DebugZombie no: " + i : "Zombie");
+
+                    zombie.setAnimateZombieSideQuest(renderer)
+                            .setSleepInterval(60)
+                            .setClosure(new ZombieSpriteAnimateClosure(zombieViews[i]));
+
+
+                    Field zeroField = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
+
+                    Field firstF = grid.getMinWeightOfNeighbors(zeroField);
+
+                    zombie.start().rotateTowards(firstF.getCenterX(), firstF.getCenterY()).goTo(firstF.getCenterX(), firstF.getCenterY(), zombie.getPrototype().recommendedVelocity, new Closure<Boolean>() {
+
+                        @Override
+                        public void onReturn(Return<Boolean> ret) {
+
+                            ret.runtimeCheckAndGet();
+
+                            Field curr = grid.getField(
+                                    zombie.getLastCoordinates().getFirst(),
+                                    zombie.getLastCoordinates().getSecond()
+                            );
+
+                            Field next = grid.getMinWeightOfNeighbors(curr);
+
+                            if (zombie.getName().contains("DebugZombie"))
+                                System.err.println(DaemonUtils.timedTag() + zombie.getName() + " at " + curr);
+
+                            if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) < 10 && player.isShootable()) {
+
+                                player.setShootable(false);
+
+                                if (player.getHp() - 100 < 1) {
+                                    player.pushSprite(explosionSprite);
+                                    throw new IllegalStateException("You ded!");
+                                } else {
+
+                                    player.setHp(player.getHp() - 100);
+                                    player.pushSprite(explosionSprite);
+//                                    renderer.consume(() -> {
+//                                        try {
+//                                            playerAnimateClosure.onReturn(new Return<>(player.animatePlayer()));
+//                                        } catch (InterruptedException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    });
+
+                                }
+
+                                zombie.attack(1000,
+                                        () -> {
+                                            player.setShootable(true);
+                                            zombie.rotateTowards(next.getCenterX(), next.getCenterY())
+                                                    .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
+                                        });
+                            } else
+                                zombie.rotateTowards(next.getCenterX(), next.getCenterY()).goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
+                        }
+                    });
+                }
 
 
 
@@ -875,10 +878,9 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
             }
-//            catch (CloneNotSupportedException e) {
-//                e.printStackTrace();
-//            }
         });
     }
 }

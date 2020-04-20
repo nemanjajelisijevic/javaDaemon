@@ -58,10 +58,10 @@ public class Grid<T> {
     }
 
     private Field<T>[][] grid;
-    private int fieldWith;
+    private int fieldWidth;
 
-    public int getFieldWith() {
-        return fieldWith;
+    public int getFieldWidth() {
+        return fieldWidth;
     }
 
     private List<Field> path;
@@ -70,8 +70,8 @@ public class Grid<T> {
 
     public boolean isInsideOfGrid (float x, float y){
         boolean in = false;
-        float x2 = xCoordinateInReal + grid[0].length * fieldWith;
-        float y2 = yCoordinateInReal + grid.length * fieldWith;
+        float x2 = xCoordinateInReal + grid[0].length * fieldWidth;
+        float y2 = yCoordinateInReal + grid.length * fieldWidth;
         if ( x >= xCoordinateInReal && x <= x2 &&
              y >= yCoordinateInReal && y <= y2 ){
             in = true;
@@ -80,7 +80,7 @@ public class Grid<T> {
     }
 
     public Grid<T> calculateFieldWidth() {
-        this.fieldWith = mapWidth / grid[0].length;
+        this.fieldWidth = mapWidth / grid[0].length;
         return this;
     }
 
@@ -93,7 +93,7 @@ public class Grid<T> {
         this.endPoint = Pair.create(0,0);
         this.xCoordinateInReal = 0;
         this.yCoordinateInReal = 0;
-        this.fieldWith = mapWidth / columns;
+        this.fieldWidth = mapWidth / columns;
         this.mapWidth = mapWidth;
         this.mapHeight = mapHeight;
         this.pathFinding = new Dijkstra();
@@ -107,7 +107,7 @@ public class Grid<T> {
             Pair<Integer, Integer> endPoint,
             float realCoordX,
             float realCoordY,
-            int fieldWith,
+            int fieldWidth,
             int mapWidth,
             int mapHeight
     ) {
@@ -115,7 +115,7 @@ public class Grid<T> {
         this.endPoint = endPoint;
         this.xCoordinateInReal = realCoordX;
         this.yCoordinateInReal = realCoordY;
-        this.fieldWith = fieldWith;
+        this.fieldWidth = fieldWidth;
         pathFinding = new Dijkstra();
         grid = createFieldGround(rows, columns,realCoordX,realCoordY);
         pathFinding.recalculate(this);//new Pair<>(0,0),new Pair<>(row - 1,column - 1)
@@ -128,10 +128,10 @@ public class Grid<T> {
         Field<T>[][] gridtemp = new Field[row][column];
 
         for (int i = 0; i < row; i++) {
-            float y = realCoordY + fieldWith / 2 + i * fieldWith;
+            float y = realCoordY + fieldWidth / 2 + i * fieldWidth;
 
             for (int j = 0; j < column; j++) {
-                float x = realCoordX + fieldWith / 2 + j * fieldWith;
+                float x = realCoordX + fieldWidth / 2 + j * fieldWidth;
 
                 Field<T> field = new Field<T>(x, y, i, j, 0, true);
                 field.gCost = Integer.MAX_VALUE;
@@ -150,8 +150,8 @@ public class Grid<T> {
         Field<T> ret = null;
 
         if (isInsideOfGrid(x,y)) {
-            int row = (int)Math.floor((y - yCoordinateInReal) / fieldWith);
-            int column = (int) Math.floor((x - xCoordinateInReal) / fieldWith);
+            int row = (int)Math.floor((y - yCoordinateInReal) / fieldWidth);
+            int column = (int) Math.floor((x - xCoordinateInReal) / fieldWidth);
             ret = grid[row][column];
         }
 
@@ -168,8 +168,8 @@ public class Grid<T> {
     }
 
     public boolean setObject(float x, float y) {
-        int row = (int) ((y) / fieldWith);
-        int column = (int) ((x) / fieldWith);
+        int row = (int) ((y) / fieldWidth);
+        int column = (int) ((x) / fieldWidth);
         return setObject(row, column);
     }
 
@@ -231,8 +231,8 @@ public class Grid<T> {
     }
 
     public boolean destroyObject(float x, float y) {
-        int row = (int) ((y) / fieldWith);
-        int column = (int) ((x) / fieldWith);
+        int row = (int) ((y) / fieldWidth);
+        int column = (int) ((x) / fieldWidth);
 
         return destroyObject(row, column);
     }
@@ -340,11 +340,11 @@ public class Grid<T> {
     }
 
     public int getGridWidth() {
-        return grid[0].length * fieldWith;
+        return grid[0].length * fieldWidth;
     }
 
     public int getGridHeight() {
-        return grid.length * fieldWith;
+        return grid.length * fieldWidth;
     }
 
 }
