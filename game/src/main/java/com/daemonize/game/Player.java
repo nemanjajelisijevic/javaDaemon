@@ -10,13 +10,14 @@ import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
+import com.daemonize.imagemovers.Movable;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
 
 import java.beans.IntrospectionException;
 import java.util.Arrays;
 
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true)
-public class Player extends CoordinatedImageTranslationMover implements Target<Player>, ZElevatable {
+public class Player extends CoordinatedImageTranslationMover implements Target<Player>, ZElevatable, Movable {
 
     private CoordinateExporter playerCoordinateExporter;
 

@@ -9,7 +9,7 @@ import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.MovementController;
 import com.daemonize.game.controller.MovementControllerDaemon;
-import com.daemonize.game.game.DaemonApp;
+import com.daemonize.game.app.DaemonApp;
 import com.daemonize.game.grid.Field;
 import com.daemonize.game.grid.Grid;
 import com.daemonize.game.interactables.Interactable;
@@ -26,8 +26,8 @@ import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -238,12 +238,14 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 //        } catch (UnsupportedEncodingException e) {
 //            e.printStackTrace();
 //        }
+//
+//        String path = getClass().getResource("/" + "test.json").getPath();
+//        File jsonGrid = new File(path);
 
-        String path = getClass().getResource("/" + "test.json").getPath();
-        File jsonGrid = new File(path);
+        InputStream in = getClass().getResourceAsStream("/test.json");
 
         try {
-            this.grid = gridLoader.readValue(jsonGrid, Grid.class).calculateFieldWidth();
+            this.grid = gridLoader.readValue(in, Grid.class).calculateFieldWidth();
 
 
             this.fieldWidth = grid.getFieldWidth();
@@ -255,8 +257,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
             this.rows = borderY / fieldWidth;
             this.columns = borderX / fieldWidth;
-
-
 
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -639,7 +639,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 controller.getPrototype().setControllable(player.start());
 
-                KeyBoardMovementControllerImpl controllerPrototype = ((KeyBoardMovementControllerImpl) controller.getPrototype());
+                com.daemonize.game.KeyBoardMovableController<PlayerDaemon> controllerPrototype = ((com.daemonize.game.KeyBoardMovableController<PlayerDaemon>) controller.getPrototype());
 
                 controllerPrototype.setConsumer(gameConsumer);
 
@@ -730,6 +730,18 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                         return ret;
                     }
+                });
+
+                controllerPrototype.setMovingAction((player, parameterPack) -> {
+
+                    if (player.getLastCoordinates().equals(parameterPack.nextCoords)) {
+                        parameterPack.rotationClosure.run();
+                        parameterPack.translationClosure.run();
+                    } else {
+                        player.rotateTowards(parameterPack.nextCoords, parameterPack.rotationClosure)
+                                .goTo(parameterPack.nextCoords, parameterPack.velocity, parameterPack.translationClosure);
+                    }
+
                 });
 
                 controllerPrototype.setMovementCallback(player -> {

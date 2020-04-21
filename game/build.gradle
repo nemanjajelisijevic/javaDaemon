@@ -6,7 +6,7 @@ dependencies {
     implementation project (':commandparser')
     implementation project (':sound')
     implementation project (':graphics2d')
-    implementation project (':imagemovers')
+    api project (':imagemovers')
     implementation project (':daemonengine')
     implementation project (':daemonprocessor')
     annotationProcessor project(':daemonprocessor')

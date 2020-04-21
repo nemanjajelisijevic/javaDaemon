@@ -1,4 +1,4 @@
-package com.daemonize.game.game;
+package com.daemonize.game.app;
 
 public interface DaemonApp<T extends DaemonApp> {
     T run();

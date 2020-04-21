@@ -8,7 +8,7 @@ import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.game.controller.MouseController;
 import com.daemonize.game.controller.MovementController;
 import com.daemonize.game.controller.MovementControllerDaemon;
-import com.daemonize.game.game.DaemonApp;
+import com.daemonize.game.app.DaemonApp;
 import com.daemonize.game.grid.Field;
 import com.daemonize.game.grid.Grid;
 import com.daemonize.game.interactables.Interactable;
@@ -22,15 +22,10 @@ import com.daemonize.graphics2d.scene.views.FixedView;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.ImageMover;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
-
-import daemon.com.commandparser.CommandParser;
-import daemon.com.commandparser.CommandParserDaemon;
 
 public class MapEditor implements DaemonApp<MapEditor> {
 

@@ -1,10 +1,12 @@
 package com.daemonize.javafxmain;
 
+import com.daemonize.game.KeyBoardMovableController;
 import com.daemonize.game.KeyBoardMovementControllerImpl;
+import com.daemonize.game.PlayerDaemon;
 import com.daemonize.game.ShooterGame;
-import com.daemonize.game.controller.KeyboardController;
+import com.daemonize.game.controller.KeyboardMovementController;
 import com.daemonize.game.controller.MovementController;
-import com.daemonize.game.game.DaemonApp;
+import com.daemonize.game.app.DaemonApp;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.javafxgraphics2d.JavaFXRenderer;
@@ -26,7 +28,7 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     private DaemonApp game;
-    private KeyboardController controller;
+    private KeyboardMovementController<PlayerDaemon> controller;
 
     @Override
     public void start(Stage primaryStage) {
@@ -70,7 +72,9 @@ public class Main extends Application {
 
 
 
-        controller = new KeyBoardMovementControllerImpl();
+        //controller = new KeyBoardMovementControllerImpl();
+
+        controller = new KeyBoardMovableController<PlayerDaemon>();
 
         game = new ShooterGame(renderer, imageManager, controller, cameraWidth, cameraHeight, 5);
 
@@ -115,9 +119,9 @@ public class Main extends Application {
         game.run();
 
 
-        //controller = ((KeyboardController) ((MapEditor) game).getMovementController().getPrototype());
+        //controller = ((KeyboardMovementController) ((MapEditor) game).getMovementController().getPrototype());
 
-        controller = ((KeyboardController) ((ShooterGame) game).getMovementController().getPrototype());
+        controller = ((KeyboardMovementController) ((ShooterGame) game).getMovementController().getPrototype());
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
 

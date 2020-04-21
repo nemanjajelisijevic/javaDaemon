@@ -3,40 +3,40 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
-import com.daemonize.daemonprocessor.annotations.Daemon;
-import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.game.controller.KeyboardMovementController;
 import com.daemonize.game.controller.MovementController;
+import com.daemonize.imagemovers.Movable;
 
 import java.util.LinkedList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class KeyBoardMovementControllerImpl implements KeyboardMovementController<PlayerDaemon> {
+public class KeyBoardMovableController<M extends Movable> implements KeyboardMovementController<M> {
 
-    @Daemon
-    public static class SpeedBoostHolder {
-
-        private long boostDureationMs;
-
-        public SpeedBoostHolder(long boostDureationMs) {
-            this.boostDureationMs = boostDureationMs;
-        }
-
-        @Daemonize
-        @GenerateRunnable
-        public void holdBoost() throws InterruptedException {
-            Thread.sleep(boostDureationMs);
-        }
+    public static class MovingParameterPack {
+        public Pair<Float, Float> nextCoords;
+        public float velocity;
+        public Runnable rotationClosure;
+        public Runnable translationClosure;
     }
 
-    private SpeedBoostHolderDaemon boostHolder;
+    @FunctionalInterface
+    public interface ControllableAction<M> {
+        void execute(M controllable, MovingParameterPack  movingParameterPack);
+    }
 
-    private PlayerDaemon controllable;
+    private M controllable;
+    private ControllableAction<M> movingAction;
+    private MovingParameterPack paramPack;
+
+    public KeyboardMovementController<M> setMovingAction(ControllableAction<M> movingAction) {
+        this.movingAction = movingAction;
+        return this;
+    }
+
     private Consumer consumer;
-    private OnMovementCompleteCallback<PlayerDaemon> movementCallback;
+    private OnMovementCompleteCallback<M> movementCallback;
 
     private DirectionToCoordinateMapper dirMapper;
 
@@ -55,26 +55,26 @@ public class KeyBoardMovementControllerImpl implements KeyboardMovementControlle
     private Pair<Boolean, Boolean> contorlMovementCondition;
     private DaemonSemaphore controlBlockingSemaphore;
 
-    //first for rotation second for translation
-    private Runnable rotationControlClosure = () -> {
-        contorlMovementCondition.setFirst(true);
-        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
-            controlBlockingSemaphore.go();
-            if (movementCallback != null)
-                consumer.consume(() -> movementCallback.onMovementComplete(controllable));
-        }
-    };
+//    //first for rotation second for translation
+//    private Runnable rotationControlClosure = () -> {
+//        contorlMovementCondition.setFirst(true);
+//        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
+//            controlBlockingSemaphore.go();
+//            if (movementCallback != null)
+//                consumer.consume(() -> movementCallback.onMovementComplete(controllable));
+//        }
+//    };
+//
+//    private Runnable translationControlClosure = () -> {
+//        contorlMovementCondition.setSecond(true);
+//        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
+//            controlBlockingSemaphore.go();
+//            if (movementCallback != null)
+//                consumer.consume(() -> movementCallback.onMovementComplete(controllable));
+//        }
+//    };
 
-    private Runnable translationControlClosure = () -> {
-        contorlMovementCondition.setSecond(true);
-        if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
-            controlBlockingSemaphore.go();
-            if (movementCallback != null)
-                consumer.consume(() -> movementCallback.onMovementComplete(controllable));
-        }
-    };
-
-    public KeyBoardMovementControllerImpl() {
+    public KeyBoardMovableController() {
 
         this.pressedDirections = new LinkedList<>();
         this.queueLock = new ReentrantLock();
@@ -86,27 +86,43 @@ public class KeyBoardMovementControllerImpl implements KeyboardMovementControlle
 
         this.controlBlockingSemaphore = new DaemonSemaphore();
         this.contorlMovementCondition = Pair.create(false, false);
-        //this.boostHolder = new SpeedBoostHolderDaemon(null, new SpeedBoostHolder(1000)).setName("Boost Holder").start();
+        this.paramPack = new MovingParameterPack();
+        this.paramPack.rotationClosure =  () -> {
+            contorlMovementCondition.setFirst(true);
+            if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
+                controlBlockingSemaphore.go();
+                if (movementCallback != null)
+                    consumer.consume(() -> movementCallback.onMovementComplete(controllable));
+            }
+        };
+
+        this.paramPack.translationClosure = () -> {
+            contorlMovementCondition.setSecond(true);
+            if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
+                controlBlockingSemaphore.go();
+                if (movementCallback != null)
+                    consumer.consume(() -> movementCallback.onMovementComplete(controllable));
+            }
+        };
     }
 
-    public KeyBoardMovementControllerImpl setConsumer(Consumer consumer) {
+    public KeyboardMovementController<M> setConsumer(Consumer consumer) {
         this.consumer = consumer;
-        //this.boostHolder.setConsumer(consumer);
         return this;
     }
 
-    public KeyBoardMovementControllerImpl setDistanceOffset(float distanceOffset) {
+    public KeyboardMovementController<M> setDistanceOffset(float distanceOffset) {
         this.distanceOffset = distanceOffset;
         return this;
     }
 
-    public KeyBoardMovementControllerImpl setDiagonalDistanceOffset(float diagonalDistanceOffset) {
+    public KeyboardMovementController<M> setDiagonalDistanceOffset(float diagonalDistanceOffset) {
         this.diagonalDistanceOffset = diagonalDistanceOffset;
         return this;
     }
 
     @Override
-    public void setMovementCallback(OnMovementCompleteCallback<PlayerDaemon> movementCallback) {
+    public void setMovementCallback(OnMovementCompleteCallback<M> movementCallback) {
         this.movementCallback = movementCallback;
     }
 
@@ -157,22 +173,14 @@ public class KeyBoardMovementControllerImpl implements KeyboardMovementControlle
     }
 
     @Override
-    public void setControllable(PlayerDaemon player) {
-        this.controllable = player;
+    public void setControllable(M controllable) {
+        this.controllable = controllable;
     }
 
     @Override
     public void speedUp() {
         currentVelocity = speedUpVelocity;
         controllable.setVelocity(currentVelocity);
-//
-//        boostHolder.holdBoost(() -> {
-//
-//            currentVelocity = controllerVelocity;
-//            controllable.setVelocity(currentVelocity);
-//
-//        });
-
     }
 
     @Override
@@ -195,18 +203,20 @@ public class KeyBoardMovementControllerImpl implements KeyboardMovementControlle
 
             Pair<Float, Float> playerCoord = controllable.getLastCoordinates();
 
-            Pair<Float, Float> nextCoords = null;
+            //Pair<Float, Float> nextCoords = null;
+
+            paramPack.velocity = currentVelocity;
 
             if(pressedDirections.size() == 1) {
 
                 MovementController.Direction dir = pressedDirections.peek();
-                nextCoords = dirMapper.map(dir);
+
+                paramPack.nextCoords = dirMapper.map(dir);
 
                 controlBlockingSemaphore.stop();
                 contorlMovementCondition.setFirst(false).setSecond(false);
 
-                controllable.rotateTowards(nextCoords, rotationControlClosure)
-                        .goTo(nextCoords, currentVelocity, translationControlClosure);
+                movingAction.execute(controllable, paramPack);
 
             } else if (pressedDirections.size() == 2) {
 
@@ -217,57 +227,56 @@ public class KeyBoardMovementControllerImpl implements KeyboardMovementControlle
                     case UP:
 
                         if (dirTwo.equals(Direction.RIGHT))
-                            nextCoords = dirMapper.map(Direction.UP_RIGHT);
+                            paramPack.nextCoords = dirMapper.map(Direction.UP_RIGHT);
                         else if (dirTwo.equals(Direction.LEFT))
-                            nextCoords = dirMapper.map(Direction.UP_LEFT);
+                            paramPack.nextCoords = dirMapper.map(Direction.UP_LEFT);
                         else
-                            nextCoords = playerCoord;
+                            paramPack.nextCoords = playerCoord;
 
                         break;
 
                     case DOWN:
 
                         if (dirTwo.equals(Direction.RIGHT))
-                            nextCoords = dirMapper.map(Direction.DOWN_RIGHT);
+                            paramPack.nextCoords = dirMapper.map(Direction.DOWN_RIGHT);
                         else if (dirTwo.equals(Direction.LEFT))
-                            nextCoords = dirMapper.map(Direction.DOWN_LEFT);
+                            paramPack.nextCoords = dirMapper.map(Direction.DOWN_LEFT);
                         else
-                            nextCoords = playerCoord;
+                            paramPack.nextCoords = playerCoord;
 
                         break;
 
                     case LEFT:
 
                         if (dirTwo.equals(Direction.UP))
-                            nextCoords = dirMapper.map(Direction.UP_LEFT);
+                            paramPack.nextCoords = dirMapper.map(Direction.UP_LEFT);
                         else if (dirTwo.equals(Direction.DOWN))
-                            nextCoords = dirMapper.map(Direction.DOWN_LEFT);
+                            paramPack.nextCoords = dirMapper.map(Direction.DOWN_LEFT);
                         else
-                            nextCoords = playerCoord;
+                            paramPack.nextCoords = playerCoord;
 
                         break;
 
                     case RIGHT:
 
                         if (dirTwo.equals(Direction.UP))
-                            nextCoords = dirMapper.map(Direction.UP_RIGHT);
+                            paramPack.nextCoords = dirMapper.map(Direction.UP_RIGHT);
                         else if (dirTwo.equals(Direction.DOWN))
-                            nextCoords = dirMapper.map(Direction.DOWN_RIGHT);
+                            paramPack.nextCoords = dirMapper.map(Direction.DOWN_RIGHT);
                         else
-                            nextCoords = playerCoord;
+                            paramPack.nextCoords = playerCoord;
 
                         break;
 
                     default:
                         throw new IllegalStateException("Unknown direction" + dirOne + ", dirTwo " + dirTwo);
 
-
                 }
 
                 controlBlockingSemaphore.stop();
                 contorlMovementCondition.setFirst(false).setSecond(false);
-                controllable.rotateTowards(nextCoords, rotationControlClosure)
-                        .goTo(nextCoords, currentVelocity, translationControlClosure);
+
+                movingAction.execute(controllable, paramPack);
 
             } else {
                 throw new IllegalStateException("Dir buffer: " + pressedDirections.toString());
