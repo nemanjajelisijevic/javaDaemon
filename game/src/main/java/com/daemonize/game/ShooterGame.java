@@ -823,20 +823,22 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                         zombieVelocity = 9.4F;
 
 
+                    float zombieInstanceVelocity = zombieVelocity + getRandomInt(-3 , 3);
+
                     ZombieDaemon zombie = new ZombieDaemon(
                             gameConsumer,
                             new Zombie(
                                     zombieMove270[0],
                                     zombieMoveAnimation.clone(),
                                     zombieAttackAnimation.clone(),
-                                    zombieVelocity + getRandomInt(-1, 1),
+                                    zombieInstanceVelocity,
                                     Pair.create(zombieViews[i].getAbsoluteX(), zombieViews[i].getAbsoluteY()),
                                     dXY
                             )
                     ).setName( i % 50 ==0 ? "DebugZombie no: " + i : "Zombie");
 
                     zombie.setAnimateZombieSideQuest(renderer)
-                            .setSleepInterval(70)
+                            .setSleepInterval(zombieInstanceVelocity > 10 ? 50 : zombieInstanceVelocity > 8 ? 70 : zombieInstanceVelocity > 5 ? 80 : zombieInstanceVelocity > 3 ? 90 : zombieInstanceVelocity > 0 ? 100 : 0)
                             .setClosure(new ZombieSpriteAnimateClosure(zombieViews[i]));
 
                     Field zeroField = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
@@ -862,25 +864,30 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                             if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) <= fieldWidth) {
 
-                                zombie.attack(() -> {
-                                    if (player.isAttackable()) {
+                                if (player.isAttackable()) {
 
-                                        player.setAttackable(false);
+                                    player.setAttackable(false);
 
-                                        if (player.getHp() - 100 < 1)
-                                            throw new IllegalStateException("You ded!");
-                                        else
-                                            player.setHp(player.getHp() - 100);
+                                    if (player.getHp() - 100 < 1)
+                                        throw new IllegalStateException("You ded!");
+                                    else
+                                        player.setHp(player.getHp() - 100);
 
-                                        player.pushSprite(explosionSprite, () -> {
-                                            player.setAttackable(true);
-                                            zombie.rotateTowards(next.getCenterX(), next.getCenterY())
-                                                    .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
-                                        });
-                                    } else
-                                        zombie.sleep(1000).rotateTowards(next.getCenterX(), next.getCenterY())
+                                    player.sleep(400).pushSprite(explosionSprite, () -> {});
+
+                                    zombie.attack(() -> {
+                                        player.setAttackable(true);
+                                        zombie.rotateTowards(next.getCenterX(), next.getCenterY())
                                                 .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
-                                });
+                                    });
+
+                                } else
+
+                                    //zombie.attack(() ->
+                                            zombie.sleep(1000).rotateTowards(next.getCenterX(), next.getCenterY())
+                                                    .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
+                                    //);
+
                             } else
                                 zombie.rotateTowards(next.getCenterX(), next.getCenterY()).goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
                         }

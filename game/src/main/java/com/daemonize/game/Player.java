@@ -71,6 +71,11 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         this.hpMax = hpMax;
     }
 
+    @Daemonize
+    @DedicatedThread(engineName = "rotate")
+    public void sleep(long ms) throws InterruptedException {
+        Thread.sleep(ms);
+    }
 
     @Override
     public int getZElevation() {
@@ -107,7 +112,6 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     public void rotateTowards(Pair<Float, Float> coords) throws InterruptedException {
         rotateTowards(coords.getFirst(), coords.getSecond());
     }
-
 
     @Daemonize
     @Override
