@@ -8,11 +8,11 @@ import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.imagemovers.AngleToImageArray;
+import com.daemonize.imagemovers.AngleToSingleImageArray;
+import com.daemonize.imagemovers.AngleToSpriteArray;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.imagemovers.Movable;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
-
-import javafx.geometry.Pos;
 
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true, daemonizeBaseMethods = true)
 public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Zombie>, Movable {
@@ -26,16 +26,26 @@ public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Z
     private PositionedImage[] ret = new PositionedImage[1];
     private RotatingSpriteImageMover rotationMover;
 
-    public Zombie(Image startImage, AngleToImageArray animation, float recommendedVelocity, Pair<Float, Float> startingPos, float dXY) {
+    private AngleToImageArray walkAnimation;
+    private AngleToSpriteArray attackAnimation;
+
+    public Zombie(Image startImage, AngleToImageArray walkAnimation, AngleToSpriteArray attackAnimation, float recommendedVelocity, Pair<Float, Float> startingPos, float dXY) {
         super(startImage, startingPos, dXY);
-        this.rotationMover = new RotatingSpriteImageMover(animation, animateSemaphore, startImage, startingPos, dXY).setRotaterName("ZombieRotater");
+        this.rotationMover = new RotatingSpriteImageMover(walkAnimation, animateSemaphore, startImage, startingPos, dXY).setRotaterName("ZombieRotater");
         this.recommendedVelocity = recommendedVelocity;
+        this.walkAnimation = walkAnimation;
+        this.attackAnimation = attackAnimation;
+    }
+
+    @Daemonize
+    public void sleep(long ms) throws InterruptedException {
+        Thread.sleep(ms);
     }
 
     @Daemonize
     @GenerateRunnable
-    public void attack(long ms) throws InterruptedException {
-        Thread.sleep(ms);
+    public void attack() throws InterruptedException {
+        rotationMover.pushSprite(attackAnimation.getSpriteByAngle(walkAnimation.getCurrentAngle()));
     }
 
     @Daemonize

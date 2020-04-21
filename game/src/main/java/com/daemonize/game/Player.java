@@ -143,12 +143,12 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     }
 
     @Override
-    public boolean isShootable() {
+    public boolean isAttackable() {
         return shootable;
     }
 
     @Override
-    public Player setShootable(boolean shootable) {
+    public Player setAttackable(boolean shootable) {
         this.shootable = shootable;
         return this;
     }
@@ -195,6 +195,7 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
 
     @Daemonize
     @DedicatedThread(engineName = "rotate")
+    @GenerateRunnable
     @Override
     public void pushSprite(Image[] sprite) throws InterruptedException {
         rotationMover.pushSprite(sprite);

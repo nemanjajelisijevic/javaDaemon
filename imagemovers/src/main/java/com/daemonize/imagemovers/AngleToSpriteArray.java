@@ -10,7 +10,7 @@ public class AngleToSpriteArray implements AngleToImageArray {
         Image[] map(int angle);
     }
 
-    private static Image[][] rotationSpriteList;
+    private Image[][] rotationSpriteList;
     private final int noOfDirections;
     private final int step;
 
@@ -44,14 +44,18 @@ public class AngleToSpriteArray implements AngleToImageArray {
     }
 
     public AngleToSpriteArray(int directionsNo) {
+        this(new Image[360][], directionsNo);
+    }
+
+    private AngleToSpriteArray(Image[][] rotationSpriteList, int directionsNo) {
 
         if (directionsNo < 4 && directionsNo % 4 != 0)
             throw new IllegalArgumentException("Arg directionsNo cant be less than 4 and must be divisible by 4. Passed: " + directionsNo);
 
-        if (this.rotationSpriteList == null) {
-            System.err.println(DaemonUtils.timedTag() + "[AngleToSpriteArray] Rotation List Initialization!");
-            this.rotationSpriteList = new Image[360][];
-        }
+//        if (this.rotationSpriteList == null) {
+        System.err.println(DaemonUtils.timedTag() + "[AngleToSpriteArray] Rotation List Initialization!");
+        this.rotationSpriteList = rotationSpriteList;
+        //      }
         this.noOfDirections = directionsNo;
         this.step = 360 / noOfDirections;
         this.currentAngleSetter = 0;
@@ -152,6 +156,10 @@ public class AngleToSpriteArray implements AngleToImageArray {
         return rotationSpriteList[pointerRot][pointerTra];
     }
 
+    public synchronized Image[] getSpriteByAngle(int angle) {
+        return rotationSpriteList[angle];
+    }
+
     @Override
     public Image getByAngle(int degrees) {
         return rotationSpriteList[degrees][0];
@@ -159,6 +167,6 @@ public class AngleToSpriteArray implements AngleToImageArray {
 
     @Override
     public AngleToSpriteArray clone() throws CloneNotSupportedException {
-        return new AngleToSpriteArray(this.noOfDirections);
+        return new AngleToSpriteArray(this.rotationSpriteList, this.noOfDirections);
     }
 }

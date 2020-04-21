@@ -116,12 +116,12 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     }
 
     @Override
-    public boolean isShootable() {
+    public boolean isAttackable() {
         return shootable;
     }
 
     @Override
-    public Enemy setShootable(boolean shootable) {
+    public Enemy setAttackable(boolean shootable) {
         this.shootable = shootable;
         return this;
     }

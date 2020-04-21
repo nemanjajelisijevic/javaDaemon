@@ -96,5 +96,4 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
 
         return ret;
     }
-
 }

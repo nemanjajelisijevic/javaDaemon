@@ -70,7 +70,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         public boolean test(Target target);
     }
 
-    protected TargetTester targetTester = target -> (target.isShootable()
+    protected TargetTester targetTester = target -> (target.isAttackable()
             && ImageTranslationMover.absDistance(
                     target.getLastCoordinates().getFirst(),
                     target.getLastCoordinates().getSecond(),
@@ -126,12 +126,12 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     @Override
-    public boolean isShootable() {
+    public boolean isAttackable() {
         return shootable;
     }
 
     @Override
-    public Tower setShootable(boolean shootable) {
+    public Tower setAttackable(boolean shootable) {
         this.shootable = shootable;
         return this;
     }
@@ -243,7 +243,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     protected void rotateTo(Target target) throws InterruptedException {
-        if (target.isShootable())
+        if (target.isAttackable())
             rotateTowards(
                     getLastCoordinates().getFirst(),
                     getLastCoordinates().getSecond(),
@@ -361,7 +361,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
                     + "\nTarget available: " + Boolean.toString(this.target != null)
                     + "\nTargetLock: " + targetLock.toString()
                     + "\nTargetCondition: " + targetCondition.toString()
-                    + "\nTarget: shootable: " + ((target != null) ? Boolean.toString(target.isShootable()) : "NULL")
+                    + "\nTarget: shootable: " + ((target != null) ? Boolean.toString(target.isAttackable()) : "NULL")
                     + ", Coord X: " + ((target != null) ? Float.toString(target.getLastCoordinates().getFirst()) : "NULL")
                     + ", Coord Y: " + ((target != null) ? Float.toString(target.getLastCoordinates().getSecond()) : "NULL")
                     + "\nAnimateSemaphore: " + animateSemaphore.toString();

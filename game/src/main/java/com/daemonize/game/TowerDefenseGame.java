@@ -1098,7 +1098,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                             .setDeactivateTowerSideQuest(renderer)
                             .setClosure(new MultiViewAnimateClosure())
                             .onInterrupt(gameConsumer, () -> {
-                                tower.setShootable(false);
+                                tower.setAttackable(false);
                                 tower.stop();
                                 renderer.consume(tower.getHpView()::hide);
                                 renderer.consume(() -> gridViewMatrix[field.getRow()][field.getColumn()].setImage(fieldImage).hide());
@@ -1229,7 +1229,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
             enemyRepo = new QueuedEntityRepo<EnemyDoubleDaemon>() {
                 @Override
                 public void onAdd(EnemyDoubleDaemon enemy) {
-                    enemy.setShootable(false).clearVelocity().clearAndInterrupt();
+                    enemy.setAttackable(false).clearVelocity().clearAndInterrupt();
 
                     renderer.consume(() -> {
                         enemy.getHpView().hide().setAbsoluteX(0).setAbsoluteY(0);
@@ -1294,7 +1294,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                     //System.err.println(DaemonUtils.tag() + enemy.getName() + " STATES: " + enemy.getEnginesState().toString());
 
                     enemy.setAnimateEnemySideQuest(renderer).setClosure(new MultiViewAnimateClosure());
-                    enemy.setShootable(true)
+                    enemy.setAttackable(true)
                             .setVelocity(new ImageMover.Velocity(enemyVelocity, new ImageMover.Direction(1F, 0.0F)))
                             .setCoordinates(grid.getStartingX(), grid.getStartingY())
                             .clearAndInterrupt()
@@ -1730,7 +1730,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
 
                                 TowerDaemon target = (TowerDaemon) ret.runtimeCheckAndGet();
 
-                                if (target.isShootable()
+                                if (target.isAttackable()
                                         && ImageTranslationMover.absDistance(
                                                 target.getLastCoordinates().getFirst(),
                                                 target.getLastCoordinates().getSecond(),
@@ -1738,7 +1738,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                                                 enemyDoubleDaemon.getLastCoordinates().getSecond()
                                         ) < range) {
 
-                                    if (enemyDoubleDaemon.isShootable())
+                                    if (enemyDoubleDaemon.isAttackable())
                                         renderer.consume(() ->
                                                 enemyDoubleDaemon.getTargetView()
                                                         .setAbsoluteX(target.getLastCoordinates().getFirst())
@@ -1755,7 +1755,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                                             2,
                                             () -> {
 
-                                                if(!target.isShootable()) {
+                                                if(!target.isAttackable()) {
                                                     renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
                                                     return;
                                                 }
@@ -1771,7 +1771,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                                                 currentSoundManager.playSound(bigExplosion);
 
                                                 target.clearAndInterrupt().pushSprite(explodeSprite, () -> {
-                                                    target.setShootable(false);
+                                                    target.setAttackable(false);
                                                     renderer.consume(enemyDoubleDaemon.getTargetView()::hide);
                                                     renderer.consume(target.getView()::hide);
                                                     towers.remove(target.getName());
@@ -1805,7 +1805,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                                     TowerDaemon neighbourTower = neighbour.getObject();
                                     if (neighbourTower != null) {
                                         neighbourTower.addTarget(enemyDoubleDaemon);//TODO check ret val
-                                        enemyDoubleDaemon.setTarget(neighbourTower.isShootable() ? neighbourTower : null);
+                                        enemyDoubleDaemon.setTarget(neighbourTower.isAttackable() ? neighbourTower : null);
                                     }
                                 }
 
@@ -2083,7 +2083,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
             TowerDaemon towerDaemon = new TowerDaemon(gameConsumer, towerPrototype)
                     .setName(towerName)
                     .setView(fieldView)
-                    .setShootable(true)
+                    .setAttackable(true)
                     .setUncaughtExceptionHandler(uncaughtExceptionHandler);
 
             towers.put(towerDaemon.getName(), towerDaemon);
@@ -2221,7 +2221,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
 
         bulletDoubleDaemon.goTo(targetX, targetY, velocity, ret -> {
 
-            if (!ret.runtimeCheckAndGet() || !target.isShootable()) {
+            if (!ret.runtimeCheckAndGet() || !target.isAttackable()) {
                 bulletRepo.add(bulletDoubleDaemon);
                 return;
             }
@@ -2279,7 +2279,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                 return;
             }
 
-            if (!target.isShootable()) {
+            if (!target.isAttackable()) {
                 rocketDoubleDaemon.rotateAndGoTo(
                         - angle,
                         sourceCoord.getFirst(),
@@ -2305,7 +2305,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                         velocity,
                         ret2 -> {
 
-                            if (!ret2.runtimeCheckAndGet() || !target.isShootable()) {
+                            if (!ret2.runtimeCheckAndGet() || !target.isAttackable()) {
                                 repo.add(rocketDoubleDaemon);
                                 return;
                             }
@@ -2348,7 +2348,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
             Runnable destructionClosure
     ) {
 
-        if (!target.isShootable() || target.isParalyzed())
+        if (!target.isAttackable() || target.isParalyzed())
             return;
 
         target.setParalyzed(true);
@@ -2362,7 +2362,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
 
             renderer.consume(() -> enemyTarget.getParalyzedView().hide());
 
-            if (target.isShootable()) {
+            if (target.isAttackable()) {
 
                 target.setVelocity(enemyVelocity);
 
@@ -2398,12 +2398,12 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                 enemyTarget.setVelocity(velocity);
 
                 if (enemyParalyizer.queueSize() == 0) {
-                    if (enemyTarget.isShootable()) {
+                    if (enemyTarget.isAttackable()) {
                         renderer.consume(() -> enemyTarget.getParalyzedView().show());
                         enemyParalyizer.daemonize(() -> Thread.sleep(enemyParalyzingInterval), paralyzerClosure, false);
                     }
                 } else {
-                    if (enemyTarget.isShootable()) {
+                    if (enemyTarget.isAttackable()) {
                         renderer.consume(() -> enemyTarget.getParalyzedView().show());
                         new MainQuestDaemonEngine(gameConsumer).setName("Helper Paralyzer").start().daemonize(() -> {
                             ////System.err.println(DaemonUtils.timedTag() + "Enemy paralyzer busy. Spawning a new paralyzer engine.");

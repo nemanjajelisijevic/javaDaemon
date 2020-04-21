@@ -495,8 +495,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                 dXY,
                                 cameraWidth / 2,
                                 cameraHeight / 2,
-                                500,
-                                500
+                                800,
+                                800
                         )
                 ).setName("Player").setPlayerCoordinateExporter((x, y) -> {
 
@@ -588,27 +588,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 Field firstField = grid.getField(100, 200);
 
-                int noOfZombies = 2;
-
-                zombieViews = new ImageView[noOfZombies];
-
-                for(int i = 0; i < noOfZombies; ++i) {
-
-                    //int currentZombieX = getRandomInt(0, borderX);
-                    //int currentZombieY = getRandomInt(0, borderY);
-
-                    int currentZombieX = ((int) firstField.getCenterX() + getRandomInt(-40, 10));
-                    int currentZombieY = ((int) firstField.getCenterY()+ getRandomInt(-40, 10));
-
-                    zombieViews[i] = scene.addImageView(new ImageViewImpl("Zombie View No. " + i))
-                            .setAbsoluteX(currentZombieX)
-                            .setAbsoluteY(currentZombieY)
-                            .setZindex(6)
-                            .setImage(zombieMove270[0])
-                            .show();
-                }
-
-
                 //picakbles
                 healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth / 2, playerWidth /2 );
 
@@ -631,7 +610,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     );
                 }
 
-                renderer.setScene(scene.lockViews()).start();
+
 
                 followingCamera.setTarget(player);
 
@@ -795,11 +774,48 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 });
 
 
+                AngleToSpriteArray zombieAttackAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
+
+                    switch (angle) {
+                        case 0:
+                            return sheetCutter.cut(156, 166, zombieSprite);
+                        case 45:
+                            return sheetCutter.cut(120, 130, zombieSprite);
+                        case 90:
+                            return sheetCutter.cut(84, 94, zombieSprite);
+                        case 135:
+                            return sheetCutter.cut(48, 58, zombieSprite);
+                        case 180:
+                            return sheetCutter.cut(12, 22, zombieSprite);
+                        case 225:
+                            return sheetCutter.cut(264, 274, zombieSprite);
+                        case 270:
+                            return sheetCutter.cut(228, 238, zombieSprite);
+                        case 315:
+                            return sheetCutter.cut(192, 202, zombieSprite);
+                        default:
+                            throw new IllegalArgumentException("Angle: " +angle);
+                    }
+                });
+
+                int noOfZombies = 16;
+
+                zombieViews = new ImageView[noOfZombies];
 
                 for(int i = 0; i < noOfZombies; ++i) {
 
+                    //int currentZombieX = getRandomInt(0, borderX);
+                    //int currentZombieY = getRandomInt(0, borderY);
 
-                    AngleToSpriteArray animClone = zombieMoveAnimation.clone();
+                    int currentZombieX = ((int) firstField.getCenterX() + getRandomInt(-40, 10));
+                    int currentZombieY = ((int) firstField.getCenterY() + getRandomInt(-40, 10));
+
+                    zombieViews[i] = scene.addImageView(new ImageViewImpl("Zombie View No. " + i))
+                            .setAbsoluteX(currentZombieX)
+                            .setAbsoluteY(currentZombieY)
+                            .setZindex(6)
+                            .setImage(zombieMove270[0])
+                            .show();
 
                     float zombieVelocity = 6.4F;
 
@@ -811,17 +827,17 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             gameConsumer,
                             new Zombie(
                                     zombieMove270[0],
-                                    animClone,
-                                    zombieVelocity,
+                                    zombieMoveAnimation.clone(),
+                                    zombieAttackAnimation.clone(),
+                                    zombieVelocity + getRandomInt(-1, 1),
                                     Pair.create(zombieViews[i].getAbsoluteX(), zombieViews[i].getAbsoluteY()),
                                     dXY
                             )
                     ).setName( i % 50 ==0 ? "DebugZombie no: " + i : "Zombie");
 
                     zombie.setAnimateZombieSideQuest(renderer)
-                            .setSleepInterval(60)
+                            .setSleepInterval(70)
                             .setClosure(new ZombieSpriteAnimateClosure(zombieViews[i]));
-
 
                     Field zeroField = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
 
@@ -844,49 +860,34 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             if (zombie.getName().contains("DebugZombie"))
                                 System.err.println(DaemonUtils.timedTag() + zombie.getName() + " at " + curr);
 
-                            if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) < 10 && player.isShootable()) {
+                            if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) <= fieldWidth) {
 
-                                player.setShootable(false);
+                                zombie.attack(() -> {
+                                    if (player.isAttackable()) {
 
-                                if (player.getHp() - 100 < 1) {
-                                    player.pushSprite(explosionSprite);
-                                    throw new IllegalStateException("You ded!");
-                                } else {
+                                        player.setAttackable(false);
 
-                                    player.setHp(player.getHp() - 100);
-                                    player.pushSprite(explosionSprite);
-//                                    renderer.consume(() -> {
-//                                        try {
-//                                            playerAnimateClosure.onReturn(new Return<>(player.animatePlayer()));
-//                                        } catch (InterruptedException e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                    });
+                                        if (player.getHp() - 100 < 1)
+                                            throw new IllegalStateException("You ded!");
+                                        else
+                                            player.setHp(player.getHp() - 100);
 
-                                }
-
-                                zombie.attack(1000,
-                                        () -> {
-                                            player.setShootable(true);
+                                        player.pushSprite(explosionSprite, () -> {
+                                            player.setAttackable(true);
                                             zombie.rotateTowards(next.getCenterX(), next.getCenterY())
                                                     .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
                                         });
+                                    } else
+                                        zombie.sleep(1000).rotateTowards(next.getCenterX(), next.getCenterY())
+                                                .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
+                                });
                             } else
                                 zombie.rotateTowards(next.getCenterX(), next.getCenterY()).goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
                         }
                     });
                 }
 
-
-
-
-//
-//                AngleToSpriteArray angleToSpriteArray = new AngleToSpriteArray(36);
-//
-//                angleToSpriteArray.mapAllAngles(angle -> {
-//                    System.out.println(DaemonUtils.tag() + "ANGLE: " + angle);
-//                    return new Image[]{playerSprite[angle / 10]};
-//                });
+                renderer.setScene(scene.lockViews()).start();
 
             } catch (IOException e) {
                 e.printStackTrace();

@@ -30,7 +30,7 @@ public class LaserTower extends Tower {
         super(rotationSprite, healthBarSprite, startingPos, range, type, dXY, hp);
         this.renderer = renderer;
         this.updateRunnable.setClosure(updateClosure);
-        this.targetTester = target -> target.isShootable()
+        this.targetTester = target -> target.isAttackable()
                 && ImageTranslationMover.absDistance(
                      target.getLastCoordinates().getFirst(),
                      target.getLastCoordinates().getSecond(),

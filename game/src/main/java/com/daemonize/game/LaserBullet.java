@@ -4,7 +4,6 @@ package com.daemonize.game;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
-import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.daemonengine.consumer.Consumer;
@@ -12,7 +11,6 @@ import com.daemonize.daemonprocessor.annotations.Daemon;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 @Daemon(doubleDaemonize = true, daemonizeBaseMethods = true)
@@ -68,7 +66,7 @@ public class LaserBullet extends Bullet {
             Consumer drawConsumer
     ) throws InterruptedException {
 
-        if (!target.isShootable())
+        if (!target.isAttackable())
             return false;
 
         for (ImageView view : views)
@@ -123,7 +121,7 @@ public class LaserBullet extends Bullet {
 
         phaseLock.await();
 
-        if (!fire || !target.isShootable())
+        if (!fire || !target.isAttackable())
             return null;
 
         Velocity velocity = target.getVelocity();
