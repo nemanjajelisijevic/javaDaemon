@@ -38,12 +38,9 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine rotateDaemonEngine;
-
   public ZombieDaemon(Consumer consumer, Zombie prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
-    this.rotateDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - rotateDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -187,8 +184,8 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
 
   /**
    * Prototype method {@link com.daemonize.game.Zombie#attack} */
-  public ZombieDaemon attack(long ms, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new AttackMainQuest(ms, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
+  public ZombieDaemon attack(Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new AttackMainQuest(retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -200,9 +197,16 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Zombie#sleep} */
+  public ZombieDaemon sleep(long ms) {
+    mainDaemonEngine.pursueQuest(new SleepMainQuest(ms).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Zombie#rotateTowards} */
   public ZombieDaemon rotateTowards(float x, float y) {
-    rotateDaemonEngine.pursueQuest(new RotateTowardsMainQuest(x, y).setConsumer(rotateDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new RotateTowardsMainQuest(x, y).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -218,7 +222,6 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   @Override
   public ZombieDaemon start() {
     mainDaemonEngine.start();
-    rotateDaemonEngine.start();
     sideDaemonEngine.start();
     return this;
   }
@@ -227,7 +230,6 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   public void stop() {
     mainDaemonEngine.stop();
     sideDaemonEngine.stop();
-    rotateDaemonEngine.stop();
   }
 
   @Override
@@ -239,14 +241,12 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   @Override
   public ZombieDaemon clear() {
     mainDaemonEngine.clear();
-    rotateDaemonEngine.clear();
     return this;
   }
 
   public List<DaemonState> getEnginesState() {
     List<DaemonState> ret = new ArrayList<DaemonState>();
     ret.add(mainDaemonEngine.getState());
-    ret.add(rotateDaemonEngine.getState());
     ret.add(sideDaemonEngine.getState());
     return ret;
   }
@@ -254,7 +254,6 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   public List<Integer> getEnginesQueueSizes() {
     List<Integer> ret = new ArrayList<Integer>();
     ret.add(mainDaemonEngine.queueSize());
-    ret.add(rotateDaemonEngine.queueSize());
     return ret;
   }
 
@@ -262,7 +261,6 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   public ZombieDaemon setName(String engineName) {
     mainDaemonEngine.setName(engineName);
     sideDaemonEngine.setName(engineName + " - SIDE");
-    rotateDaemonEngine.setName(engineName + " - rotateDaemonEngine");
     return this;
   }
 
@@ -273,7 +271,6 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
 
   public ZombieDaemon setMainQuestConsumer(Consumer consumer) {
     mainDaemonEngine.setConsumer(consumer);
-    rotateDaemonEngine.setConsumer(consumer);
     return this;
   }
 
@@ -296,21 +293,18 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   public ZombieDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
     mainDaemonEngine.setUncaughtExceptionHandler(handler);
     sideDaemonEngine.setUncaughtExceptionHandler(handler);
-    rotateDaemonEngine.setUncaughtExceptionHandler(handler);
     return this;
   }
 
   @Override
   public ZombieDaemon interrupt() {
     mainDaemonEngine.interrupt();
-    rotateDaemonEngine.interrupt();
     return this;
   }
 
   @Override
   public ZombieDaemon clearAndInterrupt() {
     mainDaemonEngine.clearAndInterrupt();
-    rotateDaemonEngine.clearAndInterrupt();
     return this;
   }
 
@@ -327,17 +321,14 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   }
 
   private final class AttackMainQuest extends ReturnVoidMainQuest {
-    private long ms;
-
-    private AttackMainQuest(long ms, Runnable retRun, ClosureExecutionWaiter closureAwaiter) {
+    private AttackMainQuest(Runnable retRun, ClosureExecutionWaiter closureAwaiter) {
       super(retRun, closureAwaiter);
-      this.ms = ms;
       this.description = "attack";
     }
 
     @Override
     public final Void pursue() throws Exception {
-      prototype.attack(ms);
+      prototype.attack();
       return null;
     }
   }
@@ -361,6 +352,22 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
     @Override
     public final Boolean pursue() throws Exception {
       return prototype.goTo(x, y, velocityint);
+    }
+  }
+
+  private final class SleepMainQuest extends VoidMainQuest {
+    private long ms;
+
+    private SleepMainQuest(long ms) {
+      super();
+      this.ms = ms;
+      this.description = "sleep";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.sleep(ms);
+      return null;
     }
   }
 

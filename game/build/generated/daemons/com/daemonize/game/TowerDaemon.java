@@ -106,6 +106,11 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
     return prototype.getMaxHp();
   }
 
+  @Override
+  public boolean isAttackable() {
+    return prototype.isAttackable();
+  }
+
   public double getAbsoluteAngle(double angle) {
     return prototype.getAbsoluteAngle(angle);
   }
@@ -117,11 +122,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   public Tower.TowerType getTowertype() {
     return prototype.getTowertype();
-  }
-
-  @Override
-  public boolean isShootable() {
-    return prototype.isShootable();
   }
 
   public TowerDaemon levelUp() {
@@ -143,6 +143,12 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   public GenericNode<Pair<ImageMover.PositionedImage, ImageView>> animateTower() throws
       InterruptedException {
     return prototype.animateTower();
+  }
+
+  @Override
+  public TowerDaemon setAttackable(boolean shootable) {
+    prototype.setAttackable(shootable);
+    return this;
   }
 
   public TowerDaemon setTowerLevel(Tower.TowerLevel towerlevel) {
@@ -233,12 +239,6 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
 
   public double getAngle(float x1, float y1, float x2, float y2) {
     return prototype.getAngle(x1, y1, x2, y2);
-  }
-
-  @Override
-  public TowerDaemon setShootable(boolean shootable) {
-    prototype.setShootable(shootable);
-    return this;
   }
 
   public ImageView getView() {

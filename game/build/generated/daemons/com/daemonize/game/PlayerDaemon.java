@@ -31,7 +31,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDaemon> {
+public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDaemon>, ZElevatable, Movable {
   private Player prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
@@ -42,11 +42,14 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   protected EagerMainQuestDaemonEngine interactDaemonEngine;
 
+  protected EagerMainQuestDaemonEngine coordBroadcasterDaemonEngine;
+
   public PlayerDaemon(Consumer consumer, Player prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
     this.rotateDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - rotateDaemonEngine");
     this.interactDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - interactDaemonEngine");
+    this.coordBroadcasterDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - coordBroadcasterDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -93,14 +96,13 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   }
 
   @Override
-  public PlayerDaemon setShootable(boolean shootable) {
-    prototype.setShootable(shootable);
-    return this;
+  public int getMaxHp() {
+    return prototype.getMaxHp();
   }
 
   @Override
-  public int getMaxHp() {
-    return prototype.getMaxHp();
+  public boolean isAttackable() {
+    return prototype.isAttackable();
   }
 
   @Override
@@ -111,11 +113,6 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public PlayerDaemon setSpriteIterator(SpriteIterator spriteiterator) {
     prototype.setSpriteIterator(spriteiterator);
     return this;
-  }
-
-  @Override
-  public boolean isShootable() {
-    return prototype.isShootable();
   }
 
   @Override
@@ -133,6 +130,12 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     return this;
   }
 
+  @Override
+  public PlayerDaemon setAttackable(boolean shootable) {
+    prototype.setAttackable(shootable);
+    return this;
+  }
+
   public PlayerDaemon setDirection(ImageMover.Direction direction) {
     prototype.setDirection(direction);
     return this;
@@ -142,6 +145,11 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     return prototype.animate();
   }
 
+  @Override
+  public void setZElevation(int zelevation) {
+    prototype.setZElevation(zelevation);
+  }
+
   public float getdXY() {
     return prototype.getdXY();
   }
@@ -149,6 +157,16 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   @Override
   public void setVelocity(float velocity) {
     prototype.setVelocity(velocity);
+  }
+
+  @Override
+  public int getZElevation() {
+    return prototype.getZElevation();
+  }
+
+  public PlayerDaemon setPlayerCoordinateExporter(Movable.CoordinateExporter playercoordinateexporter) {
+    prototype.setPlayerCoordinateExporter(playercoordinateexporter);
+    return this;
   }
 
   public double absDistance(float x1, float y1, float x2, float y2) {
@@ -213,6 +231,13 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Player#exportCoordinates} */
+  public PlayerDaemon exportCoordinates(long pause, Runnable retRun) {
+    coordBroadcasterDaemonEngine.pursueQuest(new ExportCoordinatesMainQuest(pause, retRun, null).setConsumer(coordBroadcasterDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Player#go} */
   public PlayerDaemon go(float x, float y, float velocity) {
     mainDaemonEngine.pursueQuest(new GoIMainQuest(x, y, velocity).setConsumer(mainDaemonEngine.getConsumer()));
@@ -228,8 +253,8 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   /**
    * Prototype method {@link com.daemonize.game.Player#pushSprite} */
-  public PlayerDaemon pushSprite(Image[] sprite) {
-    rotateDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite).setConsumer(rotateDaemonEngine.getConsumer()));
+  public PlayerDaemon pushSprite(Image[] sprite, Runnable retRun) {
+    rotateDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, retRun, null).setConsumer(rotateDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -263,6 +288,13 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Player#sleep} */
+  public PlayerDaemon sleep(long ms) {
+    rotateDaemonEngine.pursueQuest(new SleepMainQuest(ms).setConsumer(rotateDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Player#rotateTowards} */
   public PlayerDaemon rotateTowards(float x, float y) {
     rotateDaemonEngine.pursueQuest(new RotateTowardsIMainQuest(x, y).setConsumer(rotateDaemonEngine.getConsumer()));
@@ -288,6 +320,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   @Override
   public PlayerDaemon start() {
     mainDaemonEngine.start();
+    coordBroadcasterDaemonEngine.start();
     rotateDaemonEngine.start();
     interactDaemonEngine.start();
     sideDaemonEngine.start();
@@ -298,6 +331,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public void stop() {
     mainDaemonEngine.stop();
     sideDaemonEngine.stop();
+    coordBroadcasterDaemonEngine.stop();
     rotateDaemonEngine.stop();
     interactDaemonEngine.stop();
   }
@@ -311,6 +345,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   @Override
   public PlayerDaemon clear() {
     mainDaemonEngine.clear();
+    coordBroadcasterDaemonEngine.clear();
     rotateDaemonEngine.clear();
     interactDaemonEngine.clear();
     return this;
@@ -319,6 +354,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public List<DaemonState> getEnginesState() {
     List<DaemonState> ret = new ArrayList<DaemonState>();
     ret.add(mainDaemonEngine.getState());
+    ret.add(coordBroadcasterDaemonEngine.getState());
     ret.add(rotateDaemonEngine.getState());
     ret.add(interactDaemonEngine.getState());
     ret.add(sideDaemonEngine.getState());
@@ -328,6 +364,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public List<Integer> getEnginesQueueSizes() {
     List<Integer> ret = new ArrayList<Integer>();
     ret.add(mainDaemonEngine.queueSize());
+    ret.add(coordBroadcasterDaemonEngine.queueSize());
     ret.add(rotateDaemonEngine.queueSize());
     ret.add(interactDaemonEngine.queueSize());
     return ret;
@@ -337,6 +374,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public PlayerDaemon setName(String engineName) {
     mainDaemonEngine.setName(engineName);
     sideDaemonEngine.setName(engineName + " - SIDE");
+    coordBroadcasterDaemonEngine.setName(engineName + " - coordBroadcasterDaemonEngine");
     rotateDaemonEngine.setName(engineName + " - rotateDaemonEngine");
     interactDaemonEngine.setName(engineName + " - interactDaemonEngine");
     return this;
@@ -349,6 +387,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   public PlayerDaemon setMainQuestConsumer(Consumer consumer) {
     mainDaemonEngine.setConsumer(consumer);
+    coordBroadcasterDaemonEngine.setConsumer(consumer);
     rotateDaemonEngine.setConsumer(consumer);
     interactDaemonEngine.setConsumer(consumer);
     return this;
@@ -373,6 +412,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   public PlayerDaemon setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler handler) {
     mainDaemonEngine.setUncaughtExceptionHandler(handler);
     sideDaemonEngine.setUncaughtExceptionHandler(handler);
+    coordBroadcasterDaemonEngine.setUncaughtExceptionHandler(handler);
     rotateDaemonEngine.setUncaughtExceptionHandler(handler);
     interactDaemonEngine.setUncaughtExceptionHandler(handler);
     return this;
@@ -381,6 +421,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   @Override
   public PlayerDaemon interrupt() {
     mainDaemonEngine.interrupt();
+    coordBroadcasterDaemonEngine.interrupt();
     rotateDaemonEngine.interrupt();
     interactDaemonEngine.interrupt();
     return this;
@@ -389,6 +430,7 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   @Override
   public PlayerDaemon clearAndInterrupt() {
     mainDaemonEngine.clearAndInterrupt();
+    coordBroadcasterDaemonEngine.clearAndInterrupt();
     rotateDaemonEngine.clearAndInterrupt();
     interactDaemonEngine.clearAndInterrupt();
     return this;
@@ -421,6 +463,23 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     @Override
     public final Void pursue() throws Exception {
       prototype.go(coords, velocity);
+      return null;
+    }
+  }
+
+  private final class ExportCoordinatesMainQuest extends ReturnVoidMainQuest {
+    private long pause;
+
+    private ExportCoordinatesMainQuest(long pause, Runnable retRun,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
+      this.pause = pause;
+      this.description = "exportCoordinates";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.exportCoordinates(pause);
       return null;
     }
   }
@@ -464,11 +523,12 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     }
   }
 
-  private final class PushSpriteMainQuest extends VoidMainQuest {
+  private final class PushSpriteMainQuest extends ReturnVoidMainQuest {
     private Image[] sprite;
 
-    private PushSpriteMainQuest(Image[] sprite) {
-      super();
+    private PushSpriteMainQuest(Image[] sprite, Runnable retRun,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
       this.sprite = sprite;
       this.description = "pushSprite";
     }
@@ -557,6 +617,22 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     @Override
     public final Boolean pursue() throws Exception {
       return prototype.goTo(x, y, velocity);
+    }
+  }
+
+  private final class SleepMainQuest extends VoidMainQuest {
+    private long ms;
+
+    private SleepMainQuest(long ms) {
+      super();
+      this.ms = ms;
+      this.description = "sleep";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.sleep(ms);
+      return null;
     }
   }
 

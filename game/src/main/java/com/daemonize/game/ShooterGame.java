@@ -368,7 +368,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 Image streetLampImage = imageManager.loadImageFromAssets("streetLamp.png", playerWidth, playerWidth );
                 Image lampLightImage = imageManager.loadImageFromAssets("searchlight.png", playerWidth * 2, playerWidth); //* 4 / 3);
 
-                Field lampField = grid.getField(25, 34);
+                Field lampField = grid.getField(rows - 10, columns - 18);
                 Field lampField2 = grid.getField(6, 45);
                 Field lampField3 = grid.getField(35, 61);
 
@@ -609,8 +609,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             )
                     );
                 }
-
-
 
                 followingCamera.setTarget(player);
 

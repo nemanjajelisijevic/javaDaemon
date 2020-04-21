@@ -100,6 +100,11 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   @Override
+  public boolean isAttackable() {
+    return prototype.isAttackable();
+  }
+
+  @Override
   public int getHp() {
     return prototype.getHp();
   }
@@ -107,11 +112,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   public EnemyDoubleDaemon setPreviousField(Pair<Integer, Integer> previousfield) {
     prototype.setPreviousField(previousfield);
     return this;
-  }
-
-  @Override
-  public boolean isShootable() {
-    return prototype.isShootable();
   }
 
   public ImageView getParalyzedView() {
@@ -126,6 +126,12 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   @Override
   public EnemyDoubleDaemon setMaxHp(int maxhp) {
     prototype.setMaxHp(maxhp);
+    return this;
+  }
+
+  @Override
+  public EnemyDoubleDaemon setAttackable(boolean shootable) {
+    prototype.setAttackable(shootable);
     return this;
   }
 
@@ -197,12 +203,6 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   public Pair<Float, Float> getTargetCoordinates() {
     return prototype.getTargetCoordinates();
-  }
-
-  @Override
-  public EnemyDoubleDaemon setShootable(boolean shootable) {
-    prototype.setShootable(shootable);
-    return this;
   }
 
   public ImageView getView() {
