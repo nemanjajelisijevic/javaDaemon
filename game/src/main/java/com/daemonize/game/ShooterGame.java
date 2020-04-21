@@ -369,8 +369,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 Image lampLightImage = imageManager.loadImageFromAssets("searchlight.png", playerWidth * 2, playerWidth); //* 4 / 3);
 
                 Field lampField = grid.getField(rows - 10, columns - 18);
-                Field lampField2 = grid.getField(6, 45);
-                Field lampField3 = grid.getField(35, 61);
+                Field lampField2 = grid.getField(12, 44);
+                Field lampField3 = grid.getField(8, 6);
 
                 streetLamp.addView(
                         "streetLamp",
@@ -495,8 +495,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                 dXY,
                                 cameraWidth / 2,
                                 cameraHeight / 2,
-                                800,
-                                800
+                                1200,
+                                1000
                         )
                 ).setName("Player").setPlayerCoordinateExporter((x, y) -> {
 
@@ -591,7 +591,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 //picakbles
                 healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth / 2, playerWidth /2 );
 
-                healthPackFields.add(grid.getField(21, 25));
+                healthPackFields.add(grid.getField(rows - 10, columns - 10));
                 healthPackFields.add(grid.getField(11, 15));
                 healthPackFields.add(grid.getField(11, 35));
                 healthPackFields.add(grid.getField(2, 15));
@@ -727,6 +727,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             player.getLastCoordinates().getFirst(),
                             player.getLastCoordinates().getSecond()
                     );
+
+                    System.out.println(DaemonUtils.timedTag() + player.getName() + " at " + field);
 
                     Interactable item = field.getObject();
 
