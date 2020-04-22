@@ -11,7 +11,7 @@ import com.daemonize.game.controller.MovementControllerDaemon;
 import com.daemonize.game.app.DaemonApp;
 import com.daemonize.game.grid.Field;
 import com.daemonize.game.grid.Grid;
-import com.daemonize.game.interactables.Interactable;
+import com.daemonize.game.interactables.Interactible;
 import com.daemonize.graphics2d.camera.Camera2D;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
@@ -54,7 +54,7 @@ public class MapEditor implements DaemonApp<MapEditor> {
     int cameraWidth, cameraHeight;
 
     //grid
-    private Grid<Interactable> grid;
+    private Grid<Interactible> grid;
     private int rows;
     private int columns;
 
@@ -226,7 +226,7 @@ public class MapEditor implements DaemonApp<MapEditor> {
         this.rows = borderY / fieldWidth;
         this.columns = borderX / fieldWidth;
 
-//        this.grid = new Grid<Interactable<PlayerDaemon>>(
+//        this.grid = new Grid<Interactible<PlayerDaemon>>(
 //                rows,
 //                columns,
 //                Pair.create(0, 0),
@@ -236,7 +236,7 @@ public class MapEditor implements DaemonApp<MapEditor> {
 //                fieldWidth
 //        );
 
-        this.grid = new Grid<Interactable>(
+        this.grid = new Grid<Interactible>(
                 rows,
                 columns,
                 borderX,

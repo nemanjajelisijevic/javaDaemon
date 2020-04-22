@@ -44,8 +44,27 @@ public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Z
 
     @Daemonize
     @GenerateRunnable
+    public void sleepAndRet(long ms) throws InterruptedException {
+        this.sleep(ms);
+    }
+
+    @Daemonize
+    @GenerateRunnable
     public void attack() throws InterruptedException {
         rotationMover.pushSprite(attackAnimation.getSpriteByAngle(walkAnimation.getCurrentAngle()));
+    }
+
+    @Daemonize
+    @GenerateRunnable
+    public void animateDirectionalSprite(AngleToSpriteArray animation) throws InterruptedException {
+        rotationMover.pushSprite(animation.getSpriteByAngle(walkAnimation.getCurrentAngle()));
+    }
+
+    @Daemonize
+    @GenerateRunnable
+    @Override
+    public void pushSprite(Image[] sprite) throws InterruptedException {
+        rotationMover.pushSprite(sprite);
     }
 
     @Daemonize

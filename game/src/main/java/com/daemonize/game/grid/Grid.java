@@ -159,6 +159,10 @@ public class Grid<T> {
 
     }
 
+    public Field<T> getField(Pair<Float, Float> coordinates) {
+        return getField(coordinates.getFirst(), coordinates.getSecond());
+    }
+
     public Field[][] getGrid() {
         return grid;
     }

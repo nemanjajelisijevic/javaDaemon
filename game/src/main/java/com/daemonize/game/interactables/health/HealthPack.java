@@ -2,13 +2,13 @@ package com.daemonize.game.interactables.health;
 
 
 import com.daemonize.game.Mortal;
-import com.daemonize.game.interactables.Interactable;
+import com.daemonize.game.interactables.Interactible;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.Scene2D;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 
-public class HealthPack implements Interactable {
+public class HealthPack implements Interactible {
 
     private final int hpBoost;
     private final ImageView view;
