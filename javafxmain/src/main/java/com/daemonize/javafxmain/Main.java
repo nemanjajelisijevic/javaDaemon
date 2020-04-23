@@ -38,7 +38,9 @@ public class Main extends Application {
         ///////////////////////////////////////////////////////////////////////////////////////////
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-        int cameraWidth = ((int) primaryScreenBounds.getWidth()) - 300;
+        //int cameraWidth = ((int) primaryScreenBounds.getWidth()) - 300;
+
+        int cameraWidth = ((int) primaryScreenBounds.getWidth());
 
         //int borderX = Math.min((int)primaryScreenBounds.getWidth(), ((int) primaryScreenBounds.getHeight()));
 
@@ -54,7 +56,9 @@ public class Main extends Application {
 //        int width = gridWidth / columns;
 //        int height = width; //160
 
-        int cameraHeight = cameraWidth / 2;
+        //int cameraHeight = cameraWidth / 2;
+
+        int cameraHeight = ((int) primaryScreenBounds.getHeight());
 
         //int borderY = borderX * 3 / 4;
         //int borderY = (rows + 2) * height;

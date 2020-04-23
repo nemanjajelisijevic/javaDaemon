@@ -243,18 +243,14 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 //        } catch (UnsupportedEncodingException e) {
 //            e.printStackTrace();
 //        }
-//
-//        String path = getClass().getResource("/" + "test.json").getPath();
-//        File jsonGrid = new File(path);
 
         InputStream in = getClass().getResourceAsStream("/test.json");
 
         try {
+
             this.grid = gridLoader.readValue(in, Grid.class).calculateFieldWidth();
 
-
             this.fieldWidth = grid.getFieldWidth();
-
 
             this.borderX = grid.getGridWidth();
             this.borderY = grid.getGridHeight();
@@ -600,28 +596,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 Field firstField = grid.getField(100, 200);
 
-                //picakbles
-                healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth / 2, playerWidth /2 );
-
-                healthPackFields.add(grid.getField(rows - 10, columns - 10));
-                healthPackFields.add(grid.getField(11, 15));
-                healthPackFields.add(grid.getField(11, 35));
-                healthPackFields.add(grid.getField(2, 15));
-                healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
-                healthPackFields.add(grid.getField(getRandomInt(0, rows - 1), getRandomInt(0, columns- 1)));
-
-                for(Field<Interactible> current : healthPackFields) {
-                    current.setObject(
-                            HealthPack.generateHealthPack(
-                                    player,
-                                    20,
-                                    ((int) current.getCenterX()),
-                                    ((int) current.getCenterY()),
-                                    healthPackImage, scene
-                            )
-                    );
-                }
-
                 followingCamera.setTarget(player);
 
                 renderer.setCamera(followingCamera);
@@ -848,11 +822,40 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 System.err.println(DaemonUtils.timedTag() + "Walkable fields: " + walkableFields.size());
 
+                //picakbles
+                healthPackImage = imageManager.loadImageFromAssets("healthPack.png", playerWidth / 2, playerWidth /2 );
+
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+                healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
+
+
+                for(Field<Interactible> current : healthPackFields) {
+                    current.setObject(
+                            HealthPack.generateHealthPack(
+                                    player,
+                                    200,
+                                    ((int) current.getCenterX()),
+                                    ((int) current.getCenterY()),
+                                    healthPackImage, scene
+                            )
+                    );
+                }
+
+
                 int noOfZombies = walkableFields.size() / 50;
 
                 zombieViews = new ImageView[noOfZombies];
-
-                //float minZombieVelocity = 15;
 
                 for(int i = 0; i < noOfZombies; ++i) {
 
@@ -879,7 +882,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     ZombieDaemon zombie = new ZombieDaemon(
                             gameConsumer,
                             new Zombie(
-                                    zombieRiseAnimation.getByAngle(getRandomInt(0, 360)),
+                                    zombieRiseAnimation.getByAngle(getRandomInt(0, 359)),
                                     zombieMoveAnimation.clone(),
                                     zombieAttackAnimation.clone(),
                                     zombieInstanceVelocity,
@@ -898,7 +901,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     final int zombieRiseProximity = 70;
                     final int zombieFallDistance = 80;
 
-                    zombie.start().animateDirectionalSprite(zombieFallAnimation, new Runnable() {
+                    zombie.start().rotateTowards(getRandomInt(0, borderX), getRandomInt(0, borderY)).animateDirectionalSprite(zombieFallAnimation, new Runnable() {
                         @Override
                         public void run() {
 
