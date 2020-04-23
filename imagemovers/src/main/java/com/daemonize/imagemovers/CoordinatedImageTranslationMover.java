@@ -72,6 +72,11 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         return true;
     }
 
+    @Daemonize
+    public boolean goTo(Pair<Float, Float> coords, float velocity) throws InterruptedException {
+        return goTo(coords.getFirst(), coords.getSecond(), velocity);
+    }
+
     @Override
     public void setCoordinates(float lastX, float lastY) {
         super.setCoordinates(lastX, lastY);

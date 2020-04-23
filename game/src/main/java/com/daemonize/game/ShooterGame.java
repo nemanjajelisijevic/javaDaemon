@@ -19,6 +19,7 @@ import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
+import com.daemonize.graphics2d.scene.views.FixedCompositeImageVIewImpl;
 import com.daemonize.graphics2d.scene.views.FixedView;
 import com.daemonize.graphics2d.scene.views.ImageView;
 import com.daemonize.graphics2d.scene.views.ImageViewImpl;
@@ -29,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,6 +111,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
     //screen borders
     private int cameraWidth, cameraHeight;
+
+    private Image dark;
 
     //grid
     private Grid<Interactible> grid;
@@ -302,6 +306,12 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                         .show();
 
                 scene.addImageView(backgroundView);
+
+                dark = imageManager.loadImageFromAssets("dark.png", cameraWidth *4 / 3, cameraHeight*4 / 3);
+
+                FixedView darkView = new FixedView("Dark", cameraWidth / 2, cameraHeight / 2, 20, cameraWidth, cameraHeight);
+
+                scene.addImageView(darkView.setImage(dark).show());
 
                 //zombie sprite
                 zombieSprite = imageManager.loadSheet("zombieSheet.png", 8, 36, cameraWidth / 7, cameraWidth / 7);
@@ -715,7 +725,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                     if (player.getLastCoordinates().equals(parameterPack.nextCoords)) {
                         parameterPack.rotationClosure.run();
-                        parameterPack.translationClosure.run();
+                        parameterPack.translationClosure.onReturn(new Return<>(true));
                     } else {
                         player.rotateTowards(parameterPack.nextCoords, parameterPack.rotationClosure)
                                 .goTo(parameterPack.nextCoords, parameterPack.velocity, parameterPack.translationClosure);
@@ -829,7 +839,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     return ret;
                 });
 
-                List<Field<Interactible>> walkableFields = new LinkedList<>();
+                List<Field<Interactible>> walkableFields = new ArrayList<>();
 
                 for(int i = 0; i < rows; ++i)
                     for(int j = 0; j < columns; ++j)
@@ -869,7 +879,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     ZombieDaemon zombie = new ZombieDaemon(
                             gameConsumer,
                             new Zombie(
-                                    zombieMove270[0],
+                                    zombieRiseAnimation.getByAngle(getRandomInt(0, 360)),
                                     zombieMoveAnimation.clone(),
                                     zombieAttackAnimation.clone(),
                                     zombieInstanceVelocity,
@@ -882,8 +892,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             .setSleepInterval(zombieInstanceVelocity > 10 ? 50 : zombieInstanceVelocity > 8 ? 70 : zombieInstanceVelocity > 5 ? 80 : zombieInstanceVelocity > 3 ? 90 : zombieInstanceVelocity > 0 ? 100 : 0)
                             .setClosure(new ZombieSpriteAnimateClosure(zombieViews[i]));
 
-                    Field zeroField = grid.getField(zombie.getLastCoordinates().getFirst(), zombie.getLastCoordinates().getSecond());
-
+                    Field zeroField = grid.getField(zombie.getLastCoordinates());
                     Field firstF = grid.getMinWeightOfNeighbors(zeroField);
 
                     final int zombieRiseProximity = 70;
@@ -895,22 +904,21 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                             Runnable zombieFallClosure = this;
 
-                            zombie.sleepAndRet(2000, () -> {
+                            zombie.sleepAndRet(500, () -> {
 
                                 Field current = grid.getField(zombie.getLastCoordinates());
 
                                 if (current.gCost > zombieRiseProximity) {
-                                    zombie.sleepAndRet(1000, zombieFallClosure);
+                                    zombie.sleepAndRet(500, zombieFallClosure);
                                 } else {
 
                                     zombie.animateDirectionalSprite(zombieRiseAnimation, () -> {
 
                                         Field curr = grid.getField(zombie.getLastCoordinates());
-
                                         Field next = grid.getMinWeightOfNeighbors(curr);
 
-                                        zombie.rotateTowards(next.getCenterX(), next.getCenterY())
-                                                .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, new Closure<Boolean>(){
+                                        zombie.rotateTowards(next.getCenterCoords())
+                                                .goTo(next.getCenterCoords(), zombie.getPrototype().recommendedVelocity, new Closure<Boolean>(){
                                                     @Override
                                                     public void onReturn(Return<Boolean> goToReturn) {
 
@@ -940,19 +948,19 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                                                                 zombie.attack(() -> {
                                                                     player.setAttackable(true);
-                                                                    zombie.rotateTowards(next2.getCenterX(), next2.getCenterY())
-                                                                            .goTo(next2.getCenterX(), next2.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
+                                                                    zombie.rotateTowards(next2.getCenterCoords())
+                                                                            .goTo(next2.getCenterCoords(), zombie.getPrototype().recommendedVelocity, this::onReturn);
                                                                 });
 
                                                             } else {
                                                                 zombie.sleep(1000)
-                                                                        .rotateTowards(next2.getCenterX(), next2.getCenterY())
-                                                                        .goTo(next2.getCenterX(), next2.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
+                                                                        .rotateTowards(next2.getCenterCoords())
+                                                                        .goTo(next2.getCenterCoords(), zombie.getPrototype().recommendedVelocity, this::onReturn);
                                                             }
 
                                                         } else {
-                                                            zombie.rotateTowards(next2.getCenterX(), next2.getCenterY())
-                                                                    .goTo(next2.getCenterX(), next2.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
+                                                            zombie.rotateTowards(next2.getCenterCoords())
+                                                                    .goTo(next2.getCenterCoords(), zombie.getPrototype().recommendedVelocity, this::onReturn);
                                                         }
                                                     }
                                                 });

@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
@@ -65,7 +66,7 @@ public class KeyBoardMovementControllerImpl implements KeyboardMovementControlle
         }
     };
 
-    private Runnable translationControlClosure = () -> {
+    private Closure<Boolean> translationControlClosure = ret -> {
         contorlMovementCondition.setSecond(true);
         if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
             controlBlockingSemaphore.go();

@@ -43,9 +43,8 @@ public class DummyPlayer extends CoordinatedImageTranslationMover implements Mov
     }
 
     @Daemonize
-    @GenerateRunnable
-    public void goTo(Pair<Float, Float> coords, float velocity) throws InterruptedException {
-        super.goTo(coords.getFirst(), coords.getSecond(), velocity);
+    public boolean goTo(Pair<Float, Float> coords, float velocity) throws InterruptedException {
+        return super.goTo(coords.getFirst(), coords.getSecond(), velocity);
     }
 
     @Daemonize

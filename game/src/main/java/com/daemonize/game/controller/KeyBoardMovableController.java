@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
@@ -18,7 +19,7 @@ public class KeyBoardMovableController<M extends Movable> implements KeyboardMov
         public Pair<Float, Float> nextCoords;
         public float velocity;
         public Runnable rotationClosure;
-        public Runnable translationClosure;
+        public Closure<Boolean> translationClosure;
     }
 
     @FunctionalInterface
@@ -96,7 +97,7 @@ public class KeyBoardMovableController<M extends Movable> implements KeyboardMov
             }
         };
 
-        this.paramPack.translationClosure = () -> {
+        this.paramPack.translationClosure = ret -> {
             contorlMovementCondition.setSecond(true);
             if(contorlMovementCondition.getFirst() && contorlMovementCondition.getSecond()) {
                 controlBlockingSemaphore.go();

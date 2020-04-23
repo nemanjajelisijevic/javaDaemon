@@ -1,5 +1,7 @@
 package com.daemonize.game.grid;
 
+import com.daemonize.daemonengine.utils.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,6 +104,10 @@ public class Field<T> implements  IHeapItem , Comparable {
 
     public void setCenterY(int centerY) {
         this.centerY = centerY;
+    }
+
+    public Pair<Float, Float> getCenterCoords() {
+        return Pair.create(this.centerX, this.centerY);
     }
 
     public int getRow() {

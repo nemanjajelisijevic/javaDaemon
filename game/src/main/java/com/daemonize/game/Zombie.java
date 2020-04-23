@@ -72,9 +72,9 @@ public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Z
         rotationMover.rotateTowards(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y);
     }
 
-    @Override
-    public int getHp() {
-        return hp;
+    @Daemonize
+    public void rotateTowards(Pair<Float, Float> coords) throws InterruptedException {
+        rotateTowards(coords.getFirst(), coords.getSecond());
     }
 
     @Override
@@ -95,6 +95,10 @@ public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Z
         return hpMax;
     }
 
+    @Override
+    public int getHp() {
+        return hp;
+    }
 
     @Override
     public Image iterateSprite() {
