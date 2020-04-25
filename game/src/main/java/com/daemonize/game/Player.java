@@ -17,7 +17,7 @@ import java.beans.IntrospectionException;
 import java.util.Arrays;
 
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true)
-public class Player extends CoordinatedImageTranslationMover implements Target<Player>, ZElevatable, Movable {
+public class Player extends CoordinatedImageTranslationMover implements Target<Player>, ZElevatable, Movable, Paralyzable<Player> {
 
     private CoordinateExporter playerCoordinateExporter;
 
@@ -151,8 +151,8 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     }
 
     @Override
-    public Player setAttackable(boolean shootable) {
-        this.shootable = shootable;
+    public Player setAttackable(boolean attackable) {
+        this.shootable = attackable;
         return this;
     }
 

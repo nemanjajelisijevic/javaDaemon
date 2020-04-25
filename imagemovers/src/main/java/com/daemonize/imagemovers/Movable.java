@@ -3,7 +3,7 @@ package com.daemonize.imagemovers;
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 
-public interface Movable {
+public interface Movable extends Existent {
 
     @FunctionalInterface
     public interface AnimationWaiter {
@@ -15,7 +15,6 @@ public interface Movable {
         void exportCoords(float x, float y);
     }
 
-    Pair<Float, Float> getLastCoordinates();
     void setVelocity(float velocity);
     ImageMover.Velocity getVelocity();
     public AnimationWaiter getAnimationWaiter();

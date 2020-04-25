@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true)
-public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Shooter {
+public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Shooter, Paralyzable<Tower> {
 
     public static class TowerLevel {
 
@@ -131,8 +131,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     @Override
-    public Tower setAttackable(boolean shootable) {
-        this.shootable = shootable;
+    public Tower setAttackable(boolean attackable) {
+        this.shootable = attackable;
         return this;
     }
 

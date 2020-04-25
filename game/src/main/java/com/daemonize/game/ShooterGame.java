@@ -8,6 +8,7 @@ import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.game.controller.MouseController;
 import com.daemonize.game.controller.MovementController;
 import com.daemonize.game.controller.MovementControllerDaemon;
 import com.daemonize.game.app.DaemonApp;
@@ -26,20 +27,26 @@ import com.daemonize.graphics2d.scene.views.ImageViewImpl;
 import com.daemonize.imagemovers.AngleToSpriteArray;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
+import com.daemonize.imagemovers.Movable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import daemon.com.commandparser.CommandParser;
 import daemon.com.commandparser.CommandParserDaemon;
+import javafx.fxml.FXMLLoader;
 
 public class ShooterGame implements DaemonApp<ShooterGame> {
 
@@ -114,8 +121,51 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
     private Image dark;
 
+    //grid Interactibles
+    public static class FieldContent implements Interactible {
+
+        private Set<Target> targets;
+        private Interactible interactible;
+
+        public FieldContent subscribe(Target target) {
+            targets.add(target);
+            return this;
+        }
+
+        public FieldContent unsubscribe(Target target) {
+            targets.remove(target);
+            return this;
+        }
+
+        public int targetsSize() {
+            return targets.size();
+        }
+
+        public Set<Target> getTargets() {
+            return targets;
+        }
+
+        public FieldContent setInteractible(Interactible interactible) {
+            this.interactible = interactible;
+            return this;
+        }
+
+        public Interactible getInteractible() {
+            return interactible;
+        }
+
+        public FieldContent() {
+            this.targets = new HashSet<>();
+        }
+
+        @Override
+        public void interact() {
+            interactible.interact();
+        }
+    }
+
     //grid
-    private Grid<Interactible> grid;
+    private Grid<FieldContent> grid;
     private int rows;
     private int columns;
     //private ImageView[][] gridViewMatrix;
@@ -151,9 +201,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
     private Image[] explosionSprite;
 
-    //controllable zombie
-    //private ZombieDaemon zombie;
-
     private Image[] playerSprite;
     private Image[] healthBarSprite;
     private Image searchlight;
@@ -164,7 +211,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Image healthPackImage;
     private ImageView healthPackView;
 
-    private List<Field<Interactible>> healthPackFields;
+    private List<Field<FieldContent>> healthPackFields;
 
     //zombie
     private Image[] zombieSprite;
@@ -184,19 +231,31 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     //controller
     private MovementControllerDaemon controller;
 
+    //mouse controller
+    private MouseController aimController;
+
     public MovementControllerDaemon getMovementController() {
         return controller;
+    }
+
+    public MouseController getAimController() {
+        return aimController;
     }
 
     //test
     //private UnholyTrinity<SpriteAnimatorDaemon<ConstantSpriteAnimator>> testTrinity = new UnholyTrinity<>();
     private UnholyTrinity<DummyDaemon> streetLamp = new UnholyTrinity<>();
 
+    //bullets
+    private Image bulletImage;
+    private Queue<ImageView> bulletViews = new LinkedList<>();
+
     //construct
     public ShooterGame(
             Renderer2D renderer,
             ImageManager imageManager,
             MovementController controller,
+            MouseController aimController,
             int width,
             int height,
             int cameraToMapRatio
@@ -218,7 +277,10 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
         this.dXY = ((float) cameraWidth) / 1000;
 
         this.controller = new MovementControllerDaemon(gameConsumer, controller).setName("Player controller");
+        this.aimController = aimController;
 
+        ((ClickController) this.aimController).setCamera(followingCamera);
+        this.aimController.setConsumer(gameConsumer);
 //
 //        this.grid = new Grid<Interactible<PlayerDaemon>>(
 //                rows,
@@ -709,19 +771,20 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 controllerPrototype.setMovementCallback(player -> {
 
-                    Field<Interactible> field = grid.getField(
+                    Field<FieldContent> field = grid.getField(
                             player.getLastCoordinates().getFirst(),
                             player.getLastCoordinates().getSecond()
                     );
 
                     //System.out.println(DaemonUtils.timedTag() + player.getName() + " at " + field);
 
-                    Interactible item = field.getObject();
+                    Interactible item = field.getObject().getInteractible();
 
                     if (item != null) {
                         item.interact();
-                        renderer.consume(item.getView()::hide);
-                        field.setObject(null);
+                        if (item instanceof HealthPack)
+                            renderer.consume(((HealthPack) item).getView()::hide);
+                        field.getObject().setInteractible(null);
                     }
                 });
 
@@ -813,7 +876,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     return ret;
                 });
 
-                List<Field<Interactible>> walkableFields = new ArrayList<>();
+                List<Field<FieldContent>> walkableFields = new ArrayList<>();
 
                 for(int i = 0; i < rows; ++i)
                     for(int j = 0; j < columns; ++j)
@@ -840,18 +903,22 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
 
 
-                for(Field<Interactible> current : healthPackFields) {
-                    current.setObject(
-                            HealthPack.generateHealthPack(
-                                    player,
-                                    200,
-                                    ((int) current.getCenterX()),
-                                    ((int) current.getCenterY()),
-                                    healthPackImage, scene
-                            )
-                    );
+
+                for (int i = 0; i < rows; ++i) {
+                    for(int j = 0; j < columns; ++j) {
+                        grid.getField(i, j).setObject(new FieldContent());
+                    }
                 }
 
+                for(Field<FieldContent> current : healthPackFields) {
+                    current.getObject().setInteractible(HealthPack.generateHealthPack(
+                            player,
+                            200,
+                            ((int) current.getCenterX()),
+                            ((int) current.getCenterY()),
+                            healthPackImage, scene
+                    ));
+                }
 
                 int noOfZombies = walkableFields.size() / 50;
 
@@ -895,8 +962,12 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             .setSleepInterval(zombieInstanceVelocity > 10 ? 50 : zombieInstanceVelocity > 8 ? 70 : zombieInstanceVelocity > 5 ? 80 : zombieInstanceVelocity > 3 ? 90 : zombieInstanceVelocity > 0 ? 100 : 0)
                             .setClosure(new ZombieSpriteAnimateClosure(zombieViews[i]));
 
-                    Field zeroField = grid.getField(zombie.getLastCoordinates());
-                    Field firstF = grid.getMinWeightOfNeighbors(zeroField);
+                    Field<FieldContent> zeroField = grid.getField(zombie.getLastCoordinates());
+
+                    FieldContent zeroFieldContent  = zeroField.getObject();
+
+                    zeroFieldContent.subscribe(zombie);
+                    zombie.setCurrentField(zeroField);
 
                     final int zombieRiseProximity = 70;
                     final int zombieFallDistance = 80;
@@ -917,8 +988,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                                     zombie.animateDirectionalSprite(zombieRiseAnimation, () -> {
 
-                                        Field curr = grid.getField(zombie.getLastCoordinates());
-                                        Field next = grid.getMinWeightOfNeighbors(curr);
+                                        Field<FieldContent> curr = grid.getField(zombie.getLastCoordinates());
+                                        Field<FieldContent> next = grid.getMinWeightOfNeighbors(curr);
 
                                         zombie.rotateTowards(next.getCenterCoords())
                                                 .goTo(next.getCenterCoords(), zombie.getPrototype().recommendedVelocity, new Closure<Boolean>(){
@@ -927,7 +998,13 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                                                         goToReturn.runtimeCheckAndGet();
 
-                                                        Field curr2 = grid.getField(zombie.getLastCoordinates());
+                                                        Field<FieldContent> curr2 = grid.getField(zombie.getLastCoordinates());
+
+                                                        { //field subscription
+                                                            zombie.getCurrentField().getObject().unsubscribe(zombie);
+                                                            zombie.setCurrentField(curr2);
+                                                            curr2.getObject().subscribe(zombie);
+                                                        }
 
                                                         if (curr2.gCost > zombieFallDistance) {
                                                             zombie.animateDirectionalSprite(zombieFallAnimation, zombieFallClosure);
@@ -1067,8 +1144,52 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 //                        });
 //                    }
                 }
+//
+//                new SimpleBullet().setTargetFinder(latestCoords -> {
+//
+//                        Field curr = grid.getField(latestCoords);
+//
+//                        for(ZombieDaemon daemon : curr.getMovables()) {
+//
+//
+//
+//                        }
+//
+//                        return null;
+//
+//                }).setCoordinateValidator(latestCoords -> {
+//
+//                        Field curr = grid.getField(latestCoords);
+//
+//
+//
+//
+//                        return false;
+//                    });
+//
+//
+
+                bulletImage = imageManager.loadImageFromAssets("thebarnstarRed.png", cameraWidth / 50, cameraWidth / 50);
+
+                for (int i = 0; i < 30; ++i) {
+                    bulletViews.add(
+                            scene.addImageView(new ImageViewImpl("Bullet View no. " + i))
+                                    .setAbsoluteX(Float.NaN)
+                                    .setAbsoluteY(Float.NaN)
+                                    .setZindex(1)
+                                    .setImage(bulletImage)
+                                    .hide()
+                    );
+                }
 
                 renderer.setScene(scene.lockViews()).start();
+
+                aimController.setOnClick(new MouseController.ClickCoordinateClosure() {
+                    @Override
+                    public void onClick(float x, float y, MouseController.MouseButton mouseButton) {
+                        fireBullet(player.getLastCoordinates(), Pair.create(x, y), 20);
+                    }
+                });
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -1076,6 +1197,83 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void fireBullet(Pair<Float, Float> sourceCoords, Pair<Float, Float> dstCoords, float velocity) {
+
+        ProjectileDaemon bullet = new ProjectileDaemon(
+                gameConsumer,
+                new SimpleBullet(explosionSprite, bulletImage, sourceCoords, dXY)
+                        .setTargetFinder(currentCoords -> {
+
+                            Field<FieldContent> currentField = grid.getField(currentCoords);
+
+                            System.err.println(DaemonUtils.timedTag() + "Bullet at: " + currentCoords + ", Field[" + currentField.getRow() + "][" + currentField.getColumn() + "]");
+
+                            if (currentField != null) {
+
+                                Set<Target> targets = currentField.getObject().getTargets();
+
+                                for (Target currentTarget : targets) {
+                                    if (ImageTranslationMover.absDistance(currentCoords, currentTarget.getLastCoordinates()) < 20) {
+                                        return currentTarget;
+                                    }
+                                }
+                            }
+
+                            return null;
+                        }).setCoordinateValidator(currentCoords -> {
+
+                            Field<FieldContent> currentField = grid.getField(currentCoords);
+
+                            System.out.println(DaemonUtils.timedTag() + "Bullet at: " + currentCoords+ ", Field[" + currentField.getRow() + "][" + currentField.getColumn() + "]");
+
+                            if (currentField == null ||  !currentField.isWalkable()
+                                    || (currentCoords.getFirst() < 0 || currentCoords.getFirst() > borderX || currentCoords.getSecond() < 0 || currentCoords.getSecond() > borderY))
+                                return false;
+
+                            return true;
+                        })
+        ).setName("Simple Bullet");
+
+        ImageView bulletView = bulletViews.poll();
+
+        renderer.consume(() -> {
+            bulletView.setAbsoluteX(sourceCoords.getFirst())
+                    .setAbsoluteY(sourceCoords.getSecond())
+                    .show();
+        });
+
+        bullet.setAnimateProjectileSideQuest(renderer).setClosure(ret -> {
+            // create view
+            ImageMover.PositionedImage[] posImg = ret.runtimeCheckAndGet();
+            bulletView.setAbsoluteX(posImg[0].positionX)
+                    .setAbsoluteY(posImg[0].positionY);
+        });
+
+        bullet.updateTarget(new Runnable() {
+            @Override
+            public void run() {
+                bullet.updateTarget(this::run);
+            }
+        });
+
+        bullet.start().shoot(
+                dstCoords.getFirst(),
+                dstCoords.getSecond(),
+                velocity,
+                ret -> {
+                    System.err.println(DaemonUtils.timedTag() + "Bullet STOPPING: " + bullet.getLastCoordinates());
+
+                    renderer.consume(() -> bulletView.hide().setAbsoluteX(Float.NaN).setAbsoluteY(Float.NaN));
+
+                    bullet.stop();
+                    bulletViews.add(bulletView);
+                });
+
+        Field startingField = grid.getField(sourceCoords);
+
+        System.out.println(DaemonUtils.timedTag() + "Bullet STARTED at: " + sourceCoords + ", Field[" + startingField.getRow() + "][" + startingField.getColumn() + "]");
     }
 }
 

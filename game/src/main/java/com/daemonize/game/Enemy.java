@@ -19,7 +19,7 @@ import java.util.Arrays;
 
 
 @Daemon(doubleDaemonize = true, className = "EnemyDoubleDaemon", implementPrototypeInterfaces = true)
-public class Enemy extends CoordinatedImageTranslationMover implements Target<Enemy> {
+public class Enemy extends CoordinatedImageTranslationMover implements Target<Enemy> , Paralyzable<Enemy>{
 
     private ImageView view;
     private ImageView hpView;
@@ -121,8 +121,8 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     }
 
     @Override
-    public Enemy setAttackable(boolean shootable) {
-        this.shootable = shootable;
+    public Enemy setAttackable(boolean attackable) {
+        this.shootable = attackable;
         return this;
     }
 

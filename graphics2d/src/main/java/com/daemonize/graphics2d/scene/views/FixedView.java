@@ -1,5 +1,6 @@
 package com.daemonize.graphics2d.scene.views;
 
+import com.daemonize.graphics2d.images.Image;
 import com.daemonize.graphics2d.scene.SceneDrawer;
 
 public class FixedView extends ImageViewImpl {

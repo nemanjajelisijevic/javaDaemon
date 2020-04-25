@@ -17,6 +17,8 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     private volatile float lastX;
     private volatile float lastY;
 
+    private Pair<Float, Float> lastCoords = Pair.create(lastX, lastY);
+
     private Lock coordUpdateLock = new ReentrantLock();
 
 
@@ -87,7 +89,10 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     @Override
     public Pair<Float, Float> getLastCoordinates() {
-        return Pair.create(lastX, lastY);
+        coordUpdateLock.lock();
+        lastCoords.setFirst(lastX).setSecond(lastY);
+        coordUpdateLock.unlock();
+        return lastCoords;
     }
 
     @Override

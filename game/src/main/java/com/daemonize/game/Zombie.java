@@ -6,6 +6,7 @@ import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.daemonprocessor.annotations.DedicatedThread;
 import com.daemonize.daemonprocessor.annotations.GenerateRunnable;
 import com.daemonize.daemonprocessor.annotations.SideQuest;
+import com.daemonize.game.grid.Field;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.imagemovers.AngleToImageArray;
 import com.daemonize.imagemovers.AngleToSingleImageArray;
@@ -15,13 +16,14 @@ import com.daemonize.imagemovers.Movable;
 import com.daemonize.imagemovers.RotatingSpriteImageMover;
 
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true, daemonizeBaseMethods = true)
-public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Zombie>, Movable {
+public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Zombie>, Movable, Target<Zombie> {
 
+    public Field<ShooterGame.FieldContent> currentField;
     public final float recommendedVelocity;
 
     private volatile int hpMax;
     private volatile int hp;
-    private volatile boolean shootable = true;
+    private volatile boolean attackable = true;
 
     private PositionedImage[] ret = new PositionedImage[1];
     private RotatingSpriteImageMover rotationMover;
@@ -35,6 +37,26 @@ public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Z
         this.recommendedVelocity = recommendedVelocity;
         this.walkAnimation = walkAnimation;
         this.attackAnimation = attackAnimation;
+    }
+
+    public Field<ShooterGame.FieldContent> getCurrentField() {
+        return currentField;
+    }
+
+    public Zombie setCurrentField(Field<ShooterGame.FieldContent> currentField) {
+        this.currentField = currentField;
+        return this;
+    }
+
+    @Override
+    public boolean isAttackable() {
+        return attackable;
+    }
+
+    @Override
+    public Zombie setAttackable(boolean attackable) {
+        this.attackable = attackable;
+        return this;
     }
 
     @Daemonize

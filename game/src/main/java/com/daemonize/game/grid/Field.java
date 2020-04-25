@@ -10,8 +10,12 @@ public class Field<T> implements  IHeapItem , Comparable {
     public List<Integer> zElevation;
     public volatile int zElevator;
 
-    float centerX;
-    float centerY;
+    private Pair<Float, Float> centerCoordinates = Pair.create(Float.NaN, Float.NaN);
+
+
+//
+//    float centerX;
+//    float centerY;
 
     int row; //i - n
     int column;//j - m
@@ -25,6 +29,7 @@ public class Field<T> implements  IHeapItem , Comparable {
     int heapIndex;
 
     private T object;
+
 
     public T getObject() {
         return object;
@@ -62,8 +67,8 @@ public class Field<T> implements  IHeapItem , Comparable {
     }
 
     public Field(float centerX, float centerY, int row, int column, int weight, boolean walkable) {
-        this.centerX = centerX;
-        this.centerY = centerY;
+        this.centerCoordinates.setFirst(centerX);
+        this.centerCoordinates.setSecond(centerY);
         this.row = row;
         this.column = column;
         this.walkable = walkable;
@@ -72,8 +77,8 @@ public class Field<T> implements  IHeapItem , Comparable {
     }
 
     public Field (Field<T> field) { // copy constructor
-        this.centerX = field.centerX;
-        this.centerY = field.centerY;
+        this.centerCoordinates.setFirst(field.centerCoordinates.getFirst());
+        this.centerCoordinates.setSecond(field.centerCoordinates.getSecond());
         this.row = field.getRow();
         this.column = field.getColumn();
         this.walkable = field.isWalkable();
@@ -91,23 +96,23 @@ public class Field<T> implements  IHeapItem , Comparable {
     }
 
     public float getCenterX() {
-        return centerX;
+        return centerCoordinates.getFirst();
     }
 
     public void setCenterX(int centerX) {
-        this.centerX = centerX;
+        this.centerCoordinates.setFirst(((float) centerX));
     }
 
     public float getCenterY() {
-        return centerY;
+        return centerCoordinates.getSecond();
     }
 
     public void setCenterY(int centerY) {
-        this.centerY = centerY;
+        this.centerCoordinates.setSecond(((float) centerY));
     }
 
     public Pair<Float, Float> getCenterCoords() {
-        return Pair.create(this.centerX, this.centerY);
+        return centerCoordinates;
     }
 
     public int getRow() {
@@ -187,8 +192,8 @@ public class Field<T> implements  IHeapItem , Comparable {
 
     @Override
     public String toString() {
-        return "Field[" + row +"][" + column + "]" + " - CenterX: " + centerX
-                + ", CenterY: " + centerY
+        return "Field[" + row +"][" + column + "]" + " - CenterX: " + centerCoordinates.getFirst()
+                + ", CenterY: " + centerCoordinates.getSecond()
                 + ", Walkable : " + walkable
                 + ", Weight: " + weight
                 + ", GCost: " + gCost

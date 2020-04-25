@@ -52,10 +52,7 @@ public class AngleToSpriteArray implements AngleToImageArray {
         if (directionsNo < 4 && directionsNo % 4 != 0)
             throw new IllegalArgumentException("Arg directionsNo cant be less than 4 and must be divisible by 4. Passed: " + directionsNo);
 
-//        if (this.rotationSpriteList == null) {
-        System.err.println(DaemonUtils.timedTag() + "[AngleToSpriteArray] Rotation List Initialization!");
         this.rotationSpriteList = rotationSpriteList;
-        //      }
         this.noOfDirections = directionsNo;
         this.step = 360 / noOfDirections;
         this.currentAngleSetter = 0;

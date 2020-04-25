@@ -2163,7 +2163,7 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
                                     float velocity = lvl == 1 ? enemy.getVelocity().intensity / 2 : lvl == 2 ? enemy.getVelocity().intensity / 4 : 0;
                                     long duration = lvl == 1 ? 200 : lvl == 2 ? 400 : 600;
 
-                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, velocity, duration, () -> bulletClosure.onReturn(1));
+                                    fireLaser(towerDaemon.getLastCoordinates(), enemy, enemy, velocity, duration, () -> bulletClosure.onReturn(1));
 
                                     reloadInterval = 4000;
                                     break;
@@ -2343,15 +2343,16 @@ public class TowerDefenseGame implements DaemonApp<TowerDefenseGame> {
     public void fireLaser(
             Pair<Float, Float> source,
             Target target,
+            Paralyzable targetPar,
             float velocity,
             long duration,
             Runnable destructionClosure
     ) {
 
-        if (!target.isAttackable() || target.isParalyzed())
+        if (!target.isAttackable() || targetPar.isParalyzed())
             return;
 
-        target.setParalyzed(true);
+        targetPar.setParalyzed(true);
         EnemyDoubleDaemon enemyTarget = ((EnemyDoubleDaemon) target);
 
         currentSoundManager.playSound(laserSound);

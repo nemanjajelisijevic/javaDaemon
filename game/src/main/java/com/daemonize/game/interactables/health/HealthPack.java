@@ -21,7 +21,6 @@ public class HealthPack implements Interactible {
         this.view = view;
     }
 
-    @Override
     public ImageView getView() {
         return view;
     }

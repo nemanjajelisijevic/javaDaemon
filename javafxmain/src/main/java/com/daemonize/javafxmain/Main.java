@@ -1,10 +1,12 @@
 package com.daemonize.javafxmain;
 
+import com.daemonize.game.ClickController;
 import com.daemonize.game.KeyBoardMovableController;
 import com.daemonize.game.KeyBoardMovementControllerImpl;
 import com.daemonize.game.PlayerDaemon;
 import com.daemonize.game.ShooterGame;
 import com.daemonize.game.controller.KeyboardMovementController;
+import com.daemonize.game.controller.MouseController;
 import com.daemonize.game.controller.MovementController;
 import com.daemonize.game.app.DaemonApp;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
@@ -21,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -73,14 +76,11 @@ public class Main extends Application {
 
         //SoundManager soundManager = new JavaFxSoundManager(4);
         //game = new TowerDefenseGame(renderer, imageManager, soundManager, borderX, borderY, rows, columns,50,50);
-
-
-
         //controller = new KeyBoardMovementControllerImpl();
 
         controller = new KeyBoardMovableController<PlayerDaemon>();
 
-        game = new ShooterGame(renderer, imageManager, controller, cameraWidth, cameraHeight, 5);
+        game = new ShooterGame(renderer, imageManager, controller, new ClickController(), cameraWidth, cameraHeight, 5);
 
 //        game = new MapEditor(
 //                renderer,
@@ -168,6 +168,14 @@ public class Main extends Application {
                     controller.speedDown();
                     break;
             }
+        });
+
+        MouseController mouseController = ((ShooterGame) game).getAimController();
+
+
+        scene.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+            mouseController.onClick(MouseController.MouseButton.LEFT, ((float) event.getX()), ((float) event.getY()));
+
         });
 
 //        MouseController mouseControllerDaemon = ((MapEditor) game).getMouseController();
