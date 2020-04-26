@@ -26,8 +26,20 @@ public class HealthPack implements Interactible {
     }
 
     @Override
-    public void interact() {
-        interactor.setHp(interactor.getHp() + hpBoost);
+    public boolean interact() {
+
+        if (interactor.getHp() < interactor.getMaxHp()) {
+
+            if (interactor.getHp() + hpBoost > interactor.getMaxHp()) {
+                interactor.setHp(interactor.getMaxHp());
+            } else {
+                interactor.setHp(interactor.getHp() + hpBoost);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     public static HealthPack generateHealthPack(Mortal interactor, int hpBoost, int x, int y, Image image, Scene2D scene2D) {

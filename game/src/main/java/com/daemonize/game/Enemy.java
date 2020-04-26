@@ -272,4 +272,9 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
 
         return root;
     }
+
+    @Override
+    public Enemy destroy() {
+        return null;
+    }
 }

@@ -1,13 +1,18 @@
 package com.daemonize.game;
 
-import com.daemonize.daemonengine.Daemon;
+import com.daemonize.daemonengine.DaemonState;
 import com.daemonize.daemonengine.closure.Closure;
 import com.daemonize.daemonengine.closure.Return;
 import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
+import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
+import com.daemonize.daemonengine.quests.VoidMainQuest;
+import com.daemonize.daemonengine.quests.VoidQuest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.daemonprocessor.annotations.Daemon;
+import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.game.controller.MouseController;
 import com.daemonize.game.controller.MovementController;
 import com.daemonize.game.controller.MovementControllerDaemon;
@@ -159,8 +164,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
         }
 
         @Override
-        public void interact() {
-            interactible.interact();
+        public boolean interact() {
+            return interactible.interact();
         }
     }
 
@@ -199,7 +204,18 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private PlayerDaemon player;
     private DummyPlayerDaemon dummyPlayer;
 
+    @Daemon(eager = true)
+    public static class PlayerRotationBlocker {
+        @Daemonize
+        public void block() throws InterruptedException {
+            Thread.sleep(500);
+        }
+    }
+
+    private PlayerRotationBlockerDaemon rotationBlocker;
+
     private Image[] explosionSprite;
+    private Image[] miniExplosionSprite;
 
     private Image[] playerSprite;
     private Image[] healthBarSprite;
@@ -225,6 +241,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Image[] zombieMove270;
     private Image[] zombieMove315;
 
+    AngleToSpriteArray zombieFallAnimation;
+
     private ImageView[] zombieViews;
     //private List<SpriteAnimatorDaemon<ConstantSpriteAnimator>> zombieAnimators;
 
@@ -249,6 +267,12 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     //bullets
     private Image bulletImage;
     private Queue<ImageView> bulletViews = new LinkedList<>();
+
+    private Image crosshair;
+    private ImageView crosshairView;
+
+    private volatile int bulletDamage = 40;
+
 
     //construct
     public ShooterGame(
@@ -398,6 +422,10 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 for (int i = 0; i < explosionSprite.length; ++i)
                     explosionSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", fieldWidth, fieldWidth);
 
+                miniExplosionSprite = new Image[20];
+                for (int i = 0; i < miniExplosionSprite.length; ++i) {
+                    miniExplosionSprite[i] = imageManager.loadImageFromAssets("Bild-0000" + (i < 10 ? "0" + (i + 1) : (i + 1)) + ".png", fieldWidth / 2, fieldWidth / 2);
+                }
                 //init grid views
                 accessibleField = imageManager.loadImageFromAssets("greenOctagon.png", fieldWidth, fieldWidth);
                 inaccessibleField = imageManager.loadImageFromAssets("redOctagon.png", fieldWidth, fieldWidth);
@@ -434,6 +462,14 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 for (int i = 0; i < explodeSprite.length; ++i) {
                     explodeSprite[i] = imageManager.loadImageFromAssets("Explosion" + (i + 1) + ".png", playerWidth, playerHeight);
                 }
+
+
+                crosshair = imageManager.loadImageFromAssets("target.png", cameraWidth / 20, cameraWidth / 20);
+                crosshairView = scene.addImageView(new ImageViewImpl("Crosshair View"))
+                        .setAbsoluteX(Float.NaN)
+                        .setAbsoluteY(Float.NaN)
+                        .setImage(crosshair)
+                        .hide();
 
                 Image streetLampImage = imageManager.loadImageFromAssets("streetLamp.png", playerWidth, playerWidth );
                 Image lampLightImage = imageManager.loadImageFromAssets("searchlight.png", playerWidth * 2, playerWidth); //* 4 / 3);
@@ -683,75 +719,145 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                         Pair<Float, Float> ret = player.getLastCoordinates();
 
-                        switch (dir) {
-                            case UP:
-                                if(neighbors.get(1).isWalkable())
-                                    ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
-                                else if (neighbors.get(0).isWalkable())
-                                    ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
-                                else if (neighbors.get(2).isWalkable())
-                                    ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
-                                break;
-                            case DOWN:
-                                if(neighbors.get(6).isWalkable())
-                                    ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
-                                else if (neighbors.get(5).isWalkable())
-                                    ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
-                                else if (neighbors.get(7).isWalkable())
-                                    ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
-                                break;
-                            case RIGHT:
-                                if(neighbors.get(4).isWalkable())
-                                    ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
-                                else if (neighbors.get(2).isWalkable())
-                                    ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
-                                else if (neighbors.get(7).isWalkable())
-                                    ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
-                                break;
-                            case LEFT:
-                                if(neighbors.get(3).isWalkable())
-                                    ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
-                                else if (neighbors.get(0).isWalkable())
-                                    ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
-                                else if (neighbors.get(5).isWalkable())
-                                    ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
-                                break;
-                            case UP_RIGHT:
-                                if(neighbors.get(2).isWalkable())
-                                    ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
-                                else if (neighbors.get(1).isWalkable())
-                                    ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
-                                else if (neighbors.get(4).isWalkable())
-                                    ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
-                                break;
-                            case UP_LEFT:
-                                if(neighbors.get(0).isWalkable())
-                                    ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
-                                else if (neighbors.get(3).isWalkable())
-                                    ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
-                                else if (neighbors.get(1).isWalkable())
-                                    ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
-                                break;
-                            case DOWN_RIGHT:
-                                if(neighbors.get(7).isWalkable())
-                                    ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
-                                else if (neighbors.get(4).isWalkable())
-                                    ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
-                                else if (neighbors.get(6).isWalkable())
-                                    ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
-                                break;
-                            case DOWN_LEFT:
-                                if(neighbors.get(5).isWalkable())
-                                    ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
-                                else if (neighbors.get(3).isWalkable())
-                                    ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
-                                else if (neighbors.get(6).isWalkable())
-                                    ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
-                                break;
-                            default:
-                                throw new IllegalStateException("No dir: " + dir);
 
-                        }
+
+                            Field firstNeighbour;
+
+                            switch (dir) {
+                                case UP:
+
+                                    firstNeighbour = neighbors.get(1);
+
+                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                    ) {
+                                        if (firstNeighbour.isWalkable())
+                                            ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                        else if (neighbors.get(0).isWalkable())
+                                            ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                        else if (neighbors.get(2).isWalkable())
+                                            ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                    }
+                                    break;
+                                case DOWN:
+
+                                    firstNeighbour = neighbors.get(6);
+
+                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                    ) {
+
+                                        if (neighbors.get(6).isWalkable())
+                                            ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                        else if (neighbors.get(5).isWalkable())
+                                            ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                        else if (neighbors.get(7).isWalkable())
+                                            ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                    }
+                                    break;
+                                case RIGHT:
+
+                                    firstNeighbour = neighbors.get(4);
+
+                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                    ) {
+
+
+                                        if (neighbors.get(4).isWalkable())
+                                            ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                        else if (neighbors.get(2).isWalkable())
+                                            ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                        else if (neighbors.get(7).isWalkable())
+                                            ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                    }
+                                    break;
+                                case LEFT:
+
+                                    firstNeighbour = neighbors.get(3);
+
+                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                    ) {
+
+                                        if (neighbors.get(3).isWalkable())
+                                            ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                        else if (neighbors.get(0).isWalkable())
+                                            ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                        else if (neighbors.get(5).isWalkable())
+                                            ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                    }
+                                    break;
+                                case UP_RIGHT:
+
+                                    firstNeighbour = neighbors.get(2);
+
+                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                    ) {
+
+                                        if (neighbors.get(2).isWalkable())
+                                            ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                        else if (neighbors.get(1).isWalkable())
+                                            ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                        else if (neighbors.get(4).isWalkable())
+                                            ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                    }
+                                    break;
+                                case UP_LEFT:
+
+                                    firstNeighbour = neighbors.get(0);
+
+                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                    ) {
+
+                                        if (neighbors.get(0).isWalkable())
+                                            ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                        else if (neighbors.get(3).isWalkable())
+                                            ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                        else if (neighbors.get(1).isWalkable())
+                                            ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                    }
+                                    break;
+                                case DOWN_RIGHT:
+
+                                    firstNeighbour = neighbors.get(7);
+
+                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                    ) {
+
+                                        if (neighbors.get(7).isWalkable())
+                                            ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                        else if (neighbors.get(4).isWalkable())
+                                            ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                        else if (neighbors.get(6).isWalkable())
+                                            ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                    }
+                                    break;
+                                case DOWN_LEFT:
+
+                                    firstNeighbour = neighbors.get(5);
+
+                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                    ) {
+
+
+                                        if (neighbors.get(5).isWalkable())
+                                            ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                        else if (neighbors.get(3).isWalkable())
+                                            ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                        else if (neighbors.get(6).isWalkable())
+                                            ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                    }
+                                    break;
+                                default:
+                                    throw new IllegalStateException("No dir: " + dir);
+
+                            }
+
 
                         return ret;
                     }
@@ -763,8 +869,16 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                         parameterPack.rotationClosure.run();
                         parameterPack.translationClosure.onReturn(new Return<>(true));
                     } else {
-                        player.rotateTowards(parameterPack.nextCoords, parameterPack.rotationClosure)
-                                .goTo(parameterPack.nextCoords, parameterPack.velocity, parameterPack.translationClosure);
+                        if (rotationBlocker.getEnginesState().get(0).equals(DaemonState.IDLE)) {
+                            player.rotateTowards(parameterPack.nextCoords, parameterPack.rotationClosure)
+                                    .goTo(parameterPack.nextCoords, parameterPack.velocity, parameterPack.translationClosure);
+                            player.setAttackable(true);
+
+                        } else {
+
+                            player.goTo(parameterPack.nextCoords, parameterPack.velocity, parameterPack.translationClosure);
+                            parameterPack.rotationClosure.run();
+                        }
                     }
 
                 });
@@ -781,8 +895,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     Interactible item = field.getObject().getInteractible();
 
                     if (item != null) {
-                        item.interact();
-                        if (item instanceof HealthPack)
+                        boolean result = item.interact();
+                        if (item instanceof HealthPack && result)
                             renderer.consume(((HealthPack) item).getView()::hide);
                         field.getObject().setInteractible(null);
                     }
@@ -791,8 +905,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 controller.setControlSideQuest();
                 controller.start();
 
-                player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
-                        .go(firstField.getCenterX(), firstField.getCenterY(), 12F);
+
 
                 AngleToSpriteArray zombieMoveAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
                     switch (angle) {
@@ -841,7 +954,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     }
                 });
 
-                AngleToSpriteArray zombieFallAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
+                zombieFallAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
 
                     switch (angle) {
                         case 0:
@@ -902,8 +1015,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
                 healthPackFields.add(walkableFields.get(getRandomInt(0, walkableFields.size())));
 
-
-
                 for (int i = 0; i < rows; ++i) {
                     for(int j = 0; j < columns; ++j) {
                         grid.getField(i, j).setObject(new FieldContent());
@@ -957,6 +1068,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                                     dXY
                             )
                     ).setName( i % 50 ==0 ? "DebugZombie no: " + i : "Zombie");
+
+                    zombie.setMaxHp(80).setHp(80);
 
                     zombie.setAnimateZombieSideQuest(renderer)
                             .setSleepInterval(zombieInstanceVelocity > 10 ? 50 : zombieInstanceVelocity > 8 ? 70 : zombieInstanceVelocity > 5 ? 80 : zombieInstanceVelocity > 3 ? 90 : zombieInstanceVelocity > 0 ? 100 : 0)
@@ -1049,134 +1162,16 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                             });
                         }
                     });
-//                    if (i % 1 == 0 && i < noOfZombies - 3) {
-//
-//                        zombie.start().animateDirectionalSprite(zombieFallAnimation, new Runnable() {
-//                                    @Override
-//                                    public void run() {
-//
-//                                        Field restingField = grid.getField(zombie.getLastCoordinates());
-//
-//                                        restingField.setWalkable(false);
-//
-//                                        zombie.sleep(2000).animateDirectionalSprite(zombieRiseAnimation, () -> {
-//
-//                                            restingField.setWalkable(true);
-//
-//                                            Field current = grid.getField(zombie.getLastCoordinates());
-//                                            Field next = grid.getMinWeightOfNeighbors(current);
-//
-//                                            final Runnable root = this;
-//
-//                                            zombie.rotateTowards(
-//                                                    next.getCenterX(),
-//                                                    next.getCenterY()
-//                                            ).goTo(
-//                                                    next.getCenterX(),
-//                                                    next.getCenterY(),
-//                                                    zombie.getPrototype().recommendedVelocity,
-//                                                    new Closure<Boolean>() {
-//                                                        @Override
-//                                                        public void onReturn(Return<Boolean> ret) {
-//
-//                                                            Field current = grid.getField(zombie.getLastCoordinates());
-//                                                            Field next = grid.getMinWeightOfNeighbors(current);
-//
-//                                                            if (current.gCost > 60) {
-//                                                                zombie.rotateTowards(next.getCenterX(), next.getCenterY()).goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
-//                                                            } else {
-//                                                                zombie.animateDirectionalSprite(zombieFallAnimation, root);
-//                                                            }
-//                                                        }
-//                                                    });
-//                                        });
-//                                    }
-//                                });
-//
-//                    } else {
-//                        zombie.start().rotateTowards(firstF.getCenterX(), firstF.getCenterY()).goTo(firstF.getCenterX(), firstF.getCenterY(), zombie.getPrototype().recommendedVelocity, new Closure<Boolean>() {
-//
-//                            @Override
-//                            public void onReturn(Return<Boolean> ret) {
-//
-//                                ret.runtimeCheckAndGet();
-//
-//                                Field curr = grid.getField(
-//                                        zombie.getLastCoordinates().getFirst(),
-//                                        zombie.getLastCoordinates().getSecond()
-//                                );
-//
-//                                Field next = grid.getMinWeightOfNeighbors(curr);
-//
-//                                if (zombie.getName().contains("DebugZombie"))
-//                                    System.err.println(DaemonUtils.timedTag() + zombie.getName() + " at " + curr);
-//
-//                                if (ImageTranslationMover.absDistance(player.getLastCoordinates(), zombie.getLastCoordinates()) <= fieldWidth) {
-//
-//                                    if (player.isAttackable()) {
-//
-//                                        player.setAttackable(false);
-//
-//                                        if (player.getHp() - 100 < 1)
-//                                            throw new IllegalStateException("You ded!");
-//                                        else
-//                                            player.setHp(player.getHp() - 100);
-//
-//                                        player.sleep(400).pushSprite(explosionSprite, () -> {
-//                                        });
-//
-//                                        zombie.attack(() -> {
-//                                            player.setAttackable(true);
-//                                            zombie.rotateTowards(next.getCenterX(), next.getCenterY())
-//                                                    .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
-//                                        });
-//
-//                                    } else
-//
-//                                        //zombie.attack(() ->
-//                                        zombie.sleep(1000).rotateTowards(next.getCenterX(), next.getCenterY())
-//                                                .goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
-//                                    //);
-//
-//                                } else
-//                                    zombie.rotateTowards(next.getCenterX(), next.getCenterY()).goTo(next.getCenterX(), next.getCenterY(), zombie.getPrototype().recommendedVelocity, this::onReturn);
-//                            }
-//                        });
-//                    }
                 }
-//
-//                new SimpleBullet().setTargetFinder(latestCoords -> {
-//
-//                        Field curr = grid.getField(latestCoords);
-//
-//                        for(ZombieDaemon daemon : curr.getMovables()) {
-//
-//
-//
-//                        }
-//
-//                        return null;
-//
-//                }).setCoordinateValidator(latestCoords -> {
-//
-//                        Field curr = grid.getField(latestCoords);
-//
-//
-//
-//
-//                        return false;
-//                    });
-//
-//
 
-                bulletImage = imageManager.loadImageFromAssets("thebarnstarRed.png", cameraWidth / 50, cameraWidth / 50);
+                bulletImage = imageManager.loadImageFromAssets("thebarnstarRed.png", cameraWidth / 70, cameraWidth / 70);
 
                 for (int i = 0; i < 30; ++i) {
                     bulletViews.add(
                             scene.addImageView(new ImageViewImpl("Bullet View no. " + i))
                                     .setAbsoluteX(Float.NaN)
                                     .setAbsoluteY(Float.NaN)
-                                    .setZindex(1)
+                                    .setZindex(4)
                                     .setImage(bulletImage)
                                     .hide()
                     );
@@ -1184,12 +1179,26 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                 renderer.setScene(scene.lockViews()).start();
 
-                aimController.setOnClick(new MouseController.ClickCoordinateClosure() {
-                    @Override
-                    public void onClick(float x, float y, MouseController.MouseButton mouseButton) {
-                        fireBullet(player.getLastCoordinates(), Pair.create(x, y), 20);
-                    }
+                aimController.setOnHoover((float x, float y) -> {
+
+                    renderer.consume(() -> {//TODO encapsulate
+                       crosshairView.setAbsoluteX(x).setAbsoluteY(y);
+                    });
                 });
+
+                aimController.setOnClick((float x, float y, MouseController.MouseButton mouseButton) -> {
+
+                    if (rotationBlocker.getEnginesQueueSizes().get(0) < 2)
+                        rotationBlocker.block();
+                    player.rotateTowards(x, y);
+                    fireBullet(player.getLastCoordinates(), Pair.create(x, y), 30);
+                });
+
+                rotationBlocker = new PlayerRotationBlockerDaemon(gameConsumer, new PlayerRotationBlocker()).start();
+
+                player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
+                        .goTo(firstField.getCenterCoords(), 12F, ret -> renderer.consume(crosshairView::show));
+
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -1199,42 +1208,58 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
         });
     }
 
+    private volatile int bulletCnt = 0;
+
     private void fireBullet(Pair<Float, Float> sourceCoords, Pair<Float, Float> dstCoords, float velocity) {
 
         ProjectileDaemon bullet = new ProjectileDaemon(
                 gameConsumer,
-                new SimpleBullet(explosionSprite, bulletImage, sourceCoords, dXY)
-                        .setTargetFinder(currentCoords -> {
+                new SimpleBullet(miniExplosionSprite, bulletImage, sourceCoords, dXY)
+        ).setName("Simple Bullet " + ++bulletCnt);
 
-                            Field<FieldContent> currentField = grid.getField(currentCoords);
+        ((SimpleBullet) bullet.getPrototype()).setTargetFinder(currentCoords -> {
 
-                            System.err.println(DaemonUtils.timedTag() + "Bullet at: " + currentCoords + ", Field[" + currentField.getRow() + "][" + currentField.getColumn() + "]");
+            Field<FieldContent> currentField = grid.getField(currentCoords);
 
-                            if (currentField != null) {
+            if (currentField != null) {
 
-                                Set<Target> targets = currentField.getObject().getTargets();
+                Set<Target> targets = currentField.getObject().getTargets();
 
-                                for (Target currentTarget : targets) {
-                                    if (ImageTranslationMover.absDistance(currentCoords, currentTarget.getLastCoordinates()) < 20) {
-                                        return currentTarget;
-                                    }
-                                }
-                            }
+                for (Target currentTarget : targets) {
+                    if (ImageTranslationMover.absDistance(currentCoords, currentTarget.getLastCoordinates()) < 50) {
 
-                            return null;
-                        }).setCoordinateValidator(currentCoords -> {
+                        final ZombieDaemon zombieTarget = ((ZombieDaemon) currentTarget);
 
-                            Field<FieldContent> currentField = grid.getField(currentCoords);
+                        int targetHp = currentTarget.getHp();
+                        int newTargetHp = targetHp - bulletDamage;
 
-                            System.out.println(DaemonUtils.timedTag() + "Bullet at: " + currentCoords+ ", Field[" + currentField.getRow() + "][" + currentField.getColumn() + "]");
+                        if (newTargetHp < 1) {
+                            zombieTarget.clearAndInterrupt().animateDirectionalSprite(zombieFallAnimation, () -> {
+                                zombieTarget.stop();
+                                System.err.println(DaemonUtils.timedTag() + bullet.getName() + " -  Target: " + zombieTarget.getName() + " DESTROYED!!!!!!!!!");
+                            });
+                        } else {
+                            zombieTarget.setHp(newTargetHp);
+                            System.out.println(DaemonUtils.timedTag() +  bullet.getName() + " - Target: " + zombieTarget.getName() + ", HIT Hp: " + zombieTarget.getHp() + "!!!!!!!!!");
+                        }
 
-                            if (currentField == null ||  !currentField.isWalkable()
-                                    || (currentCoords.getFirst() < 0 || currentCoords.getFirst() > borderX || currentCoords.getSecond() < 0 || currentCoords.getSecond() > borderY))
-                                return false;
+                        return currentTarget;
+                    }
+                }
+            }
 
-                            return true;
-                        })
-        ).setName("Simple Bullet");
+            return null;
+        })
+                .setCoordinateValidator(currentCoords -> {
+
+            Field<FieldContent> currentField = grid.getField(currentCoords);
+
+            if (currentField == null ||  !currentField.isWalkable()
+                    || (currentCoords.getFirst() < 0 || currentCoords.getFirst() > borderX || currentCoords.getSecond() < 0 || currentCoords.getSecond() > borderY))
+                return false;
+
+            return true;
+        });
 
         ImageView bulletView = bulletViews.poll();
 
@@ -1263,8 +1288,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 dstCoords.getSecond(),
                 velocity,
                 ret -> {
-                    System.err.println(DaemonUtils.timedTag() + "Bullet STOPPING: " + bullet.getLastCoordinates());
 
+                    //System.err.println(DaemonUtils.timedTag() + "Bullet STOPPING: " + bullet.getLastCoordinates());
                     renderer.consume(() -> bulletView.hide().setAbsoluteX(Float.NaN).setAbsoluteY(Float.NaN));
 
                     bullet.stop();
@@ -1273,7 +1298,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
         Field startingField = grid.getField(sourceCoords);
 
-        System.out.println(DaemonUtils.timedTag() + "Bullet STARTED at: " + sourceCoords + ", Field[" + startingField.getRow() + "][" + startingField.getColumn() + "]");
+        //System.out.println(DaemonUtils.timedTag() + "Bullet STARTED at: " + sourceCoords + ", Field[" + startingField.getRow() + "][" + startingField.getColumn() + "]");
     }
 }
 

@@ -100,7 +100,7 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
         this.playerCoordinateExporter.exportCoords(getLastCoordinates().getFirst(), getLastCoordinates().getSecond());
     }
 
-    @Daemonize
+    @Daemonize(blockingClosure = true)
     @DedicatedThread(engineName = "rotate")
     public void rotateTowards(float x, float y) throws InterruptedException {
         rotationMover.rotateTowards(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y);
@@ -179,6 +179,11 @@ public class Player extends CoordinatedImageTranslationMover implements Target<P
     @Override
     public int getMaxHp() {
         return hpMax;
+    }
+
+    @Override
+    public Player destroy() {
+        return null;
     }
 
     @Override

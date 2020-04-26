@@ -4,5 +4,5 @@ import com.daemonize.graphics2d.scene.views.ImageView;
 
 @FunctionalInterface
 public interface Interactible {
-    void interact();
+    boolean interact();
 }

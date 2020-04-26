@@ -368,4 +368,10 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         targetLock.unlock();
         return ret;
     }
+
+    @Override
+    public Tower destroy() {
+        return null;
+    }
 }
+

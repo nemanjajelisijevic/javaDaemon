@@ -18,6 +18,7 @@ import javafx.application.Application;
 
 import javafx.geometry.Rectangle2D;
 import javafx.scene.CacheHint;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -101,6 +102,7 @@ public class Main extends Application {
         //primaryStage.initStyle(StageStyle.UNDECORATED);
         primaryStage.show();
 
+        scene.setCursor(Cursor.NONE);
 //        scene.setCursor(Cursor.HAND);
 //        scene.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> game.onTouch((float) event.getSceneX(), (float) event.getSceneY()));
 
@@ -175,7 +177,14 @@ public class Main extends Application {
 
         scene.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             mouseController.onClick(MouseController.MouseButton.LEFT, ((float) event.getX()), ((float) event.getY()));
+        });
 
+        scene.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+            mouseController.onRelease(MouseController.MouseButton.LEFT);
+        });
+
+        scene.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+            mouseController.onMove(((float) event.getX()), ((float) event.getY()));
         });
 
 //        MouseController mouseControllerDaemon = ((MapEditor) game).getMouseController();

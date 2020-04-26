@@ -13,9 +13,12 @@ public class ClickController implements MouseController {
     private Consumer consumer;
 
     private ClickCoordinateClosure clickCoordinateClosure;
+    private HooverCoordinateClosure hooverCoordinateClosure;
     private Camera2D camera;
 
     private volatile float clickedX, clickedY;
+    private volatile float currentX, currentY;
+
     private volatile MouseButton currentClickedButton;
 
     //private DaemonSemaphore clickSemaphore = new DaemonSemaphore().setName("Click Semaphore");
@@ -41,7 +44,9 @@ public class ClickController implements MouseController {
     }
 
     @Override
-    public void setOnHoover(HooverCoordinateClosure hooverCoordinateClosure) {}
+    public void setOnHoover(HooverCoordinateClosure hooverCoordinateClosure) {
+        this.hooverCoordinateClosure  = hooverCoordinateClosure;
+    }
 
     @Override
     public void onClick(MouseButton mouseButton, float x, float y) {
@@ -58,30 +63,37 @@ public class ClickController implements MouseController {
             currentClickedButton = null;
             //clickSemaphore.stop();
         }
+        control();
     }
 
     @Override
     public void onMove(float x, float y) {
+
+        currentX = x;
+        currentY = y;
+
         if (currentClickedButton != null) {
             clickedX = x;
             clickedY = y;
-            control();
         }
+
+        control();
     }
 
     @Override
     public void control() {
         try{
-//            while(currentClickedButton == null)
-//                clickSemaphore.await();
-
             consumer.consume(() -> {
 
-                for(FixedButton button : buttons)
+                for (FixedButton button : buttons) {
                     if (button.checkCoordinates(clickedX, clickedY))
                         return;
+                }
 
-                clickCoordinateClosure.onClick(camera.getRenderingX() + clickedX, camera.getRenderingY() + clickedY, currentClickedButton);
+                if (currentClickedButton != null)
+                    clickCoordinateClosure.onClick(camera.getRenderingX() + clickedX, camera.getRenderingY() + clickedY, currentClickedButton);
+                else
+                    hooverCoordinateClosure.onHoover(camera.getRenderingX() + currentX, camera.getRenderingY() + currentY);
             });
 
         } finally {}

@@ -4,6 +4,9 @@ import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.imagemovers.CoordinatedImageTranslationMover;
 import com.daemonize.imagemovers.Movable;
+import com.daemonize.imagemovers.RotatingSpriteImageMover;
+import com.daemonize.imagemovers.spriteiterators.BasicSpriteIterator;
+import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 
 public class SimpleBullet extends CoordinatedImageTranslationMover implements Projectile, Movable {
 
@@ -21,6 +24,7 @@ public class SimpleBullet extends CoordinatedImageTranslationMover implements Pr
     private TargetFinder targetFinder;
 
     private CoordinateValidator coordinateValidator;
+
 
     //TODO fire explosions
     private Image[] explodeOnImpactSprite;
@@ -49,10 +53,12 @@ public class SimpleBullet extends CoordinatedImageTranslationMover implements Pr
     @Override
     public boolean shoot(float x, float y, float velocity) throws InterruptedException {
 
+
         boolean ret = goTo(x, y, velocity);
-//
-//        if (ret)
-//            pushSprite(explodeOnImpactSprite);
+
+
+
+//            rotationMover.pushSprite(explodeOnImpactSprite);
 
         nearestTarget = null;
 
@@ -62,7 +68,7 @@ public class SimpleBullet extends CoordinatedImageTranslationMover implements Pr
     @Override
     public void updateTarget() throws InterruptedException {
 
-        Thread.sleep(100);
+        Thread.sleep(20);
 
         this.animateSemaphore.await();
 

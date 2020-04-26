@@ -132,4 +132,9 @@ public class Zombie extends CoordinatedImageTranslationMover implements Mortal<Z
         ret[0] = super.animate();
         return ret;
     }
+
+    @Override
+    public Zombie destroy() {
+        return null;
+    }
 }
