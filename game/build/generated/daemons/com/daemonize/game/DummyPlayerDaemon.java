@@ -8,7 +8,6 @@ import com.daemonize.daemonengine.consumer.Consumer;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
 import com.daemonize.daemonengine.implementations.SideQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.MainQuest;
-import com.daemonize.daemonengine.quests.ReturnVoidMainQuest;
 import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
@@ -24,7 +23,6 @@ import java.lang.IllegalStateException;
 import java.lang.Integer;
 import java.lang.InterruptedException;
 import java.lang.Override;
-import java.lang.Runnable;
 import java.lang.String;
 import java.lang.Thread;
 import java.lang.Void;
@@ -183,8 +181,9 @@ public class DummyPlayerDaemon implements EagerDaemon<DummyPlayerDaemon>, Movabl
 
   /**
    * Prototype method {@link com.daemonize.game.DummyPlayer#goTo} */
-  public DummyPlayerDaemon goTo(Pair<Float, Float> coords, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
+  public DummyPlayerDaemon goTo(Pair<Float, Float> coords, float velocity,
+      Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -361,23 +360,22 @@ public class DummyPlayerDaemon implements EagerDaemon<DummyPlayerDaemon>, Movabl
     }
   }
 
-  private final class GoToIMainQuest extends ReturnVoidMainQuest {
+  private final class GoToIMainQuest extends MainQuest<Boolean> {
     private Pair<Float, Float> coords;
 
     private float velocity;
 
-    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Runnable retRun,
+    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure,
         ClosureExecutionWaiter closureAwaiter) {
-      super(retRun, closureAwaiter);
+      super(closure, closureAwaiter);
       this.coords = coords;
       this.velocity = velocity;
       this.description = "goTo";
     }
 
     @Override
-    public final Void pursue() throws Exception {
-      prototype.goTo(coords, velocity);
-      return null;
+    public final Boolean pursue() throws Exception {
+      return prototype.goTo(coords, velocity);
     }
   }
 }

@@ -15,7 +15,7 @@ public class HealthPack implements Interactible {
 
     private Mortal interactor;
 
-    public HealthPack(Mortal interactor,int hpBoost, ImageView view) {
+    public HealthPack(Mortal interactor, int hpBoost, ImageView view) {
         this.interactor = interactor;
         this.hpBoost = hpBoost;
         this.view = view;

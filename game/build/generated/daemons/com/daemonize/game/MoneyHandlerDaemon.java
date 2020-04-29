@@ -166,6 +166,14 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return this;
   }
 
+  /**
+   * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
+  public MoneyHandlerDaemon goTo(Pair<Float, Float> coords, float velocity,
+      Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
   public MoneyHandler getPrototype() {
     return prototype;
   }
@@ -296,6 +304,25 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     @Override
     public final Boolean pursue() throws Exception {
       return prototype.goTo(x, y, velocityint);
+    }
+  }
+
+  private final class GoToIMainQuest extends MainQuest<Boolean> {
+    private Pair<Float, Float> coords;
+
+    private float velocity;
+
+    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
+      this.coords = coords;
+      this.velocity = velocity;
+      this.description = "goTo";
+    }
+
+    @Override
+    public final Boolean pursue() throws Exception {
+      return prototype.goTo(coords, velocity);
     }
   }
 }

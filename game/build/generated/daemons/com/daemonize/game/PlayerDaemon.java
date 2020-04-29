@@ -31,7 +31,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDaemon>, ZElevatable, Movable {
+public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDaemon>, ZElevatable, Movable, Paralyzable<PlayerDaemon> {
   private Player prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
@@ -40,16 +40,16 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   protected EagerMainQuestDaemonEngine rotateDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine interactDaemonEngine;
-
   protected EagerMainQuestDaemonEngine coordBroadcasterDaemonEngine;
+
+  protected EagerMainQuestDaemonEngine interactDaemonEngine;
 
   public PlayerDaemon(Consumer consumer, Player prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
     this.rotateDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - rotateDaemonEngine");
-    this.interactDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - interactDaemonEngine");
     this.coordBroadcasterDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - coordBroadcasterDaemonEngine");
+    this.interactDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - interactDaemonEngine");
     this.prototype = prototype;
   }
 
@@ -131,8 +131,8 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
   }
 
   @Override
-  public PlayerDaemon setAttackable(boolean shootable) {
-    prototype.setAttackable(shootable);
+  public PlayerDaemon setAttackable(boolean attackable) {
+    prototype.setAttackable(attackable);
     return this;
   }
 
@@ -171,6 +171,12 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   public double absDistance(float x1, float y1, float x2, float y2) {
     return prototype.absDistance(x1, y1, x2, y2);
+  }
+
+  @Override
+  public PlayerDaemon destroy() {
+    prototype.destroy();
+    return this;
   }
 
   @Override
@@ -303,8 +309,8 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   /**
    * Prototype method {@link com.daemonize.game.Player#goTo} */
-  public PlayerDaemon goTo(Pair<Float, Float> coords, float velocity, Runnable retRun) {
-    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
+  public PlayerDaemon goTo(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -655,23 +661,22 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
     }
   }
 
-  private final class GoToIMainQuest extends ReturnVoidMainQuest {
+  private final class GoToIMainQuest extends MainQuest<Boolean> {
     private Pair<Float, Float> coords;
 
     private float velocity;
 
-    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Runnable retRun,
+    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure,
         ClosureExecutionWaiter closureAwaiter) {
-      super(retRun, closureAwaiter);
+      super(closure, closureAwaiter);
       this.coords = coords;
       this.velocity = velocity;
       this.description = "goTo";
     }
 
     @Override
-    public final Void pursue() throws Exception {
-      prototype.goTo(coords, velocity);
-      return null;
+    public final Boolean pursue() throws Exception {
+      return prototype.goTo(coords, velocity);
     }
   }
 }

@@ -53,13 +53,7 @@ public class SimpleBullet extends CoordinatedImageTranslationMover implements Pr
     @Override
     public boolean shoot(float x, float y, float velocity) throws InterruptedException {
 
-
         boolean ret = goTo(x, y, velocity);
-
-
-
-//            rotationMover.pushSprite(explodeOnImpactSprite);
-
         nearestTarget = null;
 
         return ret;

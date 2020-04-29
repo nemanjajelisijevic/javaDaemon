@@ -32,7 +32,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target<EnemyDoubleDaemon> {
+public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target<EnemyDoubleDaemon>, Paralyzable<EnemyDoubleDaemon> {
   private Enemy prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
@@ -130,8 +130,8 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
   }
 
   @Override
-  public EnemyDoubleDaemon setAttackable(boolean shootable) {
-    prototype.setAttackable(shootable);
+  public EnemyDoubleDaemon setAttackable(boolean attackable) {
+    prototype.setAttackable(attackable);
     return this;
   }
 
@@ -151,6 +151,12 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
 
   public EnemyDoubleDaemon setTarget(Target target) {
     prototype.setTarget(target);
+    return this;
+  }
+
+  @Override
+  public EnemyDoubleDaemon destroy() {
+    prototype.destroy();
     return this;
   }
 
@@ -338,6 +344,14 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
    * Prototype method {@link com.daemonize.game.Enemy#rotateTowards} */
   public EnemyDoubleDaemon rotateTowards(float x, float y) {
     mainDaemonEngine.pursueQuest(new RotateTowardsIMainQuest(x, y).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
+  public EnemyDoubleDaemon goTo(Pair<Float, Float> coords, float velocity,
+      Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -653,6 +667,25 @@ public class EnemyDoubleDaemon implements EagerDaemon<EnemyDoubleDaemon>, Target
     public final Void pursue() throws Exception {
       prototype.rotateTowards(x, y);
       return null;
+    }
+  }
+
+  private final class GoToIMainQuest extends MainQuest<Boolean> {
+    private Pair<Float, Float> coords;
+
+    private float velocity;
+
+    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
+      this.coords = coords;
+      this.velocity = velocity;
+      this.description = "goTo";
+    }
+
+    @Override
+    public final Boolean pursue() throws Exception {
+      return prototype.goTo(coords, velocity);
     }
   }
 }

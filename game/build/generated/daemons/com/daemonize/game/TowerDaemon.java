@@ -31,7 +31,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon>, Shooter {
+public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon>, Shooter, Paralyzable<TowerDaemon> {
   private Tower prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
@@ -146,8 +146,8 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   }
 
   @Override
-  public TowerDaemon setAttackable(boolean shootable) {
-    prototype.setAttackable(shootable);
+  public TowerDaemon setAttackable(boolean attackable) {
+    prototype.setAttackable(attackable);
     return this;
   }
 
@@ -168,6 +168,12 @@ public class TowerDaemon implements EagerDaemon<TowerDaemon>, Target<TowerDaemon
   @Override
   public void setVelocity(float velocity) {
     prototype.setVelocity(velocity);
+  }
+
+  @Override
+  public TowerDaemon destroy() {
+    prototype.destroy();
+    return this;
   }
 
   @Override

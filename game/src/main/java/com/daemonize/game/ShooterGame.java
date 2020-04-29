@@ -51,7 +51,7 @@ import java.util.TreeSet;
 
 import daemon.com.commandparser.CommandParser;
 import daemon.com.commandparser.CommandParserDaemon;
-import javafx.fxml.FXMLLoader;
+
 
 public class ShooterGame implements DaemonApp<ShooterGame> {
 
@@ -242,6 +242,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Image[] zombieMove315;
 
     AngleToSpriteArray zombieFallAnimation;
+    AngleToSpriteArray zombieBlowUpAnimation;
 
     private ImageView[] zombieViews;
     //private List<SpriteAnimatorDaemon<ConstantSpriteAnimator>> zombieAnimators;
@@ -268,11 +269,13 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private Image bulletImage;
     private Queue<ImageView> bulletViews = new LinkedList<>();
 
+    private SpriteAnimatorDaemon<QueuedSpriteAnimator> bulletHitAnimator;
+    private ImageView bulletHitView;
+
     private Image crosshair;
     private ImageView crosshairView;
 
-    private volatile int bulletDamage = 40;
-
+    private volatile int bulletDamage = 20;
 
     //construct
     public ShooterGame(
@@ -305,31 +308,8 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
         ((ClickController) this.aimController).setCamera(followingCamera);
         this.aimController.setConsumer(gameConsumer);
-//
-//        this.grid = new Grid<Interactible<PlayerDaemon>>(
-//                rows,
-//                columns,
-//                Pair.create(0, 0),
-//                Pair.create(rows - 1, columns - 1),
-//                0,
-//                0,
-//                borderX / columns,
-//                borderX,
-//                borderY
-//        );
 
         ObjectMapper gridLoader = new ObjectMapper();
-
-        //URL url = this.getClass().getProtectionDomain().getCodeSource().getLocation();
-
-        //        URL url = this.getClass().getProtectionDomain().getCodeSource().getLocation();
-//        try {
-//            String jarPath = URLDecoder.decode(url.getFile(), "UTF-8");
-//            activeSoundManager.setJarResourceLocation(jarPath, "");
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-
         InputStream in = getClass().getResourceAsStream("/test.json");
 
         try {
@@ -978,6 +958,30 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     }
                 });
 
+                zombieBlowUpAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
+
+                    switch (angle) {
+                        case 0:
+                            return sheetCutter.cut(172, 180, zombieSprite);
+                        case 45:
+                            return sheetCutter.cut(136, 144, zombieSprite);
+                        case 90:
+                            return sheetCutter.cut(100, 108, zombieSprite);
+                        case 135:
+                            return sheetCutter.cut(64, 72, zombieSprite);
+                        case 180:
+                            return sheetCutter.cut(28, 36, zombieSprite);
+                        case 225:
+                            return sheetCutter.cut(280, 288, zombieSprite);
+                        case 270:
+                            return sheetCutter.cut( 244, 252,zombieSprite);
+                        case 315:
+                            return sheetCutter.cut(208, 216, zombieSprite);
+                        default:
+                            throw new IllegalArgumentException("Angle: " +angle);
+                    }
+                });
+
                 AngleToSpriteArray zombieRiseAnimation = new AngleToSpriteArray(8).mapAllAngles(angle -> {
 
                     Image[] angleSprite = zombieFallAnimation.getSpriteByAngle(angle);
@@ -1031,7 +1035,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     ));
                 }
 
-                int noOfZombies = walkableFields.size() / 50;
+                int noOfZombies = walkableFields.size() / 27;
 
                 zombieViews = new ImageView[noOfZombies];
 
@@ -1177,6 +1181,13 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     );
                 }
 
+                bulletHitView = scene.addImageView(new ImageViewImpl("Bullet Hit View"))
+                        .setAbsoluteX(Float.NaN)
+                        .setAbsoluteY(Float.NaN)
+                        .setImage(miniExplosionSprite[0])
+                        .setZindex(5)
+                        .hide();
+
                 renderer.setScene(scene.lockViews()).start();
 
                 aimController.setOnHoover((float x, float y) -> {
@@ -1194,11 +1205,33 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     fireBullet(player.getLastCoordinates(), Pair.create(x, y), 30);
                 });
 
+
+                bulletHitAnimator = new SpriteAnimatorDaemon<QueuedSpriteAnimator>(
+                        gameConsumer,
+                        new QueuedSpriteAnimator(Float.NaN, Float.NaN)
+                ).setName("Bullet Hit Animator");
+
+                bulletHitAnimator.setAnimateSideQuest(renderer).setClosure(ret -> {
+                    ImageMover.PositionedImage posImg = ret.runtimeCheckAndGet();
+
+                    if(posImg.image == null)
+                        bulletHitView.setAbsoluteX(posImg.positionX)
+                                .setAbsoluteY(posImg.positionY)
+                                .hide();
+                    else
+                        bulletHitView.setAbsoluteX(posImg.positionX)
+                            .setAbsoluteY(posImg.positionY)
+                            .setImage(posImg.image)
+                            .show();
+
+                });
+
+                bulletHitAnimator.start();
+
                 rotationBlocker = new PlayerRotationBlockerDaemon(gameConsumer, new PlayerRotationBlocker()).start();
 
                 player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
                         .goTo(firstField.getCenterCoords(), 12F, ret -> renderer.consume(crosshairView::show));
-
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -1226,16 +1259,23 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 Set<Target> targets = currentField.getObject().getTargets();
 
                 for (Target currentTarget : targets) {
-                    if (ImageTranslationMover.absDistance(currentCoords, currentTarget.getLastCoordinates()) < 50) {
+                    if (ImageTranslationMover.absDistance(currentCoords, currentTarget.getLastCoordinates()) < 70) {
 
                         final ZombieDaemon zombieTarget = ((ZombieDaemon) currentTarget);
+
+                        if(((QueuedSpriteAnimator) bulletHitAnimator.getPrototype()).getQueueSize() < 1)
+                            bulletHitAnimator.setCoords(
+                                    zombieTarget.getLastCoordinates().getFirst(),
+                                    zombieTarget.getLastCoordinates().getSecond()
+                            ).setSprite(miniExplosionSprite);
 
                         int targetHp = currentTarget.getHp();
                         int newTargetHp = targetHp - bulletDamage;
 
                         if (newTargetHp < 1) {
-                            zombieTarget.clearAndInterrupt().animateDirectionalSprite(zombieFallAnimation, () -> {
+                            zombieTarget.clearAndInterrupt().animateDirectionalSprite(zombieBlowUpAnimation, () -> {
                                 zombieTarget.stop();
+                                zombieTarget.getPrototype().currentField.getObject().unsubscribe(zombieTarget);
                                 System.err.println(DaemonUtils.timedTag() + bullet.getName() + " -  Target: " + zombieTarget.getName() + " DESTROYED!!!!!!!!!");
                             });
                         } else {
@@ -1249,8 +1289,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
             }
 
             return null;
-        })
-                .setCoordinateValidator(currentCoords -> {
+        }).setCoordinateValidator(currentCoords -> {
 
             Field<FieldContent> currentField = grid.getField(currentCoords);
 

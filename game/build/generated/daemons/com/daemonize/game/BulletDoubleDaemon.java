@@ -217,6 +217,14 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
   }
 
   /**
+   * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
+  public BulletDoubleDaemon goTo(Pair<Float, Float> coords, float velocity,
+      Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.game.Bullet#rotateAndGoTo} */
   public BulletDoubleDaemon rotateAndGoTo(int angle, float x, float y, float velocityint,
       Closure<Boolean> closure) {
@@ -387,6 +395,25 @@ public class BulletDoubleDaemon implements EagerDaemon<BulletDoubleDaemon> {
     @Override
     public final Boolean pursue() throws Exception {
       return prototype.goTo(x, y, velocityint);
+    }
+  }
+
+  private final class GoToIMainQuest extends MainQuest<Boolean> {
+    private Pair<Float, Float> coords;
+
+    private float velocity;
+
+    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
+      this.coords = coords;
+      this.velocity = velocity;
+      this.description = "goTo";
+    }
+
+    @Override
+    public final Boolean pursue() throws Exception {
+      return prototype.goTo(coords, velocity);
     }
   }
 

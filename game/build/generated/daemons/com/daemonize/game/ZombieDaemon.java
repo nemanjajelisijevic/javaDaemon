@@ -13,7 +13,9 @@ import com.daemonize.daemonengine.quests.SideQuest;
 import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.utils.Pair;
+import com.daemonize.game.grid.Field;
 import com.daemonize.graphics2d.images.Image;
+import com.daemonize.imagemovers.AngleToSpriteArray;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.Movable;
 import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
@@ -31,7 +33,7 @@ import java.lang.Void;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDaemon>, Movable {
+public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDaemon>, Movable, Target<ZombieDaemon> {
   private Zombie prototype;
 
   protected EagerMainQuestDaemonEngine mainDaemonEngine;
@@ -86,13 +88,13 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   }
 
   @Override
-  public int getHp() {
-    return prototype.getHp();
+  public boolean isAttackable() {
+    return prototype.isAttackable();
   }
 
-  public ZombieDaemon pushSprite(Image[] sprite) throws InterruptedException {
-    prototype.pushSprite(sprite);
-    return this;
+  @Override
+  public int getHp() {
+    return prototype.getHp();
   }
 
   public ZombieDaemon setSpriteIterator(SpriteIterator spriteiterator) {
@@ -112,6 +114,12 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   @Override
   public ZombieDaemon setMaxHp(int maxhp) {
     prototype.setMaxHp(maxhp);
+    return this;
+  }
+
+  @Override
+  public ZombieDaemon setAttackable(boolean attackable) {
+    prototype.setAttackable(attackable);
     return this;
   }
 
@@ -135,6 +143,21 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
 
   public double absDistance(float x1, float y1, float x2, float y2) {
     return prototype.absDistance(x1, y1, x2, y2);
+  }
+
+  @Override
+  public ZombieDaemon destroy() {
+    prototype.destroy();
+    return this;
+  }
+
+  public ZombieDaemon setCurrentField(Field<ShooterGame.FieldContent> currentfield) {
+    prototype.setCurrentField(currentfield);
+    return this;
+  }
+
+  public Field<ShooterGame.FieldContent> getCurrentField() {
+    return prototype.getCurrentField();
   }
 
   public Image iterateSprite() {
@@ -190,9 +213,37 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   }
 
   /**
+   * Prototype method {@link com.daemonize.game.Zombie#pushSprite} */
+  public ZombieDaemon pushSprite(Image[] sprite, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new PushSpriteMainQuest(sprite, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Zombie#rotateTowards} */
+  public ZombieDaemon rotateTowards(Pair<Float, Float> coords) {
+    mainDaemonEngine.pursueQuest(new RotateTowardsMainQuest(coords).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Zombie#animateDirectionalSprite} */
+  public ZombieDaemon animateDirectionalSprite(AngleToSpriteArray animation, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new AnimateDirectionalSpriteMainQuest(animation, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
    * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
   public ZombieDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
     mainDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.game.Zombie#sleepAndRet} */
+  public ZombieDaemon sleepAndRet(long ms, Runnable retRun) {
+    mainDaemonEngine.pursueQuest(new SleepAndRetMainQuest(ms, retRun, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -206,7 +257,14 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
   /**
    * Prototype method {@link com.daemonize.game.Zombie#rotateTowards} */
   public ZombieDaemon rotateTowards(float x, float y) {
-    mainDaemonEngine.pursueQuest(new RotateTowardsMainQuest(x, y).setConsumer(mainDaemonEngine.getConsumer()));
+    mainDaemonEngine.pursueQuest(new RotateTowardsIMainQuest(x, y).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
+  public ZombieDaemon goTo(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -333,6 +391,56 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
     }
   }
 
+  private final class PushSpriteMainQuest extends ReturnVoidMainQuest {
+    private Image[] sprite;
+
+    private PushSpriteMainQuest(Image[] sprite, Runnable retRun,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
+      this.sprite = sprite;
+      this.description = "pushSprite";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.pushSprite(sprite);
+      return null;
+    }
+  }
+
+  private final class RotateTowardsMainQuest extends VoidMainQuest {
+    private Pair<Float, Float> coords;
+
+    private RotateTowardsMainQuest(Pair<Float, Float> coords) {
+      super();
+      this.coords = coords;
+      this.description = "rotateTowards";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.rotateTowards(coords);
+      return null;
+    }
+  }
+
+  private final class AnimateDirectionalSpriteMainQuest extends ReturnVoidMainQuest {
+    private AngleToSpriteArray animation;
+
+    private AnimateDirectionalSpriteMainQuest(AngleToSpriteArray animation, Runnable retRun,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
+      this.animation = animation;
+      this.description = "animateDirectionalSprite";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.animateDirectionalSprite(animation);
+      return null;
+    }
+  }
+
   private final class GoToMainQuest extends MainQuest<Boolean> {
     private float x;
 
@@ -355,6 +463,22 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
     }
   }
 
+  private final class SleepAndRetMainQuest extends ReturnVoidMainQuest {
+    private long ms;
+
+    private SleepAndRetMainQuest(long ms, Runnable retRun, ClosureExecutionWaiter closureAwaiter) {
+      super(retRun, closureAwaiter);
+      this.ms = ms;
+      this.description = "sleepAndRet";
+    }
+
+    @Override
+    public final Void pursue() throws Exception {
+      prototype.sleepAndRet(ms);
+      return null;
+    }
+  }
+
   private final class SleepMainQuest extends VoidMainQuest {
     private long ms;
 
@@ -371,12 +495,12 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
     }
   }
 
-  private final class RotateTowardsMainQuest extends VoidMainQuest {
+  private final class RotateTowardsIMainQuest extends VoidMainQuest {
     private float x;
 
     private float y;
 
-    private RotateTowardsMainQuest(float x, float y) {
+    private RotateTowardsIMainQuest(float x, float y) {
       super();
       this.x = x;
       this.y = y;
@@ -387,6 +511,25 @@ public class ZombieDaemon implements EagerDaemon<ZombieDaemon>, Mortal<ZombieDae
     public final Void pursue() throws Exception {
       prototype.rotateTowards(x, y);
       return null;
+    }
+  }
+
+  private final class GoToIMainQuest extends MainQuest<Boolean> {
+    private Pair<Float, Float> coords;
+
+    private float velocity;
+
+    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
+      this.coords = coords;
+      this.velocity = velocity;
+      this.description = "goTo";
+    }
+
+    @Override
+    public final Boolean pursue() throws Exception {
+      return prototype.goTo(coords, velocity);
     }
   }
 }
