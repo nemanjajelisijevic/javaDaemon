@@ -26,12 +26,12 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
     private GraphicsContext gc;
 
 
-    private class CameraSceneDrawer implements SceneDrawer {
+    private class JavaFxCameraSceneDrawer implements SceneDrawer {
 
         private Camera2D camera2D;
         private int cameraX, cameraY;
 
-        public CameraSceneDrawer setCamera2D(Camera2D camera2D) {
+        public JavaFxCameraSceneDrawer setCamera2D(Camera2D camera2D) {
             this.camera2D = camera2D;
             this.cameraX = camera2D.getRenderingX();
             this.cameraY = camera2D.getRenderingY();
@@ -83,12 +83,12 @@ public class JavaFXRenderer implements Renderer2D<JavaFXRenderer> {
         this.width = width;
         this.height = height;
         this.drawConsumer = new DrawConsumer(this, "Renderer draw consumer", closureQueueSize);
-        this.sceneDrawer = new CameraSceneDrawer();
+        this.sceneDrawer = new JavaFxCameraSceneDrawer();
     }
 
     @Override
     public JavaFXRenderer setCamera(Camera2D camera) {
-        ((CameraSceneDrawer) sceneDrawer).setCamera2D(camera);
+        ((JavaFxCameraSceneDrawer) sceneDrawer).setCamera2D(camera);
         return this;
     }
 

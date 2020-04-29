@@ -7,6 +7,7 @@ import com.daemonize.daemonengine.consumer.DaemonConsumer;
 import com.daemonize.daemonengine.daemonscript.DaemonChainScript;
 import com.daemonize.daemonengine.dummy.DummyDaemon;
 import com.daemonize.daemonengine.implementations.EagerMainQuestDaemonEngine;
+import com.daemonize.daemonengine.implementations.MainQuestDaemonEngine;
 import com.daemonize.daemonengine.quests.VoidMainQuest;
 import com.daemonize.daemonengine.quests.VoidQuest;
 import com.daemonize.daemonengine.utils.DaemonUtils;
@@ -33,6 +34,7 @@ import com.daemonize.imagemovers.AngleToSpriteArray;
 import com.daemonize.imagemovers.ImageMover;
 import com.daemonize.imagemovers.ImageTranslationMover;
 import com.daemonize.imagemovers.Movable;
+import com.daemonize.imagemovers.RotatingSpriteImageMover;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -54,6 +56,28 @@ import daemon.com.commandparser.CommandParserDaemon;
 
 
 public class ShooterGame implements DaemonApp<ShooterGame> {
+
+    private static class LaserAnimateClosure implements Closure<List<ImageMover.PositionedImage>> {
+
+        private List<ImageView> photonViews;
+
+        public LaserAnimateClosure(List<ImageView> photonViews) {
+            this.photonViews = photonViews;
+        }
+
+        @Override
+        public void onReturn(Return<List<ImageMover.PositionedImage>> ret) {
+
+            List<ImageMover.PositionedImage> photons = ret.get();
+
+            for (int i = 0; i < photons.size(); ++i)
+                photonViews.get(i)
+                        .setAbsoluteX(photons.get(i).positionX)
+                        .setAbsoluteY(photons.get(i).positionY)
+                        .setImage(photons.get(i).image);
+        }
+    }
+
 
     private static class ZombieAnimateClosure implements Closure<ImageMover.PositionedImage> {
 
@@ -276,6 +300,12 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
     private ImageView crosshairView;
 
     private volatile int bulletDamage = 20;
+
+    //laser
+//    private LaserBulletDaemon laser;
+//    private List<ImageView> laserViews;
+//    private Image[] laserSprite;
+//    private int laserViewNo = 50;
 
     //construct
     public ShooterGame(
@@ -699,138 +729,157 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
                         Pair<Float, Float> ret = player.getLastCoordinates();
 
-
-
                             Field firstNeighbour;
 
                             switch (dir) {
                                 case UP:
 
-                                    firstNeighbour = neighbors.get(1);
+                                    if (neighbors.size() > 1) {
+                                        firstNeighbour = neighbors.get(1);
 
-                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
-                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
-                                    ) {
-                                        if (firstNeighbour.isWalkable())
-                                            ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
-                                        else if (neighbors.get(0).isWalkable())
-                                            ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
-                                        else if (neighbors.get(2).isWalkable())
-                                            ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                        if (firstNeighbour != null && firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                                && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                        ) {
+                                            if (firstNeighbour.isWalkable())
+                                                ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                            else if (neighbors.get(0).isWalkable())
+                                                ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                            else if (neighbors.get(2).isWalkable())
+                                                ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                        }
                                     }
                                     break;
                                 case DOWN:
 
-                                    firstNeighbour = neighbors.get(6);
+                                    if (neighbors.size() > 6) {
 
-                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
-                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
-                                    ) {
 
-                                        if (neighbors.get(6).isWalkable())
-                                            ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
-                                        else if (neighbors.get(5).isWalkable())
-                                            ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
-                                        else if (neighbors.get(7).isWalkable())
-                                            ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                        firstNeighbour = neighbors.get(6);
+
+                                        if (firstNeighbour != null && firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                                && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                        ) {
+
+                                            if (neighbors.get(6).isWalkable())
+                                                ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                            else if (neighbors.get(5).isWalkable())
+                                                ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                            else if (neighbors.get(7).isWalkable())
+                                                ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                        }
                                     }
                                     break;
                                 case RIGHT:
 
-                                    firstNeighbour = neighbors.get(4);
+                                    if (neighbors.size() > 4) {
 
-                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
-                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
-                                    ) {
+                                        firstNeighbour = neighbors.get(4);
+
+                                        if (firstNeighbour != null && firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                                && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                        ) {
 
 
-                                        if (neighbors.get(4).isWalkable())
-                                            ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
-                                        else if (neighbors.get(2).isWalkable())
-                                            ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
-                                        else if (neighbors.get(7).isWalkable())
-                                            ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                            if (neighbors.get(4).isWalkable())
+                                                ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                            else if (neighbors.get(2).isWalkable())
+                                                ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                            else if (neighbors.get(7).isWalkable())
+                                                ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                        }
                                     }
                                     break;
                                 case LEFT:
 
-                                    firstNeighbour = neighbors.get(3);
+                                    if (neighbors.size() > 3) {
+                                        firstNeighbour = neighbors.get(3);
 
-                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
-                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
-                                    ) {
+                                        if (firstNeighbour != null && firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                                && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                        ) {
 
-                                        if (neighbors.get(3).isWalkable())
-                                            ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
-                                        else if (neighbors.get(0).isWalkable())
-                                            ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
-                                        else if (neighbors.get(5).isWalkable())
-                                            ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                            if (neighbors.get(3).isWalkable())
+                                                ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                            else if (neighbors.get(0).isWalkable())
+                                                ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                            else if (neighbors.get(5).isWalkable())
+                                                ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                        }
                                     }
                                     break;
                                 case UP_RIGHT:
 
-                                    firstNeighbour = neighbors.get(2);
+                                    if (neighbors.size() > 2) {
 
-                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
-                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
-                                    ) {
 
-                                        if (neighbors.get(2).isWalkable())
-                                            ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
-                                        else if (neighbors.get(1).isWalkable())
-                                            ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
-                                        else if (neighbors.get(4).isWalkable())
-                                            ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                        firstNeighbour = neighbors.get(2);
+
+                                        if (firstNeighbour != null && firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                                && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                        ) {
+
+                                            if (neighbors.get(2).isWalkable())
+                                                ret = Pair.create(neighbors.get(2).getCenterX(), neighbors.get(2).getCenterY());
+                                            else if (neighbors.get(1).isWalkable())
+                                                ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                            else if (neighbors.get(4).isWalkable())
+                                                ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                        }
                                     }
                                     break;
                                 case UP_LEFT:
+                                    if (neighbors.size() > 0) {
 
-                                    firstNeighbour = neighbors.get(0);
+                                        firstNeighbour = neighbors.get(0);
 
-                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
-                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
-                                    ) {
+                                        if (firstNeighbour != null && firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                                && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                        ) {
 
-                                        if (neighbors.get(0).isWalkable())
-                                            ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
-                                        else if (neighbors.get(3).isWalkable())
-                                            ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
-                                        else if (neighbors.get(1).isWalkable())
-                                            ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                            if (neighbors.get(0).isWalkable())
+                                                ret = Pair.create(neighbors.get(0).getCenterX(), neighbors.get(0).getCenterY());
+                                            else if (neighbors.get(3).isWalkable())
+                                                ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                            else if (neighbors.get(1).isWalkable())
+                                                ret = Pair.create(neighbors.get(1).getCenterX(), neighbors.get(1).getCenterY());
+                                        }
                                     }
                                     break;
                                 case DOWN_RIGHT:
 
-                                    firstNeighbour = neighbors.get(7);
+                                    if (neighbors.size() > 7) {
+                                        firstNeighbour = neighbors.get(7);
 
-                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
-                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
-                                    ) {
+                                        if (firstNeighbour != null && firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                                && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                        ) {
 
-                                        if (neighbors.get(7).isWalkable())
-                                            ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
-                                        else if (neighbors.get(4).isWalkable())
-                                            ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
-                                        else if (neighbors.get(6).isWalkable())
-                                            ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                            if (neighbors.get(7).isWalkable())
+                                                ret = Pair.create(neighbors.get(7).getCenterX(), neighbors.get(7).getCenterY());
+                                            else if (neighbors.get(4).isWalkable())
+                                                ret = Pair.create(neighbors.get(4).getCenterX(), neighbors.get(4).getCenterY());
+                                            else if (neighbors.get(6).isWalkable())
+                                                ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                        }
                                     }
                                     break;
                                 case DOWN_LEFT:
 
-                                    firstNeighbour = neighbors.get(5);
+                                    if (neighbors.size() > 5) {
+                                        firstNeighbour = neighbors.get(5);
 
-                                    if (firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
-                                            && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
-                                    ) {
+                                        if (firstNeighbour != null && firstNeighbour.getRow() < rows && firstNeighbour.getColumn() >= 0
+                                                && firstNeighbour.getColumn() < columns && firstNeighbour.getColumn() >= 0
+                                        ) {
 
 
-                                        if (neighbors.get(5).isWalkable())
-                                            ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
-                                        else if (neighbors.get(3).isWalkable())
-                                            ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
-                                        else if (neighbors.get(6).isWalkable())
-                                            ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                            if (neighbors.get(5).isWalkable())
+                                                ret = Pair.create(neighbors.get(5).getCenterX(), neighbors.get(5).getCenterY());
+                                            else if (neighbors.get(3).isWalkable())
+                                                ret = Pair.create(neighbors.get(3).getCenterX(), neighbors.get(3).getCenterY());
+                                            else if (neighbors.get(6).isWalkable())
+                                                ret = Pair.create(neighbors.get(6).getCenterX(), neighbors.get(6).getCenterY());
+                                        }
                                     }
                                     break;
                                 default:
@@ -1168,7 +1217,7 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     });
                 }
 
-                bulletImage = imageManager.loadImageFromAssets("thebarnstarRed.png", cameraWidth / 70, cameraWidth / 70);
+                bulletImage = imageManager.loadImageFromAssets("thebarnstarBlack.png", cameraWidth / 70, cameraWidth / 70);
 
                 for (int i = 0; i < 30; ++i) {
                     bulletViews.add(
@@ -1188,8 +1237,6 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                         .setZindex(5)
                         .hide();
 
-                renderer.setScene(scene.lockViews()).start();
-
                 aimController.setOnHoover((float x, float y) -> {
 
                     renderer.consume(() -> {//TODO encapsulate
@@ -1205,6 +1252,40 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                     fireBullet(player.getLastCoordinates(), Pair.create(x, y), 30);
                 });
 
+//                laserSprite = new Image[] {imageManager.loadImageFromAssets("greenPhoton.png",  cameraWidth / 80, cameraWidth / 80)};
+//
+//                //laser views init
+//                laserViews = new ArrayList<>(laserViewNo);
+//
+//                Image[] loadingSprite = new Image[] {imageManager.loadImageFromAssets("greenPhoton.png", borderX / 150, borderX / 150)};
+//
+//                int startX = borderX / 5;
+//                int endX = borderX * 4 / 5;
+//
+//                int step = (endX - startX) / laserViewNo;
+//
+//                for (int i = 0; i < laserViewNo; ++i) {
+//                    int currX = startX + (i * step);
+//                    laserViews.add(
+//                            scene.addImageView(
+//                            new ImageViewImpl("laser View " + i)
+//                                    .setImage(loadingSprite[0])
+//                                    .hide()
+//                                    .setAbsoluteX(currX)
+//                                    .setAbsoluteY(borderY * 3 / 4)
+//                                    .setZindex(1)
+//                    ));
+//                }
+//
+//                //laser init
+//                laser = new LaserBulletDaemon(
+//                        gameConsumer,
+//                        new LaserBullet(laserSprite, Pair.create(0F, 0F), bulletDamage, dXY)
+//                ).setViews(laserViews);
+//
+//                laser.setVelocity(40);
+//                laser.setAnimateLaserSideQuest(renderer).setClosure(new LaserAnimateClosure(laserViews));
+//
 
                 bulletHitAnimator = new SpriteAnimatorDaemon<QueuedSpriteAnimator>(
                         gameConsumer,
@@ -1229,6 +1310,10 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
                 bulletHitAnimator.start();
 
                 rotationBlocker = new PlayerRotationBlockerDaemon(gameConsumer, new PlayerRotationBlocker()).start();
+
+
+                renderer.setScene(scene.lockViews()).start();
+
 
                 player.rotateTowards(firstField.getCenterX(), firstField.getCenterY())
                         .goTo(firstField.getCenterCoords(), 12F, ret -> renderer.consume(crosshairView::show));
@@ -1339,5 +1424,37 @@ public class ShooterGame implements DaemonApp<ShooterGame> {
 
         //System.out.println(DaemonUtils.timedTag() + "Bullet STARTED at: " + sourceCoords + ", Field[" + startingField.getRow() + "][" + startingField.getColumn() + "]");
     }
+
+
+
+//    public void fireLaser(
+//            Pair<Float, Float> source,
+//            Target target,
+//            float velocity,
+//            long duration,
+//            Runnable destructionClosure
+//    ) {
+//
+//        //targetPar.setParalyzed(true);
+//        ZombieDaemon enemyTarget = ((ZombieDaemon) target);
+//
+//        //currentSoundManager.playSound(laserSound);
+//
+//
+//        laser.desintegrateTarget(source, target, duration, renderer, ret -> {
+//
+//            if (!ret.runtimeCheckAndGet())
+//                return;
+//
+//            int newHp = enemyTarget.getHp() - laser.getDamage();
+//            if (newHp > 0) {
+//
+//                enemyTarget.setHp(newHp);
+//                enemyTarget.setVelocity(velocity);
+//
+//            } else
+//                destructionClosure.run();
+//        });
+//    }
 }
 
