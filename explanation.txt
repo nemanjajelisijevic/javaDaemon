@@ -1,14 +1,14 @@
 What is it?
 
-	JavaDaemon is a framework for creating multithreaded and reactive apps in Java. I found it to be useful for making games.
-	2D games for now, but I recently started working on incorporating it with OpenGl and hope to build a full blown 3D game engine.
+	JavaDaemon is a framework in development for creating multithreaded and reactive apps in Java. I found it to be useful for making games.
+	2D games for now, but lately I started working on incorporating it with OpenGl and hope to build a full blown 3D game engine.
 
-	And this is my first step towards producing a multiplatform game development framework, purely based on Java as the language 
+	This is my first step towards producing a multiplatform game development framework, purely based on Java as the language 
 	of choice. Of course, not something that could compare to big AAA game engines, but something that could be useful and fun 
-	to use.
+	to use in smaller scale games for the time being.
 	
 	That being said, it is not bound to game development only, it can be used in various kind of apps (Android, java desktop
-	apps, even server side stuff...).
+	apps, even building server side components...).
 
 	With little modifications, it can be made to work with Kotlin too.
 
@@ -50,11 +50,10 @@ Conteptual overview of javaDaemon
 
 	Consumer:
 
-		The most used architecture in non-server (client) application frameworks is the event-loop based one. And I've done 
-		Android, C++ with Qt, Windows Visual C++...
+		Today, the most used architecture in application frameworks is the event-loop based one.
 
-		Event loop (also called a consumer thread) is, as the word says: a loop. A loop that is executed by a dedicated thread, 
-		and holds a certain condition (synchronization primitive) to regulate its idle time (awaiting on a condition) so it
+		Event loop is a loop that is executed by one thread, main or dedicated, constantly checking on a certain condition 
+		(synchronization primitive) to regulate its idle time (awaiting on a condition) so it
 		wouldn't eat up CPU cycles needlessly when there is nothing to be computed. Thus, its only active when an event is
 		dispatched to it, it reacts to the event by running some developer specifiied procedure.
 
