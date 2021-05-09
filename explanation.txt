@@ -1,11 +1,11 @@
 What is it?
 
-	JavaDaemon is a framework in development for creating multithreaded and reactive apps in Java. I found it to be useful for making games.
-	2D games for now, but lately I started working on incorporating it with OpenGl and hope to build a full blown 3D game engine.
-
-	This is my first step towards producing a multiplatform game development framework, purely based on Java as the language 
-	of choice. Of course, not something that could compare to big AAA game engines, but something that could be useful and fun 
-	to use in smaller scale games for the time being.
+	JavaDaemon is an annotation processing tool (APT) that generates active objects (service wrapper classes) based on annotated user defined
+	prototype classes. It can be used for creating multithreaded and reactive apps for JVM. I found it to be useful for making games.
+	2D games for now, but with OpenGl it could become a full blown 3D multiplatform game engine.
+	
+	Of course, not something that could compare to big AAA engines, but something that could be useful and fun 
+	to use in smaller scale games for now but with potential for aggressive expansure.
 	
 	That being said, it is not bound to game development only, it can be used in various kind of apps (Android, java desktop
 	apps, even building server side components...).
@@ -16,36 +16,35 @@ About multithreading and concurrency:
 
 	Multithreading is integral in todays software development, as it allows the program to leverage the power of
 	multiple CPU cores, executng tasks fully in parrallel, making the program faster and more modular in a sense of
-	distributing tasks. 
+	distributing tasks. Most so in games.
 	
-	But programming a multithreaded app with only the language constructs like threads and synchronization primitives can
-	be hard and tedious task. Many frameworks include their own solution for easing the concurrency usage by the app developer,
+	Programming a multithreaded app with only the language constructs like threads and synchronization primitives can
+	be a tedious task. Many SDKs and frameworks include their own solution for easing the concurrency usage by the app developer,
 	and there is a variety of libraries and frameworks to choose from.
 	
-	As Java developers most certanly know, one of most popular Java libraries is Recative Extensions for Java or RXJava, which I used at work on daily basis.
-
-	JavaDaemon has the same goal as ReactiveX (RXJava) library, but different approach. Like RXJava its a combination of OOP
-	and functional programming. While RX framework is based on Observer software design pattern which can decouple subscribers
-	and observers, not just to be independent compilation units and help code reuse, but to run in different threads, this
-	framework is based on Active Object concurrency pattern and producer-consumer app building pattern.
+	As many developers most certanly know, there is RXJava, and functionwise javaDaemon is same.
+	While RXJava relies on the observer design pattern to decouple subscribers and observers,
+	not just to be independent compilation units and help code reuse, but to run in different threads,
+	javaDaemon uses annotation processing to generate asynchronous versions of user designed classes.
 
 	Furthermore, the concepts that make this possible in Java, can be applied to any OOP language in which a user has access to a compiler
-	(langauages running on JVM) or sufficiently developed meta programming (generic type) system like C++ templates.
+	(langauages running on JVM) or sufficiently developed generic type system like C++ templates.
 
-	Concurrency on steroids, is maybe a better way to describe it.
+	Its a combination of OOP and functional programming for concurrency on steroids, is maybe a better way to describe it.
 
-	Wait, what are those mentioned patterns?
-
+	What are those mentioned patterns?
 	The Active Object design pattern decouples method execution from method invocation for objects that each reside in their 
 	own thread of execution.
-	The Producer/Consumer pattern is used to decouple processes that produce and consume data at different rates.
+	The Producer/Consumer pattern is used to decouple threads that produce and consume data at different rates.
 
 So, to start off with the basics.
 
 Conteptual overview of javaDaemon
 
-	Daemon framework is based on two main components: Daemons and Consumers, as I decided to name them in a state of exhaustion that followed hours (days)
-	of trying to come up with a name that made sense. 
+	Technically, its just two java libraries. DaemonEngine and DaemonProcessor. Engine lib contains threading plumbing and service api
+	and processor is a java compiler plugin for generating specific service wrapper classes based on user defined ones.
+
+	From users perspective there are also two main components: Daemons and Consumers. 
 	
 	For the sake of clarity, the concept of Consumers will be explained first. 
 
@@ -96,15 +95,15 @@ Conteptual overview of javaDaemon
 
 	The Daemon:
 
-		Daemon is the other part of the framework. The main part. The project namebearer. Daemon is 
+		Daemon is the other part of the framework. The namebearer. It is 
 		named after daemon process in unix like OSes. In that sense, a daemon is a long-running background process 
 		that answers requests for specific services provided by the OS.
 		
 		Again, as with the consumer, there is a name discrepancy, because the
-		built-in java user Thread can be made daemon (programs main thread will not wait for it to run out of scope or join).
+		built-in java user Thread can be made daemon (programs main thread will not wait for it to join).
 		
-		The Daemon represents user defined class instance or object in form of an active object. An active object because it 
-		encapsulates a dedicated thread (or as we will see later, more than one).
+		The Daemon represents user defined object in form of an active object. An active object because it 
+		encapsulates a dedicated thread (or more than one).
 		Any kind of user defined class can be used as a prototype for a Daemon. Furthermore, all the logic of users methods and 
 		state of the member fields are undisturbed by presence of Daemons.
 		(I've pondered on writing an epic fantasy novel about a small and miserable POJO object, which obtains a Daemon armor 
@@ -125,7 +124,7 @@ Conteptual overview of javaDaemon
 				}
 			}
 
-		a Daemon wrapper class would look like:
+		a generated Daemon wrapper class would look like:
 
 			public class UserDefinedStringEditorDaemon implements Daemon {
 
