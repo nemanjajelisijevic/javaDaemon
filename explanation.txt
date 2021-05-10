@@ -150,7 +150,8 @@ Conteptual overview of javaDaemon
 		
 			stringEditDaemon.start().editString("Example string", returnString -> { 
 				
-				//Make use of the return sthring that has beeen edited in stringEditDaemons dedicated thread...
+				//Make use of the returnString (return value of the original UserDefinedStringEditor::editString method) 
+				//that has been edited in the dedicated thread of stringEditDaemon...
 				
 				stringEditDaemon.stop();
 			});
