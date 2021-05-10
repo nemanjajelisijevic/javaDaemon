@@ -121,7 +121,7 @@ Conteptual overview of javaDaemon
 
 				@Daemonize
 				public String editString(String original) {
-					// edit original string as you see fit...
+					// long running algorithm...
 				}
 			}
 
