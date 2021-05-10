@@ -113,7 +113,8 @@ Conteptual overview of javaDaemon
 		constructor parameter, encapsulating the reference to it, and maps marked (annotated) PUBLIC, user written, 
 		prototype method to their asynchronous counterpart.
 		
-		So, where a user defined class migght look like this:
+		So, if there was an extremly complicated and long running algorithm for some kind of string editing,
+		a user defined class migght look like this:
 		
 			@Daemon
 			public class UserDefinedStringEditor {
