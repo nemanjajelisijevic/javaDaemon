@@ -1,6 +1,6 @@
 What is it?
 
-	JavaDaemon is an annotation processing tool (APT) that generates active objects (service wrapper classes) based on annotated user defined
+	JavaDaemon is an annotation processing tool (java compiler plugin) that generates active objects (service wrapper classes) based on annotated user defined
 	prototype classes. It can be used for creating multithreaded and reactive apps for JVM. I found it to be useful for making games.
 	2D games for now, but with OpenGl it could become a full blown 3D multiplatform game engine.
 	
