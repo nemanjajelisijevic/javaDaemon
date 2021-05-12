@@ -106,8 +106,6 @@ Conteptual overview of javaDaemon
 		encapsulates a dedicated thread (or more than one).
 		Any kind of user defined class can be used as a prototype for a Daemon. Furthermore, all the logic of users methods and 
 		state of the member fields are undisturbed by presence of Daemons.
-		(I've pondered on writing an epic fantasy novel about a small and miserable POJO object, which obtains a Daemon armor 
-		and sets off in series of adventures along the continent of Java :))
 
 		So, basically, Daemon is a class wrapper for developer written prototype class. It accepts users prototype class as a 
 		constructor parameter, encapsulating the reference to it, and maps marked (annotated) PUBLIC, user written, 
@@ -155,8 +153,9 @@ Conteptual overview of javaDaemon
 				
 				stringEditDaemon.stop();
 			});
-		
-		
+
+	
+	
 		To break this down. As the example showcases, an instance of UserDefinedStringEditorDaemon has been allocated with its
 		user defined prototype as a second constructor argument. The first argument represents the Consumer object reference (the event loop)
 		that will execute the closures passed do daemonized methods in its own thread context. 
@@ -167,9 +166,7 @@ Conteptual overview of javaDaemon
 		
 		
 		
-		
-		
-
+	
 
 
 		Just public methods. Privates and protecteds access modifiers make no sense in this context, thus enforcing the user 
