@@ -92,6 +92,10 @@ Conteptual overview of javaDaemon
 		So, the Consumer type in javaDaemon is a class that encapsulates an event loop thread that executes all fuction objects and 
 		Closures dispatched to it by other threads. Consumer can be the main (GUI) thread itself or it can be a standalone thread, however the 
 		developer chooses to implement it.
+		
+		
+		
+		
 
 	The Daemon:
 
