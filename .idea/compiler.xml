@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$PROJECT_DIR$/daemonprocessor/build/libs/daemonprocessor.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/javapoet/1.9.0/ecc5cf9c221d55481163e773b24336db149e51/javapoet-1.9.0.jar" />
+        </processorPath>
+        <module name="javaDaemon.game" />
+        <module name="javaDaemon.commandparser" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="javaDaemon.commandparser" target="1.7" />
+      <module name="javaDaemon.daemonengine" target="1.7" />
+      <module name="javaDaemon.daemonprocessor" target="1.7" />
+      <module name="javaDaemon.game" target="1.8" />
+      <module name="javaDaemon.graphics2d" target="1.7" />
+      <module name="javaDaemon.imagemovers" target="1.7" />
+      <module name="javaDaemon.javafxgraphics2d" target="1.7" />
+      <module name="javaDaemon.javafxmain" target="11" />
+      <module name="javaDaemon.javafxsound" target="1.7" />
+      <module name="javaDaemon.sound" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -38,17 +38,17 @@ public class PlayerDaemon implements EagerDaemon<PlayerDaemon>, Target<PlayerDae
 
   protected SideQuestDaemonEngine sideDaemonEngine;
 
-  protected EagerMainQuestDaemonEngine rotateDaemonEngine;
-
   protected EagerMainQuestDaemonEngine coordBroadcasterDaemonEngine;
+
+  protected EagerMainQuestDaemonEngine rotateDaemonEngine;
 
   protected EagerMainQuestDaemonEngine interactDaemonEngine;
 
   public PlayerDaemon(Consumer consumer, Player prototype) {
     this.mainDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.sideDaemonEngine = new SideQuestDaemonEngine().setName(this.getClass().getSimpleName() + " - SIDE");
-    this.rotateDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - rotateDaemonEngine");
     this.coordBroadcasterDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - coordBroadcasterDaemonEngine");
+    this.rotateDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - rotateDaemonEngine");
     this.interactDaemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName() + " - interactDaemonEngine");
     this.prototype = prototype;
   }

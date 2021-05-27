@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects.javaDaemon.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects.javaDaemon.iml" />
       <module fileurl="file://$PROJECT_DIR$/androidgraphics2d/androidgraphics2d.iml" filepath="$PROJECT_DIR$/androidgraphics2d/androidgraphics2d.iml" />
       <module fileurl="file://$PROJECT_DIR$/androidsound/androidsound.iml" filepath="$PROJECT_DIR$/androidsound/androidsound.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
@@ -12,6 +13,16 @@
       <module fileurl="file://$PROJECT_DIR$/graphics2d/graphics2d.iml" filepath="$PROJECT_DIR$/graphics2d/graphics2d.iml" />
       <module fileurl="file://$PROJECT_DIR$/imagemovers/imagemovers.iml" filepath="$PROJECT_DIR$/imagemovers/imagemovers.iml" />
       <module fileurl="file://$PROJECT_DIR$/javaDaemon.iml" filepath="$PROJECT_DIR$/javaDaemon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/commandparser/javaDaemon.commandparser.iml" filepath="$PROJECT_DIR$/.idea/modules/commandparser/javaDaemon.commandparser.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/daemonengine/javaDaemon.daemonengine.iml" filepath="$PROJECT_DIR$/.idea/modules/daemonengine/javaDaemon.daemonengine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/daemonprocessor/javaDaemon.daemonprocessor.iml" filepath="$PROJECT_DIR$/.idea/modules/daemonprocessor/javaDaemon.daemonprocessor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/game/javaDaemon.game.iml" filepath="$PROJECT_DIR$/.idea/modules/game/javaDaemon.game.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/graphics2d/javaDaemon.graphics2d.iml" filepath="$PROJECT_DIR$/.idea/modules/graphics2d/javaDaemon.graphics2d.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/imagemovers/javaDaemon.imagemovers.iml" filepath="$PROJECT_DIR$/.idea/modules/imagemovers/javaDaemon.imagemovers.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/javafxgraphics2d/javaDaemon.javafxgraphics2d.iml" filepath="$PROJECT_DIR$/.idea/modules/javafxgraphics2d/javaDaemon.javafxgraphics2d.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/javafxmain/javaDaemon.javafxmain.iml" filepath="$PROJECT_DIR$/.idea/modules/javafxmain/javaDaemon.javafxmain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/javafxsound/javaDaemon.javafxsound.iml" filepath="$PROJECT_DIR$/.idea/modules/javafxsound/javaDaemon.javafxsound.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/sound/javaDaemon.sound.iml" filepath="$PROJECT_DIR$/.idea/modules/sound/javaDaemon.sound.iml" />
       <module fileurl="file://$PROJECT_DIR$/javafxgraphics2d/javafxgraphics2d.iml" filepath="$PROJECT_DIR$/javafxgraphics2d/javafxgraphics2d.iml" />
       <module fileurl="file://$PROJECT_DIR$/javafxmain/javafxmain.iml" filepath="$PROJECT_DIR$/javafxmain/javafxmain.iml" />
       <module fileurl="file://$PROJECT_DIR$/javafxsound/javafxsound.iml" filepath="$PROJECT_DIR$/javafxsound/javafxsound.iml" />
