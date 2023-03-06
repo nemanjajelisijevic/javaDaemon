@@ -8,6 +8,7 @@ gif showing the sample. For the implementation glimpse see:
 https://github.com/nemanjajelisijevic/javaDaemon/blob/master/game/src/main/java/com/daemonize/game/ShooterGame.java
 
 ![Alt Text](https://github.com/nemanjajelisijevic/javaDaemon/blob/master/game/assets/towerDefenseDemo.gif)
+
 ![Alt Text](https://github.com/nemanjajelisijevic/javaDaemon/blob/master/game/assets/shooterGameplay.gif)
 
 //Annotation processors : on.
