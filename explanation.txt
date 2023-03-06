@@ -1,120 +1,180 @@
 What is it?
 
-	JavaDaemon is a framework for creating multithreaded and reactive apps in Java. I found it to be useful for making games.
-	2D games for now, but I recently started working on incorporating it with OpenGl and hope to build a full blown 3D game engine.
-
-	And this is my first step towards producing a multiplatform game development framework, purely based on Java as the language 
-	of choice. Of course, not something that could compare to big AAA game engines, but something that could be useful and fun 
-	to use.
+	JavaDaemon is an annotation processing tool (java compiler plugin) that generates active objects (service wrapper classes) based on annotated user defined
+	prototype classes. It can be used for creating multithreaded and reactive apps for JVM. I found it to be useful for making games.
+	2D games for now, but with OpenGl it could become a full blown 3D multiplatform game engine.
+	
+	Of course, not something that could compare to big AAA engines, but something that could be useful and fun 
+	to use in smaller scale games for now but with potential for aggressive expansure.
 	
 	That being said, it is not bound to game development only, it can be used in various kind of apps (Android, java desktop
-	apps, even server side stuff...).
-
-	With little modifications, it can be made to work with Kotlin too.
+	apps, even building server side components...).
 
 	Its pure Java, so no platform dependencies.
 
 About multithreading and concurrency:
 
-	Multithreading is important in todays software development, as it allows the program to leverage the power of
+	Multithreading is integral in todays software development, as it allows the program to leverage the power of
 	multiple CPU cores, executng tasks fully in parrallel, making the program faster and more modular in a sense of
-	distributing tasks. 
+	distributing tasks. Most so in games.
 	
-	But programming a multithreaded app with only the language constructs like threads and synchronization primitives can
-	be hard and tedious task. Many frameworks include their own solution for easing the concurrency usage by the app developer,
+	Programming a multithreaded app with only the language constructs like threads and synchronization primitives can
+	be a tedious task. Many SDKs and frameworks include their own solution for easing the concurrency usage by the app developer,
 	and there is a variety of libraries and frameworks to choose from.
 	
-	Currently, one of most popular Java libraries is Recative Extensions for Java or RXJava, which I use at work on daily basis.
+	As many developers most certanly know, there is RXJava, and functionwise javaDaemon is same.
+	While RXJava relies on the observer design pattern to decouple subscribers and observers,
+	not just to be independent compilation units and help code reuse, but to run in different threads,
+	javaDaemon uses annotation processing to generate asynchronous versions of user designed classes.
 
-	JavaDaemon has the same goal as ReactiveX (RXJava) library, but different approach. Like RXJava its a combination of OOP
-	and functional programming. While RX framework is based on Observer software design pattern which can decouple subscribers
-	and observers, not just to be independent compilation units and help code reuse, but to run in different threads, this
-	framework is based on Active Object concurrency pattern and producer-consumer app building pattern.
+	Furthermore, the concepts that make this possible in Java, can be applied to any OOP language in which a user has access to a compiler
+	(langauages running on JVM) or sufficiently developed generic type system like C++ templates.
 
-	Concurrency on steroids, is maybe a better way to describe it.
+	Its a combination of OOP and functional programming for concurrency on steroids, is maybe a better way to describe it.
 
-Wait, what are those mentioned patterns?
-
+	What are those mentioned patterns?
 	The Active Object design pattern decouples method execution from method invocation for objects that each reside in their 
-	own thread of control.
-	The Producer/Consumer pattern is used to decouple processes that produce and consume data at different rates.
+	own thread of execution.
+	The Producer/Consumer pattern is used to decouple threads that produce and consume data at different rates.
 
 So, to start off with the basics.
 
 Conteptual overview of javaDaemon
 
-	Daemon framework is based on two main components: Daemons and Consumers.
+	Technically, its just two java libraries. DaemonEngine and DaemonProcessor. Engine lib contains threading plumbing and service api
+	and processor is a java compiler plugin for generating specific service wrapper classes based on user defined ones.
+
+	From users perspective there are also two main components: Daemons and Consumers. 
+	
 	For the sake of clarity, the concept of Consumers will be explained first. 
+
+	First off, yes, yes, I know that Consumers are a part of java.util.function and represent a generic function object
+	with a method that accepts one parameter, but I decided to give that name to an entity that actually executes above mentioned functors in its own context.
+	An entity that Consumer represents in java.utils.function, in this project is named Closure.
+
 	Its a pretty common concept, so if it bores you, just skip it, but I found, as I was learning programming, every explanation 
 	is valuable.
 
-	Consumer:
+	Consumer in javaDaemon:
 
-		The most used architecture in non-server (client) application frameworks is the event-loop based one. And I've done 
-		Android, C++ with Qt, Windows Visual C++...
+		Today, the most used architecture in application frameworks is the event-loop based one.
 
-		Event loop (also called a consumer thread) is, as the word says: a loop. A loop that is executed by a dedicated thread, 
-		and holds a certain condition (synchronization primitive) to regulate its idle time (awaiting on a condition) so it
-		wouldn't eat up CPU cycles needlessly when there is nothing to be computed. Thus, its only active when an event is
-		dispatched to it, it reacts to the event by running some developer specifiied procedure.
+		Event loop is a loop that is executed by one thread, main or dedicated, constantly checking on a certain condition 
+		(synchronization primitive) to regulate its idle time (awaiting on a condition) so it
+		wouldn't eat up CPU cycles needlessly when there is nothing to be computed. Thus, its only active when an event of certain data type is
+		dispatched to it, it reacts to the event by running some developer specifiied function.
 
-		Usually, event loop is waiting while some data structure (queue) associated with it, is empty. Queue being empty 
+		Usually, event loop is waiting while some data structure (ie. queue) associated with it, is empty. Queue being empty 
 		represents the condition to idle, and when an event is dispatched it means that the event is enqueued to the queue, so
 		it can be retrieved by event loop and used in the event handling procedure developer specifies. Events are created as a 
 		result of some specific task hat has been executed in some other threads context (producer thread). All together, they 
 		represent the producer-consumer scenario. 
 
-		As every program starts with the programs one thread executing the main function. Somewhere in that function (ussually 
-		after setting up and allocating all of the needed frameworks runtime data and other threads for running the bussines 
+		As every program starts with the programs one thread executing the main function, somewhere in that function (ussually 
+		after setting up and allocating all of the needed frameworks runtime data and other threads for running the users 
 		logic code), that main thread is stuck in an event-loop. Its commonly called GUI thread as it works with the Graphical 
 		User Interface (updating the GUI components like texts and images, as well as reacting to user controls like buttons 
 		etc.). Conventionally, its not recomended to run bussines logic code in the gui thread, especially if that code takes
-		some time to execute, since it will block the main thread and cause the user interface halt (app not responding).
+		some time to execute, since it will block the main thread and cause the UI halt (app not responding).
 
 		So delegating the business logic tasks to other threads in application is desired (like reacting to the button click 
 		that symbolyzes a task to be done), and when those tasks are done an event is sent form the tasks thread to the GUI 
 		threads' event loop to update the views.
 
-		As in some other frameworks, an event in JavaDaemon is the Runnable object and its specializations in form of Closures, 
-		which are objects that just encapsulate the algorithm to be executed or plainly - function objects. Closure (in Java 8 
-		java.utils.function its called Consumer, but I feel like thats not a very suitable name) is like a Runnable, but it has 
-		one argument to be passed.
+		As in some other frameworks, an event that gets consumed in JavaDaemon is the function object (functor) and its specializations 
+		in form of Closures, which are objects that just encapsulate the algorithm to be executed (same as java.util.function).
 
 		Those objects are the base of functional programming (in Java at least, different languages have different 
 		implementations) and can be written as lambda expressions. They are sucessors of functors in C++
 		or function pointers in C. Their main purpouse is allowing the functions to be passed around as if they were objects 
 		(data types).
 
-		So, the Consumer type in javaDaemon is a class that encapsulates an event loop thread that executes all Runables and 
-		Closures dispatched to it by other threads. Consumer can be the GUI thread or it can be a standalone thread, however the 
+		So, the Consumer type in javaDaemon is a class that encapsulates an event loop thread that executes all fuction objects and 
+		Closures dispatched to it by other threads. Consumer can be the main (GUI) thread itself or it can be a standalone thread, however the 
 		developer chooses to implement it.
+		
+		
+		
+		
 
 	The Daemon:
 
-		Daemon is the other part of the framework, the main part, the thing that that the framework is named after. Daemon is 
-		named after daemon process in unix like OSes, not the java daemon thread, because threads in javaDaemon are user 
-		threads, and will be waited for by JVM to run out of scope. Of course, it can be made daemon, as in java daemon thread, 
-		but I never had the need to.
-
-		In that sense, a daemon is a long-running background process that answers requests for services. The term originated 
-		with Unix, but most operating systems use daemons in some form or another...
-		Nevermind, I just thought its a cool name.
-
-		The Daemon represents users (developers) class instance or object in form of an active object. Active object because it 
+		Daemon is the other part of the framework. The namebearer. It is 
+		named after daemon process in unix like OSes. In that sense, a daemon is a long-running background process 
+		that answers requests for specific services provided by the OS.
+		
+		Again, as with the consumer, there is a name discrepancy, because the
+		built-in java user Thread can be made daemon (programs main thread will not wait for it to join).
+		
+		The Daemon represents user defined object in form of an active object. An active object because it 
 		encapsulates a dedicated thread (or more than one).
 		Any kind of user defined class can be used as a prototype for a Daemon. Furthermore, all the logic of users methods and 
 		state of the member fields are undisturbed by presence of Daemons.
-		(I've pondered on writing an epic fantasy novel about a small and miserable POJO object, which obtains a Daemon armor 
-		and sets off in series of adventures along the continent of Java :))
 
-		So, basically, Daemon is a class wrapper for developers written prototype class. It accepts users prototype class as a 
+		So, basically, Daemon is a class wrapper for developer written prototype class. It accepts users prototype class as a 
 		constructor parameter, encapsulating the reference to it, and maps marked (annotated) PUBLIC, user written, 
-		prototype method to their asynchronous counterpart, where instead of prototype methods return value of <ReturnType>,
-		a new parameter of type Closure<ReturnType> (or Runnable if method returns void) is added, 
-		so user can use it to extend the calling logic.
+		prototype method to their asynchronous counterpart.
+		
+		So, if there was an extremly complicated and long running algorithm for some kind of string editing,
+		a user defined class migght look like this:
+		
+			@Daemon
+			public class UserDefinedStringEditor {
+
+				@Daemonize
+				public String editString(String original) {
+					// long running algorithm...
+				}
+			}
+
+		a generated Daemon wrapper class would look like:
+
+			public class UserDefinedStringEditorDaemon implements Daemon {
+
+				//construct
+				public UserDefinedStringEditorDaemon(Consumer consumer, UserDefinedStringEditor prototype) {...}
+
+				//daemonized
+				public void editString(String original, Closure<String> closure) {...}
+				
+				//Daemon service methods
+				UserDefinedStringEditorDaemon start() {...}
+				void stop() {...}
+			}
+
+		And once a Daemon object has been instantiated:
+		
+			DaemonConsumer consumer = ...;
+		
+			UserDefinedStringEditorDaemon stringEditDaemon = new UserDefinedStringEditorDaemon(consumer, new UserDefinedStringEditor());
+		
+		it can be used:
+		
+			stringEditDaemon.start().editString("Example string", returnString -> { 
+				
+				//Make use of the returnString (return value of the original UserDefinedStringEditor::editString method) 
+				//that has been edited in the dedicated thread of stringEditDaemon...
+				
+				stringEditDaemon.stop();
+			});
+
+	
+	
+		To break this down. As the example showcases, an instance of UserDefinedStringEditorDaemon has been allocated with its
+		user defined prototype as a second constructor argument. The first argument represents the Consumer object reference (the event loop)
+		that will execute the closures passed do daemonized methods in its own thread context. 
+		
+		In this case the Consumer will execute the lambda function passed as a second argument of the editString method. 
+		It will execute the closure (lambda) after the editString method returns in Daemons dedicated thread, and the closure runs 
+		in consumers thread instead. 
+		
+		
+		
+	
+
 
 		Just public methods. Privates and protecteds access modifiers make no sense in this context, thus enforcing the user 
-		class API. Still dont know what to do with static methods...
+		class API.
 
 		It could be said that, underneath, Daemons also function by following the producer consumer scenario. Actually, they can 
 		also be considered consumers, if you think of the scope 
