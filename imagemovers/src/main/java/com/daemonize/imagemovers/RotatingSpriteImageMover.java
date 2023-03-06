@@ -2,6 +2,7 @@ package com.daemonize.imagemovers;
 
 
 import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 
@@ -13,10 +14,17 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     protected volatile Image[] currentRotationSprite;
     private volatile int size;
 
+    private String name;
+
+    public RotatingSpriteImageMover setRotaterName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public synchronized void setRotationSprite(Image[] rotationSprite) {
         int currentAngle = spriteBuffer != null ? spriteBuffer.getCurrentAngle() : 0;
         int step = 360 / rotationSprite.length;
-        this.spriteBuffer = new AngleToImageArray(rotationSprite, step);
+        this.spriteBuffer = new AngleToSingleImageArray(rotationSprite, step);
         this.currentRotationSprite = new Image[(180 / step) + 1];
         this.size = 0;
         popSprite();
@@ -31,32 +39,45 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
     public RotatingSpriteImageMover(
             Image[] rotationSprite,
             Image startingImage,
-            float velocity,
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        super(new Image[]{startingImage}, velocity, startingPos, dXY);
+        super(new Image[]{startingImage}, startingPos, dXY);
         setRotationSprite(rotationSprite);
+    }
+
+    public RotatingSpriteImageMover(
+            AngleToImageArray animation,
+            DaemonCountingSemaphore animateSemaphore,
+            Image startingImage,
+            Pair<Float, Float> startingPos,
+            float dXY
+    ) {
+        super(new Image[]{startingImage}, startingPos, dXY);
+        animation.setCurrentAngle(0);
+        this.spriteBuffer = animation;
+        this.animateSemaphore = animateSemaphore;
+        this.currentRotationSprite = new Image[(180 / animation.getStep()) + 1];
     }
 
     public RotatingSpriteImageMover(
             Image[] rotationSprite,
             DaemonCountingSemaphore animateSemaphore,
-            float velocity,
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        this(rotationSprite, Arrays.copyOfRange(rotationSprite, 0, 1)[0], velocity, startingPos, dXY);
+        this(rotationSprite, Arrays.copyOfRange(rotationSprite, 0, 1)[0], startingPos, dXY);
         this.animateSemaphore = animateSemaphore;
     }
 
-    public void rotateTowards(float x, float y) throws InterruptedException {
-        rotate((int) getAngle(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y));
+    public void rotateTowards(float lastX, float lastY, float targetX, float targetY) throws InterruptedException {
+        rotate((int) getAngle(lastX, lastY, targetX, targetY));
     }
 
     public void rotate(int targetAngle) throws InterruptedException {
         Image[] rotateSprite = getRotationSprite(targetAngle);
-        pushSprite(rotateSprite, velocity.intensity);
+        if (rotateSprite.length > 0) //TODO figure it out...
+            pushSprite(rotateSprite);
     }
 
     protected synchronized Image[] getRotationSprite(int targetAngle) throws InterruptedException {
@@ -64,10 +85,13 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
         int currentAngle = spriteBuffer.getCurrentAngle();
 
         if (currentAngle == targetAngle) {
+
             return new Image[]{spriteBuffer.getCurrent()};
+
         } else if (Math.abs(targetAngle - currentAngle) <= spriteBuffer.getStep()) { //TODO check how many steps is the limit?
 
             spriteBuffer.setCurrentAngle(targetAngle);
+
             Image[] last = new Image[1];
             last[0] = spriteBuffer.getCurrent();
 
@@ -81,18 +105,41 @@ public class RotatingSpriteImageMover extends CachedArraySpriteImageMover {
             boolean direction; //true for increasing angle
 
             if (targetAngle < 180) {
+
                 mirrorAngle = targetAngle + 180;
                 direction = !(currentAngle < mirrorAngle && currentAngle > targetAngle);
+
             } else {
+
                 mirrorAngle = targetAngle - 180;
                 direction = currentAngle < targetAngle && currentAngle > mirrorAngle;
             }
 
-            while (!(Math.abs(targetAngle - spriteBuffer.getCurrentAngle()) < spriteBuffer.getStep()) && size < currentRotationSprite.length)//TODO fix this!!!!!!
-                currentRotationSprite[size++] = direction ? spriteBuffer.getIncrementedByStep() : spriteBuffer.getDecrementedByStep();
+            while (!(Math.abs(targetAngle - spriteBuffer.getCurrentAngle())
+                    < spriteBuffer.getStep())
+                    && size < currentRotationSprite.length) //TODO fix this!!!!!!
+                currentRotationSprite[size++] =
+                        direction ? spriteBuffer.getIncrementedByStep()
+                                : spriteBuffer.getDecrementedByStep();
 
-            return Arrays.copyOf(currentRotationSprite, size);
+            Image[] ret = Arrays.copyOf(currentRotationSprite, size);
+            return ret;
         }
+    }
+
+    @Override
+    public Image iterateSprite() {
+
+        if (cache.isValid()) {
+            return cache.getNext();
+        } else {
+            return spriteBuffer.getCurrent();
+        }
+//
+//        if (name.equals("ZombieRotater"))
+//            return spriteBuffer.getCurrent();
+//        else
+//            return super.iterateSprite();
     }
 
     public static double getAngle(Pair<Float, Float> one, Pair<Float, Float> two) {

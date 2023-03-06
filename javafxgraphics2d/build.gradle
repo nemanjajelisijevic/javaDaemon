@@ -1,4 +1,14 @@
-apply plugin: 'java-library'
+//apply plugin: 'java-library'
+
+plugins {
+    id 'java-library'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+}
+
+javafx {
+    version = "11.0.2"
+    modules = [ 'javafx.controls' ]
+}
 
 dependencies {
     api project (':graphics2d')

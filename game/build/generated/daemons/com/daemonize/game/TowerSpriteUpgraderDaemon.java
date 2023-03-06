@@ -20,28 +20,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TowerSpriteUpgraderDaemon implements EagerDaemon<TowerSpriteUpgraderDaemon> {
-  private Game.TowerSpriteUpgrader prototype;
+  private TowerDefenseGame.TowerSpriteUpgrader prototype;
 
   public EagerMainQuestDaemonEngine daemonEngine;
 
-  public TowerSpriteUpgraderDaemon(Consumer consumer, Game.TowerSpriteUpgrader prototype) {
+  public TowerSpriteUpgraderDaemon(Consumer consumer,
+      TowerDefenseGame.TowerSpriteUpgrader prototype) {
     this.daemonEngine = new EagerMainQuestDaemonEngine(consumer).setName(this.getClass().getSimpleName());
     this.prototype = prototype;
   }
 
   /**
-   * Prototype method {@link com.daemonize.game.Game.TowerSpriteUpgrader#updateTowerSprite} */
+   * Prototype method {@link com.daemonize.game.TowerDefenseGame.TowerSpriteUpgrader#updateTowerSprite} */
   public TowerSpriteUpgraderDaemon updateTowerSprite(TowerDaemon tower, Image[] sprite,
       Closure<GenericNode<Pair<ImageMover.PositionedImage, ImageView>>> closure) {
     daemonEngine.pursueQuest(new UpdateTowerSpriteMainQuest(tower, sprite, closure, null).setConsumer(daemonEngine.getConsumer()));
     return this;
   }
 
-  public Game.TowerSpriteUpgrader getPrototype() {
+  public TowerDefenseGame.TowerSpriteUpgrader getPrototype() {
     return prototype;
   }
 
-  public TowerSpriteUpgraderDaemon setPrototype(Game.TowerSpriteUpgrader prototype) {
+  public TowerSpriteUpgraderDaemon setPrototype(TowerDefenseGame.TowerSpriteUpgrader prototype) {
     this.prototype = prototype;
     return this;
   }

@@ -15,7 +15,7 @@ public class MoneyHandler extends CoordinatedImageTranslationMover  {
     private PositionedImage currency = new PositionedImage();
 
     public MoneyHandler(Image[] sprite, Image moneySign, float dXY) {
-        super(sprite, 0, Pair.create(0F, 0F), dXY);
+        super(sprite, Pair.create(0F, 0F), dXY);
         this.currency.image = moneySign;
     }
 
@@ -23,12 +23,6 @@ public class MoneyHandler extends CoordinatedImageTranslationMover  {
         if (amount < 0  || amount > 9) //TODO fix boundries
             throw new IllegalArgumentException("Amount must be > 0 && < 10!");
         this.amount = amount;
-    }
-
-    @Override
-    public MoneyHandler setBorders(float x1, float x2, float y1, float y2) {
-        super.setBorders(x1, x2, y1, y2);
-        return this;
     }
 
     @Override

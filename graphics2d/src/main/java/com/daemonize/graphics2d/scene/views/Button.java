@@ -27,14 +27,19 @@ public class Button extends CompositeImageViewImpl {
         return this;
     }
 
+    public Button click() {
+        onClickCallback.run();
+        return this;
+    }
+
     @Override
     public boolean checkCoordinates(float x, float y) {
 
         if (!enabled || onClickCallback == null)
             return false;
 
-        if (x >= getStartingX() && x <= getEndX()) {
-            if (y >= getStartingY() && y <= getEndY() && isShowing()) {
+        if (x >= getRenderingX() && x <= getEndX()) {
+            if (y >= getRenderingY() && y <= getEndY() && isShowing()) {
                 onClickCallback.run();//TODO should this be here?????
                 return true;
             }

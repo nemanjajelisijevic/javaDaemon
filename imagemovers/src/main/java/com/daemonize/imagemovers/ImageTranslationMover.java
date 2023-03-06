@@ -8,37 +8,53 @@ import com.daemonize.imagemovers.spriteiterators.BasicSpriteIterator;
 import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import com.daemonize.graphics2d.images.Image;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     private volatile float lastX;
     private volatile float lastY;
 
+    private Pair<Float, Float> lastCoords = Pair.create(lastX, lastY);
+
+    private Lock coordUpdateLock = new ReentrantLock();
+
+
     private double dX = 0;
     private double dY = 0;
 
-    private float dXY;
-
-    protected float borderX1;
-    protected float borderX2;
-
-    protected float borderY1;
-    protected float borderY2;
+    private final Float dXY;
 
     protected SpriteIterator spriteIterator;
-    protected float initVelocity;
+
+    public ImageTranslationMover setSpriteIterator(SpriteIterator spriteIterator) {
+        this.spriteIterator = spriteIterator;
+        return this;
+    }
+
     protected volatile Velocity velocity;
 
-    private Consumer outOfBordersConsumer;
-    private Runnable outOfBordersClosure;
     private PositionedImage ret = new PositionedImage();
 
     protected DaemonCountingSemaphore animateSemaphore = new DaemonCountingSemaphore().setName("Animate Semaphore");
 
-    public ImageTranslationMover(Image[] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
+    private AnimationWaiter animationSemaphoreWaiterWrapper = new AnimationWaiter() {
+        @Override
+        public void await() throws InterruptedException {
+            animateSemaphore.await();
+        }
+    };
+
+    @Override
+    public AnimationWaiter getAnimationWaiter() {
+        return animationSemaphoreWaiterWrapper;
+    }
+
+    public ImageTranslationMover(Image[] sprite, Pair<Float, Float> startingPos, float dXY) {
         this.spriteIterator = new BasicSpriteIterator(sprite);
-        this.initVelocity = velocity;
-        this.velocity = new Velocity(velocity, new Direction(0, 0));
+        this.velocity = new Velocity(0, new Direction(0, 0));
         this.dXY = dXY;
         lastX = startingPos.getFirst();
         lastY = startingPos.getSecond();
@@ -73,7 +89,10 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     @Override
     public Pair<Float, Float> getLastCoordinates() {
-        return Pair.create(lastX, lastY);
+        coordUpdateLock.lock();
+        lastCoords.setFirst(lastX).setSecond(lastY);
+        coordUpdateLock.unlock();
+        return lastCoords;
     }
 
     @Override
@@ -82,17 +101,19 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
     }
 
     @Override
-    public synchronized void setCoordinates(float lastX, float lastY) {
+    public void setCoordinates(float lastX, float lastY) {
+        this.coordUpdateLock.lock();
         this.lastX = lastX;
         this.lastY = lastY;
+        this.coordUpdateLock.unlock();
     }
 
     @Override
     public Image iterateSprite() {
         Image ret = spriteIterator.iterateSprite();
-
-        if (ret == null)
-            throw new IllegalStateException("Sprite image can not be null!");
+//
+//        if (ret == null)
+//            throw new IllegalStateException("Sprite image can not be null!");
 
         return ret;
     }
@@ -109,6 +130,28 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
 
     @Override
     public void setVelocity(float velocity) {
+
+        if (velocity > 0) {
+
+            if (this.getVelocity().intensity <= 0) {
+                animateSemaphore.subscribe();
+            }
+
+        } else {
+            velocity = 0;
+            if (this.getVelocity().intensity > 0)
+                animateSemaphore.unsubscribe();
+
+        }
+
+
+//        if (getVelocity().intensity  < 0.1 && velocity > 0.1)
+//            animateSemaphore.subscribe();
+//        else if (getVelocity().intensity  > 0.1 && velocity < 0.1) {
+//            velocity = 0;
+//            animateSemaphore.unsubscribe();
+//        }
+
         this.velocity.intensity = velocity;
     }
 
@@ -134,45 +177,19 @@ public class ImageTranslationMover implements ImageMover, SpriteIterator {
         return true;
     }
 
-    @Override
-    public boolean setDirectionAndMove(float x, float y, float velocityInt) {
-        boolean ret = false;
-        velocity.intensity = 0;
-        ret = setDirectionToPoint(x, y);
-        velocity.intensity = velocityInt;
-        return ret;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public ImageTranslationMover setBorders(float x1, float x2, float y1, float y2) {
-        this.borderX1 = x1;
-        this.borderX2 = x2;
-        this.borderY1 = y1;
-        this.borderY2 = y2;
-        return this;
-    }
-
-
-    public void setOutOfBordersConsumer(Consumer consumer) {
-        this.outOfBordersConsumer = consumer;
-    }
-
-    public void setOutOfBordersClosure(Runnable closure) {
-        this.outOfBordersClosure = closure;
+    protected void updateCoordinates() {
+        coordUpdateLock.lock();
+        ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY);
+        ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * dXY);
+        coordUpdateLock.unlock();
     }
 
     @Override
     public PositionedImage animate() throws InterruptedException {
 
         animateSemaphore.await();
-
         ret.image = iterateSprite();
-
-        synchronized (this) {
-            ret.positionX = lastX += velocity.intensity * (velocity.direction.coeficientX * dXY);
-            ret.positionY = lastY += velocity.intensity * (velocity.direction.coeficientY * dXY);
-        }
+        updateCoordinates();
 
         return ret;
     }

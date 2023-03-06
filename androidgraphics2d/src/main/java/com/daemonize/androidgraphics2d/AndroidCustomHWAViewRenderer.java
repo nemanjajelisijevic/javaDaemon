@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.view.View;
 
+import com.daemonize.graphics2d.camera.Camera2D;
 import com.daemonize.graphics2d.renderer.DrawConsumer;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
@@ -34,6 +35,11 @@ public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWA
         this.view = view.setRenderer(this);
         this.view.setLayerType(View.LAYER_TYPE_HARDWARE, this.paint);
         this.drawConsumer = new DrawConsumer(this, "AndroidCustomHWAViewRenderer draw consumer", closureQueueSize);
+    }
+
+    @Override
+    public AndroidCustomHWAViewRenderer setCamera(Camera2D camera) {
+        return this;
     }
 
     @Override
@@ -70,8 +76,8 @@ public class AndroidCustomHWAViewRenderer implements Renderer2D<AndroidCustomHWA
             if (view.isShowing()) {
                 canvas.drawBitmap(
                         ((Bitmap) view.getImage().getImageImp()),
-                        view.getStartingX(),
-                        view.getStartingY(),
+                        view.getRenderingX(),
+                        view.getRenderingY(),
                         paint
                 );
             }

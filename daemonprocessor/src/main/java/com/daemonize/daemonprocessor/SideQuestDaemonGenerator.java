@@ -226,15 +226,18 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
 
         MethodSpec.Builder sideQuestSetter = MethodSpec.methodBuilder("set" + Character.toUpperCase(methodName.charAt(0)) + methodName.substring(1) + "SideQuest")
                 .addModifiers(Modifier.PUBLIC)
-                .addJavadoc("Prototype method {@link $N#$N}", sideQuestMethod.getFirst().getEnclosingElement().getSimpleName(), sideQuestMethod.getFirst().getSimpleName())
-                .addParameter(consumer, "consumer")
-                .returns(sideQuestOfRet)
+                .addJavadoc("Prototype method {@link $N#$N}", sideQuestMethod.getFirst().getEnclosingElement().getSimpleName(), sideQuestMethod.getFirst().getSimpleName());
+
+        if (!prototypeMethodData.isVoid())
+                sideQuestSetter.addParameter(consumer, "consumer");
+
+        sideQuestSetter.returns(sideQuestOfRet)
                 .addStatement("$T sideQuest = new $N(" + (blockingClosure ? daemonEngineString + ".getClosureAwaiter()" : "null" ) +  ")", sideQuestOfRet, sideQuest);
 
         if (sleep > 0)
-            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L).setConsumer(consumer))", sleep);
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setSleepInterval($L)" + (prototypeMethodData.isVoid() ?  ".setConsumer(null))" : ".setConsumer(consumer))"), sleep);
         else
-            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest.setConsumer(consumer))");
+            sideQuestSetter.addStatement(daemonEngineString + ".setSideQuest(sideQuest" + (prototypeMethodData.isVoid() ?  ".setConsumer(null))" : ".setConsumer(consumer))"));
 
         sideQuestSetter.addStatement("return sideQuest");
 
@@ -248,7 +251,6 @@ public class SideQuestDaemonGenerator extends BaseDaemonGenerator implements Dae
                 .addStatement("return this.$N.getSideQuest()", daemonEngineString)
                 .build();
     }
-
 
     @Override
     public MethodSpec generateGetEnginesStateDaemonApiMethod() {

@@ -53,7 +53,7 @@ public abstract class InterruptibleSideQuest<T> extends SideQuest<T> implements 
             }
             return true;
         } catch (InterruptedException ex) {
-            System.out.println(DaemonUtils.tag() + description + " interrupted.");
+            //System.out.println(DaemonUtils.tag() + description + " interrupted.");
             initLatch.clear();
             onInterruptRunnable.run();
             return false;

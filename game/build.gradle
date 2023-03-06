@@ -3,12 +3,15 @@ apply plugin: 'idea'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project (':commandparser')
     implementation project (':sound')
     implementation project (':graphics2d')
-    implementation project (':imagemovers')
+    api project (':imagemovers')
     implementation project (':daemonengine')
     implementation project (':daemonprocessor')
     annotationProcessor project(':daemonprocessor')
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.10.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.3'
 }
 
 sourceCompatibility = "1.8"
@@ -17,6 +20,7 @@ targetCompatibility = "1.8"
 def daemonsSource = "/generated/daemons"
 
 compileJava {
+
     options.compilerArgs << "-s"
     options.compilerArgs << "$buildDir$daemonsSource"
 

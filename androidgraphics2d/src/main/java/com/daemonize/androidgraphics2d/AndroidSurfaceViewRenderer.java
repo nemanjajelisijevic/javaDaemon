@@ -10,6 +10,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import com.daemonize.graphics2d.camera.Camera2D;
 import com.daemonize.graphics2d.renderer.DrawConsumer;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.graphics2d.scene.Scene2D;
@@ -42,6 +43,11 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
         this.dirtyFlag = true;
         dirtyCondition.signal();
         dirtyLock.unlock();
+        return this;
+    }
+
+    @Override
+    public AndroidSurfaceViewRenderer setCamera(Camera2D camera) {
         return this;
     }
 
@@ -137,8 +143,8 @@ public class AndroidSurfaceViewRenderer implements Renderer2D<AndroidSurfaceView
                 if (view.isShowing()) {
                     canvas.drawBitmap(
                             ((Bitmap) view.getImage().getImageImp()),
-                            view.getStartingX(),
-                            view.getStartingY(),
+                            view.getRenderingX(),
+                            view.getRenderingY(),
                             paint
                     );
                 }

@@ -13,6 +13,8 @@ import com.daemonize.daemonengine.quests.SleepSideQuest;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 import com.daemonize.imagemovers.ImageMover;
+import com.daemonize.imagemovers.Movable;
+import com.daemonize.imagemovers.spriteiterators.SpriteIterator;
 import java.lang.Boolean;
 import java.lang.Exception;
 import java.lang.Float;
@@ -20,7 +22,6 @@ import java.lang.IllegalStateException;
 import java.lang.Integer;
 import java.lang.InterruptedException;
 import java.lang.Override;
-import java.lang.Runnable;
 import java.lang.String;
 import java.lang.Thread;
 import java.util.ArrayList;
@@ -65,13 +66,18 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return this;
   }
 
-  public MoneyHandlerDaemon pushSprite(Image[] sprite, float velocity) throws InterruptedException {
-    prototype.pushSprite(sprite, velocity);
+  public int getSize() {
+    return prototype.getSize();
+  }
+
+  public MoneyHandlerDaemon pushSprite(Image[] sprite) throws InterruptedException {
+    prototype.pushSprite(sprite);
     return this;
   }
 
-  public int getSize() {
-    return prototype.getSize();
+  public MoneyHandlerDaemon setSpriteIterator(SpriteIterator spriteiterator) {
+    prototype.setSpriteIterator(spriteiterator);
+    return this;
   }
 
   public Pair<ImageMover.PositionedImage, ImageMover.PositionedImage> animateMoney() throws
@@ -79,13 +85,12 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return prototype.animateMoney();
   }
 
-  public boolean setDirectionToPoint(float x, float y) {
-    return prototype.setDirectionToPoint(x, y);
+  public Movable.AnimationWaiter getAnimationWaiter() {
+    return prototype.getAnimationWaiter();
   }
 
-  public MoneyHandlerDaemon setBorders(float x1, float x2, float y1, float y2) {
-    prototype.setBorders(x1, x2, y1, y2);
-    return this;
+  public boolean setDirectionToPoint(float x, float y) {
+    return prototype.setDirectionToPoint(x, y);
   }
 
   public MoneyHandlerDaemon setDirection(ImageMover.Direction direction) {
@@ -112,11 +117,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
 
   public Image iterateSprite() {
     return prototype.iterateSprite();
-  }
-
-  public MoneyHandlerDaemon setOutOfBordersClosure(Runnable closure) {
-    prototype.setOutOfBordersClosure(closure);
-    return this;
   }
 
   public ImageMover.Velocity getVelocity() {
@@ -155,15 +155,6 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     return this;
   }
 
-  public MoneyHandlerDaemon setOutOfBordersConsumer(Consumer consumer) {
-    prototype.setOutOfBordersConsumer(consumer);
-    return this;
-  }
-
-  public boolean setDirectionAndMove(float x, float y, float velocityint) {
-    return prototype.setDirectionAndMove(x, y, velocityint);
-  }
-
   public SideQuest getCurrentSideQuest() {
     return this.sideDaemonEngine.getSideQuest();
   }
@@ -172,6 +163,14 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
    * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
   public MoneyHandlerDaemon goTo(float x, float y, float velocityint, Closure<Boolean> closure) {
     mainDaemonEngine.pursueQuest(new GoToMainQuest(x, y, velocityint, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
+    return this;
+  }
+
+  /**
+   * Prototype method {@link com.daemonize.imagemovers.CoordinatedImageTranslationMover#goTo} */
+  public MoneyHandlerDaemon goTo(Pair<Float, Float> coords, float velocity,
+      Closure<Boolean> closure) {
+    mainDaemonEngine.pursueQuest(new GoToIMainQuest(coords, velocity, closure, null).setConsumer(mainDaemonEngine.getConsumer()));
     return this;
   }
 
@@ -305,6 +304,25 @@ public class MoneyHandlerDaemon implements EagerDaemon<MoneyHandlerDaemon> {
     @Override
     public final Boolean pursue() throws Exception {
       return prototype.goTo(x, y, velocityint);
+    }
+  }
+
+  private final class GoToIMainQuest extends MainQuest<Boolean> {
+    private Pair<Float, Float> coords;
+
+    private float velocity;
+
+    private GoToIMainQuest(Pair<Float, Float> coords, float velocity, Closure<Boolean> closure,
+        ClosureExecutionWaiter closureAwaiter) {
+      super(closure, closureAwaiter);
+      this.coords = coords;
+      this.velocity = velocity;
+      this.description = "goTo";
+    }
+
+    @Override
+    public final Boolean pursue() throws Exception {
+      return prototype.goTo(coords, velocity);
     }
   }
 }

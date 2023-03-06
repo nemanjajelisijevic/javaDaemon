@@ -5,7 +5,9 @@ import com.daemonize.daemonengine.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Grid<T> {
 
@@ -14,6 +16,35 @@ public class Grid<T> {
     Pair<Integer, Integer> startPoint;
     Pair<Integer, Integer> endPoint;
 
+    public Set<Field> multipleZFieldSet = Collections.synchronizedSet(new HashSet<>());
+
+    private int mapWidth;
+    private int mapHeight;
+
+    private String mapName;
+
+    public String getMapName() {
+        return mapName;
+    }
+
+    public Grid<T> setMapName(String mapName) {
+        this.mapName = mapName;
+        return this;
+    }
+
+    public Grid<T> setMapWidth(int mapWidth) {
+        this.mapWidth = mapWidth;
+        return this;
+    }
+
+    public Grid<T> setMapHeight(int mapHeight) {
+        this.mapHeight = mapHeight;
+        return this;
+    }
+
+    public int getMapWidth() {return mapWidth;}
+
+    public int getMapHeight() {return mapHeight;}
 
     private float xCoordinateInReal;
     private float yCoordinateInReal;
@@ -27,14 +58,20 @@ public class Grid<T> {
     }
 
     private Field<T>[][] grid;
-    int fieldWith ;
+    private int fieldWidth;
+
+    public int getFieldWidth() {
+        return fieldWidth;
+    }
 
     private List<Field> path;
 
+    private List<Field<T>[]> walkableFields;
+
     public boolean isInsideOfGrid (float x, float y){
         boolean in = false;
-        float x2 = xCoordinateInReal + grid[0].length * fieldWith;
-        float y2 = yCoordinateInReal + grid.length * fieldWith;
+        float x2 = xCoordinateInReal + grid[0].length * fieldWidth;
+        float y2 = yCoordinateInReal + grid.length * fieldWidth;
         if ( x >= xCoordinateInReal && x <= x2 &&
              y >= yCoordinateInReal && y <= y2 ){
             in = true;
@@ -42,26 +79,59 @@ public class Grid<T> {
         return in;
     }
 
-    public Grid(int row, int column, Pair<Integer, Integer> startPoint, Pair<Integer, Integer> endPoint, float realCoordX, float realCoordY, int fieldWith) {
+    public Grid<T> calculateFieldWidth() {
+        this.fieldWidth = mapWidth / grid[0].length;
+        return this;
+    }
+
+    public Grid(){
+        this.pathFinding = new Dijkstra();
+    }
+
+    public Grid(int rows, int columns, int mapWidth, int mapHeight){
+        this.startPoint = Pair.create(0,0);
+        this.endPoint = Pair.create(0,0);
+        this.xCoordinateInReal = 0;
+        this.yCoordinateInReal = 0;
+        this.fieldWidth = mapWidth / columns;
+        this.mapWidth = mapWidth;
+        this.mapHeight = mapHeight;
+        this.pathFinding = new Dijkstra();
+        this.grid = createFieldGround(rows, columns,xCoordinateInReal,yCoordinateInReal);
+    }
+
+    public Grid(
+            int rows,
+            int columns,
+            Pair<Integer, Integer> startPoint,
+            Pair<Integer, Integer> endPoint,
+            float realCoordX,
+            float realCoordY,
+            int fieldWidth,
+            int mapWidth,
+            int mapHeight
+    ) {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
         this.xCoordinateInReal = realCoordX;
         this.yCoordinateInReal = realCoordY;
-        this.fieldWith = fieldWith;
+        this.fieldWidth = fieldWidth;
         pathFinding = new Dijkstra();
-        grid = createFieldGround(row, column,realCoordX,realCoordY);
+        grid = createFieldGround(rows, columns,realCoordX,realCoordY);
         pathFinding.recalculate(this);//new Pair<>(0,0),new Pair<>(row - 1,column - 1)
 
+        this.mapWidth = mapWidth;
+        this.mapHeight = mapHeight;
     }
 
     Field<T>[][] createFieldGround(int row, int column,float realCoordX, float realCoordY) {
         Field<T>[][] gridtemp = new Field[row][column];
 
         for (int i = 0; i < row; i++) {
-            float y = realCoordY + fieldWith / 2 + i * fieldWith;
+            float y = realCoordY + fieldWidth / 2 + i * fieldWidth;
 
             for (int j = 0; j < column; j++) {
-                float x = realCoordX + fieldWith / 2 + j * fieldWith;
+                float x = realCoordX + fieldWidth / 2 + j * fieldWidth;
 
                 Field<T> field = new Field<T>(x, y, i, j, 0, true);
                 field.gCost = Integer.MAX_VALUE;
@@ -80,13 +150,17 @@ public class Grid<T> {
         Field<T> ret = null;
 
         if (isInsideOfGrid(x,y)) {
-            int row = (int)Math.floor((y - yCoordinateInReal) / fieldWith);
-            int column = (int) Math.floor((x - xCoordinateInReal) / fieldWith);
+            int row = (int)Math.floor((y - yCoordinateInReal) / fieldWidth);
+            int column = (int) Math.floor((x - xCoordinateInReal) / fieldWidth);
             ret = grid[row][column];
         }
 
         return ret;
 
+    }
+
+    public Field<T> getField(Pair<Float, Float> coordinates) {
+        return getField(coordinates.getFirst(), coordinates.getSecond());
     }
 
     public Field[][] getGrid() {
@@ -98,8 +172,8 @@ public class Grid<T> {
     }
 
     public boolean setObject(float x, float y) {
-        int row = (int) ((y) / fieldWith);
-        int column = (int) ((x) / fieldWith);
+        int row = (int) ((y) / fieldWidth);
+        int column = (int) ((x) / fieldWidth);
         return setObject(row, column);
     }
 
@@ -122,7 +196,6 @@ public class Grid<T> {
 
         boolean acceptTower = pathFinding.recalculate(this);
 
-
         if (acceptTower) {
             return true;
         } else {
@@ -132,9 +205,38 @@ public class Grid<T> {
         }
     }
 
+
+    public void setStartAndRecalculate(int row, int column) {
+
+        startPoint = Pair.create(row, column);
+        endPoint = Pair.create(0, 0);
+
+        //copy of grid
+        Field<T>[][] gridTemp = new Field[grid.length][grid[0].length];
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                Field<T> field = new Field(grid[i][j]);
+                gridTemp[i][j] = field;
+                gridTemp[i][j].gCost = Integer.MAX_VALUE;
+                //grid[i][j].gCost = Integer.MAX_VALUE;
+            }
+        }
+
+        pathFinding.recalculate(gridTemp, row, column);
+
+        grid = gridTemp;
+        //System.out.println(gridToString(grid).toString());
+    }
+
+    public void setCoordsAndRecalculate(int row, int column) {
+        startPoint = Pair.create(row, column);
+        endPoint = Pair.create(0, 0);
+        pathFinding.recalculate(this);
+    }
+
     public boolean destroyObject(float x, float y) {
-        int row = (int) ((y) / fieldWith);
-        int column = (int) ((x) / fieldWith);
+        int row = (int) ((y) / fieldWidth);
+        int column = (int) ((x) / fieldWidth);
 
         return destroyObject(row, column);
     }
@@ -218,12 +320,14 @@ public class Grid<T> {
         return neighbors.get(0);
     }
 
-    public StringBuilder gridToString() {
+
+
+    public static StringBuilder gridToString(Field[][] grid) {
         StringBuilder str = new StringBuilder("");
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
 
-                String pomstr = grid[i][j].isWalkable() ? (grid[i][j].fCost() == Integer.MAX_VALUE ? "H" : grid[i][j].fCost() + "") : "T";
+                String pomstr = grid[i][j].isWalkable() ? (grid[i][j].fCost() == Integer.MAX_VALUE ? "H" : grid[i][j].fCost() + "") : "NW";
                 str.append("\t" + pomstr + "\t");
             }
             str.append('\n');
@@ -231,16 +335,20 @@ public class Grid<T> {
         return str;
     }
 
+    public StringBuilder gridToString() {
+        return gridToString(grid);
+    }
+
     public Pair<Integer, Integer> getEndPoint() {
         return endPoint;
     }
 
     public int getGridWidth() {
-        return grid[0].length * fieldWith;
+        return grid[0].length * fieldWidth;
     }
 
     public int getGridHeight() {
-        return grid.length * fieldWith;
+        return grid.length * fieldWidth;
     }
 
 }

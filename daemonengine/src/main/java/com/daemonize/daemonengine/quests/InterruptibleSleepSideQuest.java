@@ -67,7 +67,7 @@ public abstract class InterruptibleSleepSideQuest<T> extends SleepSideQuest<T> i
             daemonStateSetter.setState(DaemonState.SIDE_QUEST);
             return true;
         } catch (InterruptedException ex) {
-            System.out.println(DaemonUtils.tag() + description + " interrupted.");
+            //System.out.println(DaemonUtils.tag() + description + " interrupted.");
             initLatch.clear();
             onInterruptRunnable.run();
             return false;

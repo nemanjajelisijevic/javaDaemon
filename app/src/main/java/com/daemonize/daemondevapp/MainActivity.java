@@ -17,14 +17,14 @@ import com.daemonize.androidgraphics2d.AndroidCustomHWAViewRenderer;
 import com.daemonize.androidgraphics2d.AndroidImageManager;
 import com.daemonize.androidgraphics2d.AndroidCustomHWAView;
 import com.daemonize.androidsound.AndroidSoundManager;
-import com.daemonize.game.Game;
+import com.daemonize.game.TowerDefenseGame;
 import com.daemonize.graphics2d.images.imageloader.ImageManager;
 import com.daemonize.graphics2d.renderer.Renderer2D;
 import com.daemonize.sound.SoundManager;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Game game;
+    private TowerDefenseGame towerDefenseGame;
 
     private int getPercentageValue(int percent, int hundredPercentValue) {
         return (hundredPercentValue * percent) / 100;
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }).setName("Background Music Loader").start();
 
-        game = new Game(
+        towerDefenseGame = new TowerDefenseGame(
                 renderer,
                 imageManager,
                 soundManager,
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 50
         );
 
-        game.uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
+        towerDefenseGame.uncaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 e.printStackTrace();
@@ -100,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if(!game.isRunning())
-            game.run();
+        if(!towerDefenseGame.isRunning())
+            towerDefenseGame.run();
     }
 
 
@@ -113,21 +113,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN)
-            game.onTouch(event.getX(), event.getY());
+            towerDefenseGame.onTouch(event.getX(), event.getY());
         return true;
     }
 
     @Override
     public void onResume(){
-        if (game.isRunning() && game.isPaused())
-            game.cont();
+        if (towerDefenseGame.isRunning() && towerDefenseGame.isPaused())
+            towerDefenseGame.cont();
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        if (game.isRunning() && !game.isPaused())
-            game.pause();
+        if (towerDefenseGame.isRunning() && !towerDefenseGame.isPaused())
+            towerDefenseGame.pause();
         super.onPause();
     }
 
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        game.stop();
+        towerDefenseGame.stop();
         super.onDestroy();
     }
 

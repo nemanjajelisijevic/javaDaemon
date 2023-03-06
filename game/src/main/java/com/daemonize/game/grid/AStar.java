@@ -7,6 +7,11 @@ import java.util.List;
 public class AStar extends PathFinding {
 
     @Override
+    public <T> boolean recalculate(Field<T>[][] grid, int row, int column) {
+        return false;
+    }
+
+    @Override
     public <T> boolean recalculate(Grid<T> grid) {
         Field startNode =  grid.getGrid()[grid.startPoint.getFirst()][grid.startPoint.getSecond()];
         Field endNode = grid.getGrid()[grid.endPoint.getFirst()][grid.endPoint.getSecond()];

@@ -1,5 +1,6 @@
 package com.daemonize.game;
 
+import com.daemonize.daemonengine.utils.DaemonCountingSemaphore;
 import com.daemonize.daemonengine.utils.DaemonSemaphore;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.AwaitedClosure;
@@ -18,7 +19,7 @@ import java.util.Arrays;
 
 
 @Daemon(doubleDaemonize = true, className = "EnemyDoubleDaemon", implementPrototypeInterfaces = true)
-public class Enemy extends CoordinatedImageTranslationMover implements Target<Enemy> {
+public class Enemy extends CoordinatedImageTranslationMover implements Target<Enemy> , Paralyzable<Enemy>{
 
     private ImageView view;
     private ImageView hpView;
@@ -38,11 +39,11 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     private PositionedImage hBar = new PositionedImage();
     private PositionedImage paralyzedPosImage = new PositionedImage();
 
-    public Enemy(Image[] sprite, float velocity, int hp, Pair<Float, Float> startingPos, float dXY) {
-        super(Arrays.copyOf(sprite, 1), velocity, startingPos, dXY);
+    public Enemy(Image[] sprite, int hp, Pair<Float, Float> startingPos, float dXY) {
+        super(Arrays.copyOf(sprite, 1), startingPos, dXY);
         this.hp = hp;
         this.hpMax = hp;
-        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, velocity, startingPos, dXY);
+        this.rotationMover = new RotatingSpriteImageMover(sprite, animateSemaphore, startingPos, dXY);
     }
 
     public ImageView getParalyzedView() {
@@ -115,13 +116,13 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     }
 
     @Override
-    public boolean isShootable() {
+    public boolean isAttackable() {
         return shootable;
     }
 
     @Override
-    public Enemy setShootable(boolean shootable) {
-        this.shootable = shootable;
+    public Enemy setAttackable(boolean attackable) {
+        this.shootable = attackable;
         return this;
     }
 
@@ -178,8 +179,8 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     @GenerateRunnable
     @Daemonize
     @Override
-    public void pushSprite(Image [] sprite, float velocity) throws InterruptedException {
-        rotationMover.pushSprite(sprite, velocity);
+    public void pushSprite(Image [] sprite) throws InterruptedException {
+        rotationMover.pushSprite(sprite);
     }
 
     @Daemonize
@@ -187,11 +188,47 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         rotationMover.rotate(angle);
     }
 
-    @DedicatedThread
+    @Daemonize
+    public void rotateTowards(float x, float y) throws InterruptedException {
+        rotationMover.rotate((int)RotatingSpriteImageMover.getAngle(getLastCoordinates().getFirst(), getLastCoordinates().getSecond(), x, y));
+    }
+
+    @Daemonize
+    public void rotateTowards(Pair<Float, Float> coords) throws InterruptedException {
+        rotateTowards(coords.getFirst(), coords.getSecond());
+    }
+
+    @DedicatedThread(engineName = "goTo")
     @Daemonize
     @Override
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
         return super.goTo(x, y, velocityInt);
+    }
+
+    @DedicatedThread(engineName = "goTo")
+    @Daemonize
+    public void go(float x, float y, float velocityInt) throws InterruptedException {
+        super.goTo(x, y, velocityInt);
+    }
+
+    @DedicatedThread(engineName = "goTo")
+    @Daemonize
+    public void rotAndGo(float x, float y, float velocityInt) throws InterruptedException {
+        rotateTowards(x, y);
+        goTo(x, y, velocityInt);
+    }
+
+    @DedicatedThread(engineName = "goTo")
+    @Daemonize
+    public void rotAndGo(Pair<Float, Float> coords, float velocityInt) throws InterruptedException {
+        rotateTowards(coords.getFirst(), coords.getSecond());
+        goTo(coords.getFirst(), coords.getSecond(), velocityInt);
+    }
+
+    @Daemonize
+    public void redir(float x, float y) throws InterruptedException {
+        rotateTowards(x, y);
+        super.redirect(x, y);
     }
 
     @Override
@@ -211,7 +248,6 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
     public GenericNode<Pair<PositionedImage, ImageView>> animateEnemy() throws InterruptedException {
 
         Pair<Float, Float> lastCoord = getLastCoordinates();
-
         PositionedImage enemyPosBmp = super.animate();
 
         if (enemyPosBmp == null)
@@ -235,5 +271,10 @@ public class Enemy extends CoordinatedImageTranslationMover implements Target<En
         }
 
         return root;
+    }
+
+    @Override
+    public Enemy destroy() {
+        return null;
     }
 }

@@ -11,6 +11,8 @@ public final class Pair<K, V> {
         return new Pair<>(first, second);
     }
 
+    public Pair(){}
+
     private Pair(K first, V second) {
         this.first = first;
         this.second = second;
@@ -34,14 +36,14 @@ public final class Pair<K, V> {
         return second;
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (!(o instanceof Pair)) {
-//            return false;
-//        }
-//        Pair<?, ?> p = (Pair<?, ?>) o;
-//        return Objects.equals(p.first, first) && Objects.equals(p.second, second);
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Pair)) {
+            return false;
+        }
+        Pair<?, ?> p = (Pair<?, ?>) o;
+        return Objects.equals(p.first, first) && Objects.equals(p.second, second);
+    }
 //
 //    @Override
 //    public int hashCode() {
@@ -50,6 +52,6 @@ public final class Pair<K, V> {
 
     @Override
     public String toString() {
-        return "Pair{" + String.valueOf(first) + " " + String.valueOf(second) + "}";
+        return "Pair{" + String.valueOf(first) + ", " + String.valueOf(second) + "}";
     }
 }

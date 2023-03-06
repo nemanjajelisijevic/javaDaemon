@@ -1,0 +1,32 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project (':daemonengine')
+    implementation project (':daemonprocessor')
+    annotationProcessor project(':daemonprocessor')
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"
+
+
+def daemonsSource = "/generated/daemons"
+
+compileJava {
+    options.compilerArgs << "-s"
+    options.compilerArgs << "$buildDir$daemonsSource"
+
+    doFirst {
+        // make sure that directory exists
+        file(new File(buildDir, daemonsSource)).mkdirs()
+    }
+}
+
+sourceSets {
+    generated {
+        java {
+            srcDir "$buildDir$daemonsSource"
+        }
+    }
+}

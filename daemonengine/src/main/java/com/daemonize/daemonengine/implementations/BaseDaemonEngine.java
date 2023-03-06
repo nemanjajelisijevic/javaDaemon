@@ -78,7 +78,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
 
     protected void loop(){
 
-        System.out.println(DaemonUtils.tag() + "Daemon engine started!");
+        //System.out.println(DaemonUtils.tag() + "Daemon engine started!");
 
         BaseQuest currentQuest;
 
@@ -95,7 +95,7 @@ public abstract class BaseDaemonEngine<D extends BaseDaemonEngine> implements Da
         }
 
         cleanUp();
-        System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
+        //System.out.println(DaemonUtils.tag() + "Daemon engine stopped!");
         setDaemonState(STOPPED);
     }
 

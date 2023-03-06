@@ -37,6 +37,11 @@ public interface ImageMover extends Movable {
             clone.positionY = this.positionY;
             return clone;
         }
+
+        @Override
+        public String toString() {
+            return "PositionedImage - x: " + positionX + ", y: " + positionY + ", Image: " + image.getImageImp().toString();
+        }
     }
 
     class Direction {
@@ -63,13 +68,11 @@ public interface ImageMover extends Movable {
 
     boolean setDirectionToPoint(float x, float y);
 
-    boolean setDirectionAndMove(float x, float y, float velocityInt);
+    //boolean setDirectionAndMove(float x, float y);
 
     void setVelocity(float velocity);
 
-    <I extends ImageMover> I setBorders(float x1, float x2, float y1, float y2);
-
     @SideQuest(SLEEP = 25)
     PositionedImage animate() throws InterruptedException;
-
+    
 }

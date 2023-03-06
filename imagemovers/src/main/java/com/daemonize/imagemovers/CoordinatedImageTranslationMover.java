@@ -1,5 +1,6 @@
 package com.daemonize.imagemovers;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.daemonprocessor.annotations.Daemonize;
 import com.daemonize.graphics2d.images.Image;
@@ -27,13 +28,21 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
         return Pair.create(targetX, targetY);
     }
 
-    public  CoordinatedImageTranslationMover(
+    public CoordinatedImageTranslationMover(
             Image [] sprite,
-            float velocity,
             Pair<Float, Float> startingPos,
             float dXY
     ) {
-        super(sprite, velocity, startingPos, dXY);
+        super(sprite, startingPos, dXY);
+        setTargetCoordinates(Float.NaN, Float.NaN);
+    }
+
+    public CoordinatedImageTranslationMover(
+            Image startImage,
+            Pair<Float, Float> startingPos,
+            float dXY
+    ) {
+        this(new Image[]{startImage}, startingPos, dXY);
     }
 
     public boolean redirect(float x, float y) {
@@ -44,24 +53,28 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
     @Daemonize
     public boolean goTo(float x, float y, float velocityInt) throws InterruptedException {
 
-        if (!super.setDirectionAndMove(x, y, velocityInt))
+        if (!super.setDirectionToPoint(x, y))
             return false;
 
         coordinateLock.lock();
         setTargetCoordinates(x, y);
-
-        animateSemaphore.subscribe();
+        setVelocity(velocityInt);
 
         try {
             while (!coordinatesReached)
                 coordinateReachedCondition.await();
         } finally {
             coordinatesReached = false;
-            animateSemaphore.unsubscribe();
+            setVelocity(0);
             coordinateLock.unlock();
         }
 
         return true;
+    }
+
+    @Daemonize
+    public boolean goTo(Pair<Float, Float> coords, float velocity) throws InterruptedException {
+        return goTo(coords.getFirst(), coords.getSecond(), velocity);
     }
 
     @Override
@@ -79,13 +92,13 @@ public class CoordinatedImageTranslationMover extends CachedArraySpriteImageMove
                 && Math.abs(ret.positionY - targetY)  <= velocity.intensity * getdXY()) {
             coordinateLock.lock();
             coordinatesReached = true;
-            setTargetCoordinates(Float.NaN, Float.NaN);
-            coordinateReachedCondition.signal();
+            ret.positionX = targetX;
+            ret.positionY = targetY;
+            setCoordinates(targetX, targetY);
+            coordinateReachedCondition.signalAll();
             coordinateLock.unlock();
-            return null;
         }
 
         return ret;
     }
-
 }

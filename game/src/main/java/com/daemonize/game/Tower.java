@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 @Daemon(doubleDaemonize = true, implementPrototypeInterfaces = true)
-public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Shooter {
+public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Shooter, Paralyzable<Tower> {
 
     public static class TowerLevel {
 
@@ -70,7 +70,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         public boolean test(Target target);
     }
 
-    protected TargetTester targetTester = target -> (target.isShootable()
+    protected TargetTester targetTester = target -> (target.isAttackable()
             && ImageTranslationMover.absDistance(
                     target.getLastCoordinates().getFirst(),
                     target.getLastCoordinates().getSecond(),
@@ -80,7 +80,7 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     );
 
     public Tower(Image[] rotationSprite, Image[] healthBarImage, Pair<Float, Float> startingPos, float range, TowerType type, float dXY, int hp) {
-        super(rotationSprite, rotationSprite[18], 0, startingPos, dXY);
+        super(rotationSprite, rotationSprite[18], startingPos, dXY);
         this.ret.positionX = startingPos.getFirst();
         this.ret.positionY = startingPos.getSecond();
         this.range = range;
@@ -106,8 +106,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     public Tower setHp(int hp) {
-        if (hp <= hpMax)
-            this.hp = hp;
+//        if (hp <= hpMax)
+//            this.hp = hp;
         return this;
     }
 
@@ -126,13 +126,13 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     @Override
-    public boolean isShootable() {
+    public boolean isAttackable() {
         return shootable;
     }
 
     @Override
-    public Tower setShootable(boolean shootable) {
-        this.shootable = shootable;
+    public Tower setAttackable(boolean attackable) {
+        this.shootable = attackable;
         return this;
     }
 
@@ -199,8 +199,8 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     @Daemonize
     @GenerateRunnable
     @Override
-    public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
-        super.pushSprite(sprite, velocity);
+    public void pushSprite(Image[] sprite) throws InterruptedException {
+        super.pushSprite(sprite);
     }
 
     public void addTarget(Target target) {
@@ -243,8 +243,10 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
     }
 
     protected void rotateTo(Target target) throws InterruptedException {
-        if (target.isShootable())
+        if (target.isAttackable())
             rotateTowards(
+                    getLastCoordinates().getFirst(),
+                    getLastCoordinates().getSecond(),
                     target.getLastCoordinates().getFirst(),
                     target.getLastCoordinates().getSecond()
             );
@@ -353,16 +355,23 @@ public class Tower extends RotatingSpriteImageMover implements Target<Tower>, Sh
         String ret =  towerLevel.toString()
                     + "\nTowerType: " + towertype
                     + "\nCurrent hp: " + hp + ", Max hp: " + hpMax
+                    + "\nCoords - X: " + getLastCoordinates().getFirst() + ", Y: " + getLastCoordinates().getSecond()
                     + "\nShootable: " + shootable
                     + "\nRange: " + range
                     + "\nTarget available: " + Boolean.toString(this.target != null)
                     + "\nTargetLock: " + targetLock.toString()
                     + "\nTargetCondition: " + targetCondition.toString()
-                    + "\nTarget: shootable: " + ((target != null) ? Boolean.toString(target.isShootable()) : "NULL")
+                    + "\nTarget: shootable: " + ((target != null) ? Boolean.toString(target.isAttackable()) : "NULL")
                     + ", Coord X: " + ((target != null) ? Float.toString(target.getLastCoordinates().getFirst()) : "NULL")
                     + ", Coord Y: " + ((target != null) ? Float.toString(target.getLastCoordinates().getSecond()) : "NULL")
                     + "\nAnimateSemaphore: " + animateSemaphore.toString();
         targetLock.unlock();
         return ret;
     }
+
+    @Override
+    public Tower destroy() {
+        return null;
+    }
 }
+

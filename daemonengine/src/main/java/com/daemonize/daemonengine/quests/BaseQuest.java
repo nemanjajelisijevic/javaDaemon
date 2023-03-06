@@ -59,6 +59,7 @@ public abstract class BaseQuest<T, Q extends BaseQuest<T, Q>> implements Quest<T
   }
 
   public boolean setErrorAndUpdate(Exception error) {
+    error.printStackTrace();//TODO DEV
     return consumer.consume(returnRunnable.setError(error, description));
   }
 

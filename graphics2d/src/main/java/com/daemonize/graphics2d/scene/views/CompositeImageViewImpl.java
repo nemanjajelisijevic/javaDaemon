@@ -1,6 +1,7 @@
 package com.daemonize.graphics2d.scene.views;
 
 import com.daemonize.graphics2d.images.Image;
+import com.daemonize.graphics2d.scene.SceneDrawer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.Map;
 
 public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl> {
 
-    private ImageViewImpl view;
+    protected ImageViewImpl view;
 
     protected List<CompositeImageViewImpl> childrenViews;
     private boolean isRoot = false;
@@ -80,12 +81,12 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
     }
 
     @Override
-    public float getStartingX() {
+    public float getRenderingX() {
         return view.startingX;
     }
 
     @Override
-    public float getStartingY() {
+    public float getRenderingY() {
         return view.startingY;
     }
 
@@ -192,7 +193,7 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
         view.absoluteX = absoluteX;
         view.startingX = absoluteX - view.xOffset;
         for(CompositeImageViewImpl child : childrenViews) {
-            child.setAbsoluteX(this.getStartingX() + child.getRelativeX());
+            child.setAbsoluteX(this.getRenderingX() + child.getRelativeX());
         }
         return this;
     }
@@ -202,7 +203,7 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
         view.absoluteY = absoluteY;
         view.startingY = absoluteY - view.yOffset;
         for(CompositeImageViewImpl child : childrenViews) {
-            child.setAbsoluteY(this.getStartingY() + child.getRelativeY());
+            child.setAbsoluteY(this.getRenderingY() + child.getRelativeY());
         }
         return this;
     }
@@ -235,19 +236,19 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
     public void addChild(CompositeImageViewImpl child) {
         if(child.isRoot)
             throw new IllegalArgumentException("Can not add a child view that is root. Please use non root constructor for this child view(" + child.getName() + ")");
-        child.setAbsoluteX((view.startingX + child.getRelativeX()));//TODO check this -- need this because of root child
-        child.setAbsoluteY((view.startingY + child.getRelativeY()));//TODO check this
+        child.setAbsoluteX((view.getRenderingX() + child.getRelativeX()));//TODO check this -- need this because of root child
+        child.setAbsoluteY((view.getRenderingX() + child.getRelativeY()));//TODO check this
         child.setZindex(this.getZindex() + 1);
         this.addCh(child);
     }
 
     private void addCh(CompositeImageViewImpl newChild) {
         for (CompositeImageViewImpl child : this.childrenViews){
-            if (child.checkRootCoordinates(newChild.getStartingX(), newChild.getStartingY())){
-                newChild.setRelativeX(newChild.getRelativeX() - (child.getStartingX() - this.view.startingX));
-                newChild.setRelativeY(newChild.getRelativeY() - (child.getStartingY() - this.view.startingY));
-                newChild.setAbsoluteX((child.getStartingX() + newChild.getRelativeX()));//TODO check this reson to stay duble check
-                newChild.setAbsoluteY((child.getStartingY() + newChild.getRelativeY()));//TODO check this
+            if (child.checkRootCoordinates(newChild.getRenderingX(), newChild.getRenderingY())){
+                newChild.setRelativeX(newChild.getRelativeX() - (child.getRenderingX() - this.view.getRenderingX()));
+                newChild.setRelativeY(newChild.getRelativeY() - (child.getRenderingY() - this.view.getRenderingY()));
+                newChild.setAbsoluteX((child.getRenderingX() + newChild.getRelativeX()));//TODO check this reson to stay duble check
+                newChild.setAbsoluteY((child.getRenderingY() + newChild.getRelativeY()));//TODO check this
                 newChild.setZindex(child.getZindex() + 1);
                 child.addCh(newChild);
                 return;
@@ -272,8 +273,8 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
     }
 
     private boolean checkRootCoordinates(float x, float y) {
-        if (x > getStartingX() && x < getEndX()) {
-            if (y > getStartingY() && y < getEndY())
+        if (x > getRenderingX() && x < getEndX()) {
+            if (y > getRenderingY() && y < getEndY())
                 return true;
         }
         return false;
@@ -325,4 +326,14 @@ public class CompositeImageViewImpl implements ImageView<CompositeImageViewImpl>
         }
         return compositeImageView;
     }
+
+    @Override
+    public void draw(SceneDrawer sceneDrawer) {
+        if (isShowing()) {
+            sceneDrawer.drawView(this);
+            for(CompositeImageViewImpl child : childrenViews)
+                child.draw(sceneDrawer);
+        }
+    }
 }
+

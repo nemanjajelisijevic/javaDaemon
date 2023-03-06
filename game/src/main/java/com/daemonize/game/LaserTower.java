@@ -30,7 +30,7 @@ public class LaserTower extends Tower {
         super(rotationSprite, healthBarSprite, startingPos, range, type, dXY, hp);
         this.renderer = renderer;
         this.updateRunnable.setClosure(updateClosure);
-        this.targetTester = target -> target.isShootable()
+        this.targetTester = target -> target.isAttackable()
                 && ImageTranslationMover.absDistance(
                      target.getLastCoordinates().getFirst(),
                      target.getLastCoordinates().getSecond(),
@@ -47,9 +47,9 @@ public class LaserTower extends Tower {
     }
 
     @Override
-    public void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
+    public void pushSprite(Image[] sprite) throws InterruptedException {
         animateFollowTarget = false;
-        super.pushSprite(sprite, velocity);
+        super.pushSprite(sprite);
         animateFollowTarget = true;
     }
 

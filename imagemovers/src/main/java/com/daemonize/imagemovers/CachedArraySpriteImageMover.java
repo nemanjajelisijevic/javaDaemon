@@ -1,5 +1,6 @@
 package com.daemonize.imagemovers;
 
+import com.daemonize.daemonengine.utils.DaemonUtils;
 import com.daemonize.daemonengine.utils.Pair;
 import com.daemonize.graphics2d.images.Image;
 
@@ -8,8 +9,8 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
 
     protected AwaitedArraySprite cache = new AwaitedArraySprite();
 
-    public synchronized void pushSprite(Image[] sprite, float velocity) throws InterruptedException {
-        this.velocity.intensity = velocity;
+    public synchronized void pushSprite(Image[] sprite) throws InterruptedException {
+
         cache.clearCache();
         cache.setSprite(sprite);
         setSprite(new Image[]{sprite[sprite.length - 1]});
@@ -34,7 +35,7 @@ public class CachedArraySpriteImageMover extends ImageTranslationMover {
             return super.iterateSprite();
     }
 
-    public CachedArraySpriteImageMover(Image [] sprite, float velocity, Pair<Float, Float> startingPos, float dXY) {
-        super(sprite, velocity, startingPos, dXY);
+    public CachedArraySpriteImageMover(Image [] sprite, Pair<Float, Float> startingPos, float dXY) {
+        super(sprite, startingPos, dXY);
     }
 }

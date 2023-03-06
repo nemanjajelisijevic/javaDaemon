@@ -26,4 +26,9 @@ public class AndroidImageManager implements ImageManager {
     public Image rescaleImage(Image image, int width, int height) {
         return new AndroidBitmapImage(Bitmap.createScaledBitmap((Bitmap)image.getImageImp(), width, height, false));
     }
+
+    @Override
+    public Image[] loadSheet(String name, int rows, int columns, int pieceWidth, int pieceHeight) throws IOException {
+        return new Image[0];
+    }
 }

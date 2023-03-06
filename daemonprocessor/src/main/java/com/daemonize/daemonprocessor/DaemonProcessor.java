@@ -84,6 +84,12 @@ public class DaemonProcessor extends AbstractProcessor {
                                 BaseDaemonGenerator.getPublicClassMethodsWithBaseClasses(classElement) :
                                 BaseDaemonGenerator.getPublicClassMethods(classElement);
 
+                int daemonized = 0;
+
+                for (ExecutableElement method : publicPrototypeMethods)
+                    if(method.getAnnotation(Daemonize.class) != null)
+                        daemonized++;
+
                 List<Pair<ExecutableElement, SideQuest>> sideQuestMethods =
                         BaseDaemonGenerator.getSideQuestMethods(publicPrototypeMethods);
 
@@ -111,7 +117,7 @@ public class DaemonProcessor extends AbstractProcessor {
                 } else {
 
                     if(publicPrototypeMethods.size() == sideQuestMethods.size()) {
-
+                    //if(daemonized > 0) {
                         generator = new SideQuestDaemonGenerator(((TypeElement) classElement));
 
                     } else if (publicPrototypeMethods.size() > sideQuestMethods.size()) {
